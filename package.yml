@@ -1,0 +1,26 @@
+package: jblock
+version: '1.0.0-dev'
+name: JBlock
+author: Friends Of REDAXO
+supportpage: https://github.com/FriendsOfREDAXO/JBlock
+
+page:
+    title: 'translate:title'
+    pjax: true
+    perm: jblock[]
+#    subpages:
+#        overview: { title: 'translate:overview' }
+#        demo:
+#            title: 'translate:referenz_demo'
+#            subpages:
+#                demo_base: { title: 'translate:demo_base' }
+#                demo_extended: { title: 'translate:demo_extended' }
+#                demo_expert: { title: 'translate:demo_expert' }
+    subpages:
+        overview: { title: 'translate:overview' }
+        index: { title: 'translate:slice_json_block' }
+        json_value: { title: 'translate:rex_json_value' }
+        generate_media: { title: 'translate:generate_media' }
+
+requires:
+    redaxo: '^5.0.0'

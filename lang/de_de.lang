@@ -1,0 +1,7 @@
+slice_modul = Module/Slices erweitern
+slice_json_block = JSON Block
+generate_media = Media-Button generieren
+rex_json_value = REX_JSON_VALUE[0-20]
+slice_json_block_json_help = JSON Beispiel
+
+perm_options_slice_ui[json] = Slice JSON Form
