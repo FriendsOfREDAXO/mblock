@@ -1,0 +1,55 @@
+.jblock_wrapper {
+    margin: auto;
+    padding: 0;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.jblock_wrapper > div {
+    border: 1px solid #e1e1e1;
+    background: #F6F6F6;
+    color: #1C94C4;
+    margin: 5px;
+    padding: 15px 20px 15px 25px;
+    position: relative;
+}
+.jblock_wrapper span.sorthandle {
+    cursor: move;
+    position:absolute;
+    opacity: 0.5;
+    top:5px;
+    bottom:5px;
+    left:3px;
+    width:8px;
+    background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAB3RJTUUH3wIDBycZ/Cj09AAAAAlwSFlzAAALEgAACxIB0t1+/AAAAARnQU1BAACxjwv8YQUAAAAWSURBVHjaY2DABhoaGupBGMRmYiAEAKo2BAFbROu9AAAAAElFTkSuQmCC');
+}
+.jblock_wrapper span.sorthandle:hover {
+    opacity: 0.8;
+}
+
+div.sortable-ghost {
+    border: 1px dashed #CCC;
+    opacity: 0.4;
+}
+.jblock_wrapper span.removeadded {
+    position: absolute;
+    padding: 5px;
+    right: 0;
+    top: 0;
+}
+
+
+.jblock_wrapper > div:before,
+.jblock_wrapper > div:after { /* for modern browsers *!*/
+    content:"";
+    display:table;
+}
+.jblock_wrapper > div:after {
+    clear:both;
+}
+.jblock_wrapper > div { /* for IE6,7 */
+    zoom:1;
+}
