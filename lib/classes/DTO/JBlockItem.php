@@ -24,6 +24,11 @@ class JBlockItem
     public $valueId;
 
     /**
+     * @var integer
+     */
+    public $systemId;
+
+    /**
      * @var string
      */
     public $form;
@@ -80,6 +85,22 @@ class JBlockItem
     {
         $this->valueId = $valueId;
         return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSystemId()
+    {
+        return $this->systemId;
+    }
+
+    /**
+     * @param int $systemId
+     */
+    public function setSystemId($systemId)
+    {
+        $this->systemId = $systemId;
     }
 
     /**
