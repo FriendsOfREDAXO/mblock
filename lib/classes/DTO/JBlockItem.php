@@ -31,10 +31,16 @@ class JBlockItem
     /**
      * @var string
      */
+    public $systemName;
+
+    /**
+     * @var string
+     */
     public $form;
 
     /**
      * @return array
+     * @author Joachim Doerr
      */
     public function getResult()
     {
@@ -43,7 +49,8 @@ class JBlockItem
 
     /**
      * @param array $result
-     * @return $this
+     * @return JBlockItem
+     * @author Joachim Doerr
      */
     public function setResult($result)
     {
@@ -53,6 +60,7 @@ class JBlockItem
 
     /**
      * @return int
+     * @author Joachim Doerr
      */
     public function getId()
     {
@@ -61,7 +69,8 @@ class JBlockItem
 
     /**
      * @param int $id
-     * @return $this
+     * @return JBlockItem
+     * @author Joachim Doerr
      */
     public function setId($id)
     {
@@ -71,6 +80,7 @@ class JBlockItem
 
     /**
      * @return int
+     * @author Joachim Doerr
      */
     public function getValueId()
     {
@@ -79,7 +89,8 @@ class JBlockItem
 
     /**
      * @param int $valueId
-     * @return $this
+     * @return JBlockItem
+     * @author Joachim Doerr
      */
     public function setValueId($valueId)
     {
@@ -89,6 +100,7 @@ class JBlockItem
 
     /**
      * @return int
+     * @author Joachim Doerr
      */
     public function getSystemId()
     {
@@ -97,14 +109,38 @@ class JBlockItem
 
     /**
      * @param int $systemId
+     * @return JBlockItem
+     * @author Joachim Doerr
      */
     public function setSystemId($systemId)
     {
         $this->systemId = $systemId;
+        return $this;
     }
 
     /**
      * @return string
+     * @author Joachim Doerr
+     */
+    public function getSystemName()
+    {
+        return $this->systemName;
+    }
+
+    /**
+     * @param string $systemName
+     * @return JBlockItem
+     * @author Joachim Doerr
+     */
+    public function setSystemName($systemName)
+    {
+        $this->systemName = $systemName;
+        return $this;
+    }
+
+    /**
+     * @return string
+     * @author Joachim Doerr
      */
     public function getForm()
     {
@@ -113,11 +149,13 @@ class JBlockItem
 
     /**
      * @param string $form
-     * @return $this
+     * @return JBlockItem
+     * @author Joachim Doerr
      */
     public function setForm($form)
     {
         $this->form = $form;
         return $this;
     }
+
 }
