@@ -8,6 +8,11 @@
 
 class JBlockFormItemDecorator
 {
+    /**
+     * @param JBlockItem $item
+     * @return String
+     * @author Joachim Doerr
+     */
     static public function decorateFormItem(JBlockItem $item)
     {
         $document = phpQuery::newDocumentHTML($item->getForm());
@@ -73,11 +78,15 @@ class JBlockFormItemDecorator
                 }
             }
         }
-
         // return the manipulated html output
         return $document->htmlOuter();
     }
 
+    /**
+     * @param DOMElement $dom
+     * @param JBlockItem $item
+     * @author Joachim Doerr
+     */
     protected static function changeName(DOMElement $dom, JBlockItem $item)
     {
         // replace attribute id
@@ -85,6 +94,11 @@ class JBlockFormItemDecorator
         if ($matches) $dom->setAttribute('name', str_replace($matches[0], '][' . $item->getId() . '][', $dom->getAttribute('name')));
     }
 
+    /**
+     * @param DOMElement $dom
+     * @param JBlockItem $item
+     * @author Joachim Doerr
+     */
     protected static function changeValue(DOMElement $dom, JBlockItem $item)
     {
         // get value key by name
@@ -104,6 +118,11 @@ class JBlockFormItemDecorator
         }
     }
 
+    /**
+     * @param DOMElement $dom
+     * @param JBlockItem $item
+     * @author Joachim Doerr
+     */
     protected static function changeChecked(DOMElement $dom, JBlockItem $item)
     {
         // get value key by name
@@ -121,6 +140,12 @@ class JBlockFormItemDecorator
         }
     }
 
+    /**
+     * @param DOMElement $select
+     * @param DOMElement $option
+     * @param JBlockItem $item
+     * @author Joachim Doerr
+     */
     protected static function changeOptionSelect(DOMElement $select, DOMElement $option, JBlockItem $item)
     {
         // get value key by name
@@ -128,7 +153,7 @@ class JBlockFormItemDecorator
 
         if ($matches) {
             // unset select
-            if ($option->getAttribute('selected')) {
+            if ($option->hasAttribute('selected')) {
                 $option->removeAttribute('selected');
             }
             // set select by value = result
@@ -138,6 +163,13 @@ class JBlockFormItemDecorator
         }
     }
 
+    /**
+     * @param phpQueryObject $document
+     * @param DOMElement $dom
+     * @param JBlockItem $item
+     * @return bool
+     * @author Joachim Doerr
+     */
     protected static function changeForId(phpQueryObject $document, DOMElement $dom, JBlockItem $item)
     {
         // get input id
@@ -160,8 +192,14 @@ class JBlockFormItemDecorator
                 }
             }
         }
+        return true;
     }
 
+    /**
+     * @param DOMElement $dom
+     * @return mixed
+     * @author Joachim Doerr
+     */
     protected static function getName(DOMElement $dom)
     {
         preg_match('/^.*?\[(\w+)\]$/i', $dom->getAttribute('name'), $matches);

@@ -8,6 +8,11 @@
  */
 class JBlockSystemButtonReplacer extends JBlockFormItemDecorator
 {
+    /**
+     * @param JBlockItem $item
+     * @return String
+     * @author Joachim Doerr
+     */
     public static function replaceNameId(JBlockItem $item)
     {
         $document = phpQuery::newDocumentHTML($item->getForm());
@@ -33,6 +38,7 @@ class JBlockSystemButtonReplacer extends JBlockFormItemDecorator
             foreach ($matches as $match) {
                 // replace name
                 self::replaceName($match, $item, 'REX_INPUT_MEDIALIST');
+                // label for and id change
                 self::changeForId($document, $match, $item, false);
             }
         }
@@ -43,10 +49,10 @@ class JBlockSystemButtonReplacer extends JBlockFormItemDecorator
         if ($matches) {
             /** @var DOMElement $match */
             foreach ($matches as $match) {
-                // replace name
+                // label for and id change
                 self::changeForId($document, $match, $item);
 
-                self::addSelectOptions($match, $item);
+                self::addMediaSelectOptions($match, $item);
             }
         }
 
@@ -55,6 +61,14 @@ class JBlockSystemButtonReplacer extends JBlockFormItemDecorator
         return $document->htmlOuter();
     }
 
+    /**
+     * @param phpQueryObject $document
+     * @param DOMElement $dom
+     * @param JBlockItem $item
+     * @param bool $replaceButtons
+     * @author Joachim Doerr
+     * @return bool
+     */
     protected static function changeForId(phpQueryObject $document, DOMElement $dom, JBlockItem $item, $replaceButtons = true)
     {
         // get input id
@@ -78,20 +92,46 @@ class JBlockSystemButtonReplacer extends JBlockFormItemDecorator
                 }
             }
         }
+        return true;
     }
 
+    /**
+     * @param DOMElement $dom
+     * @param JBlockItem $item
+     * @param $name
+     * @author Joachim Doerr
+     */
     protected static function replaceName(DOMElement $dom, JBlockItem $item, $name)
     {
         $matches = self::getName($dom);
         if ($matches) {
-            $item->setSystemId($matches[1]);
+            $item->setSystemId($matches[1])
+                ->setSystemName($name);
             // replace
             $dom->setAttribute('name', str_replace(array($name, '[' . $item->getSystemId() . ']'), array('REX_INPUT_VALUE', '[' . $item->getValueId() . '][0][' . $name . '_' . $item->getSystemId() . ']'), $dom->getAttribute('name')));
         }
     }
 
-    protected static function addSelectOptions(DOMElement $dom, JBlockItem $item)
+    /**
+     * @param DOMElement $dom
+     * @param JBlockItem $item
+     * @author Joachim Doerr
+     */
+    protected static function addMediaSelectOptions(DOMElement $dom, JBlockItem $item)
     {
+        if (is_array($item->getResult()) && array_key_exists($item->getSystemName() . '_' . $item->getSystemId(), $item->getResult())) {
 
+            $resultItems = explode(',',$item->getResult()[$item->getSystemName() . '_' . $item->getSystemId()]);
+
+            foreach ($resultItems as $resultItem) {
+                $dom->appendChild(new DOMElement('option', $resultItem));
+            }
+
+            /** @var DOMElement $child */
+            foreach ($dom->childNodes as $child) {
+                $child->setAttribute('value', $child->nodeValue);
+                $child->removeAttribute('selected');
+            }
+        }
     }
 }
