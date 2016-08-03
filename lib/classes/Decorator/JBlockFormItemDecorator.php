@@ -78,14 +78,14 @@ class JBlockFormItemDecorator
         return $document->htmlOuter();
     }
 
-    static protected function changeName(DOMElement $dom, JBlockItem $item)
+    protected static function changeName(DOMElement $dom, JBlockItem $item)
     {
         // replace attribute id
         preg_match('/\]\[\d+\]\[/', $dom->getAttribute('name'), $matches);
         if ($matches) $dom->setAttribute('name', str_replace($matches[0], '][' . $item->getId() . '][', $dom->getAttribute('name')));
     }
 
-    static protected function changeValue(DOMElement $dom, JBlockItem $item)
+    protected static function changeValue(DOMElement $dom, JBlockItem $item)
     {
         // get value key by name
         $matches = self::getName($dom);
@@ -104,7 +104,7 @@ class JBlockFormItemDecorator
         }
     }
 
-    static protected function changeChecked(DOMElement $dom, JBlockItem $item)
+    protected static function changeChecked(DOMElement $dom, JBlockItem $item)
     {
         // get value key by name
         $matches = self::getName($dom);
@@ -121,7 +121,7 @@ class JBlockFormItemDecorator
         }
     }
 
-    static protected function changeOptionSelect(DOMElement $select, DOMElement $option, JBlockItem $item)
+    protected static function changeOptionSelect(DOMElement $select, DOMElement $option, JBlockItem $item)
     {
         // get value key by name
         $matches = self::getName($select);
@@ -138,7 +138,7 @@ class JBlockFormItemDecorator
         }
     }
 
-    static protected function changeForId(phpQueryObject $document, DOMElement $dom, JBlockItem $item)
+    protected static function changeForId(phpQueryObject $document, DOMElement $dom, JBlockItem $item)
     {
         // get input id
         $id = $dom->getAttribute('id');
@@ -162,7 +162,7 @@ class JBlockFormItemDecorator
         }
     }
 
-    static protected function getName(DOMElement $dom)
+    protected static function getName(DOMElement $dom)
     {
         preg_match('/^.*?\[(\w+)\]$/i', $dom->getAttribute('name'), $matches);
         return $matches;

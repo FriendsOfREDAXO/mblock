@@ -14,7 +14,7 @@ class JBlockParser
      * @return mixed
      * @author Joachim Doerr
      */
-    static public function parseElement(JBlockElement $element, $templateType)
+    public static function parseElement(JBlockElement $element, $templateType)
     {
         return str_replace(
             array_merge(array(' />'),$element->getKeys()),

@@ -13,7 +13,7 @@ class JBlockTemplateFileProvider
      * @return string
      * @author Joachim Doerr
      */
-    static public function loadTemplate($templateType)
+    public static function loadTemplate($templateType)
     {
         // set theme path to load type template file
         $path = rex_path::addonData('jBlock', 'templates/default_theme/');

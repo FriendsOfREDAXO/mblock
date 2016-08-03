@@ -12,7 +12,7 @@ class JBlockValueHandler
      * @return array
      * @author Joachim Doerr
      */
-    static public function loadRexVars()
+    public static function loadRexVars()
     {
         $sliceId = rex_request('slice_id', 'int', false);
         $result = array();

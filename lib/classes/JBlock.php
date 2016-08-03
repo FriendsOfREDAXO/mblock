@@ -14,24 +14,24 @@ class JBlock
     /**
      * @var array
      */
-    static private $items = array();
+    private static $items = array();
 
     /**
      * @var array
      */
-    static private $result;
+    private static $result;
 
     /**
      * @var array
      */
-    static private $output = array();
+    private static $output = array();
 
     /**
      * @param $id
      * @param $form
      * @return mixed
      */
-    static public function show($id, $form)
+    public static function show($id, $form)
     {
         // load rex value by id
         self::$result = JBlockValueHandler::loadRexVars();
@@ -57,8 +57,16 @@ class JBlock
         // foreach rex value json items
         /** @var JBlockItem $item */
         foreach (static::$items as $item) {
+//            echo '<pre>';
+//            print_r($item);
+//            echo '</pre>';
+
+            $item->setForm(JBlockSystemButtonReplacer::replaceNameId($item));
+
             // decorate item form
-            if ($item->getResult()) $item->setForm(JBlockFormItemDecorator::decorateFormItem($item));
+            if ($item->getResult()) {
+                $item->setForm(JBlockFormItemDecorator::decorateFormItem($item));
+            }
 
             // parse form item
             $element = new JBlockElement();
