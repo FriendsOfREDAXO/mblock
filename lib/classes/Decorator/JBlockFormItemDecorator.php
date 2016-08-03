@@ -179,6 +179,10 @@ class JBlockFormItemDecorator
             return false;
         }
 
+        if (strpos($id, 'REX_LINK') !== false) {
+            return false;
+        }
+
         $dom->setAttribute('id', $id . '_' . $item->getId());
         // find label with for
         $matches = $document->find('label');
