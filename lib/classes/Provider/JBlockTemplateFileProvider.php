@@ -16,8 +16,8 @@ class JBlockTemplateFileProvider
     public static function loadTemplate($templateType)
     {
         // set theme path to load type template file
-        $path = rex_path::addonData('jBlock', 'templates/default_theme/');
-        $file = "jBlock_$templateType.ini"; // create file name
+        $path = rex_path::addonData('jblock', 'templates/default_theme/');
+        $file = "jblock_$templateType.ini"; // create file name
 
         // to print without template
         $templateString = '<jblock:output/><jblock:form/>';
