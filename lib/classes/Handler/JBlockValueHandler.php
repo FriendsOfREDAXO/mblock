@@ -1,7 +1,6 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: joachimdoerr
+ * Author: Joachim Doerr
  * Date: 30.07.16
  * Time: 22:38
  */
@@ -16,6 +15,10 @@ class JBlockValueHandler
     {
         $sliceId = rex_request('slice_id', 'int', false);
         $result = array();
+
+        if (rex_get('function') == 'add') {
+            return $result;
+        }
 
         if ($sliceId != false) {
             $table = rex::getTablePrefix() . 'article_slice';
