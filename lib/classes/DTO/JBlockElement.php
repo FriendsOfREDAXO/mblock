@@ -1,11 +1,10 @@
 <?php
-
 /**
- * Created by PhpStorm.
- * User: joachimdoerr
+ * Author: Joachim Doerr
  * Date: 30.07.16
  * Time: 22:37
  */
+
 class JBlockElement
 {
     const KEY = "<jblock:%s/>";

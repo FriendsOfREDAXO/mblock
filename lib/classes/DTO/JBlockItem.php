@@ -1,7 +1,6 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: joachimdoerr
+ * Author: Joachim Doerr
  * Date: 31.07.16
  * Time: 08:34
  */
