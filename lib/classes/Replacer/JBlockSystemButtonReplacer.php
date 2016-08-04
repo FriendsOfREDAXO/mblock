@@ -1,61 +1,56 @@
 <?php
-
 /**
- * Created by PhpStorm.
- * User: joachimdoerr
+ * Author: Joachim Doerr
  * Date: 01.08.16
  * Time: 20:43
  */
-class JBlockSystemButtonReplacer extends JBlockFormItemDecorator
+
+class JBlockSystemButtonReplacer
 {
     /**
      * @param JBlockItem $item
      * @return String
      * @author Joachim Doerr
      */
-    public static function replaceNameId(JBlockItem $item)
+    public static function replaceSystemButtons(JBlockItem $item)
     {
+        // set phpquery document
         $document = phpQuery::newDocumentHTML($item->getForm());
 
-        // find input
-        $matches = $document->find('.rex-js-widget-media input');
-
-        if ($matches) {
+        // find input group
+        if ($matches = $document->find('div.input-group')) {
             /** @var DOMElement $match */
             foreach ($matches as $match) {
-                // replace name
-                self::replaceName($match, $item, 'REX_INPUT_MEDIA');
-                // label for and id change
-                self::changeForId($document, $match, $item);
+                if ($match->hasChildNodes()) {
+                    /** @var DOMElement $child */
+                    foreach ($match->getElementsByTagName('input') as $child) {
+                        if ($child instanceof DOMElement) {
+                            // set id and name
+                            $id = $child->getAttribute('id');
+                            $name = $child->getAttribute('name');
+
+                            // process by type
+                            if (strpos($id, 'REX_MEDIA_') !== false) {
+                                // media button
+                                self::processMedia($document, $match, $item);
+                            }
+                            if (strpos($id, 'REX_MEDIALIST_') !== false) {
+                                // medialist button
+                                self::processMediaList($document, $match, $item);
+                            }
+                            if (strpos($name, 'REX_LINK_') !== false) {
+                                // link button
+                                self::processLink($document, $match, $item);
+                            }
+                            if (strpos($id, 'REX_LINKLIST_') !== false) {
+                                // linklist button
+                                self::processLinkList($document, $match, $item);
+                            }
+                        }
+                    }
+                }
             }
         }
-
-        // find input
-        $matches = $document->find('.rex-js-widget-medialist input');
-
-        if ($matches) {
-            /** @var DOMElement $match */
-            foreach ($matches as $match) {
-                // replace name
-                self::replaceName($match, $item, 'REX_INPUT_MEDIALIST');
-                // label for and id change
-                self::changeForId($document, $match, $item, false);
-            }
-        }
-
-        // label for and id change
-        $matches = $document->find('.rex-js-widget-medialist select');
-
-        if ($matches) {
-            /** @var DOMElement $match */
-            foreach ($matches as $match) {
-                // label for and id change
-                self::changeForId($document, $match, $item);
-
-                self::addMediaSelectOptions($match, $item);
-            }
-        }
-
 
         // return the manipulated html output
         return $document->htmlOuter();
@@ -65,34 +60,167 @@ class JBlockSystemButtonReplacer extends JBlockFormItemDecorator
      * @param phpQueryObject $document
      * @param DOMElement $dom
      * @param JBlockItem $item
-     * @param bool $replaceButtons
      * @author Joachim Doerr
-     * @return bool
      */
-    protected static function changeForId(phpQueryObject $document, DOMElement $dom, JBlockItem $item, $replaceButtons = true)
+    protected static function processMedia(phpQueryObject $document, DOMElement $dom, JBlockItem $item)
+    {
+        // set system name
+        $item->setSystemName('REX_INPUT_MEDIA');
+        // has children ?
+        if ($dom->hasChildNodes()) {
+            // replace name first child is input
+            self::replaceName($dom->firstChild, $item, 'REX_INPUT_MEDIA');
+            // change for id
+            self::replaceId($dom->firstChild, $item);
+            // change onclick id
+            self::replaceOnClick($document, $item, 'REXMedia(');
+        }
+    }
+
+    /**
+     * @param phpQueryObject $document
+     * @param DOMElement $dom
+     * @param JBlockItem $item
+     * @author Joachim Doerr
+     */
+    protected static function processMediaList(phpQueryObject $document, DOMElement $dom, JBlockItem $item)
+    {
+        // set system name
+        $item->setSystemName('REX_INPUT_MEDIALIST');
+        // has children ?
+        if ($dom->hasChildNodes()) {
+            if ($dom->firstChild->hasAttribute('name')) {
+                // remove name
+                $dom->firstChild->removeAttribute('name');
+                // change id
+                self::replaceId($dom->firstChild, $item);
+                /** @var DOMElement $child */
+                foreach ($dom->getElementsByTagName('input') as $child) {
+                    if ($child->getAttribute('type') == 'hidden') {
+                        // replace name
+                        self::replaceName($child, $item, 'REX_INPUT_MEDIALIST');
+                        // change id
+                        self::replaceId($child, $item);
+                    }
+                }
+                // add options
+                self::addMediaSelectOptions($dom->firstChild, $item);
+                // change click id
+                self::replaceOnClick($document, $item, 'REXMedialist(');
+            }
+        }
+    }
+
+    /**
+     * @param phpQueryObject $document
+     * @param DOMElement $dom
+     * @param JBlockItem $item
+     * @author Joachim Doerr
+     */
+    protected static function processLink(phpQueryObject $document, DOMElement $dom, JBlockItem $item)
+    {
+        // set system name
+        $item->setSystemName('REX_INPUT_LINK');
+        // has children ?
+        if ($dom->hasChildNodes()) {
+            /** @var DOMElement $child */
+            foreach ($dom->getElementsByTagName('input') as $child) {
+                // hidden input
+                if (strpos($child->getAttribute('name'), 'REX_INPUT_LINK') !== false) {
+                    // replace name
+                    self::replaceName($child, $item, 'REX_INPUT_LINK');
+                }
+                if ($child->getAttribute('type') == 'text') {
+                    // remove name
+                    $child->removeAttribute('name');
+                    // add link art name
+                    self::addArtName($child, $item);
+                }
+                // change id
+                self::replaceId($child, $item);
+            }
+            // change click id
+            self::replaceOnClick($document, $item, 'REXLink(');
+            // change click id
+            self::replaceOnClick($document, $item, 'openLinkMap(', '_');
+        }
+    }
+
+    /**
+     * @param phpQueryObject $document
+     * @param DOMElement $dom
+     * @param JBlockItem $item
+     * @author Joachim Doerr
+     */
+    protected static function processLinkList(phpQueryObject $document, DOMElement $dom, JBlockItem $item)
+    {
+        // set system name
+        $item->setSystemName('REX_INPUT_LINKLIST');
+        // has children ?
+        if ($dom->hasChildNodes()) {
+            /** @var DOMElement $child */
+            foreach ($dom->getElementsByTagName('select') as $child) {
+                if (strpos($child->getAttribute('id'), 'REX_LINKLIST_SELECT_') !== false) {
+                    // replace id
+                    self::replaceId($child, $item);
+                    // add options
+                    self::addLinkSelectOptions($child, $item);
+                }
+            }
+
+            /** @var DOMElement $child */
+            foreach ($dom->getElementsByTagName('input') as $child) {
+                if ($child->getAttribute('type') == 'hidden') {
+                    // replace name
+                    self::replaceName($child, $item, 'REX_INPUT_LINKLIST');
+                    // change id
+                    self::replaceId($child, $item);
+                }
+            }
+
+            // change click id
+            self::replaceOnClick($document, $item, 'REXLinklist(', '', ',');
+            // change click id
+            self::replaceOnClick($document, $item, 'deleteREXLinklist(');
+        }
+    }
+
+    /**
+     * @param phpQueryObject $document
+     * @param JBlockItem $item
+     * @param $btnFindKey
+     * @param string $prefix
+     * @param string $suffix
+     * @author Joachim Doerr
+     */
+    protected static function replaceOnClick(phpQueryObject $document, JBlockItem $item, $btnFindKey, $prefix = '', $suffix = '')
+    {
+        // find a buttons and replace id
+        if ($matches = $document->find('a.btn-popup')) {
+            /** @var DOMElement $match */
+            foreach ($matches as $match) {
+                if (strpos($match->getAttribute('onclick'), $btnFindKey) !== false) {
+                    $match->setAttribute('onclick', str_replace($prefix . $item->getSystemId() . $suffix, $prefix . $item->getId() . $suffix, $match->getAttribute('onclick')));
+                }
+            }
+        }
+    }
+
+    /**
+     * @param DOMElement $dom
+     * @param JBlockItem $item
+     * @author Joachim Doerr
+     */
+    protected static function replaceId(DOMElement $dom, JBlockItem $item)
     {
         // get input id
         $id = $dom->getAttribute('id');
         preg_match('/_\d/', $id, $matches);
-
+        // found
         if ($matches) {
-            $id = str_replace($matches[0], '_' . $item->getId(), $id);
             // replace id
-            $dom->setAttribute('id', $id);
-
-            if ($replaceButtons) {
-                // find a buttons and replace id
-                $matches = $document->find('.rex-js-widget a.btn-popup');
-
-                if ($matches) {
-                    /** @var DOMElement $match */
-                    foreach ($matches as $match) {
-                        $match->setAttribute('onclick', str_replace($item->getSystemId(), $item->getId(), $match->getAttribute('onclick')));
-                    }
-                }
-            }
+            $dom->setAttribute('id', str_replace($matches[0], '_' . $item->getId(), $id));
         }
-        return true;
     }
 
     /**
@@ -103,11 +231,13 @@ class JBlockSystemButtonReplacer extends JBlockFormItemDecorator
      */
     protected static function replaceName(DOMElement $dom, JBlockItem $item, $name)
     {
-        $matches = self::getName($dom);
+        // get name
+        $matches = JBlockFormItemDecorator::getName($dom);
+        // found
         if ($matches) {
-            $item->setSystemId($matches[1])
-                ->setSystemName($name);
-            // replace
+            // set system id
+            $item->setSystemId($matches[1]);
+            // and replace name attribute
             $dom->setAttribute('name', str_replace(array($name, '[' . $item->getSystemId() . ']'), array('REX_INPUT_VALUE', '[' . $item->getValueId() . '][0][' . $name . '_' . $item->getSystemId() . ']'), $dom->getAttribute('name')));
         }
     }
@@ -120,18 +250,68 @@ class JBlockSystemButtonReplacer extends JBlockFormItemDecorator
     protected static function addMediaSelectOptions(DOMElement $dom, JBlockItem $item)
     {
         if (is_array($item->getResult()) && array_key_exists($item->getSystemName() . '_' . $item->getSystemId(), $item->getResult())) {
-
-            $resultItems = explode(',',$item->getResult()[$item->getSystemName() . '_' . $item->getSystemId()]);
-
+            $resultItems = explode(',', $item->getResult()[$item->getSystemName() . '_' . $item->getSystemId()]);
             foreach ($resultItems as $resultItem) {
                 $dom->appendChild(new DOMElement('option', $resultItem));
             }
-
             /** @var DOMElement $child */
             foreach ($dom->childNodes as $child) {
                 $child->setAttribute('value', $child->nodeValue);
                 $child->removeAttribute('selected');
             }
         }
+    }
+
+    /**
+     * @param DOMElement $dom
+     * @param JBlockItem $item
+     * @author Joachim Doerr
+     */
+    protected static function addLinkSelectOptions(DOMElement $dom, JBlockItem $item)
+    {
+        if (is_array($item->getResult()) && array_key_exists($item->getSystemName() . '_' . $item->getSystemId(), $item->getResult())) {
+            $resultItems = explode(',', $item->getResult()[$item->getSystemName() . '_' . $item->getSystemId()]);
+            if ($resultItems[0] != '') {
+                foreach ($resultItems as $resultItem) {
+                    $dom->appendChild(new DOMElement('option', $resultItem));
+                }
+                /** @var DOMElement $child */
+                foreach ($dom->childNodes as $child) {
+                    $child->setAttribute('value', $child->nodeValue);
+                    $child->nodeValue = self::getLinkInfo($child->getAttribute('value'))['art_name'];
+                    $child->removeAttribute('selected');
+                }
+            }
+        }
+    }
+
+    /**
+     * @param DOMElement $dom
+     * @param JBlockItem $item
+     * @author Joachim Doerr
+     */
+    protected static function addArtName(DOMElement $dom, JBlockItem $item)
+    {
+        if (is_array($item->getResult()) && array_key_exists($item->getSystemName() . '_' . $item->getSystemId(), $item->getResult())) {
+            $linkInfo = self::getLinkInfo($item->getResult()[$item->getSystemName() . '_' . $item->getSystemId()]);
+            $dom->setAttribute('value', $linkInfo['art_name']);
+        }
+    }
+
+    /**
+     * @param $id
+     * @return array
+     * @author Joachim Doerr
+     */
+    private static function getLinkInfo($id)
+    {
+        $art_name = '';
+        $category = 0;
+        $art = rex_article::get($id);
+        if ($art instanceof rex_article) {
+            $art_name = $art->getName();
+            $category = $art->getCategoryId();
+        }
+        return array('art_name' => $art_name, 'category_id' => $category);
     }
 }

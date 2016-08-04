@@ -1,7 +1,6 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: joachimdoerr
+ * Author: Joachim Doerr
  * Date: 31.07.16
  * Time: 08:48
  */
@@ -15,69 +14,78 @@ class JBlockFormItemDecorator
      */
     static public function decorateFormItem(JBlockItem $item)
     {
+        // set phpquery document
         $document = phpQuery::newDocumentHTML($item->getForm());
 
-        // find input
-        $matches = $document->find('input');
-
-        if ($matches) {
+        // find inputs
+        if ($matches = $document->find('input')) {
             /** @var DOMElement $match */
             foreach ($matches as $match) {
                 // label for and id change
-                self::changeForId($document, $match, $item);
+                self::replaceForId($document, $match, $item);
                 // replace attribute id
-                self::changeName($match, $item);
+                self::replaceName($match, $item);
+                // change checked or value by type
                 switch ($match->getAttribute('type')) {
                     case 'checkbox':
                     case 'radio':
-                        self::changeChecked($match, $item);
+                        // replace checked
+                        self::replaceChecked($match, $item);
                         break;
                     default:
                         // replace value by json key
-                        self::changeValue($match, $item);
+                        self::replaceValue($match, $item);
                 }
             }
         }
 
-        $matches = $document->find('textarea');
-
-        if ($matches) {
+        // find textareas
+        if ($matches = $document->find('textarea')) {
             /** @var DOMElement $match */
             foreach ($matches as $match) {
                 // label for and id change
-                self::changeForId($document, $match, $item);
+                self::replaceForId($document, $match, $item);
                 // replace attribute id
-                self::changeName($match, $item);
+                self::replaceName($match, $item);
                 // replace value by json key
-                self::changeValue($match, $item);
+                self::replaceValue($match, $item);
             }
         }
 
-        $matches = $document->find('select');
-
-        if ($matches) {
+        // find selects
+        if ($matches = $document->find('select')) {
             /** @var DOMElement $match */
             foreach ($matches as $match) {
+                // continue by media elements
+                if (strpos($match->getAttribute('id'), 'REX_MEDIA') !== false) {
+                    continue;
+                }
+                // continue by link elements
+                if (strpos($match->getAttribute('id'), 'REX_LINK') !== false) {
+                    continue;
+                }
                 // label for and id change
-                self::changeForId($document, $match, $item);
+                self::replaceForId($document, $match, $item);
                 // replace attribute id
-                self::changeName($match, $item);
+                self::replaceName($match, $item);
                 // replace value by json key
-                /** @var DOMElement $child */
-                $children = $match->childNodes;
-                foreach ($children as $child) {
-                    switch ($child->nodeName) {
-                        case 'optgroup':
-                            foreach ($child->childNodes as $nodeChild)
-                                self::changeOptionSelect($match, $nodeChild, $item);
-                            break;
-                        default:
-                            self::changeOptionSelect($match, $child, $item);
-                            break;
+                if ($match->hasChildNodes()) {
+                    /** @var DOMElement $child */
+                    foreach ($match->childNodes as $child) {
+                        switch ($child->nodeName) {
+                            case 'optgroup':
+                                foreach ($child->childNodes as $nodeChild)
+                                    self::replaceOptionSelect($match, $nodeChild, $item);
+                                break;
+                            default:
+                                self::replaceOptionSelect($match, $child, $item);
+                                break;
+                        }
                     }
                 }
             }
         }
+
         // return the manipulated html output
         return $document->htmlOuter();
     }
@@ -87,7 +95,7 @@ class JBlockFormItemDecorator
      * @param JBlockItem $item
      * @author Joachim Doerr
      */
-    protected static function changeName(DOMElement $dom, JBlockItem $item)
+    protected static function replaceName(DOMElement $dom, JBlockItem $item)
     {
         // replace attribute id
         preg_match('/\]\[\d+\]\[/', $dom->getAttribute('name'), $matches);
@@ -99,20 +107,21 @@ class JBlockFormItemDecorator
      * @param JBlockItem $item
      * @author Joachim Doerr
      */
-    protected static function changeValue(DOMElement $dom, JBlockItem $item)
+    protected static function replaceValue(DOMElement $dom, JBlockItem $item)
     {
         // get value key by name
         $matches = self::getName($dom);
 
+        // found
         if ($matches) {
             // node name switch
             switch ($dom->nodeName) {
                 default:
                 case 'input':
-                    if ($matches) $dom->setAttribute('value', $item->getResult()[$matches[1]]);
+                    if ($matches && array_key_exists($matches[1], $item->getResult())) $dom->setAttribute('value', $item->getResult()[$matches[1]]);
                     break;
                 case 'textarea':
-                    if ($matches) $dom->nodeValue = $item->getResult()[$matches[1]];
+                    if ($matches && array_key_exists($matches[1], $item->getResult())) $dom->nodeValue = $item->getResult()[$matches[1]];
                     break;
             }
         }
@@ -123,18 +132,19 @@ class JBlockFormItemDecorator
      * @param JBlockItem $item
      * @author Joachim Doerr
      */
-    protected static function changeChecked(DOMElement $dom, JBlockItem $item)
+    protected static function replaceChecked(DOMElement $dom, JBlockItem $item)
     {
         // get value key by name
         $matches = self::getName($dom);
 
+        // found
         if ($matches) {
             // unset select
             if ($dom->getAttribute('checked')) {
                 $dom->removeAttribute('checked');
             }
             // set select by value = result
-            if ($matches && $item->getResult()[$matches[1]] == $dom->getAttribute('value')) {
+            if ($matches && array_key_exists($matches[1], $item->getResult()) && $item->getResult()[$matches[1]] == $dom->getAttribute('value')) {
                 $dom->setAttribute('checked', 'checked');
             }
         }
@@ -146,7 +156,7 @@ class JBlockFormItemDecorator
      * @param JBlockItem $item
      * @author Joachim Doerr
      */
-    protected static function changeOptionSelect(DOMElement $select, DOMElement $option, JBlockItem $item)
+    protected static function replaceOptionSelect(DOMElement $select, DOMElement $option, JBlockItem $item)
     {
         // get value key by name
         $matches = self::getName($select);
@@ -157,7 +167,7 @@ class JBlockFormItemDecorator
                 $option->removeAttribute('selected');
             }
             // set select by value = result
-            if ($matches && $item->getResult()[$matches[1]] == $option->getAttribute('value')) {
+            if ($matches && array_key_exists($matches[1], $item->getResult()) && $item->getResult()[$matches[1]] == $option->getAttribute('value')) {
                 $option->setAttribute('selected', 'selected');
             }
         }
@@ -170,7 +180,7 @@ class JBlockFormItemDecorator
      * @return bool
      * @author Joachim Doerr
      */
-    protected static function changeForId(phpQueryObject $document, DOMElement $dom, JBlockItem $item)
+    protected static function replaceForId(phpQueryObject $document, DOMElement $dom, JBlockItem $item)
     {
         // get input id
         $id = $dom->getAttribute('id');
@@ -178,7 +188,6 @@ class JBlockFormItemDecorator
         if (strpos($id, 'REX_MEDIA') !== false) {
             return false;
         }
-
         if (strpos($id, 'REX_LINK') !== false) {
             return false;
         }
@@ -204,17 +213,11 @@ class JBlockFormItemDecorator
      * @return mixed
      * @author Joachim Doerr
      */
-    protected static function getName(DOMElement $dom)
+    public static function getName(DOMElement $dom)
     {
         preg_match('/^.*?\[(\w+)\]$/i', $dom->getAttribute('name'), $matches);
         return $matches;
     }
-
-
-
-
-
-
 
 //    static protected function get_html_from_node($node){
 //        $html = '';
