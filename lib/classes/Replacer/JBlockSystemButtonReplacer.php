@@ -130,15 +130,13 @@ class JBlockSystemButtonReplacer
                     // replace name
                     self::replaceName($child, $item, 'REX_INPUT_LINK');
                 }
-                if ($child->getAttribute('type') == 'text') {
-                    // remove name
-                    $child->removeAttribute('name');
-                    // add link art name
-                    self::addArtName($child, $item);
-                }
                 // change id
                 self::replaceId($child, $item);
             }
+            // remove name
+            $dom->firstChild->removeAttribute('name');
+            // add link art name
+            self::addArtName($dom->firstChild, $item);
             // change click id
             self::replaceOnClick($document, $item, 'REXLink(');
             // change click id
@@ -159,16 +157,6 @@ class JBlockSystemButtonReplacer
         // has children ?
         if ($dom->hasChildNodes()) {
             /** @var DOMElement $child */
-            foreach ($dom->getElementsByTagName('select') as $child) {
-                if (strpos($child->getAttribute('id'), 'REX_LINKLIST_SELECT_') !== false) {
-                    // replace id
-                    self::replaceId($child, $item);
-                    // add options
-                    self::addLinkSelectOptions($child, $item);
-                }
-            }
-
-            /** @var DOMElement $child */
             foreach ($dom->getElementsByTagName('input') as $child) {
                 if ($child->getAttribute('type') == 'hidden') {
                     // replace name
@@ -177,7 +165,17 @@ class JBlockSystemButtonReplacer
                     self::replaceId($child, $item);
                 }
             }
-
+            /** @var DOMElement $child */
+            foreach ($dom->getElementsByTagName('select') as $child) {
+                if (strpos($child->getAttribute('id'), 'REX_LINKLIST_SELECT_') !== false) {
+                    // replace name
+                    $child->setAttribute('name', str_replace($item->getSystemId(), $item->getId(), $child->getAttribute('name')));
+                    // replace id
+                    self::replaceId($child, $item);
+                    // add options
+                    self::addLinkSelectOptions($child, $item);
+                }
+            }
             // change click id
             self::replaceOnClick($document, $item, 'REXLinklist(', '', ',');
             // change click id
