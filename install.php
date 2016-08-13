@@ -8,5 +8,10 @@
  * @license MIT
  */
 
+// set default template
+if (!$this->hasConfig()) {
+    $this->setConfig('jblock_template', 'default_theme');
+}
+
 // copy data directory
 rex_dir::copy($this->getPath('data'), $this->getDataPath());
