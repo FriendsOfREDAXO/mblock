@@ -1,1 +1,0 @@
-<p>Es kann vorkommen, dass Media-Buttons automatisch generiert werden müssen. Hier ist ein Beispiel wie das aussehen kann.</p>

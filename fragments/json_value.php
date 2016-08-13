@@ -1,2 +1,0 @@
-<p>Damit ein JSON-String im Slice nicht mehr extra von einem Anwender in ein Array umgewandelt werden muss, wurde mit dem Plugin <b>slice_json_block</b> der REX-Platzhalter REX_JSON_VALUE[0-20] erstellt.</p>
-<p>Der Feldname muss dabei einem Array entsprechen und muss den normalen Redaxo-Konfentionen entsprechen.</p>
