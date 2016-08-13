@@ -1,7 +1,7 @@
 /**
  * Created by joachimdoerr on 30.07.16.
  */
-// add for use parsley in new rex5 backend mform forms
+
 $(function () {
     initjBlock();
     $(document).on('pjax:end', function() {
