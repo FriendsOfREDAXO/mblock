@@ -1,7 +1,6 @@
 /**
  * Created by joachimdoerr on 30.07.16.
  */
-
 $(function () {
     initjBlock();
     $(document).on('pjax:end', function() {
@@ -14,7 +13,7 @@ function initjBlock() {
         jblock = $('.jblock_wrapper');
     // init by siteload
     if (rform.length && jblock.length) {
-        initsort(jblock);
+        initjblocksort(jblock);
     }
 }
 
@@ -22,10 +21,31 @@ function initjBlock() {
 function initsort(element) {
     // reindex
     reindexit(element);
+    // init
+    initjblocksort(element);
+}
+
+function initjblocksort(element) {
     // add linking
     addlinking(element);
+    // remove removeme
+    removeme(element);
     // init sortable
     sortit(element);
+}
+
+function removeme(element) {
+    var finded = element.find('> div');
+    if (finded.length == 1) {
+        finded.find('.removeme').hide();
+    } else {
+        finded.find('.removeme').show();
+    }
+    finded.each(function(index){
+        if (index==0) {
+            $(this).find('.moveup').hide();
+        }
+    });
 }
 
 function sortit(element) {
@@ -39,14 +59,11 @@ function sortit(element) {
 }
 
 function reindexit(element) {
+
+    // remove removeme
+    removeme(element);
+
     element.find('> div').each(function(index) {
-
-        if (index == 0) {
-            $(this).find('.removeme').hide();
-        } else {
-            $(this).find('.removeme').show();
-        }
-
         // find input elements
         $(this).find('input,textarea,select').each(function() {
             var attr = $(this).attr('name');
@@ -85,17 +102,43 @@ function reindexit(element) {
                 });
             }
         });
+
+        $(this).find('.redactor-box').each(function(){
+            var toolbar = $(this).find('.redactor-toolbar'),
+                voice = $(this).find('.redactor-voice-label'),
+                redctorin = $(this).find('.redactor-in');
+            toolbar.attr('id', toolbar.attr('id').replace(/\d+/, index));
+            voice.attr('id', voice.attr('id').replace(/\d+/, index));
+            redctorin.attr('id', redctorin.attr('id').replace(/\d+/, index));
+
+            $(this).find('textarea').each(function(){
+                if($(this).attr('id')) {
+                    $(this).attr('id', $(this).attr('id').replace(/(.{1})\s*$/, index));
+                }
+            });
+        });
     });
+
+    // if(typeof redactorInit === 'function') redactorInit();
+
 }
 
 function replacefor(element, item, index) {
-    element.find('label').each(function() {
-        if ($(this).attr('for') == item.attr('id')) {
-            var id = $(this).attr('for') + '_' + index;
-            $(this).attr('for', id);
-            item.attr('id', id);
+    if (item.attr('id').indexOf("REX_MEDIA") >= 0 ||
+        item.attr('id').indexOf("REX_LINK") >= 0 ||
+        item.attr('id').indexOf("redactor") >= 0
+    ) { } else {
+        item.attr('id', item.attr('id').replace(/_\d_+/, '_' + index + '_'));
+        if (item.parent().find('label').length) {
+            label = item.parent().find('label');
         }
-    });
+        if (item.parent().parent().find('label').length) {
+            label = item.parent().parent().find('label');
+        }
+        if (label.length) {
+            label.attr('for', label.attr('for').replace(/_\d_+/, '_' + index + '_'));
+        }
+    }
     replacecheckboxfor(element);
 }
 
@@ -127,6 +170,28 @@ function removeitem(element, item) {
     }
 }
 
+// function moveup(element, item) {
+//
+// }
+//
+// function movedown(element) {
+//     element.find('> div').each(function(){
+//         var json = $(this);
+//         json.find('.moveup').unbind().bind('click', function(){
+//             alert(json.parents());
+//             var parent = $(this).parents(),
+//                 replace = parent.index()-1;
+//
+//             if(replace <= 0)
+//                 return false;
+//
+//             // updateIndex(parent.prev(),(parent.index()-2).toString(),1,1);
+//             parent.insertBefore(parent.prev());
+//             // updateIndex(parent,replace.toString(),-1,1);
+//         });
+//     });
+// }
+
 function addlinking(element) {
     element.find('> div .addme').unbind().bind('click', function() {
         additem(element, $(this).closest('div[class^="sortitem"]'));
@@ -136,4 +201,13 @@ function addlinking(element) {
         removeitem(element, $(this).closest('div[class^="sortitem"]'));
         return false;
     });
+    movedown(element);
+    element.find('> div .moveup').unbind().bind('click', function() {
+    //     moveup($(this).parent().parent());
+    //     return false;
+    // });
+    // element.find('> div .movedown').unbind().bind('click', function() {
+    //     movedown(element, $(this).closest('div[class^="sortitem"]'));
+    //     return false;
+    // });
 }

@@ -183,16 +183,17 @@ class JBlockFormItemDecorator
     protected static function replaceForId(phpQueryObject $document, DOMElement $dom, JBlockItem $item)
     {
         // get input id
-        $id = $dom->getAttribute('id');
+        $domId = $dom->getAttribute('id');
 
-        if (strpos($id, 'REX_MEDIA') !== false) {
+        if (strpos($domId, 'REX_MEDIA') !== false) {
             return false;
         }
-        if (strpos($id, 'REX_LINK') !== false) {
+        if (strpos($domId, 'REX_LINK') !== false) {
             return false;
         }
 
-        $dom->setAttribute('id', $id . '_' . $item->getId());
+        $id = preg_replace('/(_\d+){2}/i', '_' . $item->getId(), $domId);
+        $dom->setAttribute('id', $id);
         // find label with for
         $matches = $document->find('label');
 
@@ -200,8 +201,8 @@ class JBlockFormItemDecorator
             /** @var DOMElement $match */
             foreach ($matches as $match) {
                 $for = $match->getAttribute('for');
-                if ($for == $id) {
-                    $match->setAttribute('for', $id . '_' . $item->getId());
+                if ($for == $domId) {
+                    $match->setAttribute('for', $id);
                 }
             }
         }
