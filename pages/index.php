@@ -1,20 +1,13 @@
 <?php
+/**
+ * @copyright Copyright (c) 2015 by Joachim Doerr
+ * @author mail[at]joachim-doerr[dot]com Joachim Doerr
+ *
+ * @package redaxo5
+ * @version 4.0.0
+ * @license MIT
+ */
 
-$fragment = new rex_fragment();
-$content = $fragment->parse('json_help.php');
+echo rex_view::title(rex_i18n::msg('jblock_title') . ' ' . rex_i18n::msg('jblock_'.rex_be_controller::getCurrentPagePart(2)));
 
-$fragment = new rex_fragment();
-$fragment->setVar('class', 'info', false);
-$fragment->setVar('title', $this->i18n('slice_json_block_json_help'), false);
-$fragment->setVar('body', $content.'<code>'.highlight_file('codes/0.input.module-json.php',1).'</code>', false);
-echo $fragment->parse('core/page/section.php');
-
-
-$fragment = new rex_fragment();
-$content = $fragment->parse('json_value.php');
-
-$fragment = new rex_fragment();
-$fragment->setVar('class', 'info', false);
-$fragment->setVar('title', $this->i18n('slice_json_block_json_help'), false);
-$fragment->setVar('body', $content.'<code>'.highlight_file('codes/rex_json_value.php',1).'</code>', false);
-echo $fragment->parse('core/page/section.php');
+include rex_be_controller::getCurrentPageObject()->getSubPath();

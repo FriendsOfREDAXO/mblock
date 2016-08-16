@@ -1,3 +1,6 @@
+jblock_title = JBlock
+
+
 slice_modul = Module/Slices erweitern
 slice_json_block = JSON Block
 generate_media = Media-Button generieren
