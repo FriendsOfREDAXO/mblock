@@ -201,13 +201,13 @@ function addlinking(element) {
         removeitem(element, $(this).closest('div[class^="sortitem"]'));
         return false;
     });
-    movedown(element);
-    element.find('> div .moveup').unbind().bind('click', function() {
-    //     moveup($(this).parent().parent());
-    //     return false;
-    // });
-    // element.find('> div .movedown').unbind().bind('click', function() {
-    //     movedown(element, $(this).closest('div[class^="sortitem"]'));
-    //     return false;
+    // movedown(element);
+    // element.find('> div .moveup').unbind().bind('click', function() {
+    // //     moveup($(this).parent().parent());
+    // //     return false;
+    // // });
+    // // element.find('> div .movedown').unbind().bind('click', function() {
+    // //     movedown(element, $(this).closest('div[class^="sortitem"]'));
+    // //     return false;
     // });
 }
