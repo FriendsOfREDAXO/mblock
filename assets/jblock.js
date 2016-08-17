@@ -37,20 +37,20 @@ function initjblocksort(element) {
 function removeme(element) {
     var finded = element.find('> div');
     if (finded.length == 1) {
-        finded.find('.removeme').hide();
+        finded.find('.removeme').addClass('jblock_hide');
     } else {
-        finded.find('.removeme').show();
+        finded.find('.removeme').removeClass('jblock_hide');
     }
     finded.each(function(index){
         if (index==0) {
-            $(this).find('.moveup').hide();
+            $(this).find('.moveup').addClass('jblock_hide');
         } else {
-            $(this).find('.moveup').show();
+            $(this).find('.moveup').removeClass('jblock_hide');
         }
-        if ((index + 1)== finded.length) {
-            $(this).find('.movedown').hide();
+        if ((index + 1)== finded.length) { // if max count?
+            $(this).find('.movedown').addClass('jblock_hide');
         } else {
-            $(this).find('.movedown').show();
+            $(this).find('.movedown').removeClass('jblock_hide');
         }
     });
 }
@@ -179,47 +179,57 @@ function removeitem(element, item) {
 
 function moveup(element, item) {
     var prev = item.prev();
-    if (prev.length == 0)
-        return;
-    prev.css('z-index', 999).css('position','relative').animate({ top: item.height() }, 250);
-    item.css('z-index', 1000).css('position', 'relative').animate({ top: '-' + prev.height() }, 300, function () {
-        prev.css('z-index', '').css('top', '').css('position', '');
-        item.css('z-index', '').css('top', '').css('position', '');
-        item.insertBefore(prev);
+    if (prev.length == 0) return;
+    prev.css('z-index', 99).addClass('jblock_animate').css({ 'position': 'relative', 'top': item.outerHeight() });// }, 250);
+    item.css('z-index', 100).addClass('jblock_animate').css({ 'position': 'relative', 'top': - prev.outerHeight() }); // });
 
+    setTimeout(function(){
+        prev.removeClass('jblock_animate').css({ 'z-index': '', 'top': '', 'position': '' });
+        item.removeClass('jblock_animate').css({ 'z-index': '', 'top': '', 'position': '' });
+        item.insertBefore(prev);
         reindexit(element);
-    });
+    },250);
 
 }
+
 function movedown(element, item) {
     var next = item.next();
-    if (next.length == 0)
-        return;
-    next.css('z-index', 999).css('position', 'relative').animate({ top: '-' + item.height() }, 250);
-    item.css('z-index', 1000).css('position', 'relative').animate({ top: next.height() }, 300, function () {
-        next.css('z-index', '').css('top', '').css('position', '');
-        item.css('z-index', '').css('top', '').css('position', '');
-        item.insertAfter(next);
+    if (next.length == 0) return;
 
+    next.css('z-index', 99).addClass('jblock_animate').css({ 'position': 'relative', 'top': - item.outerHeight() });// }, 250);
+    item.css('z-index', 100).addClass('jblock_animate').css({ 'position': 'relative', 'top': next.outerHeight() }); // });
+
+    setTimeout(function(){
+        next.removeClass('jblock_animate').css({ 'z-index': '', 'top': '', 'position': '' });
+        item.removeClass('jblock_animate').css({ 'z-index': '', 'top': '', 'position': '' });
+        item.insertAfter(next);
         reindexit(element);
-    });
+    },250);
 }
 
 function addlinking(element) {
     element.find('> div .addme').unbind().bind('click', function() {
-        additem(element, $(this).closest('div[class^="sortitem"]'));
+        if (!$(this).hasClass('jblock_hide')) {
+            additem(element, $(this).closest('div[class^="sortitem"]'));
+        }
         return false;
     });
     element.find('> div .removeme').unbind().bind('click', function() {
-        removeitem(element, $(this).closest('div[class^="sortitem"]'));
+        if (!$(this).hasClass('jblock_hide')) {
+            removeitem(element, $(this).closest('div[class^="sortitem"]'));
+        }
         return false;
     });
     element.find('> div .moveup').unbind().bind('click', function() {
-        moveup(element, $(this).closest('div[class^="sortitem"]'));
+        if (!$(this).hasClass('jblock_hide')) {
+            moveup(element, $(this).closest('div[class^="sortitem"]'));
+        }
         return false;
     });
     element.find('> div .movedown').unbind().bind('click', function() {
-        movedown(element, $(this).closest('div[class^="sortitem"]'));
+        if (!$(this).hasClass('jblock_hide')) {
+            movedown(element, $(this).closest('div[class^="sortitem"]'));
+        }
         return false;
     });
 }
