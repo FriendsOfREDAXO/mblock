@@ -44,6 +44,13 @@ function removeme(element) {
     finded.each(function(index){
         if (index==0) {
             $(this).find('.moveup').hide();
+        } else {
+            $(this).find('.moveup').show();
+        }
+        if ((index + 1)== finded.length) {
+            $(this).find('.movedown').hide();
+        } else {
+            $(this).find('.movedown').show();
         }
     });
 }
@@ -170,27 +177,33 @@ function removeitem(element, item) {
     }
 }
 
-// function moveup(element, item) {
-//
-// }
-//
-// function movedown(element) {
-//     element.find('> div').each(function(){
-//         var json = $(this);
-//         json.find('.moveup').unbind().bind('click', function(){
-//             alert(json.parents());
-//             var parent = $(this).parents(),
-//                 replace = parent.index()-1;
-//
-//             if(replace <= 0)
-//                 return false;
-//
-//             // updateIndex(parent.prev(),(parent.index()-2).toString(),1,1);
-//             parent.insertBefore(parent.prev());
-//             // updateIndex(parent,replace.toString(),-1,1);
-//         });
-//     });
-// }
+function moveup(element, item) {
+    var prev = item.prev();
+    if (prev.length == 0)
+        return;
+    prev.css('z-index', 999).css('position','relative').animate({ top: item.height() }, 250);
+    item.css('z-index', 1000).css('position', 'relative').animate({ top: '-' + prev.height() }, 300, function () {
+        prev.css('z-index', '').css('top', '').css('position', '');
+        item.css('z-index', '').css('top', '').css('position', '');
+        item.insertBefore(prev);
+
+        reindexit(element);
+    });
+
+}
+function movedown(element, item) {
+    var next = item.next();
+    if (next.length == 0)
+        return;
+    next.css('z-index', 999).css('position', 'relative').animate({ top: '-' + item.height() }, 250);
+    item.css('z-index', 1000).css('position', 'relative').animate({ top: next.height() }, 300, function () {
+        next.css('z-index', '').css('top', '').css('position', '');
+        item.css('z-index', '').css('top', '').css('position', '');
+        item.insertAfter(next);
+
+        reindexit(element);
+    });
+}
 
 function addlinking(element) {
     element.find('> div .addme').unbind().bind('click', function() {
@@ -201,13 +214,12 @@ function addlinking(element) {
         removeitem(element, $(this).closest('div[class^="sortitem"]'));
         return false;
     });
-    // movedown(element);
-    // element.find('> div .moveup').unbind().bind('click', function() {
-    // //     moveup($(this).parent().parent());
-    // //     return false;
-    // // });
-    // // element.find('> div .movedown').unbind().bind('click', function() {
-    // //     movedown(element, $(this).closest('div[class^="sortitem"]'));
-    // //     return false;
-    // });
+    element.find('> div .moveup').unbind().bind('click', function() {
+        moveup(element, $(this).closest('div[class^="sortitem"]'));
+        return false;
+    });
+    element.find('> div .movedown').unbind().bind('click', function() {
+        movedown(element, $(this).closest('div[class^="sortitem"]'));
+        return false;
+    });
 }
