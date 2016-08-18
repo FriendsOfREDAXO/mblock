@@ -33,7 +33,7 @@ $form = '';
 if ($config['submit']) {
     // show is saved field
     $this->setConfig('jblock_theme', $config['jblock_theme']);
-    $form .= rex_view::info($this->i18n('config_saved'));
+    $form .= rex_view::info(rex_i18n::msg('jblock_config_saved'));
 }
 
 // read dir
@@ -42,14 +42,14 @@ $themes = JBlockThemeHelper::getThemesInformation();
 // open form
 $form .= '
   <form action="' . rex_url::currentBackendPage() . '" method="post">
-    <fieldset>
+    <fieldset><legend class="middle">' . rex_i18n::msg('jblock_theme_options') . '</legend>
 ';
 
 // set arrays
 $formElements = array();
 $elements = array();
 $elements['label'] = '
-  <label for="rex-jblock-config-template">' . $this->i18n('config_label_template') . '</label>
+  <label for="rex-jblock-config-template">' . rex_i18n::msg('jblock_config_label_template') . '</label>
 ';
 
 // create select
@@ -70,13 +70,28 @@ $fragment = new rex_fragment();
 $fragment->setVar('elements', $formElements, false);
 $form .= $fragment->parse('core/form/form.php');
 
+$form .= '</fieldset><fieldset><legend class="middle">' . rex_i18n::msg('jblock_defaults') . '</legend>';
+
+// add checkbox
+$formElements = array();
+$elements = array();
+// $elements['before'] = '<label for="rex-jblock-config-delete">' . rex_i18n::msg('jblock_delete') . '</label>';
+$elements['label'] = '<label for="rex-jblock-config-delete">' . rex_i18n::msg('jblock_delete') . '</label>';
+$elements['field'] = '<input type="checkbox" id="rex-jblock-config-delete" name="config[jblock_delete]" value="1" ' . ($this->getConfig('jblock_delete') ? ' checked="checked"' : '') . ' />';
+$formElements[] = $elements;
+// parse checkbox element
+$fragment = new rex_fragment();
+$fragment->setVar('elements', $formElements, false);
+$form .= $fragment->parse('core/form/checkbox.php');
+
 // create submit button
 $formElements = array();
 $elements = array();
 $elements['field'] = '
-  <input type="submit" class="btn btn-save rex-form-aligned" name="config[submit]" value="' . $this->i18n('config_save') . '" ' . rex::getAccesskey($this->i18n('config_save'), 'save') . ' />
+  <input type="submit" class="btn btn-save rex-form-aligned" name="config[submit]" value="' . rex_i18n::msg('jblock_config_save') . '" ' . rex::getAccesskey(rex_i18n::msg('jblock_config_save'), 'save') . ' />
 ';
 $formElements[] = $elements;
+
 // parse submit element
 $fragment = new rex_fragment();
 $fragment->setVar('elements', $formElements, false);
@@ -92,6 +107,6 @@ $form .= '
 // parse form fragment
 $fragment = new rex_fragment();
 $fragment->setVar('class', 'edit', false);
-$fragment->setVar('title', $this->i18n('config'));
+$fragment->setVar('title', rex_i18n::msg('jblock_config'));
 $fragment->setVar('body', $form, false);
 echo $fragment->parse('core/page/section.php');
