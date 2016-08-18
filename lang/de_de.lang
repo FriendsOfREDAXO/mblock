@@ -1,10 +1,28 @@
 jblock_title = JBlock
 
+jblock_overview = Übersicht
+jblock_config_save = Einstellungen speichern
 
-slice_modul = Module/Slices erweitern
-slice_json_block = JSON Block
-generate_media = Media-Button generieren
-rex_json_value = REX_JSON_VALUE[0-20]
-slice_json_block_json_help = JSON Beispiel
+jblock_config_label_template = Theme für JBlock Sort-Fields
+jblock_config_saved = Einstellungen wurden gespeichert.
+jblock_config = Konfiguration
 
-perm_options_slice_ui[json] = Slice JSON Form
+jblock_demo = Beispiel Sammlung
+jblock_demo_base = Basis Beispiele
+
+jblock_example_base_simple_example = Team Member Beispiel
+
+jblock_modul_input = Modul Eingabe
+jblock_modul_output = Modul Ausgabe
+
+jblock_help_subheadline_1 = JBlock - für sortier- und erweiterbare Json-Value Modul-Input-Formulare
+jblock_help_infotext_1 = Mit JBlock lassen sich sehr einfach Nested-Slices erstellen. Es ermöglicht das Duplizieren des gesamtne Modul-Input-Formulares oder Teile eines Modul-Inputs, die Nested-Slide-Blöcke können per Drag & Drop oder Button beliebig sortiert werden.
+jblock_help_infotext_2 = Alle Beispiele in der Beispielsammlung wurden mit JBlock und MForm konstruiert.
+jblock_github = JBlock bei FOS - go to github
+
+jblock_info = Info
+jblock_example_description_base = Die "Basis Beispiele" zeigen wie einfach man JBlock nutzen kann um Nested-Slices zu erzeugen.
+
+jblock_defaults = Default Settings
+jblock_delete = Formular-Inhalte beim duplizieren entfernen
+jblock_theme_options = Theme Settings
