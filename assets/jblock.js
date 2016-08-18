@@ -36,12 +36,35 @@ function initjblocksort(element) {
 
 function removeme(element) {
     var finded = element.find('> div');
+
     if (finded.length == 1) {
         finded.find('.removeme').addClass('jblock_hide');
     } else {
         finded.find('.removeme').removeClass('jblock_hide');
     }
+
+    // has data?
+    if(element.data().hasOwnProperty('max')) {
+        if (finded.length >= element.data('max')) {
+            element.find('.addme').addClass('jblock_hide');
+        } else {
+            element.find('.addme').removeClass('jblock_hide');
+        }
+    }
+
+    if(element.data().hasOwnProperty('min')) {
+        if (finded.length <= element.data('min')) {
+            element.find('.removeme').addClass('jblock_hide');
+        } else {
+            element.find('.removeme').removeClass('jblock_hide');
+        }
+    }
+
     finded.each(function(index){
+        // min removeme hide
+        if ((index+1)==element.data('min') && finded.length == element.data('min')) {
+            $(this).find('.removeme').addClass('jblock_hide');
+        }
         if (index==0) {
             $(this).find('.moveup').addClass('jblock_hide');
         } else {
@@ -66,7 +89,6 @@ function sortit(element) {
 }
 
 function reindexit(element) {
-
     // remove removeme
     removeme(element);
 
@@ -161,6 +183,22 @@ function additem(element, item) {
         element.sortable("destory");
         // add element
         item.after(item.clone());
+
+        if(element.data().hasOwnProperty('input_delete')) {
+            if (element.data('input_delete') == true) {
+                item.next().find('input, textarea').val('');
+                item.next().find('option:selected').removeAttr("selected");
+                item.next().find('input:checked').removeAttr("checked");
+                item.next().find('select').each(function () {
+                    if ($(this).attr('id').indexOf("REX_MEDIALIST") >= 0
+                        || $(this).attr('id').indexOf("REX_LINKLIST") >= 0
+                    ) {
+                        $(this).find('option').remove();
+                    }
+                });
+            }
+        }
+
         // reinit
         initsort(element);
     }
@@ -180,8 +218,8 @@ function removeitem(element, item) {
 function moveup(element, item) {
     var prev = item.prev();
     if (prev.length == 0) return;
-    prev.css('z-index', 99).addClass('jblock_animate').css({ 'position': 'relative', 'top': item.outerHeight() });// }, 250);
-    item.css('z-index', 100).addClass('jblock_animate').css({ 'position': 'relative', 'top': - prev.outerHeight() }); // });
+    prev.css('z-index', 99).addClass('jblock_animate').css({ 'position': 'relative', 'top': item.outerHeight() });
+    item.css('z-index', 100).addClass('jblock_animate').css({ 'position': 'relative', 'top': - prev.outerHeight() });
 
     setTimeout(function(){
         prev.removeClass('jblock_animate').css({ 'z-index': '', 'top': '', 'position': '' });
@@ -189,15 +227,14 @@ function moveup(element, item) {
         item.insertBefore(prev);
         reindexit(element);
     },250);
-
 }
 
 function movedown(element, item) {
     var next = item.next();
     if (next.length == 0) return;
 
-    next.css('z-index', 99).addClass('jblock_animate').css({ 'position': 'relative', 'top': - item.outerHeight() });// }, 250);
-    item.css('z-index', 100).addClass('jblock_animate').css({ 'position': 'relative', 'top': next.outerHeight() }); // });
+    next.css('z-index', 99).addClass('jblock_animate').css({ 'position': 'relative', 'top': - item.outerHeight() });
+    item.css('z-index', 100).addClass('jblock_animate').css({ 'position': 'relative', 'top': next.outerHeight() });
 
     setTimeout(function(){
         next.removeClass('jblock_animate').css({ 'z-index': '', 'top': '', 'position': '' });

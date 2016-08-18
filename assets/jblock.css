@@ -34,8 +34,6 @@ div.sortable-ghost {
     right: 0;
     top: 0;
 }
-
-
 .jblock_wrapper > div:before,
 .jblock_wrapper > div:after { /* for modern browsers *!*/
     content:"";
