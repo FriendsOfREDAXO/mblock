@@ -28,9 +28,10 @@ class JBlock
     /**
      * @param $id
      * @param $form
+     * @param array $settings
      * @return mixed
      */
-    public static function show($id, $form)
+    public static function show($id, $form, $settings = array())
     {
         // load rex value by id
         self::$result = JBlockValueHandler::loadRexVars();
@@ -79,7 +80,8 @@ class JBlock
 
         // wrap parsed form items
         $wrapper = new JBlockElement();
-        $wrapper->setOutput(implode('',static::$output));
+        $wrapper->setOutput(implode('',static::$output))
+            ->setSettings(JBlockSettingsHelper::getSettings($settings));
 
         // return wrapped from elements
         return JBlockParser::parseElement($wrapper, 'wrapper');

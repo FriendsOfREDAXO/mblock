@@ -10,6 +10,11 @@ class JBlockElement
     const KEY = "<jblock:%s/>";
 
     /**
+     * @var
+     */
+    public $settings;
+
+    /**
      * @var string
      */
     public $output;
@@ -18,6 +23,26 @@ class JBlockElement
      * @var string
      */
     public $form;
+
+    /**
+     * @return mixed
+     * @author Joachim Doerr
+     */
+    public function getSettings()
+    {
+        return $this->settings;
+    }
+
+    /**
+     * @param mixed $settings
+     * @return JBlockElement
+     * @author Joachim Doerr
+     */
+    public function setSettings($settings)
+    {
+        $this->settings = $settings;
+        return $this;
+    }
 
     /**
      * @param string $output
