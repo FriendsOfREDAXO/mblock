@@ -20,11 +20,6 @@ class JBlockSettingsHelper
             $settings['input_delete'] = rex_addon::get('jblock')->getConfig('jblock_delete');
         }
 
-        echo '<pre>';
-        print_r($settings);
-        echo '</pre>';
-
-
         foreach ($settings as $key => $value) {
             if (!$value) {
                 $value = 'false';
