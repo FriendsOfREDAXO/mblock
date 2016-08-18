@@ -1,9 +1,6 @@
 <?php
 
 if (rex::isBackend() && is_object(rex::getUser())) {
-//    echo '<pre>';
-//    print_r(rex_addon::get('jblock')->getConfig('jblock_theme'));
-//    echo '</pre>';
     // check theme css is exists
     JBlockThemeHelper::themeBootCheck(rex_addon::get('jblock')->getConfig('jblock_theme'));
 
@@ -16,9 +13,6 @@ if (rex::isBackend() && is_object(rex::getUser())) {
         }
     }
     rex_view::addJsFile($this->getAssetsUrl('jquery.fn.sortable.min.js'));
-    rex_view::addJsFile($this->getAssetsUrl('jblock.js'));
-    rex_view::addCssFile($this->getAssetsUrl('jblock.css'));
-
-//    rex_perm::register('slice_ui[json]', null, rex_perm::OPTIONS);
-
+    rex_view::addJsFile($this->getAssetsUrl('jblock.min.js'));
+    rex_view::addCssFile($this->getAssetsUrl('jblock.min.css'));
 }
