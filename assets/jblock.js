@@ -226,7 +226,7 @@ function moveup(element, item) {
         item.removeClass('jblock_animate').css({ 'z-index': '', 'top': '', 'position': '' });
         item.insertBefore(prev);
         reindexit(element);
-    },130);
+    },150);
 }
 
 function movedown(element, item) {
@@ -241,7 +241,7 @@ function movedown(element, item) {
         item.removeClass('jblock_animate').css({ 'z-index': '', 'top': '', 'position': '' });
         item.insertAfter(next);
         reindexit(element);
-    },130);
+    },150);
 }
 
 function addlinking(element) {
