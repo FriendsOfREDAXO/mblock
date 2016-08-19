@@ -45,3 +45,11 @@ div.sortable-ghost {
 .jblock_wrapper > div { /* for IE6,7 */
     zoom:1;
 }
+.jblock_animate {
+    -webkit-transition: opacity 249ms ease-in-out, top 300ms ease-in-out;
+    -moz-transition: opacity 249ms ease-in-out, top 300ms ease-in-out;
+    transition: opacity 249ms ease-in-out, top 300ms ease-in-out;
+}
+.jblock_hide {
+    opacity: 0.2;
+}
