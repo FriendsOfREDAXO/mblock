@@ -218,30 +218,30 @@ function removeitem(element, item) {
 function moveup(element, item) {
     var prev = item.prev();
     if (prev.length == 0) return;
-    prev.css('z-index', 99).addClass('jblock_animate').css({ 'position': 'relative', 'top': item.outerHeight() });
-    item.css('z-index', 100).addClass('jblock_animate').css({ 'position': 'relative', 'top': - prev.outerHeight() });
+    prev.css('z-index', 99).addClass('jblock_animate').css({ 'position': 'relative', 'top': item.outerHeight(true) });
+    item.css('z-index', 100).addClass('jblock_animate').css({ 'position': 'relative', 'top': - prev.outerHeight(true) });
 
     setTimeout(function(){
         prev.removeClass('jblock_animate').css({ 'z-index': '', 'top': '', 'position': '' });
         item.removeClass('jblock_animate').css({ 'z-index': '', 'top': '', 'position': '' });
         item.insertBefore(prev);
         reindexit(element);
-    },250);
+    },130);
 }
 
 function movedown(element, item) {
     var next = item.next();
     if (next.length == 0) return;
 
-    next.css('z-index', 99).addClass('jblock_animate').css({ 'position': 'relative', 'top': - item.outerHeight() });
-    item.css('z-index', 100).addClass('jblock_animate').css({ 'position': 'relative', 'top': next.outerHeight() });
+    next.css('z-index', 99).addClass('jblock_animate').css({ 'position': 'relative', 'top': - item.outerHeight(true) });
+    item.css('z-index', 100).addClass('jblock_animate').css({ 'position': 'relative', 'top': next.outerHeight(true) });
 
     setTimeout(function(){
         next.removeClass('jblock_animate').css({ 'z-index': '', 'top': '', 'position': '' });
         item.removeClass('jblock_animate').css({ 'z-index': '', 'top': '', 'position': '' });
         item.insertAfter(next);
         reindexit(element);
-    },250);
+    },130);
 }
 
 function addlinking(element) {
