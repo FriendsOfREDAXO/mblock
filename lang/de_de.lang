@@ -11,6 +11,9 @@ mblock_demo = Beispiel Sammlung
 mblock_demo_base = Basis Beispiele
 
 mblock_example_base_simple_example = Team Member Beispiel
+mblock_example_base_link_example = Link und Linklist-Buttons
+mblock_example_base_media_example = Media und Medialist-Buttons
+mblock_example_base_defaults_example = Default Formular-Elemente
 
 mblock_modul_input = Modul Eingabe
 mblock_modul_output = Modul Ausgabe
@@ -25,7 +28,3 @@ mblock_example_description_base = Die "Basis Beispiele" zeigen wie einfach man M
 mblock_defaults = Default Settings
 mblock_delete = Formular-Inhalte beim duplizieren entfernen
 mblock_theme_options = Theme Settings
-
-
-
-Beliebig viele Datenblöcke innerhalb eines Moduls, per Drag & Drop verschiebbar.

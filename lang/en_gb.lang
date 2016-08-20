@@ -1,0 +1,30 @@
+mblock_title = MBlock
+
+mblock_overview = Overview
+mblock_config_save = Save settings
+
+mblock_config_label_template = Theme for MBlock sort-fields
+mblock_config_saved = Settings saved.
+mblock_config = Configuration
+
+mblock_demo = Example collection
+mblock_demo_base = Basis examples
+
+mblock_example_base_simple_example = Team member example
+mblock_example_base_link_example = Link and linklist-buttons
+mblock_example_base_media_example = Media und medialist-buttons
+mblock_example_base_defaults_example = Default formular-elements
+
+mblock_modul_input = Modul input
+mblock_modul_output = Modul output
+
+mblock_help_subheadline_1 = MBlock - multiple Datenblöcke innerhalb eines Moduls anlegen und sortieren
+mblock_help_infotext_1 = Mit MBlock ist es möglich innerhalb eines Moduls belieb viele Datenblöcke zu erzeugen. Die Datenblöcke können dann einfach per Drag & Drop oder auch via Up-/Down-Button sortiert werden.
+mblock_github = MBlock bei FOS - go to github
+
+mblock_info = Info
+mblock_example_description_base = Die "Basis Beispiele" zeigen wie einfach man MBlock nutzen kann um multiple Blöcke zu erzeugen.
+
+mblock_defaults = Default settings
+mblock_delete = Formular-Inhalte beim duplizieren entfernen
+mblock_theme_options = Theme Settings

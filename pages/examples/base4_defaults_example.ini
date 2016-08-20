@@ -1,0 +1,33 @@
+<?php
+
+// this modul input example use the mform addon
+
+// base ID
+$id = 1;
+
+// init mform
+$mform = new MForm();
+
+// fieldset
+$mform->addFieldset('Text Inputs');
+
+// textinput
+$mform->addTextField("$id.0.test1", array('label'=>'Input Text1')); // use string for x.0 json values
+$mform->addTextField("$id.0.test2", array('label'=>'Input Text2')); // use string for x.0 json values
+
+// textarea
+$mform->addTextAreaField("$id.0.test3", array('label'=>'Textarea Text3'));
+
+// fieldset
+$mform->addFieldset('Select elements');
+
+// selects
+$mform->addSelectField("$id.0.test4", array(1=>'test-1',2=>'test-2',3=>'test-3',4=>'test-4'), array('label'=>'Select'));
+
+// select group
+$mform->addSelectField("$id.0.test5", array('group 1'=>array(1=>'test-1',2=>'test-2'), 'group 2'=>array(3=>'test-3',4=>'test-4')), array('label'=>'Select optgroup'));
+
+// parse form
+echo MBlock::show($id, $mform->show());
+
+?>
