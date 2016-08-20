@@ -4,11 +4,11 @@
 }
 
 .mblock_wrapper > div {
-    border: 1px solid #e1e1e1;
-    background: #F6F6F6;
+    border: 1px solid #bfe0d8;
+    background: #f1fcfa;
     color: #1C94C4;
-    margin: 5px;
-    padding: 15px 20px 15px 25px;
+    margin: 0 0 10px 0;
+    padding: 20px 15px 15px 25px;
     position: relative
 }
 
@@ -18,7 +18,7 @@
     opacity: .5;
     top: 5px;
     bottom: 5px;
-    left: 3px;
+    left: 4px;
     width: 8px;
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAB3RJTUUH3wIDBycZ/Cj09AAAAAlwSFlzAAALEgAACxIB0t1+/AAAAARnQU1BAACxjwv8YQUAAAAWSURBVHjaY2DABhoaGupBGMRmYiAEAKo2BAFbROu9AAAAAElFTkSuQmCC)
 }
@@ -34,9 +34,16 @@ div.sortable-ghost {
 
 .mblock_wrapper span.removeadded {
     position: absolute;
-    padding: 5px;
-    right: 0;
-    top: 0
+    right: 15px;
+    top: 9px;
+}
+
+.mblock_wrapper span.removeadded .btn {
+    cursor: pointer;
+}
+
+.mblock_wrapper span.removeadded .btn[disabled] {
+    cursor: default;
 }
 
 .mblock_wrapper > div:after, .mblock_wrapper > div:before {
@@ -56,8 +63,4 @@ div.sortable-ghost {
     -webkit-transition: opacity 249ms linear, top 149ms ease;
     -moz-transition: opacity 249ms linear, top 149ms ease;
     transition: opacity 249ms linear, top 149ms ease;
-}
-
-.mblock_hide {
-    opacity: .2
 }
