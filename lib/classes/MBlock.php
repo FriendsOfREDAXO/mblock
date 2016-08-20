@@ -1,14 +1,14 @@
 <?php
 /**
- * Author: Joachim Doerr
- * Date: 30.07.16
- * Time: 21:53
+ * @author mail[at]joachim-doerr[dot]com Joachim Doerr
+ * @package redaxo5
+ * @license MIT
  */
 
 // we need the vendors
-include_once rex_path::addon('jblock', 'vendors/phpQuery/phpQuery.php');
+include_once rex_path::addon('mblock', 'vendors/phpQuery/phpQuery.php');
 
-class JBlock
+class MBlock
 {
     /**
      * @var array
@@ -34,14 +34,14 @@ class JBlock
     public static function show($id, $form, $settings = array())
     {
         // load rex value by id
-        self::$result = JBlockValueHandler::loadRexVars();
+        self::$result = MBlockValueHandler::loadRexVars();
 
         // is loaded
         if (array_key_exists('value', self::$result)) {
             // item result to item
             foreach (self::$result['value'][$id] as $jId => $values) {
                 // init item
-                self::$items[$jId] = new JBlockItem;
+                self::$items[$jId] = new MBlockItem;
                 self::$items[$jId]->setId($jId)
                     ->setValueId($id)
                     ->setResult($values)
@@ -52,7 +52,7 @@ class JBlock
         // don't loaded?
         if (!self::$items) {
             // set plain item for add
-            self::$items[0] = new JBlockItem();
+            self::$items[0] = new MBlockItem();
             self::$items[0]->setId(0)
                 ->setValueId($id)
                 ->setResult(array())
@@ -60,30 +60,30 @@ class JBlock
         }
 
         // foreach rex value json items
-        /** @var JBlockItem $item */
+        /** @var MBlockItem $item */
         foreach (static::$items as $item) {
             // replace system button data
-            $item->setForm(JBlockSystemButtonReplacer::replaceSystemButtons($item));
+            $item->setForm(MBlockSystemButtonReplacer::replaceSystemButtons($item));
 
             // decorate item form
             if ($item->getResult()) {
-                $item->setForm(JBlockFormItemDecorator::decorateFormItem($item));
+                $item->setForm(MBlockFormItemDecorator::decorateFormItem($item));
             }
 
             // parse form item
-            $element = new JBlockElement();
+            $element = new MBlockElement();
             $element->setForm($item->getForm());
 
             // add to output
-            static::$output[] = JBlockParser::parseElement($element, 'element');
+            static::$output[] = MBlockParser::parseElement($element, 'element');
         }
 
         // wrap parsed form items
-        $wrapper = new JBlockElement();
+        $wrapper = new MBlockElement();
         $wrapper->setOutput(implode('',static::$output))
-            ->setSettings(JBlockSettingsHelper::getSettings($settings));
+            ->setSettings(MBlockSettingsHelper::getSettings($settings));
 
         // return wrapped from elements
-        return JBlockParser::parseElement($wrapper, 'wrapper');
+        return MBlockParser::parseElement($wrapper, 'wrapper');
     }
 }

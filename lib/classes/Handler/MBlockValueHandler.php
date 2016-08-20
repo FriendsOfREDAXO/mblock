@@ -1,11 +1,11 @@
 <?php
 /**
- * Author: Joachim Doerr
- * Date: 30.07.16
- * Time: 22:38
+ * @author mail[at]joachim-doerr[dot]com Joachim Doerr
+ * @package redaxo5
+ * @license MIT
  */
 
-class JBlockValueHandler
+class MBlockValueHandler
 {
     /**
      * @return array

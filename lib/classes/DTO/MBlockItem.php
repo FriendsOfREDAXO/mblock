@@ -1,11 +1,11 @@
 <?php
 /**
- * Author: Joachim Doerr
- * Date: 31.07.16
- * Time: 08:34
+ * @author mail[at]joachim-doerr[dot]com Joachim Doerr
+ * @package redaxo5
+ * @license MIT
  */
 
-class JBlockItem
+class MBlockItem
 {
     /**
      * @var array
@@ -48,7 +48,7 @@ class JBlockItem
 
     /**
      * @param array $result
-     * @return JBlockItem
+     * @return MBlockItem
      * @author Joachim Doerr
      */
     public function setResult($result)
@@ -68,7 +68,7 @@ class JBlockItem
 
     /**
      * @param int $id
-     * @return JBlockItem
+     * @return MBlockItem
      * @author Joachim Doerr
      */
     public function setId($id)
@@ -88,7 +88,7 @@ class JBlockItem
 
     /**
      * @param int $valueId
-     * @return JBlockItem
+     * @return MBlockItem
      * @author Joachim Doerr
      */
     public function setValueId($valueId)
@@ -108,7 +108,7 @@ class JBlockItem
 
     /**
      * @param int $systemId
-     * @return JBlockItem
+     * @return MBlockItem
      * @author Joachim Doerr
      */
     public function setSystemId($systemId)
@@ -128,7 +128,7 @@ class JBlockItem
 
     /**
      * @param string $systemName
-     * @return JBlockItem
+     * @return MBlockItem
      * @author Joachim Doerr
      */
     public function setSystemName($systemName)
@@ -148,7 +148,7 @@ class JBlockItem
 
     /**
      * @param string $form
-     * @return JBlockItem
+     * @return MBlockItem
      * @author Joachim Doerr
      */
     public function setForm($form)
@@ -156,5 +156,4 @@ class JBlockItem
         $this->form = $form;
         return $this;
     }
-
 }

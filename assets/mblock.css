@@ -1,9 +1,9 @@
-.jblock_wrapper {
+.mblock_wrapper {
     margin: auto;
     padding: 0
 }
 
-.jblock_wrapper > div {
+.mblock_wrapper > div {
     border: 1px solid #e1e1e1;
     background: #F6F6F6;
     color: #1C94C4;
@@ -12,7 +12,7 @@
     position: relative
 }
 
-.jblock_wrapper span.sorthandle {
+.mblock_wrapper span.sorthandle {
     cursor: move;
     position: absolute;
     opacity: .5;
@@ -23,7 +23,7 @@
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAB3RJTUUH3wIDBycZ/Cj09AAAAAlwSFlzAAALEgAACxIB0t1+/AAAAARnQU1BAACxjwv8YQUAAAAWSURBVHjaY2DABhoaGupBGMRmYiAEAKo2BAFbROu9AAAAAElFTkSuQmCC)
 }
 
-.jblock_wrapper span.sorthandle:hover {
+.mblock_wrapper span.sorthandle:hover {
     opacity: .8
 }
 
@@ -32,32 +32,32 @@ div.sortable-ghost {
     opacity: .4
 }
 
-.jblock_wrapper span.removeadded {
+.mblock_wrapper span.removeadded {
     position: absolute;
     padding: 5px;
     right: 0;
     top: 0
 }
 
-.jblock_wrapper > div:after, .jblock_wrapper > div:before {
+.mblock_wrapper > div:after, .mblock_wrapper > div:before {
     content: "";
     display: table
 }
 
-.jblock_wrapper > div:after {
+.mblock_wrapper > div:after {
     clear: both
 }
 
-.jblock_wrapper > div {
+.mblock_wrapper > div {
     zoom: 1
 }
 
-.jblock_animate {
+.mblock_animate {
     -webkit-transition: opacity 249ms linear, top 149ms ease;
     -moz-transition: opacity 249ms linear, top 149ms ease;
     transition: opacity 249ms linear, top 149ms ease;
 }
 
-.jblock_hide {
+.mblock_hide {
     opacity: .2
 }

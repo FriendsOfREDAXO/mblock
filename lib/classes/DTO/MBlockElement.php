@@ -1,13 +1,13 @@
 <?php
 /**
- * Author: Joachim Doerr
- * Date: 30.07.16
- * Time: 22:37
+ * @author mail[at]joachim-doerr[dot]com Joachim Doerr
+ * @package redaxo5
+ * @license MIT
  */
 
-class JBlockElement
+class MBlockElement
 {
-    const KEY = "<jblock:%s/>";
+    const KEY = "<mblock:%s/>";
 
     /**
      * @var
@@ -35,7 +35,7 @@ class JBlockElement
 
     /**
      * @param mixed $settings
-     * @return JBlockElement
+     * @return MBlockElement
      * @author Joachim Doerr
      */
     public function setSettings($settings)

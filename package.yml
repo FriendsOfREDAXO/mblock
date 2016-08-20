@@ -1,13 +1,13 @@
-package: jblock
+package: mblock
 version: '1.0.0'
-name: JBlock
+name: MBlock
 author: Friends Of REDAXO
-supportpage: https://github.com/FriendsOfREDAXO/JBlock
+supportpage: https://github.com/FriendsOfREDAXO/mblock
 
 page:
     title: 'translate:title'
     pjax: true
-    perm: jblock[]
+    perm: mblock[]
     subpages:
         overview: { title: 'translate:overview' }
         demo:

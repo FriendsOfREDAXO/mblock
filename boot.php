@@ -1,18 +1,23 @@
 <?php
+/**
+ * @author mail[at]joachim-doerr[dot]com Joachim Doerr
+ * @package redaxo5
+ * @license MIT
+ */
 
 if (rex::isBackend() && is_object(rex::getUser())) {
     // check theme css is exists
-    JBlockThemeHelper::themeBootCheck(rex_addon::get('jblock')->getConfig('jblock_theme'));
+    MBlockThemeHelper::themeBootCheck(rex_addon::get('mblock')->getConfig('mblock_theme'));
 
     // use theme helper class
-    if (JBlockThemeHelper::getCssAssets(rex_addon::get('jblock')->getConfig('jblock_theme'))) {
+    if (MBlockThemeHelper::getCssAssets(rex_addon::get('mblock')->getConfig('mblock_theme'))) {
         // foreach all css files
-        foreach (JBlockThemeHelper::getCssAssets(rex_addon::get('jblock')->getConfig('jblock_theme')) as $css) {
+        foreach (MBlockThemeHelper::getCssAssets(rex_addon::get('mblock')->getConfig('mblock_theme')) as $css) {
             // add assets css file
             rex_view::addCssFile($this->getAssetsUrl($css));
         }
     }
     rex_view::addJsFile($this->getAssetsUrl('jquery.fn.sortable.min.js'));
-    rex_view::addJsFile($this->getAssetsUrl('jblock.min.js'));
-    rex_view::addCssFile($this->getAssetsUrl('jblock.min.css'));
+    rex_view::addJsFile($this->getAssetsUrl('mblock.min.js'));
+    rex_view::addCssFile($this->getAssetsUrl('mblock.min.css'));
 }

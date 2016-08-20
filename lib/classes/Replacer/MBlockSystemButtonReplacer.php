@@ -1,18 +1,18 @@
 <?php
 /**
- * Author: Joachim Doerr
- * Date: 01.08.16
- * Time: 20:43
+ * @author mail[at]joachim-doerr[dot]com Joachim Doerr
+ * @package redaxo5
+ * @license MIT
  */
 
-class JBlockSystemButtonReplacer
+class MBlockSystemButtonReplacer
 {
     /**
-     * @param JBlockItem $item
+     * @param MBlockItem $item
      * @return String
      * @author Joachim Doerr
      */
-    public static function replaceSystemButtons(JBlockItem $item)
+    public static function replaceSystemButtons(MBlockItem $item)
     {
         // set phpquery document
         $document = phpQuery::newDocumentHTML($item->getForm());
@@ -59,10 +59,10 @@ class JBlockSystemButtonReplacer
     /**
      * @param phpQueryObject $document
      * @param DOMElement $dom
-     * @param JBlockItem $item
+     * @param MBlockItem $item
      * @author Joachim Doerr
      */
-    protected static function processMedia(phpQueryObject $document, DOMElement $dom, JBlockItem $item)
+    protected static function processMedia(phpQueryObject $document, DOMElement $dom, MBlockItem $item)
     {
         // set system name
         $item->setSystemName('REX_INPUT_MEDIA');
@@ -80,10 +80,10 @@ class JBlockSystemButtonReplacer
     /**
      * @param phpQueryObject $document
      * @param DOMElement $dom
-     * @param JBlockItem $item
+     * @param MBlockItem $item
      * @author Joachim Doerr
      */
-    protected static function processMediaList(phpQueryObject $document, DOMElement $dom, JBlockItem $item)
+    protected static function processMediaList(phpQueryObject $document, DOMElement $dom, MBlockItem $item)
     {
         // set system name
         $item->setSystemName('REX_INPUT_MEDIALIST');
@@ -114,10 +114,10 @@ class JBlockSystemButtonReplacer
     /**
      * @param phpQueryObject $document
      * @param DOMElement $dom
-     * @param JBlockItem $item
+     * @param MBlockItem $item
      * @author Joachim Doerr
      */
-    protected static function processLink(phpQueryObject $document, DOMElement $dom, JBlockItem $item)
+    protected static function processLink(phpQueryObject $document, DOMElement $dom, MBlockItem $item)
     {
         // set system name
         $item->setSystemName('REX_INPUT_LINK');
@@ -147,10 +147,10 @@ class JBlockSystemButtonReplacer
     /**
      * @param phpQueryObject $document
      * @param DOMElement $dom
-     * @param JBlockItem $item
+     * @param MBlockItem $item
      * @author Joachim Doerr
      */
-    protected static function processLinkList(phpQueryObject $document, DOMElement $dom, JBlockItem $item)
+    protected static function processLinkList(phpQueryObject $document, DOMElement $dom, MBlockItem $item)
     {
         // set system name
         $item->setSystemName('REX_INPUT_LINKLIST');
@@ -185,13 +185,13 @@ class JBlockSystemButtonReplacer
 
     /**
      * @param phpQueryObject $document
-     * @param JBlockItem $item
+     * @param MBlockItem $item
      * @param $btnFindKey
      * @param string $prefix
      * @param string $suffix
      * @author Joachim Doerr
      */
-    protected static function replaceOnClick(phpQueryObject $document, JBlockItem $item, $btnFindKey, $prefix = '', $suffix = '')
+    protected static function replaceOnClick(phpQueryObject $document, MBlockItem $item, $btnFindKey, $prefix = '', $suffix = '')
     {
         // find a buttons and replace id
         if ($matches = $document->find('a.btn-popup')) {
@@ -206,10 +206,10 @@ class JBlockSystemButtonReplacer
 
     /**
      * @param DOMElement $dom
-     * @param JBlockItem $item
+     * @param MBlockItem $item
      * @author Joachim Doerr
      */
-    protected static function replaceId(DOMElement $dom, JBlockItem $item)
+    protected static function replaceId(DOMElement $dom, MBlockItem $item)
     {
         // get input id
         $id = $dom->getAttribute('id');
@@ -223,14 +223,14 @@ class JBlockSystemButtonReplacer
 
     /**
      * @param DOMElement $dom
-     * @param JBlockItem $item
+     * @param MBlockItem $item
      * @param $name
      * @author Joachim Doerr
      */
-    protected static function replaceName(DOMElement $dom, JBlockItem $item, $name)
+    protected static function replaceName(DOMElement $dom, MBlockItem $item, $name)
     {
         // get name
-        $matches = JBlockFormItemDecorator::getName($dom);
+        $matches = MBlockFormItemDecorator::getName($dom);
         // found
         if ($matches) {
             // set system id
@@ -242,10 +242,10 @@ class JBlockSystemButtonReplacer
 
     /**
      * @param DOMElement $dom
-     * @param JBlockItem $item
+     * @param MBlockItem $item
      * @author Joachim Doerr
      */
-    protected static function addMediaSelectOptions(DOMElement $dom, JBlockItem $item)
+    protected static function addMediaSelectOptions(DOMElement $dom, MBlockItem $item)
     {
         if (is_array($item->getResult()) && array_key_exists($item->getSystemName() . '_' . $item->getSystemId(), $item->getResult())) {
             $resultItems = explode(',', $item->getResult()[$item->getSystemName() . '_' . $item->getSystemId()]);
@@ -262,10 +262,10 @@ class JBlockSystemButtonReplacer
 
     /**
      * @param DOMElement $dom
-     * @param JBlockItem $item
+     * @param MBlockItem $item
      * @author Joachim Doerr
      */
-    protected static function addLinkSelectOptions(DOMElement $dom, JBlockItem $item)
+    protected static function addLinkSelectOptions(DOMElement $dom, MBlockItem $item)
     {
         if (is_array($item->getResult()) && array_key_exists($item->getSystemName() . '_' . $item->getSystemId(), $item->getResult())) {
             $resultItems = explode(',', $item->getResult()[$item->getSystemName() . '_' . $item->getSystemId()]);
@@ -285,10 +285,10 @@ class JBlockSystemButtonReplacer
 
     /**
      * @param DOMElement $dom
-     * @param JBlockItem $item
+     * @param MBlockItem $item
      * @author Joachim Doerr
      */
-    protected static function addArtName(DOMElement $dom, JBlockItem $item)
+    protected static function addArtName(DOMElement $dom, MBlockItem $item)
     {
         if (is_array($item->getResult()) && array_key_exists($item->getSystemName() . '_' . $item->getSystemId(), $item->getResult())) {
             $linkInfo = self::getLinkInfo($item->getResult()[$item->getSystemName() . '_' . $item->getSystemId()]);

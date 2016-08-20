@@ -5,14 +5,14 @@
  * Time: 08:48
  */
 
-class JBlockFormItemDecorator
+class MBlockFormItemDecorator
 {
     /**
-     * @param JBlockItem $item
+     * @param MBlockItem $item
      * @return String
      * @author Joachim Doerr
      */
-    static public function decorateFormItem(JBlockItem $item)
+    static public function decorateFormItem(MBlockItem $item)
     {
         // set phpquery document
         $document = phpQuery::newDocumentHTML($item->getForm());
@@ -92,10 +92,10 @@ class JBlockFormItemDecorator
 
     /**
      * @param DOMElement $dom
-     * @param JBlockItem $item
+     * @param MBlockItem $item
      * @author Joachim Doerr
      */
-    protected static function replaceName(DOMElement $dom, JBlockItem $item)
+    protected static function replaceName(DOMElement $dom, MBlockItem $item)
     {
         // replace attribute id
         preg_match('/\]\[\d+\]\[/', $dom->getAttribute('name'), $matches);
@@ -104,10 +104,10 @@ class JBlockFormItemDecorator
 
     /**
      * @param DOMElement $dom
-     * @param JBlockItem $item
+     * @param MBlockItem $item
      * @author Joachim Doerr
      */
-    protected static function replaceValue(DOMElement $dom, JBlockItem $item)
+    protected static function replaceValue(DOMElement $dom, MBlockItem $item)
     {
         // get value key by name
         $matches = self::getName($dom);
@@ -129,10 +129,10 @@ class JBlockFormItemDecorator
 
     /**
      * @param DOMElement $dom
-     * @param JBlockItem $item
+     * @param MBlockItem $item
      * @author Joachim Doerr
      */
-    protected static function replaceChecked(DOMElement $dom, JBlockItem $item)
+    protected static function replaceChecked(DOMElement $dom, MBlockItem $item)
     {
         // get value key by name
         $matches = self::getName($dom);
@@ -153,10 +153,10 @@ class JBlockFormItemDecorator
     /**
      * @param DOMElement $select
      * @param DOMElement $option
-     * @param JBlockItem $item
+     * @param MBlockItem $item
      * @author Joachim Doerr
      */
-    protected static function replaceOptionSelect(DOMElement $select, DOMElement $option, JBlockItem $item)
+    protected static function replaceOptionSelect(DOMElement $select, DOMElement $option, MBlockItem $item)
     {
         // get value key by name
         $matches = self::getName($select);
@@ -176,11 +176,11 @@ class JBlockFormItemDecorator
     /**
      * @param phpQueryObject $document
      * @param DOMElement $dom
-     * @param JBlockItem $item
+     * @param MBlockItem $item
      * @return bool
      * @author Joachim Doerr
      */
-    protected static function replaceForId(phpQueryObject $document, DOMElement $dom, JBlockItem $item)
+    protected static function replaceForId(phpQueryObject $document, DOMElement $dom, MBlockItem $item)
     {
         // get input id
         $domId = $dom->getAttribute('id');

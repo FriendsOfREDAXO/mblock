@@ -1,14 +1,14 @@
 <?php
 /**
- * Author: Joachim Doerr
- * Date: 30.07.16
- * Time: 22:36
+ * @author mail[at]joachim-doerr[dot]com Joachim Doerr
+ * @package redaxo5
+ * @license MIT
  */
 
-class JBlockTemplateFileProvider
+class MBlockTemplateFileProvider
 {
     const DEFAULT_THEME = 'default_theme';
-    const THEME_PATH = 'jblock/templates/%s/';
+    const THEME_PATH = 'mblock/templates/%s/';
     const ELEMENTS_PATH = 'elements/';
 
     /**
@@ -27,10 +27,10 @@ class JBlockTemplateFileProvider
 
         // set theme path to load type template file
         $path = rex_path::addonData(sprintf(self::THEME_PATH . $subPath, $theme));
-        $file = "jblock_$templateType.ini"; // create file name
+        $file = "mblock_$templateType.ini"; // create file name
 
         // to print without template
-        $templateString = '<jblock:output/><jblock:form/>';
+        $templateString = '<mblock:output/><mblock:form/>';
 
         // is template file exist? and template type not html
         if (file_exists($path . $file)) {

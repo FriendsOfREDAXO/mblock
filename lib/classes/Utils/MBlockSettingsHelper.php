@@ -1,11 +1,11 @@
 <?php
-
 /**
- * Author Joachim Doerr
- * Date: 18.08.16
- * Time: 07:12
+ * @author mail[at]joachim-doerr[dot]com Joachim Doerr
+ * @package redaxo5
+ * @license MIT
  */
-class JBlockSettingsHelper
+
+class MBlockSettingsHelper
 {
     /**
      * @param array $settings
@@ -17,7 +17,7 @@ class JBlockSettingsHelper
         $out = '';
         if (!array_key_exists('input_delete', $settings)) {
             // set default
-            $settings['input_delete'] = rex_addon::get('jblock')->getConfig('jblock_delete');
+            $settings['input_delete'] = rex_addon::get('mblock')->getConfig('mblock_delete');
         }
 
         foreach ($settings as $key => $value) {

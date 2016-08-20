@@ -1,28 +1,31 @@
-jblock_title = JBlock
+mblock_title = MBlock
 
-jblock_overview = Übersicht
-jblock_config_save = Einstellungen speichern
+mblock_overview = Übersicht
+mblock_config_save = Einstellungen speichern
 
-jblock_config_label_template = Theme für JBlock Sort-Fields
-jblock_config_saved = Einstellungen wurden gespeichert.
-jblock_config = Konfiguration
+mblock_config_label_template = Theme für MBlock Sort-Fields
+mblock_config_saved = Einstellungen wurden gespeichert.
+mblock_config = Konfiguration
 
-jblock_demo = Beispiel Sammlung
-jblock_demo_base = Basis Beispiele
+mblock_demo = Beispiel Sammlung
+mblock_demo_base = Basis Beispiele
 
-jblock_example_base_simple_example = Team Member Beispiel
+mblock_example_base_simple_example = Team Member Beispiel
 
-jblock_modul_input = Modul Eingabe
-jblock_modul_output = Modul Ausgabe
+mblock_modul_input = Modul Eingabe
+mblock_modul_output = Modul Ausgabe
 
-jblock_help_subheadline_1 = JBlock - für sortier- und erweiterbare Json-Value Modul-Input-Formulare
-jblock_help_infotext_1 = Mit JBlock lassen sich sehr einfach Nested-Slices erstellen. Es ermöglicht das Duplizieren des gesamtne Modul-Input-Formulares oder Teile eines Modul-Inputs, die Nested-Slide-Blöcke können per Drag & Drop oder Button beliebig sortiert werden.
-jblock_help_infotext_2 = Alle Beispiele in der Beispielsammlung wurden mit JBlock und MForm konstruiert.
-jblock_github = JBlock bei FOS - go to github
+mblock_help_subheadline_1 = MBlock - multiple Datenblöcke innerhalb eines Moduls anlegen und sortieren
+mblock_help_infotext_1 = Mit MBlock ist es möglich innerhalb eines Moduls belieb viele Datenblöcke zu erzeugen. Die Datenblöcke können dann einfach per Drag & Drop oder auch via Up-/Down-Button sortiert werden.
+mblock_github = MBlock bei FOS - go to github
 
-jblock_info = Info
-jblock_example_description_base = Die "Basis Beispiele" zeigen wie einfach man JBlock nutzen kann um Nested-Slices zu erzeugen.
+mblock_info = Info
+mblock_example_description_base = Die "Basis Beispiele" zeigen wie einfach man MBlock nutzen kann um multiple Blöcke zu erzeugen.
 
-jblock_defaults = Default Settings
-jblock_delete = Formular-Inhalte beim duplizieren entfernen
-jblock_theme_options = Theme Settings
+mblock_defaults = Default Settings
+mblock_delete = Formular-Inhalte beim duplizieren entfernen
+mblock_theme_options = Theme Settings
+
+
+
+Beliebig viele Datenblöcke innerhalb eines Moduls, per Drag & Drop verschiebbar.
