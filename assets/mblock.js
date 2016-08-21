@@ -38,42 +38,42 @@ function removeme(element) {
     var finded = element.find('> div');
 
     if (finded.length == 1) {
-        finded.find('.removeme').addClass('mblock_hide');
+        finded.find('.removeme').prop('disabled', true);
     } else {
-        finded.find('.removeme').removeClass('mblock_hide');
+        finded.find('.removeme').prop('disabled', false);
     }
 
     // has data?
     if(element.data().hasOwnProperty('max')) {
         if (finded.length >= element.data('max')) {
-            element.find('.addme').addClass('mblock_hide');
+            element.find('.addme').prop('disabled', true);
         } else {
-            element.find('.addme').removeClass('mblock_hide');
+            element.find('.addme').prop('disabled', false);
         }
     }
 
     if(element.data().hasOwnProperty('min')) {
         if (finded.length <= element.data('min')) {
-            element.find('.removeme').addClass('mblock_hide');
+            element.find('.removeme').prop('disabled', true);
         } else {
-            element.find('.removeme').removeClass('mblock_hide');
+            element.find('.removeme').prop('disabled', false);
         }
     }
 
     finded.each(function(index){
         // min removeme hide
         if ((index+1)==element.data('min') && finded.length == element.data('min')) {
-            $(this).find('.removeme').addClass('mblock_hide');
+            $(this).find('.removeme').prop('disabled', true);
         }
         if (index==0) {
-            $(this).find('.moveup').addClass('mblock_hide');
+            $(this).find('.moveup').prop('disabled', true);
         } else {
-            $(this).find('.moveup').removeClass('mblock_hide');
+            $(this).find('.moveup').prop('disabled', false);
         }
         if ((index + 1)== finded.length) { // if max count?
-            $(this).find('.movedown').addClass('mblock_hide');
+            $(this).find('.movedown').prop('disabled', true);
         } else {
-            $(this).find('.movedown').removeClass('mblock_hide');
+            $(this).find('.movedown').prop('disabled', false);
         }
     });
 }
@@ -246,25 +246,25 @@ function movedown(element, item) {
 
 function addlinking(element) {
     element.find('> div .addme').unbind().bind('click', function() {
-        if (!$(this).hasClass('mblock_hide')) {
+        if (!$(this).prop('disabled')) {
             additem(element, $(this).closest('div[class^="sortitem"]'));
         }
         return false;
     });
     element.find('> div .removeme').unbind().bind('click', function() {
-        if (!$(this).hasClass('mblock_hide')) {
+        if (!$(this).prop('disabled')) {
             removeitem(element, $(this).closest('div[class^="sortitem"]'));
         }
         return false;
     });
     element.find('> div .moveup').unbind().bind('click', function() {
-        if (!$(this).hasClass('mblock_hide')) {
+        if (!$(this).prop('disabled')) {
             moveup(element, $(this).closest('div[class^="sortitem"]'));
         }
         return false;
     });
     element.find('> div .movedown').unbind().bind('click', function() {
-        if (!$(this).hasClass('mblock_hide')) {
+        if (!$(this).prop('disabled')) {
             movedown(element, $(this).closest('div[class^="sortitem"]'));
         }
         return false;
