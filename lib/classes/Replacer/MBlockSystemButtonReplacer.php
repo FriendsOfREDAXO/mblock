@@ -198,7 +198,7 @@ class MBlockSystemButtonReplacer
             /** @var DOMElement $match */
             foreach ($matches as $match) {
                 if (strpos($match->getAttribute('onclick'), $btnFindKey) !== false) {
-                    $match->setAttribute('onclick', str_replace($prefix . $item->getSystemId() . $suffix, $prefix . $item->getId() . $suffix, $match->getAttribute('onclick')));
+                    $match->setAttribute('onclick', str_replace($prefix . $item->getSystemId() . $suffix, $prefix . '100'.$item->getId() . $suffix, $match->getAttribute('onclick')));
                 }
             }
         }
@@ -217,7 +217,7 @@ class MBlockSystemButtonReplacer
         // found
         if ($matches) {
             // replace id
-            $dom->setAttribute('id', str_replace($matches[0], '_' . $item->getId(), $id));
+            $dom->setAttribute('id', str_replace($matches[0], '_100' . $item->getId(), $id));
         }
     }
 
