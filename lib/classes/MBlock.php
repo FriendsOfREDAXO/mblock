@@ -37,7 +37,7 @@ class MBlock
         self::$result = MBlockValueHandler::loadRexVars();
 
         // is loaded
-        if (array_key_exists('value', self::$result)) {
+        if (array_key_exists('value', self::$result) && is_array(self::$result['value'][$id])) {
             // item result to item
             foreach (self::$result['value'][$id] as $jId => $values) {
                 // init item
@@ -84,6 +84,28 @@ class MBlock
             ->setSettings(MBlockSettingsHelper::getSettings($settings));
 
         // return wrapped from elements
-        return MBlockParser::parseElement($wrapper, 'wrapper');
+        $output = MBlockParser::parseElement($wrapper, 'wrapper');
+
+        // reset for multi block fields
+        self::reset();
+
+        // return output
+        return $output;
+    }
+
+    /**
+     * @author Joachim Doerr
+     */
+    private static function reset()
+    {
+        foreach (self::$items as $key => $item) {
+            unset(self::$items[$key]);
+        }
+        foreach (self::$result as $key => $value) {
+            unset(self::$result[$key]);
+        }
+        foreach (self::$output as $key => $value) {
+            unset(self::$output[$key]);
+        }
     }
 }
