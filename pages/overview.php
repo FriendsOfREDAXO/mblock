@@ -8,6 +8,7 @@
 // rex request
 $config = rex_post('config', array(
     array('mblock_theme', 'string'),
+    array('mblock_delete', 'boolean'),
     array('submit', 'boolean')
 ));
 
@@ -30,6 +31,7 @@ $form = '';
 if ($config['submit']) {
     // show is saved field
     $this->setConfig('mblock_theme', $config['mblock_theme']);
+    $this->setConfig('mblock_delete', $config['mblock_delete']);
     $form .= rex_view::info(rex_i18n::msg('mblock_config_saved'));
 }
 
@@ -39,7 +41,7 @@ $themes = MBlockThemeHelper::getThemesInformation();
 // open form
 $form .= '
   <form action="' . rex_url::currentBackendPage() . '" method="post">
-    <fieldset><legend class="middle">' . rex_i18n::msg('mblock_theme_options') . '</legend>
+    <fieldset><legend class="middle">' . rex_i18n::msg('mblock_defaults') . '</legend>
 ';
 
 // set arrays
@@ -59,7 +61,7 @@ $select->setName('config[mblock_theme]');
 foreach ($themes as $theme) {
     $select->addOption($theme['theme_screen_name'], $theme['theme_path']);
 }
-$select->setSelected($this->getConfig('mblock_theme'));
+$select->setSelected(rex_addon::get('mblock')->getConfig('mblock_theme'));
 $elements['field'] = $select->get();
 $formElements[] = $elements;
 // parse select element
@@ -67,19 +69,29 @@ $fragment = new rex_fragment();
 $fragment->setVar('elements', $formElements, false);
 $form .= $fragment->parse('core/form/form.php');
 
-$form .= '</fieldset><fieldset><legend class="middle">' . rex_i18n::msg('mblock_defaults') . '</legend>';
-
-// add checkbox
+// label
 $formElements = array();
 $elements = array();
-// $elements['before'] = '<label for="rex-mblock-config-delete">' . rex_i18n::msg('mblock_delete') . '</label>';
-$elements['label'] = '<label for="rex-mblock-config-delete">' . rex_i18n::msg('mblock_delete') . '</label>';
-$elements['field'] = '<input type="checkbox" id="rex-mblock-config-delete" name="config[mblock_delete]" value="1" ' . ($this->getConfig('mblock_delete') ? ' checked="checked"' : '') . ' />';
+$elements['label'] = '
+  <label for="rex-mblock-config-template">' . rex_i18n::msg('mform_delete_label') . '</label>
+';
+// create select
+$select = new rex_select;
+$select->setId('rex-mblock-config-delete');
+$select->setSize(1);
+$select->setAttribute('class', 'form-control');
+$select->setName('config[mblock_delete]');
+// add options
+$select->addOption(rex_i18n::msg('mblock_not_delete'), 0);
+$select->addOption(rex_i18n::msg('mblock_delete'), 1);
+$select->setSelected(rex_addon::get('mblock')->getConfig('mblock_delete'));
+$elements['field'] = $select->get();
 $formElements[] = $elements;
-// parse checkbox element
+// parse select element
 $fragment = new rex_fragment();
 $fragment->setVar('elements', $formElements, false);
-$form .= $fragment->parse('core/form/checkbox.php');
+$form .= $fragment->parse('core/form/form.php');
+
 
 // create submit button
 $formElements = array();
