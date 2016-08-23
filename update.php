@@ -7,7 +7,8 @@
 
 // set default template
 if (!$this->hasConfig()) {
-    $this->setConfig('mblock_template', 'default_theme');
+    $this->setConfig('mblock_theme', 'default_theme');
+    $this->setConfig('mblock_delete', 1);
 }
 
 // copy data directory
