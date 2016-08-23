@@ -13,7 +13,10 @@ function initmblock() {
         mblock = $('.mblock_wrapper');
     // init by siteload
     if (rform.length && mblock.length) {
-        initmblocksort(mblock);
+        mblock.each(function(){
+            // alert('test1');
+            initmblocksort($(this));
+        });
     }
 }
 
@@ -110,9 +113,9 @@ function reindexit(element) {
                     $(this).attr('id').indexOf("REX_MEDIALIST_SELECT_") >= 0 ||
                     $(this).attr('id').indexOf("REX_LINKLIST_SELECT_") >= 0
                 )) {
-                $(this).attr('id', $(this).attr('id').replace(/\d+/, index));
+                $(this).attr('id', $(this).attr('id').replace(/\d+/, 100 + index));
                 if ($(this).attr('name') != undefined) {
-                    $(this).attr('name', $(this).attr('name').replace(/\d+/, index));
+                    $(this).attr('name', $(this).attr('name').replace(/\d+/, 100 + index));
                 }
             }
 
@@ -123,11 +126,11 @@ function reindexit(element) {
                     $(this).attr('id').indexOf("REX_MEDIA_") >= 0 ||
                     $(this).attr('id').indexOf("REX_MEDIALIST_") >= 0
                 )) {
-                $(this).attr('id', $(this).attr('id').replace(/\d+/, index));
+                $(this).attr('id', $(this).attr('id').replace(/\d+/, '100' + index));
                 // button
                 $(this).parent().find('a.btn-popup').each(function(){
-                    $(this).attr('onclick', $(this).attr('onclick').replace(/\(\d+/, '(' + index));
-                    $(this).attr('onclick', $(this).attr('onclick').replace(/_\d+/, '_' + index));
+                    $(this).attr('onclick', $(this).attr('onclick').replace(/\(\d+/, '(100' + index));
+                    $(this).attr('onclick', $(this).attr('onclick').replace(/_\d+/, '_100' + index));
                 });
             }
         });
