@@ -27,4 +27,6 @@ mblock_example_description_base = Beispiele, die zeigen, wie mehrfache Blöcke i
 
 mblock_defaults = Einstellungen
 mblock_delete = Formularinhalte beim Duplizieren von Datenblöcken entfernen
+mblock_not_delete = Formularinhalte beim Duplizieren von Datenblöcken übernehmen
 mblock_theme_options = Theme-Optionen
+mform_delete_label = Formularinhalte
