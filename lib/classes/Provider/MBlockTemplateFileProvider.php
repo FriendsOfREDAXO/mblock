@@ -22,7 +22,7 @@ class MBlockTemplateFileProvider
     public static function loadTemplate($templateType, $subPath = '', $theme = NULL, $stop = false)
     {
         if (is_null($theme)) {
-            $theme = rex_addon::get('mform')->getConfig('mform_theme');
+            $theme = rex_addon::get('mblock')->getConfig('mblock_theme');
         }
 
         // set theme path to load type template file
