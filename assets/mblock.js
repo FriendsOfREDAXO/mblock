@@ -113,9 +113,9 @@ function reindexit(element) {
                     $(this).attr('id').indexOf("REX_MEDIALIST_SELECT_") >= 0 ||
                     $(this).attr('id').indexOf("REX_LINKLIST_SELECT_") >= 0
                 )) {
-                $(this).attr('id', $(this).attr('id').replace(/\d+/, 100 + index));
+                $(this).attr('id', $(this).attr('id').replace(/\d+/, '100' + index));
                 if ($(this).attr('name') != undefined) {
-                    $(this).attr('name', $(this).attr('name').replace(/\d+/, 100 + index));
+                    $(this).attr('name', $(this).attr('name').replace(/\d+/, '100' + index));
                 }
             }
 
