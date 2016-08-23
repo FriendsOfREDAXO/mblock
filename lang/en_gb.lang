@@ -27,4 +27,6 @@ mblock_example_description_base = Examples that demonstrate how to set up multip
 
 mblock_defaults = Settings
 mblock_delete = Remove form content when duplicating data blocks
+mblock_not_delete = Hold form content when duplicating data blocks
 mblock_theme_options = Theme settings
+mform_delete_label = Form content
