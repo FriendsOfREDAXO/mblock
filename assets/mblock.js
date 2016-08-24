@@ -95,6 +95,8 @@ function reindexit(element) {
     // remove removeme
     removeme(element);
 
+    var initredactor = false;
+
     element.find('> div').each(function(index) {
         // find input elements
         $(this).find('input,textarea,select').each(function() {
@@ -106,7 +108,9 @@ function reindexit(element) {
                 $(this).attr('name', value);
             }
 
-            replacefor(element, $(this), index);
+            if ($(this).attr('id')) {
+                replacefor(element, $(this), index);
+            }
 
             // select rex button
             if ($(this).prop("nodeName") == 'SELECT' && (
@@ -135,24 +139,26 @@ function reindexit(element) {
             }
         });
 
-        $(this).find('.redactor-box').each(function(){
-            var toolbar = $(this).find('.redactor-toolbar'),
-                voice = $(this).find('.redactor-voice-label'),
-                redctorin = $(this).find('.redactor-in');
-            toolbar.attr('id', toolbar.attr('id').replace(/\d+/, index));
-            voice.attr('id', voice.attr('id').replace(/\d+/, index));
-            redctorin.attr('id', redctorin.attr('id').replace(/\d+/, index));
-
+        $(this).find('.redactor-box').parent().each(function(){
+            var area;
             $(this).find('textarea').each(function(){
                 if($(this).attr('id')) {
-                    $(this).attr('id', $(this).attr('id').replace(/(.{1})\s*$/, index));
+                    $(this).attr('id', $(this).attr('id').replace(/\d+/, index));
+                    area = $(this).clone().css('display','block');
                 }
             });
+            if (area.length) {
+                initredactor = true;
+                $(this).append(area);
+                $(this).find('.redactor-box').remove();
+            }
         });
+
     });
 
-    // if(typeof redactorInit === 'function') redactorInit();
-
+    if (initredactor) {
+        if(typeof redactorInit === 'function') redactorInit();
+    }
 }
 
 function replacefor(element, item, index) {
