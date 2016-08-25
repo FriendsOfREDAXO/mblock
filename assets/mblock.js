@@ -9,10 +9,9 @@ $(function () {
 });
 
 function initmblock() {
-    var rform = $('#REX_FORM'),
-        mblock = $('.mblock_wrapper');
+    var mblock = $('.mblock_wrapper');
     // init by siteload
-    if (rform.length && mblock.length) {
+    if ($('#REX_FORM').length && mblock.length) {
         mblock.each(function(){
             // alert('test1');
             initmblocksort($(this));
@@ -139,24 +138,33 @@ function reindexit(element) {
             }
         });
 
-        $(this).find('.redactor-box').parent().each(function(){
-            var area;
+        $(this).find('.redactor-box').each(function(){
+            initredactor = true;
             $(this).find('textarea').each(function(){
                 if($(this).attr('id')) {
-                    $(this).attr('id', $(this).attr('id').replace(/\d+/, index));
-                    area = $(this).clone().css('display','block');
+                    $(this).attr('id', $(this).attr('id').replace(/\d+/, '100' + index));
                 }
             });
-            if (area.length) {
-                initredactor = true;
-                $(this).append(area);
-                $(this).find('.redactor-box').remove();
-            }
         });
 
     });
 
     if (initredactor) {
+
+        $('.redactor-box').each(function(){
+            var area;
+            $(this).find('textarea').each(function(){
+                if($(this).attr('id')) {
+                    area = $(this).clone().css('display','block');
+                }
+            });
+            if (area.length) {
+                initredactor = true;
+                $(this).parent().append(area);
+                $(this).remove();
+            }
+        });
+
         if(typeof redactorInit === 'function') redactorInit();
     }
 }
