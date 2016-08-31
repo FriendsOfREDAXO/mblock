@@ -38,6 +38,11 @@ class MBlockItem
     public $form;
 
     /**
+     * @var array
+     */
+    public $payload = array();
+
+    /**
      * @return array
      * @author Joachim Doerr
      */
@@ -154,6 +159,42 @@ class MBlockItem
     public function setForm($form)
     {
         $this->form = $form;
+        return $this;
+    }
+
+    /**
+     * @param null $key
+     * @return array
+     * @author Joachim Doerr
+     */
+    public function getPayload($key = null)
+    {
+        if (!is_null($key) && array_key_exists($key, $this->payload)) {
+            return $this->payload[$key];
+        }
+        return $this->payload;
+    }
+
+    /**
+     * @param array $payload
+     * @return MBlockItem
+     * @author Joachim Doerr
+     */
+    public function setPayload($payload)
+    {
+        $this->payload = $payload;
+        return $this;
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function addPayload($key, $value)
+    {
+        $this->payload[$key] = $value;
         return $this;
     }
 }
