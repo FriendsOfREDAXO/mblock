@@ -2,41 +2,45 @@
  * Created by joachimdoerr on 30.07.16.
  */
 $(function () {
-    initmblock();
+    mblock_init();
     $(document).on('pjax:end', function() {
-        initmblock();
+        mblock_init();
     });
 });
 
+<<<<<<< 8e4a7f84e468d062e746364bd4786e4baf4d1803
 function initmblock() {
+=======
+function mblock_init() {
+>>>>>>> add counting and redactor content pick up
     var mblock = $('.mblock_wrapper');
     // init by siteload
     if ($('#REX_FORM').length && mblock.length) {
         mblock.each(function(){
             // alert('test1');
-            initmblocksort($(this));
+            mblock_sort($(this));
         });
     }
 }
 
 // List with handle
-function initsort(element) {
+function mblock_init_sort(element) {
     // reindex
-    reindexit(element);
+    mblock_reindex(element);
     // init
-    initmblocksort(element);
+    mblock_sort(element);
 }
 
-function initmblocksort(element) {
+function mblock_sort(element) {
     // add linking
-    addlinking(element);
-    // remove removeme
-    removeme(element);
+    mblock_add(element);
+    // remove mblock_remove
+    mblock_remove(element);
     // init sortable
-    sortit(element);
+    mblock_sortable(element);
 }
 
-function removeme(element) {
+function mblock_remove(element) {
     var finded = element.find('> div');
 
     if (finded.length == 1) {
@@ -80,26 +84,28 @@ function removeme(element) {
     });
 }
 
-function sortit(element) {
+function mblock_sortable(element) {
     element.sortable({
         handle: '.sorthandle',
         animation: 150,
         onEnd: function () {
-            reindexit(element);
+            mblock_reindex(element);
         }
     });
 }
 
-function reindexit(element) {
-    // remove removeme
-    removeme(element);
+function mblock_reindex(element) {
+    // remove mblock_remove
+    mblock_remove(element);
 
     var initredactor = false;
 
     element.find('> div').each(function(index) {
         // find input elements
-        $(this).find('input,textarea,select').each(function() {
+        $(this).find('input,textarea,select').each(function(key) {
             var attr = $(this).attr('name');
+            eindex = key + 1;
+            sindex = index + 1;
             // For some browsers, `attr` is undefined; for others,
             // `attr` is false. Check for both.
             if (typeof attr !== typeof undefined && attr !== false) {
@@ -108,7 +114,7 @@ function reindexit(element) {
             }
 
             if ($(this).attr('id')) {
-                replacefor(element, $(this), index);
+                mblock_replace_for(element, $(this), index);
             }
 
             // select rex button
@@ -116,9 +122,10 @@ function reindexit(element) {
                     $(this).attr('id').indexOf("REX_MEDIALIST_SELECT_") >= 0 ||
                     $(this).attr('id').indexOf("REX_LINKLIST_SELECT_") >= 0
                 )) {
-                $(this).attr('id', $(this).attr('id').replace(/\d+/, '100' + index));
+                $(this).parent().data('eindex', eindex);
+                $(this).attr('id', $(this).attr('id').replace(/_\d+/, '_' + sindex + '00' + eindex));
                 if ($(this).attr('name') != undefined) {
-                    $(this).attr('name', $(this).attr('name').replace(/\d+/, '100' + index));
+                    $(this).attr('name', $(this).attr('name').replace(/_\d+/, '_' + sindex + '00' + eindex));
                 }
             }
 
@@ -129,20 +136,33 @@ function reindexit(element) {
                     $(this).attr('id').indexOf("REX_MEDIA_") >= 0 ||
                     $(this).attr('id').indexOf("REX_MEDIALIST_") >= 0
                 )) {
-                $(this).attr('id', $(this).attr('id').replace(/\d+/, '100' + index));
+                if ($(this).parent().data('eindex')) {
+                    eindex = $(this).parent().data('eindex');
+                }
+                $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '00' + eindex));
                 // button
                 $(this).parent().find('a.btn-popup').each(function(){
-                    $(this).attr('onclick', $(this).attr('onclick').replace(/\(\d+/, '(100' + index));
-                    $(this).attr('onclick', $(this).attr('onclick').replace(/_\d+/, '_100' + index));
+                    $(this).attr('onclick', $(this).attr('onclick').replace(/\(\d+/, '(' + sindex + '00' + eindex));
+                    $(this).attr('onclick', $(this).attr('onclick').replace(/_\d+/, '_' + sindex + '00' + eindex));
                 });
             }
         });
 
+<<<<<<< 8e4a7f84e468d062e746364bd4786e4baf4d1803
         $(this).find('.redactor-box').each(function(){
             initredactor = true;
             $(this).find('textarea').each(function(){
                 if($(this).attr('id')) {
                     $(this).attr('id', $(this).attr('id').replace(/\d+/, '100' + index));
+=======
+        $(this).find('.redactor-box').each(function(key){
+            initredactor = true;
+            eindex = key + 1;
+            sindex = index + 1;
+            $(this).find('textarea').each(function(){
+                if($(this).attr('id')) {
+                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '00' + eindex));
+>>>>>>> add counting and redactor content pick up
                 }
             });
         });
@@ -153,14 +173,31 @@ function reindexit(element) {
 
         $('.redactor-box').each(function(){
             var area;
+            var content = '';
+            $(this).find('div.redactor-in').each(function () {
+                if ($(this).attr('role')) {
+                    content = $(this).html();
+                }
+            });
+            if (element.data('input_delete') == true && $(this).closest('div[class^="sortitem"]').length) {
+                content = '';
+            }
             $(this).find('textarea').each(function(){
                 if($(this).attr('id')) {
+<<<<<<< 8e4a7f84e468d062e746364bd4786e4baf4d1803
+=======
+                    // copy content
+>>>>>>> add counting and redactor content pick up
                     area = $(this).clone().css('display','block');
                 }
             });
             if (area.length) {
                 initredactor = true;
                 $(this).parent().append(area);
+<<<<<<< 8e4a7f84e468d062e746364bd4786e4baf4d1803
+=======
+                $(this).parent().find('textarea').val(content);
+>>>>>>> add counting and redactor content pick up
                 $(this).remove();
             }
         });
@@ -169,7 +206,7 @@ function reindexit(element) {
     }
 }
 
-function replacefor(element, item, index) {
+function mblock_replace_for(element, item, index) {
     if (item.attr('id').indexOf("REX_MEDIA") >= 0 ||
         item.attr('id').indexOf("REX_LINK") >= 0 ||
         item.attr('id').indexOf("redactor") >= 0
@@ -185,16 +222,16 @@ function replacefor(element, item, index) {
             label.attr('for', label.attr('for').replace(/_\d_+/, '_' + index + '_'));
         }
     }
-    replacecheckboxfor(element);
+    mblock_replace_checkbox_for(element);
 }
 
-function replacecheckboxfor(element) {
+function mblock_replace_checkbox_for(element) {
     element.find('input:checkbox').each(function() {
         $(this).parent().find('label').attr('for', $(this).attr('id'));
     });
 }
 
-function additem(element, item) {
+function mblock_add_item(element, item) {
     if (item.parent().hasClass(element.attr('class'))) {
         // unset sortable
         element.sortable("destory");
@@ -217,22 +254,22 @@ function additem(element, item) {
         }
 
         // reinit
-        initsort(element);
+        mblock_init_sort(element);
     }
 }
 
-function removeitem(element, item) {
+function mblock_remove_item(element, item) {
     if (item.parent().hasClass(element.attr('class'))) {
         // unset sortable
         element.sortable("destory");
         // remove element
         item.remove();
         // reinit
-        initsort(element);
+        mblock_init_sort(element);
     }
 }
 
-function moveup(element, item) {
+function mblock_moveup(element, item) {
     var prev = item.prev();
     if (prev.length == 0) return;
     prev.css('z-index', 99).addClass('mblock_animate').css({ 'position': 'relative', 'top': item.outerHeight(true) });
@@ -242,11 +279,11 @@ function moveup(element, item) {
         prev.removeClass('mblock_animate').css({ 'z-index': '', 'top': '', 'position': '' });
         item.removeClass('mblock_animate').css({ 'z-index': '', 'top': '', 'position': '' });
         item.insertBefore(prev);
-        reindexit(element);
+        mblock_reindex(element);
     },150);
 }
 
-function movedown(element, item) {
+function mblock_movedown(element, item) {
     var next = item.next();
     if (next.length == 0) return;
 
@@ -257,32 +294,32 @@ function movedown(element, item) {
         next.removeClass('mblock_animate').css({ 'z-index': '', 'top': '', 'position': '' });
         item.removeClass('mblock_animate').css({ 'z-index': '', 'top': '', 'position': '' });
         item.insertAfter(next);
-        reindexit(element);
+        mblock_reindex(element);
     },150);
 }
 
-function addlinking(element) {
+function mblock_add(element) {
     element.find('> div .addme').unbind().bind('click', function() {
         if (!$(this).prop('disabled')) {
-            additem(element, $(this).closest('div[class^="sortitem"]'));
+            mblock_add_item(element, $(this).closest('div[class^="sortitem"]'));
         }
         return false;
     });
     element.find('> div .removeme').unbind().bind('click', function() {
         if (!$(this).prop('disabled')) {
-            removeitem(element, $(this).closest('div[class^="sortitem"]'));
+            mblock_remove_item(element, $(this).closest('div[class^="sortitem"]'));
         }
         return false;
     });
     element.find('> div .moveup').unbind().bind('click', function() {
         if (!$(this).prop('disabled')) {
-            moveup(element, $(this).closest('div[class^="sortitem"]'));
+            mblock_moveup(element, $(this).closest('div[class^="sortitem"]'));
         }
         return false;
     });
     element.find('> div .movedown').unbind().bind('click', function() {
         if (!$(this).prop('disabled')) {
-            movedown(element, $(this).closest('div[class^="sortitem"]'));
+            mblock_movedown(element, $(this).closest('div[class^="sortitem"]'));
         }
         return false;
     });
