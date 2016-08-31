@@ -8,11 +8,7 @@ $(function () {
     });
 });
 
-<<<<<<< 8e4a7f84e468d062e746364bd4786e4baf4d1803
-function initmblock() {
-=======
 function mblock_init() {
->>>>>>> add counting and redactor content pick up
     var mblock = $('.mblock_wrapper');
     // init by siteload
     if ($('#REX_FORM').length && mblock.length) {
@@ -148,13 +144,6 @@ function mblock_reindex(element) {
             }
         });
 
-<<<<<<< 8e4a7f84e468d062e746364bd4786e4baf4d1803
-        $(this).find('.redactor-box').each(function(){
-            initredactor = true;
-            $(this).find('textarea').each(function(){
-                if($(this).attr('id')) {
-                    $(this).attr('id', $(this).attr('id').replace(/\d+/, '100' + index));
-=======
         $(this).find('.redactor-box').each(function(key){
             initredactor = true;
             eindex = key + 1;
@@ -162,7 +151,6 @@ function mblock_reindex(element) {
             $(this).find('textarea').each(function(){
                 if($(this).attr('id')) {
                     $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '00' + eindex));
->>>>>>> add counting and redactor content pick up
                 }
             });
         });
@@ -184,20 +172,14 @@ function mblock_reindex(element) {
             }
             $(this).find('textarea').each(function(){
                 if($(this).attr('id')) {
-<<<<<<< 8e4a7f84e468d062e746364bd4786e4baf4d1803
-=======
                     // copy content
->>>>>>> add counting and redactor content pick up
                     area = $(this).clone().css('display','block');
                 }
             });
             if (area.length) {
                 initredactor = true;
                 $(this).parent().append(area);
-<<<<<<< 8e4a7f84e468d062e746364bd4786e4baf4d1803
-=======
                 $(this).parent().find('textarea').val(content);
->>>>>>> add counting and redactor content pick up
                 $(this).remove();
             }
         });
