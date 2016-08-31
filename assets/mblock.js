@@ -94,7 +94,8 @@ function mblock_reindex(element) {
     // remove mblock_remove
     mblock_remove(element);
 
-    var initredactor = false;
+    var initredactor = false,
+        initmarkitup = false;
 
     element.find('> div').each(function(index) {
         // find input elements
@@ -155,6 +156,17 @@ function mblock_reindex(element) {
             });
         });
 
+        $(this).find('.markitup_markdown, .markitup_textile').each(function(key){
+            initmarkitup = true;
+            eindex = key + 1;
+            sindex = index + 1;
+            $(this).find('textarea').each(function(){
+                if($(this).attr('id')) {
+                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '00' + eindex));
+                }
+            })
+        });
+
     });
 
     if (initredactor) {
@@ -167,9 +179,6 @@ function mblock_reindex(element) {
                     content = $(this).html();
                 }
             });
-            if (element.data('input_delete') == true && $(this).closest('div[class^="sortitem"]').length) {
-                content = '';
-            }
             $(this).find('textarea').each(function(){
                 if($(this).attr('id')) {
                     // copy content
@@ -177,7 +186,6 @@ function mblock_reindex(element) {
                 }
             });
             if (area.length) {
-                initredactor = true;
                 $(this).parent().append(area);
                 $(this).parent().find('textarea').val(content);
                 $(this).remove();
@@ -186,12 +194,33 @@ function mblock_reindex(element) {
 
         if(typeof redactorInit === 'function') redactorInit();
     }
+
+    if (initmarkitup) {
+
+        $('.markitup_markdown, .markitup_textile').each(function(){
+            var area;
+            $(this).find('textarea').each(function(){
+                area = $(this).clone();
+            });
+            if (area.length) {
+                $(this).parent().append(area);
+                $(this).remove();
+            }
+        });
+
+        if(typeof markitupInit === 'function' && typeof autosize === 'function') {
+            markitupInit();
+            autosize($("textarea[class*=\'markitupEditor-\']"));
+        }
+
+    }
 }
 
 function mblock_replace_for(element, item, index) {
     if (item.attr('id').indexOf("REX_MEDIA") >= 0 ||
         item.attr('id').indexOf("REX_LINK") >= 0 ||
-        item.attr('id').indexOf("redactor") >= 0
+        item.attr('id').indexOf("redactor") >= 0 ||
+        item.attr('id').indexOf("markitup") >= 0
     ) { } else {
         item.attr('id', item.attr('id').replace(/_\d_+/, '_' + index + '_'));
         if (item.parent().find('label').length) {
@@ -222,7 +251,9 @@ function mblock_add_item(element, item) {
 
         if(element.data().hasOwnProperty('input_delete')) {
             if (element.data('input_delete') == true) {
+                item.next().find('div.redactor-in').html('');
                 item.next().find('input, textarea').val('');
+                item.next().find('textarea').html('');
                 item.next().find('option:selected').removeAttr("selected");
                 item.next().find('input:checked').removeAttr("checked");
                 item.next().find('select').each(function () {

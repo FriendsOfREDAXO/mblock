@@ -7,7 +7,12 @@
 
 class MBlockEditorReplacer extends MBlockSystemButtonReplacer
 {
-
+    /**
+     * @param MBlockItem $item
+     * @param $count
+     * @return String
+     * @author Joachim Doerr
+     */
     public static function replaceEditorArea(MBlockItem $item, $count)
     {
         // set phpquery document
@@ -26,6 +31,10 @@ class MBlockEditorReplacer extends MBlockSystemButtonReplacer
                     // change for id
                     self::processRedactor($match, $item);
                 }
+                if (strpos($class, 'markitupEditor') !== false) {
+                    // change for id
+                    self::processMarkitup($match, $item);
+                }
             }
         }
 
@@ -33,7 +42,23 @@ class MBlockEditorReplacer extends MBlockSystemButtonReplacer
         return $document->htmlOuter();
     }
 
+    /**
+     * @param DOMElement $dom
+     * @param MBlockItem $item
+     * @author Joachim Doerr
+     */
     public static function processRedactor(DOMElement $dom, MBlockItem $item)
+    {
+        // change for id
+        self::replaceId($dom, $item);
+    }
+
+    /**
+     * @param DOMElement $dom
+     * @param MBlockItem $item
+     * @author Joachim Doerr
+     */
+    public static function processMarkitup(DOMElement $dom, MBlockItem $item)
     {
         // change for id
         self::replaceId($dom, $item);
