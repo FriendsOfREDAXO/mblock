@@ -9,18 +9,21 @@ class MBlockSystemButtonReplacer
 {
     /**
      * @param MBlockItem $item
+     * @param $count
      * @return String
      * @author Joachim Doerr
      */
-    public static function replaceSystemButtons(MBlockItem $item)
+    public static function replaceSystemButtons(MBlockItem $item, $count)
     {
         // set phpquery document
         $document = phpQuery::newDocumentHTML($item->getForm());
+        $item->addPayload('count-id', $count);
 
         // find input group
         if ($matches = $document->find('div.input-group')) {
             /** @var DOMElement $match */
-            foreach ($matches as $match) {
+            foreach ($matches as $key => $match) {
+                $item->addPayload('replace-id', $key);
                 if ($match->hasChildNodes()) {
                     /** @var DOMElement $child */
                     foreach ($match->getElementsByTagName('input') as $child) {
@@ -73,7 +76,8 @@ class MBlockSystemButtonReplacer
             // change for id
             self::replaceId($dom->firstChild, $item);
             // change onclick id
-            self::replaceOnClick($document, $item, 'REXMedia(');
+            self::replaceOnClick($document, $item, 'REXMedia(', '(', ',');
+            self::replaceOnClick($document, $item, 'REXMedia(', '(', ')');
         }
     }
 
@@ -87,6 +91,7 @@ class MBlockSystemButtonReplacer
     {
         // set system name
         $item->setSystemName('REX_INPUT_MEDIALIST');
+
         // has children ?
         if ($dom->hasChildNodes()) {
             if ($dom->firstChild->hasAttribute('name')) {
@@ -106,7 +111,8 @@ class MBlockSystemButtonReplacer
                 // add options
                 self::addMediaSelectOptions($dom->firstChild, $item);
                 // change click id
-                self::replaceOnClick($document, $item, 'REXMedialist(');
+                self::replaceOnClick($document, $item, 'REXMedialist(', '(', ',');
+                self::replaceOnClick($document, $item, 'REXMedialist(', '(', ')');
             }
         }
     }
@@ -138,9 +144,9 @@ class MBlockSystemButtonReplacer
             // add link art name
             self::addArtName($dom->firstChild, $item);
             // change click id
-            self::replaceOnClick($document, $item, 'REXLink(');
+            self::replaceOnClick($document, $item, 'REXLink(', '(', ')');
             // change click id
-            self::replaceOnClick($document, $item, 'openLinkMap(', '_');
+            self::replaceOnClick($document, $item, 'openLinkMap(', '_', '\'');
         }
     }
 
@@ -177,9 +183,9 @@ class MBlockSystemButtonReplacer
                 }
             }
             // change click id
-            self::replaceOnClick($document, $item, 'REXLinklist(', '', ',');
+            self::replaceOnClick($document, $item, 'REXLinklist(', '(', ',');
             // change click id
-            self::replaceOnClick($document, $item, 'deleteREXLinklist(');
+            self::replaceOnClick($document, $item, 'deleteREXLinklist(', '(', ')');
         }
     }
 
@@ -198,7 +204,7 @@ class MBlockSystemButtonReplacer
             /** @var DOMElement $match */
             foreach ($matches as $match) {
                 if (strpos($match->getAttribute('onclick'), $btnFindKey) !== false) {
-                    $match->setAttribute('onclick', str_replace($prefix . $item->getSystemId() . $suffix, $prefix . '100'.$item->getId() . $suffix, $match->getAttribute('onclick')));
+                    $match->setAttribute('onclick', str_replace($prefix . $item->getSystemId() . $suffix, $prefix . $item->getPayload('count-id') .'00'. $item->getPayload('replace-id') . $suffix, $match->getAttribute('onclick')));
                 }
             }
         }
@@ -217,7 +223,7 @@ class MBlockSystemButtonReplacer
         // found
         if ($matches) {
             // replace id
-            $dom->setAttribute('id', str_replace($matches[0], '_100' . $item->getId(), $id));
+            $dom->setAttribute('id', str_replace($matches[0], '_' . $item->getPayload('count-id') .'00' . $item->getPayload('replace-id'), $id));
         }
     }
 

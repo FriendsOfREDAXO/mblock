@@ -61,9 +61,10 @@ class MBlock
 
         // foreach rex value json items
         /** @var MBlockItem $item */
-        foreach (static::$items as $item) {
+        foreach (static::$items as $count => $item) {
             // replace system button data
-            $item->setForm(MBlockSystemButtonReplacer::replaceSystemButtons($item));
+            $item->setForm(MBlockSystemButtonReplacer::replaceSystemButtons($item, ($count+1)));
+            $item->setForm(MBlockEditorReplacer::replaceEditorArea($item, ($count+1)));
 
             // decorate item form
             if ($item->getResult()) {
