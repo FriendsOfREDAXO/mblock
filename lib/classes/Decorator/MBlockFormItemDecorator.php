@@ -57,11 +57,8 @@ class MBlockFormItemDecorator
             /** @var DOMElement $match */
             foreach ($matches as $match) {
                 // continue by media elements
-                if (strpos($match->getAttribute('id'), 'REX_MEDIA') !== false) {
-                    continue;
-                }
-                // continue by link elements
-                if (strpos($match->getAttribute('id'), 'REX_LINK') !== false) {
+                if (strpos($match->getAttribute('id'), 'REX_MEDIA') !== false
+                    or strpos($match->getAttribute('id'), 'REX_LINK') !== false) {
                     continue;
                 }
                 // label for and id change
@@ -185,10 +182,9 @@ class MBlockFormItemDecorator
         // get input id
         $domId = $dom->getAttribute('id');
 
-        if (strpos($domId, 'REX_MEDIA') !== false) {
-            return false;
-        }
-        if (strpos($domId, 'REX_LINK') !== false) {
+        if (strpos($domId, 'REX_MEDIA') !== false
+            or strpos($dom->getAttribute('class'), 'redactorEditor') !== false
+            or strpos($domId, 'REX_LINK') !== false) {
             return false;
         }
 
