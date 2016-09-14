@@ -196,9 +196,11 @@ class MBlockFormItemDecorator
         if ($matches) {
             /** @var DOMElement $match */
             foreach ($matches as $match) {
-                $for = $match->getAttribute('for');
-                if ($for == $domId) {
-                    $match->setAttribute('for', $id);
+                if ($match->hasAttribute('for')) {
+                    $for = $match->getAttribute('for');
+                    if ($for == $domId) {
+                        $match->setAttribute('for', $id);
+                    }
                 }
             }
         }
