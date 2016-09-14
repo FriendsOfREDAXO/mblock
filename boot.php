@@ -7,12 +7,12 @@
 
 if (rex::isBackend() && is_object(rex::getUser())) {
     // check theme css is exists
-    MBlockThemeHelper::themeBootCheck(rex_addon::get('mblock')->getConfig('mblock_theme'));
+    MBlockThemeHelper::themeBootCheck($this->getConfig('mblock_theme'));
 
     // use theme helper class
-    if (MBlockThemeHelper::getCssAssets(rex_addon::get('mblock')->getConfig('mblock_theme'))) {
+    if (MBlockThemeHelper::getCssAssets($this->getConfig('mblock_theme'))) {
         // foreach all css files
-        foreach (MBlockThemeHelper::getCssAssets(rex_addon::get('mblock')->getConfig('mblock_theme')) as $css) {
+        foreach (MBlockThemeHelper::getCssAssets($this->getConfig('mblock_theme')) as $css) {
             // add assets css file
             rex_view::addCssFile($this->getAssetsUrl($css));
         }

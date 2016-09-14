@@ -9,6 +9,8 @@ mblock_config = Konfiguration
 
 mblock_demo = Beispielsammlung
 mblock_demo_base = Modul-Beispiele
+mblock_demo_mform = MForm Modul-Beispiele
+mblock_demo_html = HTML Modul-Beispiele
 
 mblock_example_base_simple_example = Teammitglieder
 mblock_example_base_link_example = Link und Linklist
@@ -23,7 +25,7 @@ mblock_help_infotext_1 = Mit MBlock ist es möglich, innerhalb eines Moduls beli
 mblock_github = MBlock bei Friends Of REDAXO
 
 mblock_info = Info
-mblock_example_description_base = Beispiele, die zeigen, wie mehrfache Blöcke innerhalb eines Moduls erzeugt werden können.<br>Wichtig: Für alle Beispiele wird zusätzlich das Addon MForm benötigt!
+mblock_example_description_base = Beispiele, die zeigen, wie mehrfache Blöcke innerhalb eines Moduls erzeugt werden können.<br><b>Wichtig:</b> Für alle Beispiele wird zusätzlich das Addon MForm benötigt!
 
 mblock_defaults = Einstellungen
 mblock_delete = Formularinhalte beim Duplizieren von Datenblöcken entfernen

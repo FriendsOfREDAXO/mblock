@@ -62,7 +62,7 @@ $select->setName('config[mblock_theme]');
 foreach ($themes as $theme) {
     $select->addOption($theme['theme_screen_name'], $theme['theme_path']);
 }
-$select->setSelected(rex_addon::get('mblock')->getConfig('mblock_theme'));
+$select->setSelected($this->getConfig('mblock_theme'));
 $elements['field'] = $select->get();
 $formElements[] = $elements;
 // parse select element
@@ -85,7 +85,7 @@ $select->setName('config[mblock_delete]');
 // add options
 $select->addOption(rex_i18n::msg('mblock_not_delete'), 0);
 $select->addOption(rex_i18n::msg('mblock_delete'), 1);
-$select->setSelected(rex_addon::get('mblock')->getConfig('mblock_delete'));
+$select->setSelected($this->getConfig('mblock_delete'));
 $elements['field'] = $select->get();
 $formElements[] = $elements;
 // parse select element
@@ -108,7 +108,7 @@ $select->setName('config[mblock_scroll]');
 // add options
 $select->addOption(rex_i18n::msg('mblock_not_scroll'), 0);
 $select->addOption(rex_i18n::msg('mblock_scroll'), 1);
-$select->setSelected(rex_addon::get('mblock')->getConfig('mblock_scroll'));
+$select->setSelected($this->getConfig('mblock_scroll'));
 $elements['field'] = $select->get();
 $formElements[] = $elements;
 // parse select element

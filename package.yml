@@ -13,6 +13,9 @@ page:
         overview: { title: 'translate:overview' }
         demo:
             title: 'translate:demo_base'
+            subpages:
+                demo_mform: { title: 'translate:demo_mform' }
+                demo_html: { title: 'translate:demo_html' }
 
 requires:
     redaxo: '^5.1.0'
