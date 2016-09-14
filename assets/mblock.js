@@ -33,7 +33,7 @@ function mblock_sort(element) {
     // remove mblock_remove
     mblock_remove(element);
     // init sortable
-    mblock_sortable(element);
+    mblock_sort_it(element);
 }
 
 function mblock_remove(element) {
@@ -80,8 +80,8 @@ function mblock_remove(element) {
     });
 }
 
-function mblock_sortable(element) {
-    element.sortable({
+function mblock_sort_it(element) {
+    element.mblock_sortable({
         handle: '.sorthandle',
         animation: 150,
         onEnd: function () {
@@ -245,7 +245,7 @@ function mblock_replace_checkbox_for(element) {
 function mblock_add_item(element, item) {
     if (item.parent().hasClass(element.attr('class'))) {
         // unset sortable
-        element.sortable("destory");
+        element.mblock_sortable("destory");
         // add element
         item.after(item.clone());
 
@@ -265,20 +265,29 @@ function mblock_add_item(element, item) {
                 });
             }
         }
-
         // reinit
         mblock_init_sort(element);
+        // scroll to item
+        mblock_scroll(element, item.next());
     }
 }
 
 function mblock_remove_item(element, item) {
     if (item.parent().hasClass(element.attr('class'))) {
         // unset sortable
-        element.sortable("destory");
+        element.mblock_sortable("destory");
+        // set prev item
+        var prevItem = item.prev();
+        // is prev exist?
+        if (!prevItem.hasClass('sortitem')) {
+            prevItem = item.next(); // go to next
+        }
         // remove element
         item.remove();
         // reinit
         mblock_init_sort(element);
+        // scroll to item
+        mblock_scroll(element, prevItem);
     }
 }
 
@@ -309,6 +318,17 @@ function mblock_movedown(element, item) {
         item.insertAfter(next);
         mblock_reindex(element);
     },150);
+}
+
+function mblock_scroll(element, item) {
+    if(element.data().hasOwnProperty('smooth_scroll')) {
+        if (element.data('smooth_scroll') == true) {
+            $.mblockSmoothScroll({
+                scrollTarget: item,
+                speed: 500
+            });
+        }
+    }
 }
 
 function mblock_add(element) {
