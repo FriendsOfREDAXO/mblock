@@ -1,5 +1,5 @@
 package: mblock
-version: '1.5.0'
+version: '1.5.1'
 name: MBlock
 author: Friends Of REDAXO
 supportpage: https://github.com/FriendsOfREDAXO/mblock
@@ -8,6 +8,7 @@ page:
     title: 'translate:title'
     pjax: true
     perm: mblock[]
+    icon: rex-icon fa-train
     subpages:
         overview: { title: 'translate:overview' }
         demo:
