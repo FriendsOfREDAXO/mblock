@@ -19,10 +19,14 @@ class MBlockSettingsHelper
             // set default
             $settings['input_delete'] = rex_addon::get('mblock')->getConfig('mblock_delete');
         }
+        if (!array_key_exists('smooth_scroll', $settings)) {
+            // set default
+            $settings['smooth_scroll'] = rex_addon::get('mblock')->getConfig('mblock_scroll');
+        }
 
         foreach ($settings as $key => $value) {
             if (!$value) {
-                $value = 'false';
+                $value = 0;
             }
             $out .= " data-$key=\"$value\"";
         }

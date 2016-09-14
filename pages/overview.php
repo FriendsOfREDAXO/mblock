@@ -8,6 +8,7 @@
 // rex request
 $config = rex_post('config', array(
     array('mblock_theme', 'string'),
+    array('mblock_scroll', 'boolean'),
     array('mblock_delete', 'boolean'),
     array('submit', 'boolean')
 ));
@@ -32,6 +33,7 @@ if ($config['submit']) {
     // show is saved field
     $this->setConfig('mblock_theme', $config['mblock_theme']);
     $this->setConfig('mblock_delete', $config['mblock_delete']);
+    $this->setConfig('mblock_scroll', $config['mblock_scroll']);
     $form .= rex_view::info(rex_i18n::msg('mblock_config_saved'));
 }
 
@@ -50,7 +52,6 @@ $elements = array();
 $elements['label'] = '
   <label for="rex-mblock-config-template">' . rex_i18n::msg('mblock_config_label_template') . '</label>
 ';
-
 // create select
 $select = new rex_select;
 $select->setId('rex-mblock-config-template');
@@ -73,7 +74,7 @@ $form .= $fragment->parse('core/form/form.php');
 $formElements = array();
 $elements = array();
 $elements['label'] = '
-  <label for="rex-mblock-config-template">' . rex_i18n::msg('mform_delete_label') . '</label>
+  <label for="rex-mblock-config-template">' . rex_i18n::msg('mblock_delete_label') . '</label>
 ';
 // create select
 $select = new rex_select;
@@ -85,6 +86,29 @@ $select->setName('config[mblock_delete]');
 $select->addOption(rex_i18n::msg('mblock_not_delete'), 0);
 $select->addOption(rex_i18n::msg('mblock_delete'), 1);
 $select->setSelected(rex_addon::get('mblock')->getConfig('mblock_delete'));
+$elements['field'] = $select->get();
+$formElements[] = $elements;
+// parse select element
+$fragment = new rex_fragment();
+$fragment->setVar('elements', $formElements, false);
+$form .= $fragment->parse('core/form/form.php');
+
+// label
+$formElements = array();
+$elements = array();
+$elements['label'] = '
+  <label for="rex-mblock-config-template">' . rex_i18n::msg('mblock_scroll_label') . '</label>
+';
+// create select
+$select = new rex_select;
+$select->setId('rex-mblock-config-scroll');
+$select->setSize(1);
+$select->setAttribute('class', 'form-control');
+$select->setName('config[mblock_scroll]');
+// add options
+$select->addOption(rex_i18n::msg('mblock_not_scroll'), 0);
+$select->addOption(rex_i18n::msg('mblock_scroll'), 1);
+$select->setSelected(rex_addon::get('mblock')->getConfig('mblock_scroll'));
 $elements['field'] = $select->get();
 $formElements[] = $elements;
 // parse select element

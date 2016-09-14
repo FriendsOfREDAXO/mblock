@@ -17,7 +17,8 @@ if (rex::isBackend() && is_object(rex::getUser())) {
             rex_view::addCssFile($this->getAssetsUrl($css));
         }
     }
-    rex_view::addJsFile($this->getAssetsUrl('jquery.fn.sortable.min.js'));
+    rex_view::addJsFile($this->getAssetsUrl('mblock_sortable.min.js'));
+    rex_view::addJsFile($this->getAssetsUrl('mblock_smooth_scroll.min.js'));
     rex_view::addJsFile($this->getAssetsUrl('mblock.min.js'));
     rex_view::addCssFile($this->getAssetsUrl('mblock.min.css'));
 }
