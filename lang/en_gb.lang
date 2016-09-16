@@ -12,10 +12,15 @@ mblock_demo_base = Module examples
 mblock_demo_mform = MForm modul examples
 mblock_demo_html = HTML modul examples
 
-mblock_example_base_simple_example = Team members
+mblock_example_base_teammember_example = Team members
 mblock_example_base_link_example = Link and linklist
 mblock_example_base_media_example = Media and medialist
 mblock_example_base_defaults_example = Misc form elements
+
+mblock_example_html_teammember_example = Team members
+mblock_example_html_link_example = Link and linklist
+mblock_example_html_media_example = Media and medialist
+mblock_example_html_defaults_example = Misc form elements
 
 mblock_modul_input = Modul input
 mblock_modul_output = Modul output
@@ -26,6 +31,7 @@ mblock_github = MBlock at Friends Of REDAXO
 
 mblock_info = Info
 mblock_example_description_base = Examples that demonstrate how to set up multiple blocks within a single module.<br><b>Important:</b> all examples require the MForm addon to be installed!
+mblock_example_description_html = The follow examples demonstrate how to set up multiple block within a single module, without MForm.
 
 mblock_defaults = Settings
 mblock_delete = Remove form content when duplicating data blocks
