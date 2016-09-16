@@ -128,10 +128,25 @@ function mblock_reindex(element) {
 
             // input rex button
             if ($(this).prop("nodeName") == 'INPUT' && $(this).attr('id') && (
-                    $(this).attr('id').indexOf("REX_LINK_") >= 0 ||
                     $(this).attr('id').indexOf("REX_LINKLIST_") >= 0 ||
-                    $(this).attr('id').indexOf("REX_MEDIA_") >= 0 ||
                     $(this).attr('id').indexOf("REX_MEDIALIST_") >= 0
+                )) {
+                if ($(this).parent().data('eindex')) {
+                    eindex = $(this).parent().data('eindex');
+                }
+                $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '00' + eindex));
+
+                // button
+                $(this).parent().find('a.btn-popup').each(function () {
+                    $(this).attr('onclick', $(this).attr('onclick').replace(/\(\d+/, '(' + sindex + '00' + eindex));
+                    $(this).attr('onclick', $(this).attr('onclick').replace(/_\d+/, '_' + sindex + '00' + eindex));
+                });
+            }
+
+            // input rex button
+            if ($(this).prop("nodeName") == 'INPUT' && $(this).attr('id') && (
+                    $(this).attr('id').indexOf("REX_LINK_") >= 0 ||
+                    $(this).attr('id').indexOf("REX_MEDIA_") >= 0
                 )) {
                 if ($(this).attr('type') != 'hidden') {
                     if ($(this).parent().data('eindex')) {
