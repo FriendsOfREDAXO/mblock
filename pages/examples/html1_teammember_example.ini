@@ -1,0 +1,28 @@
+<?php
+
+// this modul input is an example for use easy html form
+
+// base ID
+$id = 1;
+
+// html form
+$form = <<<EOT
+    <fieldset class="form-horizontal ">
+        <legend>Team member</legend>
+        <div class="form-group">
+            <div class="col-sm-2 control-label"><label for="rv2_1_0_name">Name</label></div>
+            <div class="col-sm-10"><input id="rv2_1_0_name" type="text" name="REX_INPUT_VALUE[$id][0][name]" value="" class="form-control "></div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-2 control-label"><label>Avatar</label></div>
+            <div class="col-sm-10">
+                REX_MEDIA[id="1" widget="1"]
+            </div>
+        </div>
+    </fieldset>
+EOT;
+
+// parse form
+echo MBlock::show($id, $form);
+
+?>
