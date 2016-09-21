@@ -43,7 +43,12 @@ class MBlockSystemButtonReplacer
                             }
                             if (strpos($name, 'REX_LINK_') !== false) {
                                 // link button
-                                self::processLink($document, $match, $item);
+                                if (strpos($match->getAttribute('class'), 'custom-link') !== false) {
+                                    self::processCustomLink($document, $match, $item);
+                                } else {
+                                    self::processLink($document, $match, $item);
+                                }
+
                             }
                             if (strpos($id, 'REX_LINKLIST_') !== false) {
                                 // linklist button
@@ -156,6 +161,25 @@ class MBlockSystemButtonReplacer
      * @param MBlockItem $item
      * @author Joachim Doerr
      */
+    protected static function processCustomLink(phpQueryObject $document, DOMElement $dom, MBlockItem $item)
+    {
+        self::processLink($document, $dom, $item);
+        $id = self::replaceCustomLinkButtonId($document, $item);
+
+        if ($matches = $document->find('.custom-link')) {
+            /** @var DOMElement $match */
+            foreach ($matches as $match) {
+                $match->setAttribute('data-id', $id);
+            }
+        }
+    }
+
+    /**
+     * @param phpQueryObject $document
+     * @param DOMElement $dom
+     * @param MBlockItem $item
+     * @author Joachim Doerr
+     */
     protected static function processLinkList(phpQueryObject $document, DOMElement $dom, MBlockItem $item)
     {
         // set system name
@@ -192,6 +216,30 @@ class MBlockSystemButtonReplacer
     /**
      * @param phpQueryObject $document
      * @param MBlockItem $item
+     * @return array|null|string
+     * @author Joachim Doerr
+     */
+    protected static function replaceCustomLinkButtonId(phpQueryObject $document, MBlockItem $item)
+    {
+        $id = null;
+        // find a buttons and replace id
+        if ($matches = $document->find('a.btn-popup')) {
+            /** @var DOMElement $match */
+            foreach ($matches as $match) {
+                $replaceId = self::replaceId($match, $item);
+                if ($replaceId) $id = $replaceId;
+            }
+        }
+        if (!is_null($id)) {
+            $id = explode('_',$id);
+            $id = $id[sizeof($id)-1];
+        }
+        return $id;
+    }
+
+    /**
+     * @param phpQueryObject $document
+     * @param MBlockItem $item
      * @param $btnFindKey
      * @param string $prefix
      * @param string $suffix
@@ -214,6 +262,7 @@ class MBlockSystemButtonReplacer
      * @param DOMElement $dom
      * @param MBlockItem $item
      * @author Joachim Doerr
+     * @return string|null
      */
     protected static function replaceId(DOMElement $dom, MBlockItem $item)
     {
@@ -224,7 +273,9 @@ class MBlockSystemButtonReplacer
         if ($matches) {
             // replace id
             $dom->setAttribute('id', str_replace($matches[0], '_' . $item->getPayload('count-id') .'00' . $item->getPayload('replace-id'), $id));
+            return $dom->getAttribute('id');
         }
+        return null;
     }
 
     /**
