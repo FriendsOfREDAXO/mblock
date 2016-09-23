@@ -269,7 +269,7 @@ function mblock_replace_checkbox_for(element) {
 function mblock_add_item(element, item) {
     if (item.parent().hasClass(element.attr('class'))) {
         // unset sortable
-        element.mblock_sortable("destory");
+        element.mblock_sortable("destroy");
         // add element
         item.after(item.clone());
 
