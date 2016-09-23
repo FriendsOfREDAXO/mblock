@@ -293,6 +293,7 @@ function mblock_add_item(element, item) {
         mblock_init_sort(element);
         // scroll to item
         mblock_scroll(element, item.next());
+        element.trigger('mblock:add', [element]);
     }
 }
 
