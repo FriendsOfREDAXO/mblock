@@ -163,13 +163,18 @@ class MBlockSystemButtonReplacer
      */
     protected static function processCustomLink(phpQueryObject $document, DOMElement $dom, MBlockItem $item)
     {
+        // TODO TODO TODO!!!!
         self::processLink($document, $dom, $item);
         $id = self::replaceCustomLinkButtonId($document, $item);
 
         if ($matches = $document->find('.custom-link')) {
+//            echo '<pre>';
+//            print_r(array(sizeof($matches),$id));
+//            echo '</pre>';
+
             /** @var DOMElement $match */
             foreach ($matches as $match) {
-                $match->setAttribute('data-id', $id);
+//                $match->setAttribute('data-id', $id);
             }
         }
     }
@@ -227,6 +232,9 @@ class MBlockSystemButtonReplacer
             /** @var DOMElement $match */
             foreach ($matches as $match) {
                 $replaceId = self::replaceId($match, $item);
+                echo '<pre>';
+                print_r($replaceId);
+                echo '</pre>';
                 if ($replaceId) $id = $replaceId;
             }
         }
