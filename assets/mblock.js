@@ -309,12 +309,26 @@ function mblock_add_item(element, item) {
                 });
             }
         }
+        // set count
+        mblock_set_count(element, item);
         // reinit
         mblock_init_sort(element);
         // scroll to item
         mblock_scroll(element, item.next());
         element.trigger('mblock:add', [element]);
     }
+}
+
+function mblock_set_count(element, item) {
+    var countItem = item.next().find('span.mb_count'),
+        count = element.find('> div').length;
+
+    if (element.data('latest')) {
+        count = element.data('latest') + 1;
+    }
+
+    countItem.text(count);
+    element.data('latest', count);
 }
 
 function mblock_remove_item(element, item) {
