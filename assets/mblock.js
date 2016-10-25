@@ -160,11 +160,31 @@ function mblock_reindex(element) {
 
                     // button
                     $(this).parent().find('a.btn-popup').each(function () {
-                        $(this).attr('onclick', $(this).attr('onclick').replace(/\(\d+/, '(' + sindex + '00' + eindex));
-                        $(this).attr('onclick', $(this).attr('onclick').replace(/_\d+/, '_' + sindex + '00' + eindex));
+                        if($(this).attr('onclick')) {
+                            $(this).attr('onclick', $(this).attr('onclick').replace(/\(\d+/, '(' + sindex + '00' + eindex));
+                            $(this).attr('onclick', $(this).attr('onclick').replace(/_\d+/, '_' + sindex + '00' + eindex));
+                        }
                     });
                 }
             }
+        });
+
+        $(this).find('.custom-link').each(function(key){
+            eindex = key + 1;
+            sindex = index + 1;
+            customlink = $(this);
+            $(this).find('input').each(function(){
+                if($(this).attr('id')) {
+                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '00' + eindex));
+                }
+            });
+            $(this).find('a.btn-popup').each(function(){
+                if($(this).attr('id')) {
+                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '00' + eindex));
+                }
+            });
+            customlink.attr('data-id', sindex + '00' + eindex);
+            if(typeof mform_custom_link === 'function') mform_custom_link(customlink);
         });
 
         $(this).find('.redactor-box').each(function(key){
