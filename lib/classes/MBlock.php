@@ -65,6 +65,7 @@ class MBlock
             // replace system button data
             $item->setForm(MBlockSystemButtonReplacer::replaceSystemButtons($item, ($count+1)));
             $item->setForm(MBlockEditorReplacer::replaceEditorArea($item, ($count+1)));
+            $item->setForm(MBlockCountReplacer::replaceCountKeys($item, ($count+1)));
 
             // decorate item form
             if ($item->getResult()) {
