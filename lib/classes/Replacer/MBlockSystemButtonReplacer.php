@@ -163,18 +163,40 @@ class MBlockSystemButtonReplacer
      */
     protected static function processCustomLink(phpQueryObject $document, DOMElement $dom, MBlockItem $item)
     {
-        // TODO TODO TODO!!!!
-        self::processLink($document, $dom, $item);
-        $id = self::replaceCustomLinkButtonId($document, $item);
+        if ($dom->hasAttribute('data-id')) {
+            self::replaceDataId($dom, $item);
+        }
 
-        if ($matches = $document->find('.custom-link')) {
-//            echo '<pre>';
-//            print_r(array(sizeof($matches),$id));
-//            echo '</pre>';
+        // set system name
+        $item->setSystemName('REX_INPUT_LINK');
 
-            /** @var DOMElement $match */
-            foreach ($matches as $match) {
-//                $match->setAttribute('data-id', $id);
+        $id = $item->getPayload('count-id') .'00' . $item->getPayload('replace-id');
+
+        // has children ?
+        if ($dom->hasChildNodes()) {
+            /** @var DOMElement $child */
+            foreach ($dom->getElementsByTagName('input') as $child) {
+                // hidden input
+                if (strpos($child->getAttribute('name'), 'REX_INPUT_LINK') !== false) {
+                    // replace name
+                    self::replaceName($child, $item, 'REX_INPUT_LINK');
+                }
+                // change id
+                $attrId = preg_replace('/\d+/', $id, $child->getAttribute('id'));
+                $child->setAttribute('id', $attrId);
+            }
+            // remove name
+            $dom->firstChild->removeAttribute('name');
+            // add link art name
+            self::addArtName($dom->firstChild, $item);
+
+            if ($parent = $dom->parentNode) {
+                if ($parent->hasChildNodes()) {
+                    foreach ($parent->getElementsByTagName('a') as $child) {
+                        $attrId = preg_replace('/\d+/', $id, $child->getAttribute('id'));
+                        $child->setAttribute('id', $attrId);
+                    }
+                }
             }
         }
     }
@@ -221,33 +243,6 @@ class MBlockSystemButtonReplacer
     /**
      * @param phpQueryObject $document
      * @param MBlockItem $item
-     * @return array|null|string
-     * @author Joachim Doerr
-     */
-    protected static function replaceCustomLinkButtonId(phpQueryObject $document, MBlockItem $item)
-    {
-        $id = null;
-        // find a buttons and replace id
-        if ($matches = $document->find('a.btn-popup')) {
-            /** @var DOMElement $match */
-            foreach ($matches as $match) {
-                $replaceId = self::replaceId($match, $item);
-                echo '<pre>';
-                print_r($replaceId);
-                echo '</pre>';
-                if ($replaceId) $id = $replaceId;
-            }
-        }
-        if (!is_null($id)) {
-            $id = explode('_',$id);
-            $id = $id[sizeof($id)-1];
-        }
-        return $id;
-    }
-
-    /**
-     * @param phpQueryObject $document
-     * @param MBlockItem $item
      * @param $btnFindKey
      * @param string $prefix
      * @param string $suffix
@@ -284,6 +279,17 @@ class MBlockSystemButtonReplacer
             return $dom->getAttribute('id');
         }
         return null;
+    }
+
+    /**
+     * @param DOMElement $dom
+     * @param MBlockItem $item
+     * @author Joachim Doerr
+     */
+    protected static function replaceDataId(DOMElement $dom, MBlockItem $item)
+    {
+        // get input id
+        $dom->setAttribute('data-id', $item->getPayload('count-id') .'00' . $item->getPayload('replace-id'));
     }
 
     /**
