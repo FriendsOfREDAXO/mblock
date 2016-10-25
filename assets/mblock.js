@@ -115,7 +115,7 @@ function mblock_reindex(element) {
             }
 
             // select rex button
-            if ($(this).prop("nodeName") == 'SELECT' && (
+            if ($(this).prop("nodeName") == 'SELECT' && $(this).attr('id') && (
                     $(this).attr('id').indexOf("REX_MEDIALIST_SELECT_") >= 0 ||
                     $(this).attr('id').indexOf("REX_LINKLIST_SELECT_") >= 0
                 )) {
@@ -127,22 +127,64 @@ function mblock_reindex(element) {
             }
 
             // input rex button
-            if ($(this).prop("nodeName") == 'INPUT' && (
-                    $(this).attr('id').indexOf("REX_LINK_") >= 0 ||
+            if ($(this).prop("nodeName") == 'INPUT' && $(this).attr('id') && (
                     $(this).attr('id').indexOf("REX_LINKLIST_") >= 0 ||
-                    $(this).attr('id').indexOf("REX_MEDIA_") >= 0 ||
                     $(this).attr('id').indexOf("REX_MEDIALIST_") >= 0
                 )) {
                 if ($(this).parent().data('eindex')) {
                     eindex = $(this).parent().data('eindex');
                 }
                 $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '00' + eindex));
+
                 // button
-                $(this).parent().find('a.btn-popup').each(function(){
+                $(this).parent().find('a.btn-popup').each(function () {
                     $(this).attr('onclick', $(this).attr('onclick').replace(/\(\d+/, '(' + sindex + '00' + eindex));
                     $(this).attr('onclick', $(this).attr('onclick').replace(/_\d+/, '_' + sindex + '00' + eindex));
                 });
             }
+
+            // input rex button
+            if ($(this).prop("nodeName") == 'INPUT' && $(this).attr('id') && (
+                    $(this).attr('id').indexOf("REX_LINK_") >= 0 ||
+                    $(this).attr('id').indexOf("REX_MEDIA_") >= 0
+                )) {
+                if ($(this).attr('type') != 'hidden') {
+                    if ($(this).parent().data('eindex')) {
+                        eindex = $(this).parent().data('eindex');
+                    }
+                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '00' + eindex));
+
+                    if ($(this).next().attr('type') == 'hidden') {
+                        $(this).next().attr('id', $(this).next().attr('id').replace(/\d+/, sindex + '00' + eindex));
+                    }
+
+                    // button
+                    $(this).parent().find('a.btn-popup').each(function () {
+                        if($(this).attr('onclick')) {
+                            $(this).attr('onclick', $(this).attr('onclick').replace(/\(\d+/, '(' + sindex + '00' + eindex));
+                            $(this).attr('onclick', $(this).attr('onclick').replace(/_\d+/, '_' + sindex + '00' + eindex));
+                        }
+                    });
+                }
+            }
+        });
+
+        $(this).find('.custom-link').each(function(key){
+            eindex = key + 1;
+            sindex = index + 1;
+            customlink = $(this);
+            $(this).find('input').each(function(){
+                if($(this).attr('id')) {
+                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '00' + eindex));
+                }
+            });
+            $(this).find('a.btn-popup').each(function(){
+                if($(this).attr('id')) {
+                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '00' + eindex));
+                }
+            });
+            customlink.attr('data-id', sindex + '00' + eindex);
+            if(typeof mform_custom_link === 'function') mform_custom_link(customlink);
         });
 
         $(this).find('.redactor-box').each(function(key){
@@ -217,20 +259,22 @@ function mblock_reindex(element) {
 }
 
 function mblock_replace_for(element, item, index) {
-    if (item.attr('id').indexOf("REX_MEDIA") >= 0 ||
+    if (item.attr('id') && (item.attr('id').indexOf("REX_MEDIA") >= 0 ||
         item.attr('id').indexOf("REX_LINK") >= 0 ||
         item.attr('id').indexOf("redactor") >= 0 ||
         item.attr('id').indexOf("markitup") >= 0
-    ) { } else {
-        item.attr('id', item.attr('id').replace(/_\d_+/, '_' + index + '_'));
-        if (item.parent().find('label').length) {
-            label = item.parent().find('label');
-        }
-        if (item.parent().parent().find('label').length) {
-            label = item.parent().parent().find('label');
-        }
-        if (label.length) {
-            label.attr('for', label.attr('for').replace(/_\d_+/, '_' + index + '_'));
+    )) { } else {
+        if (item.attr('id')) {
+            item.attr('id', item.attr('id').replace(/_\d_+/, '_' + index + '_'));
+            if (item.parent().find('label').length) {
+                label = item.parent().find('label');
+            }
+            if (item.parent().parent().find('label').length) {
+                label = item.parent().parent().find('label');
+            }
+            if (label.length) {
+                label.attr('for', label.attr('for').replace(/_\d_+/, '_' + index + '_'));
+            }
         }
     }
     mblock_replace_checkbox_for(element);
@@ -257,9 +301,9 @@ function mblock_add_item(element, item) {
                 item.next().find('option:selected').removeAttr("selected");
                 item.next().find('input:checked').removeAttr("checked");
                 item.next().find('select').each(function () {
-                    if ($(this).attr('id').indexOf("REX_MEDIALIST") >= 0
+                    if ($(this).attr('id') && ($(this).attr('id').indexOf("REX_MEDIALIST") >= 0
                         || $(this).attr('id').indexOf("REX_LINKLIST") >= 0
-                    ) {
+                    )) {
                         $(this).find('option').remove();
                     }
                 });
