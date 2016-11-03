@@ -8,6 +8,44 @@ $(function () {
     });
 });
 
+var mblock_module = (function(){
+    var callbacks = {
+        add_item_start: [],
+        reindex_end: [],
+    };
+    var mod = {}
+
+    // Register a callback
+    // @input evnt string name of the event
+    // @input f function callback
+    // @output void
+    mod.registerCallback = function(evnt, f) {
+        callbacks[evnt].push(f);
+    }
+
+    // @input evnt string name of the event
+    // @output []function
+    mod.getRegisteredCallbacks = function(evnt) {
+        if (typeof callbacks[evnt] === 'undefined') {
+            return [];
+        }
+        else {
+            return callbacks[evnt];
+        }
+    }
+
+    // @input evnt string name of the event
+    // @output void
+    mod.executeRegisteredCallbacks = function(evnt) {
+        var list = mod.getRegisteredCallbacks(evnt);
+        for (var i=0;i<list.length;i++) {
+            list[i]();
+        }
+    }
+
+    return mod;
+})();
+
 function mblock_init() {
     var mblock = $('.mblock_wrapper');
     // init by siteload
@@ -256,6 +294,7 @@ function mblock_reindex(element) {
         }
 
     }
+    mblock_module.executeRegisteredCallbacks('reindex_end');
 }
 
 function mblock_replace_for(element, item, index) {
@@ -287,6 +326,7 @@ function mblock_replace_checkbox_for(element) {
 }
 
 function mblock_add_item(element, item) {
+    mblock_module.executeRegisteredCallbacks('add_item_start');
     if (item.parent().hasClass(element.attr('class'))) {
         // unset sortable
         element.mblock_sortable("destroy");
