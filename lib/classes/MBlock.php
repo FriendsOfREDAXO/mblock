@@ -76,8 +76,17 @@ class MBlock
             $element = new MBlockElement();
             $element->setForm($item->getForm());
 
+            // parse element to output
+            $output = MBlockParser::parseElement($element, 'element');
+
+            // fix & error
+            foreach ($item->getResult() as $result) {
+                if (is_array($result) && array_key_exists('id', $result)) {
+                    $output = str_replace($result['id'], $result['value'], $output);
+                }
+            }
             // add to output
-            static::$output[] = MBlockParser::parseElement($element, 'element');
+            static::$output[] = $output;
         }
 
         // wrap parsed form items

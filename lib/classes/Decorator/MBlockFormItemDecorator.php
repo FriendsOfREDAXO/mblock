@@ -118,7 +118,19 @@ class MBlockFormItemDecorator
                     if ($matches && array_key_exists($matches[1], $item->getResult())) $dom->setAttribute('value', $item->getResult()[$matches[1]]);
                     break;
                 case 'textarea':
-                    if ($matches && array_key_exists($matches[1], $item->getResult())) $dom->nodeValue = $item->getResult()[$matches[1]];
+                    if ($matches && array_key_exists($matches[1], $item->getResult())) {
+                        $result = $item->getResult();
+                        $id = uniqid(md5(rand(1000,9999)),true);
+                        // node value cannot contains &
+                        // so set a unique id there we replace later with the right value
+                        $dom->nodeValue = $id;
+
+                        // add the id to the result value
+                        $result[$matches[1]] = array('id'=>$id, 'value'=>$result[$matches[1]]);
+
+                        // reset result
+                        $item->setResult($result);
+                    }
                     break;
             }
         }
