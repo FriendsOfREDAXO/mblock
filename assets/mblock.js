@@ -265,10 +265,12 @@ function mblock_reindex(element) {
                     area = $(this).clone().css('display','block');
                 }
             });
-            if (area.length) {
-                $(this).parent().append(area);
-                $(this).parent().find('textarea').val(content);
-                $(this).remove();
+            if (typeof area === 'object') {
+                if (area.length) {
+                    $(this).parent().append(area);
+                    $(this).parent().find('textarea').val(content);
+                    $(this).remove();
+                }
             }
         });
 
@@ -305,14 +307,22 @@ function mblock_replace_for(element, item, index) {
     )) { } else {
         if (item.attr('id')) {
             item.attr('id', item.attr('id').replace(/_\d_+/, '_' + index + '_'));
+
+            var label;
+
+            if (item.find('label').length) {
+                label = item.find('label');
+            }
             if (item.parent().find('label').length) {
                 label = item.parent().find('label');
             }
             if (item.parent().parent().find('label').length) {
                 label = item.parent().parent().find('label');
             }
-            if (label.length) {
-                label.attr('for', label.attr('for').replace(/_\d_+/, '_' + index + '_'));
+            if (typeof label === 'object') {
+                if (label.length) {
+                    label.attr('for', label.attr('for').replace(/_\d_+/, '_' + index + '_'));
+                }
             }
         }
     }
