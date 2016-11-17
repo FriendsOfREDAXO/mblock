@@ -51,7 +51,6 @@ function mblock_init() {
     // init by siteload
     if ($('#REX_FORM').length && mblock.length) {
         mblock.each(function(){
-            // alert('test1');
             mblock_sort($(this));
         });
     }
@@ -260,15 +259,16 @@ function mblock_reindex(element) {
                 }
             });
             $(this).find('textarea').each(function(){
-                if($(this).attr('id')) {
-                    // copy content
+                if ($(this).css('display') == 'none') {
                     area = $(this).clone().css('display','block');
                 }
             });
-            if (area.length) {
-                $(this).parent().append(area);
-                $(this).parent().find('textarea').val(content);
-                $(this).remove();
+            if (typeof area === 'object') {
+                if (area.length) {
+                    $(this).parent().append(area);
+                    $(this).parent().find('textarea').val(content);
+                    $(this).remove();
+                }
             }
         });
 
@@ -282,9 +282,11 @@ function mblock_reindex(element) {
             $(this).find('textarea').each(function(){
                 area = $(this).clone();
             });
-            if (area.length) {
-                $(this).parent().append(area);
-                $(this).remove();
+            if (typeof area === 'object') {
+                if (area.length) {
+                    $(this).parent().append(area);
+                    $(this).remove();
+                }
             }
         });
 
