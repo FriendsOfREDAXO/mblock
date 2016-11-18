@@ -206,6 +206,11 @@ function mblock_reindex(element) {
             }
         });
 
+        var mselect = $(this).find('.multiple-select');
+        if (mselect.length > 0) {
+            mform_multiple_select(mselect);
+        }
+
         $(this).find('.custom-link').each(function(key){
             eindex = key + 1;
             sindex = index + 1;
