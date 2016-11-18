@@ -175,9 +175,21 @@ class MBlockFormItemDecorator
             if ($option->hasAttribute('selected')) {
                 $option->removeAttribute('selected');
             }
+
             // set select by value = result
-            if ($matches && array_key_exists($matches[1], $item->getResult()) && $item->getResult()[$matches[1]] == $option->getAttribute('value')) {
-                $option->setAttribute('selected', 'selected');
+            if ($matches && array_key_exists($matches[1], $item->getResult())) {
+
+                if (is_array($item->getResult()[$matches[1]])) {
+                    $values = $item->getResult()[$matches[1]];
+                } else {
+                    $values = explode(',',$item->getResult()[$matches[1]]);
+                }
+
+                foreach ($values as $value) {
+                    if ($value == $option->getAttribute('value')) {
+                        $option->setAttribute('selected', 'selected');
+                    }
+                }
             }
         }
     }
