@@ -236,7 +236,7 @@ class MBlockFormItemDecorator
      */
     public static function getName(DOMElement $dom)
     {
-        preg_match('/^.*?\[(\w+)\]$/i', $dom->getAttribute('name'), $matches);
+        preg_match('/^.*?\[(\w+)\]$/i', str_replace('[]','',$dom->getAttribute('name')), $matches);
         return $matches;
     }
 
