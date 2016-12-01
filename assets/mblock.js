@@ -264,7 +264,7 @@ function mblock_reindex(element) {
                 }
             });
             $(this).find('textarea').each(function(){
-                if ($(this).css('display') == 'none') {
+                if ($(this).attr('class').indexOf("redactor") >= 0) {
                     area = $(this).clone().css('display','block');
                 }
             });
