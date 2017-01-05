@@ -264,8 +264,11 @@ function mblock_reindex(element) {
                 }
             });
             $(this).find('textarea').each(function(){
-                if ($(this).attr('class').indexOf("redactor") >= 0) {
-                    area = $(this).clone().css('display','block');
+                var attr = $(this).attr('class');
+                if (typeof attr !== typeof undefined && attr !== false) {
+                    if ($(this).attr('class').indexOf("redactor") >= 0) {
+                        area = $(this).clone().css('display','block');
+                    }
                 }
             });
             if (typeof area === 'object') {
