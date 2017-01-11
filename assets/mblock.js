@@ -52,6 +52,7 @@ function mblock_init() {
     if ($('#REX_FORM').length && mblock.length) {
         mblock.each(function(){
             mblock_sort($(this));
+            mblock_set_unique_id($(this), false);
         });
     }
 }
@@ -365,6 +366,7 @@ function mblock_add_item(element, item) {
                 });
             }
         }
+        mblock_set_unique_id(item.next(), true);
         // set count
         mblock_set_count(element, item);
         // reinit
@@ -373,6 +375,25 @@ function mblock_add_item(element, item) {
         mblock_scroll(element, item.next());
         element.trigger('mblock:add', [element]);
     }
+}
+
+function mblock_set_unique_id(item, input_delete) {
+    var unique_id = Math.random().toString(16).slice(2),
+        unique_int = Math.random();
+
+    item.find('input').each(function() {
+        if ($(this).attr('data-unique-int') == 1) {
+            unique_id = unique_int;
+        }
+        if ($(this).attr('data-unique') == 1 || $(this).attr('data-unique-int') == 1) {
+            if (input_delete == true) {
+                $(this).val('');
+            }
+            if ($(this).val() == '') {
+                $(this).val(unique_id);
+            }
+        }
+    });
 }
 
 function mblock_set_count(element, item) {
