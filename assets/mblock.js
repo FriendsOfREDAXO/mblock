@@ -137,7 +137,7 @@ function mblock_reindex(element) {
 
     element.find('> div').each(function(index) {
         // find input elements
-        $(this).find('input,textarea,select').each(function(key) {
+        $(this).find('input,textarea,select,button').each(function(key) {
             var attr = $(this).attr('name');
             eindex = key + 1;
             sindex = index + 1;
@@ -378,10 +378,10 @@ function mblock_add_item(element, item) {
 }
 
 function mblock_set_unique_id(item, input_delete) {
-    var unique_id = Math.random().toString(16).slice(2),
-        unique_int = Math.random();
-
     item.find('input').each(function() {
+        var unique_id = Math.random().toString(16).slice(2),
+            unique_int = parseInt(Math.random()*1000000000000);
+
         if ($(this).attr('data-unique-int') == 1) {
             unique_id = unique_int;
         }
