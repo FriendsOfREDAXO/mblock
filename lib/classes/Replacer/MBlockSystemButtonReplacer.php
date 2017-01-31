@@ -28,7 +28,14 @@ class MBlockSystemButtonReplacer
                     /** @var DOMElement $child */
                     foreach ($match->getElementsByTagName('input') as $child) {
                         if ($child->getAttribute('type') == 'text') {
-                            $child->setAttribute('value', $value);
+                            // is numeric also link
+                            if (is_numeric($value)) {
+                                // add link art name
+                                $linkInfo = self::getLinkInfo($value);
+                                $child->setAttribute('value', $linkInfo['art_name']);
+                            } else {
+                                $child->setAttribute('value', $value);
+                            }
                             break;
                         }
                     }
