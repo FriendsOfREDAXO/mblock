@@ -70,6 +70,8 @@ class MBlock
             // decorate item form
             if ($item->getResult()) {
                 $item->setForm(MBlockFormItemDecorator::decorateFormItem($item));
+                // custom link hidden to text
+                $item->setForm(MBlockSystemButtonReplacer::replaceCustomLinkText($item));
             }
 
             // parse form item
