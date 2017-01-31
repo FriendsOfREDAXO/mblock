@@ -7,6 +7,38 @@
 
 class MBlockSystemButtonReplacer
 {
+    public static function replaceCustomLinkText(MBlockItem $item)
+    {
+        // set phpquery document
+        $document = phpQuery::newDocumentHTML($item->getForm());
+
+        // find custom-link
+        if ($matches = $document->find('.custom-link')) {
+            /** @var DOMElement $match */
+            foreach ($matches as $key => $match) {
+                if ($match->hasChildNodes()) {
+                    $value = '';
+                    /** @var DOMElement $child */
+                    foreach ($match->getElementsByTagName('input') as $child) {
+                        if ($child->getAttribute('type') == 'hidden') {
+                            $value = $child->getAttribute('value');
+                            break;
+                        }
+                    }
+                    /** @var DOMElement $child */
+                    foreach ($match->getElementsByTagName('input') as $child) {
+                        if ($child->getAttribute('type') == 'text') {
+                            $child->setAttribute('value', $value);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        // return the manipulated html output
+        return $document->htmlOuter();
+    }
+
     /**
      * @param MBlockItem $item
      * @param $count
