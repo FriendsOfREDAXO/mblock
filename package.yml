@@ -1,21 +1,21 @@
 package: mblock
-version: '1.6.5'
+version: 1.7.0
 name: MBlock
 author: Friends Of REDAXO
 supportpage: https://github.com/FriendsOfREDAXO/mblock
 
 page:
-    title: 'translate:title'
+    title: translate:title
     pjax: true
     perm: mblock[]
     icon: rex-icon fa-train
     subpages:
-        overview: { title: 'translate:overview' }
+        overview: { title: translate:overview }
         demo:
-            title: 'translate:demo_base'
+            title: translate:demo_base
             subpages:
-                demo_mform: { title: 'translate:demo_mform' }
-                demo_html: { title: 'translate:demo_html' }
+                demo_mform: { title: translate:demo_mform }
+                demo_html: { title: translate:demo_html }
 
 requires:
-    redaxo: '^5.1.0'
+    redaxo: ^5.1.0
