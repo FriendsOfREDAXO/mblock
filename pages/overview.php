@@ -10,6 +10,7 @@ $config = rex_post('config', array(
     array('mblock_theme', 'string'),
     array('mblock_scroll', 'boolean'),
     array('mblock_delete', 'boolean'),
+    array('mblock_delete_confirm', 'boolean'),
     array('submit', 'boolean')
 ));
 
@@ -34,6 +35,7 @@ if ($config['submit']) {
     $this->setConfig('mblock_theme', $config['mblock_theme']);
     $this->setConfig('mblock_delete', $config['mblock_delete']);
     $this->setConfig('mblock_scroll', $config['mblock_scroll']);
+    $this->setConfig('mblock_delete_confirm', $config['mblock_delete_confirm']);
     $form .= rex_view::info(rex_i18n::msg('mblock_config_saved'));
 }
 
@@ -74,11 +76,11 @@ $form .= $fragment->parse('core/form/form.php');
 $formElements = array();
 $elements = array();
 $elements['label'] = '
-  <label for="rex-mblock-config-template">' . rex_i18n::msg('mblock_delete_label') . '</label>
+  <label for="rex-mblock-config-delete-label">' . rex_i18n::msg('mblock_delete_label') . '</label>
 ';
 // create select
 $select = new rex_select;
-$select->setId('rex-mblock-config-delete');
+$select->setId('rex-mblock-config-delete-label');
 $select->setSize(1);
 $select->setAttribute('class', 'form-control');
 $select->setName('config[mblock_delete]');
@@ -97,11 +99,11 @@ $form .= $fragment->parse('core/form/form.php');
 $formElements = array();
 $elements = array();
 $elements['label'] = '
-  <label for="rex-mblock-config-template">' . rex_i18n::msg('mblock_scroll_label') . '</label>
+  <label for="rex-mblock-config-scroll-label">' . rex_i18n::msg('mblock_scroll_label') . '</label>
 ';
 // create select
 $select = new rex_select;
-$select->setId('rex-mblock-config-scroll');
+$select->setId('rex-mblock-config-scroll-label');
 $select->setSize(1);
 $select->setAttribute('class', 'form-control');
 $select->setName('config[mblock_scroll]');
@@ -109,6 +111,29 @@ $select->setName('config[mblock_scroll]');
 $select->addOption(rex_i18n::msg('mblock_not_scroll'), 0);
 $select->addOption(rex_i18n::msg('mblock_scroll'), 1);
 $select->setSelected($this->getConfig('mblock_scroll'));
+$elements['field'] = $select->get();
+$formElements[] = $elements;
+// parse select element
+$fragment = new rex_fragment();
+$fragment->setVar('elements', $formElements, false);
+$form .= $fragment->parse('core/form/form.php');
+
+// label
+$formElements = array();
+$elements = array();
+$elements['label'] = '
+  <label for="rex-mblock-config-delete-confirm">' . rex_i18n::msg('mblock_delete_confirm_label') . '</label>
+';
+// create select
+$select = new rex_select;
+$select->setId('rex-mblock-config-delete-confirm');
+$select->setSize(1);
+$select->setAttribute('class', 'form-control');
+$select->setName('config[mblock_delete_confirm]');
+// add options
+$select->addOption(rex_i18n::msg('mblock_not_delete_confirm'), 0);
+$select->addOption(rex_i18n::msg('mblock_ok_delete_confirm'), 1);
+$select->setSelected($this->getConfig('mblock_delete_confirm'));
 $elements['field'] = $select->get();
 $formElements[] = $elements;
 // parse select element

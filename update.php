@@ -15,6 +15,9 @@ if (!$this->hasConfig('mblock_delete')) {
 if (!$this->hasConfig('mblock_scroll')) {
     $this->setConfig('mblock_scroll', 1);
 }
+if (!$this->hasConfig('mblock_delete_confirm')) {
+    $this->setConfig('mblock_delete_confirm', 1);
+}
 
 // copy data directory
 rex_dir::copy($this->getPath('data'), $this->getDataPath());

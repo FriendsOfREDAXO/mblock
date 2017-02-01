@@ -14,14 +14,25 @@ class MBlockSettingsHelper
      */
     public static function getSettings(array $settings)
     {
+        $addon = rex_addon::get('mblock');
         $out = '';
         if (!array_key_exists('input_delete', $settings)) {
             // set default
-            $settings['input_delete'] = rex_addon::get('mblock')->getConfig('mblock_delete');
+            $settings['input_delete'] = $addon->getConfig('mblock_delete');
         }
         if (!array_key_exists('smooth_scroll', $settings)) {
             // set default
-            $settings['smooth_scroll'] = rex_addon::get('mblock')->getConfig('mblock_scroll');
+            $settings['smooth_scroll'] = $addon->getConfig('mblock_scroll');
+        }
+        if (!array_key_exists('delete_confirm', $settings)) {
+            if ($addon->getConfig('mblock_delete_confirm')) {
+                // set default
+                $settings['delete_confirm'] = rex_i18n::msg('mblock_delete_confirm');
+            }
+        } else {
+            if ($settings['delete_confirm'] == 1) {
+                $settings['delete_confirm'] = rex_i18n::msg('mblock_delete_confirm');
+            }
         }
 
         foreach ($settings as $key => $value) {
