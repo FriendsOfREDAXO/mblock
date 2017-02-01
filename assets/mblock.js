@@ -409,6 +409,13 @@ function mblock_set_count(element, item) {
 }
 
 function mblock_remove_item(element, item) {
+
+    if(element.data().hasOwnProperty('delete_confirm')) {
+        if (!confirm(element.data('delete_confirm'))) {
+            return false;
+        }
+    }
+
     if (item.parent().hasClass(element.attr('class'))) {
         // unset sortable
         element.mblock_sortable("destory");
