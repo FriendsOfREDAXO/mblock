@@ -148,10 +148,6 @@ function mblock_reindex(element) {
                 $(this).attr('name', value);
             }
 
-            // if ($(this).attr('id')) {
-            //     mblock_replace_for(element, $(this), index);
-            // }
-
             // select rex button
             if ($(this).prop("nodeName") == 'SELECT' && $(this).attr('id') && (
                     $(this).attr('id').indexOf("REX_MEDIALIST_SELECT_") >= 0 ||
@@ -305,35 +301,32 @@ function mblock_reindex(element) {
         }
 
     }
+    // sets for attribute for most elements to make them work accordingly
+    mblock_replace_for(element);
+
     mblock_module.executeRegisteredCallbacks('reindex_end');
 }
 
-function mblock_replace_for(element, item, index) {
-    if (item.attr('id') && (item.attr('id').indexOf("REX_MEDIA") >= 0 ||
-        item.attr('id').indexOf("REX_LINK") >= 0 ||
-        item.attr('id').indexOf("redactor") >= 0 ||
-        item.attr('id').indexOf("markitup") >= 0
-    )) { } else {
-        if (item.attr('id')) {
-            item.attr('id', item.attr('id').replace(/_\d_+/, '_' + index + '_'));
-
-            var label;
-
-            if (item.find('label').length) {
-                label = item.find('label');
-            }
-            if (item.parent().find('label').length) {
-                label = item.parent().find('label');
-            }
-            if (item.parent().parent().find('label').length) {
-                label = item.parent().parent().find('label');
-            }
-            if (label.length) {
-                label.attr('for', label.attr('for').replace(/_\d_+/, '_' + index + '_'));
-            }
-        }
-    }
-    mblock_replace_checkbox_for(element);
+function mblock_replace_for(element) {
+	
+	element.find(' > div').each(function(index) {
+		var mblock = $(this);
+		mblock.find('input,textarea,select').each(function(key) {
+			var el = $(this);
+			var id = el.attr('id');
+			if (typeof id !== typeof undefined && id !== false) {
+				if (!(id.indexOf("REX_MEDIA") >= 0 ||
+				    id.indexOf("REX_LINK") >= 0 ||
+				    id.indexOf("redactor") >= 0 ||
+				    id.indexOf("markitup") >= 0)
+				) {
+					var label = mblock.find('label[for="'+id+'"]');
+					el.attr('id', el.attr('name'));
+					label.attr('for', el.attr('name'));
+				}
+			}
+		});
+	});
 }
 
 function mblock_replace_checkbox_for(element) {
