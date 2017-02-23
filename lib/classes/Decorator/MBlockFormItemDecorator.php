@@ -205,6 +205,10 @@ class MBlockFormItemDecorator
     {
         // get input id
         $domId = $dom->getAttribute('id');
+        
+        if (!$domId) {
+            return true;
+        }
 
         if (strpos($domId, 'REX_MEDIA') !== false
             or strpos($dom->getAttribute('class'), 'redactorEditor') !== false
