@@ -148,6 +148,20 @@ function mblock_reindex(element) {
                 $(this).attr('name', value);
             }
 
+            if ($(this).attr('type') == 'checkbox') {
+                $(this).unbind().bind('change', function(){
+                    if ($(this).is(':checked')) {
+                        $(this).val(1);
+                    } else {
+                        $(this).val(0);
+                    }
+                });
+            }
+
+            // if ($(this).attr('id')) {
+            //     mblock_replace_for(element, $(this), index);
+            // }
+
             // select rex button
             if ($(this).prop("nodeName") == 'SELECT' && $(this).attr('id') && (
                     $(this).attr('id').indexOf("REX_MEDIALIST_SELECT_") >= 0 ||
@@ -308,25 +322,25 @@ function mblock_reindex(element) {
 }
 
 function mblock_replace_for(element) {
-	
-	element.find(' > div').each(function(index) {
-		var mblock = $(this);
-		mblock.find('input,textarea,select').each(function(key) {
-			var el = $(this);
-			var id = el.attr('id');
-			if (typeof id !== typeof undefined && id !== false) {
-				if (!(id.indexOf("REX_MEDIA") >= 0 ||
-				    id.indexOf("REX_LINK") >= 0 ||
-				    id.indexOf("redactor") >= 0 ||
-				    id.indexOf("markitup") >= 0)
-				) {
-					var label = mblock.find('label[for="'+id+'"]');
-					el.attr('id', el.attr('name'));
-					label.attr('for', el.attr('name'));
-				}
-			}
-		});
-	});
+
+    element.find(' > div').each(function(index) {
+        var mblock = $(this);
+        mblock.find('input,textarea,select').each(function(key) {
+            var el = $(this);
+            var id = el.attr('id');
+            if (typeof id !== typeof undefined && id !== false) {
+                if (!(id.indexOf("REX_MEDIA") >= 0 ||
+                    id.indexOf("REX_LINK") >= 0 ||
+                    id.indexOf("redactor") >= 0 ||
+                    id.indexOf("markitup") >= 0)
+                ) {
+                    var label = mblock.find('label[for="'+id+'"]');
+                    el.attr('id', el.attr('name'));
+                    label.attr('for', el.attr('name'));
+                }
+            }
+        });
+    });
 }
 
 function mblock_replace_checkbox_for(element) {
