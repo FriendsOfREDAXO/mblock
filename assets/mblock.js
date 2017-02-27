@@ -3,12 +3,12 @@
  */
 $(function () {
     mblock_init();
-    $(document).on('pjax:end', function() {
+    $(document).on('pjax:end', function () {
         mblock_init();
     });
 });
 
-var mblock_module = (function(){
+var mblock_module = (function () {
     var callbacks = {
         add_item_start: [],
         reindex_end: [],
@@ -19,13 +19,13 @@ var mblock_module = (function(){
     // @input evnt string name of the event
     // @input f function callback
     // @output void
-    mod.registerCallback = function(evnt, f) {
+    mod.registerCallback = function (evnt, f) {
         callbacks[evnt].push(f);
     }
 
     // @input evnt string name of the event
     // @output []function
-    mod.getRegisteredCallbacks = function(evnt) {
+    mod.getRegisteredCallbacks = function (evnt) {
         if (typeof callbacks[evnt] === 'undefined') {
             return [];
         }
@@ -36,9 +36,9 @@ var mblock_module = (function(){
 
     // @input evnt string name of the event
     // @output void
-    mod.executeRegisteredCallbacks = function(evnt) {
+    mod.executeRegisteredCallbacks = function (evnt) {
         var list = mod.getRegisteredCallbacks(evnt);
-        for (var i=0;i<list.length;i++) {
+        for (var i = 0; i < list.length; i++) {
             list[i]();
         }
     }
@@ -50,7 +50,7 @@ function mblock_init() {
     var mblock = $('.mblock_wrapper');
     // init by siteload
     if ($('#REX_FORM').length && mblock.length) {
-        mblock.each(function(){
+        mblock.each(function () {
             mblock_sort($(this));
             mblock_set_unique_id($(this), false);
         });
@@ -84,7 +84,7 @@ function mblock_remove(element) {
     }
 
     // has data?
-    if(element.data().hasOwnProperty('max')) {
+    if (element.data().hasOwnProperty('max')) {
         if (finded.length >= element.data('max')) {
             element.find('.addme').prop('disabled', true);
         } else {
@@ -92,7 +92,7 @@ function mblock_remove(element) {
         }
     }
 
-    if(element.data().hasOwnProperty('min')) {
+    if (element.data().hasOwnProperty('min')) {
         if (finded.length <= element.data('min')) {
             element.find('.removeme').prop('disabled', true);
         } else {
@@ -100,17 +100,17 @@ function mblock_remove(element) {
         }
     }
 
-    finded.each(function(index){
+    finded.each(function (index) {
         // min removeme hide
-        if ((index+1)==element.data('min') && finded.length == element.data('min')) {
+        if ((index + 1) == element.data('min') && finded.length == element.data('min')) {
             $(this).find('.removeme').prop('disabled', true);
         }
-        if (index==0) {
+        if (index == 0) {
             $(this).find('.moveup').prop('disabled', true);
         } else {
             $(this).find('.moveup').prop('disabled', false);
         }
-        if ((index + 1)== finded.length) { // if max count?
+        if ((index + 1) == finded.length) { // if max count?
             $(this).find('.movedown').prop('disabled', true);
         } else {
             $(this).find('.movedown').prop('disabled', false);
@@ -135,9 +135,9 @@ function mblock_reindex(element) {
     var initredactor = false,
         initmarkitup = false;
 
-    element.find('> div').each(function(index) {
+    element.find('> div').each(function (index) {
         // find input elements
-        $(this).find('input,textarea,select,button').each(function(key) {
+        $(this).find('input,textarea,select,button').each(function (key) {
             var attr = $(this).attr('name');
             eindex = key + 1;
             sindex = index + 1;
@@ -148,8 +148,17 @@ function mblock_reindex(element) {
                 $(this).attr('name', value);
             }
 
+            // remove for for checkbox and radio boxes
+            if ($(this).attr('type') == 'checkbox' || $(this).attr('type') == 'radio') {
+                if ($(this).parent().is('label')) {
+                    // remove for
+                    $(this).parent().removeAttr('for');
+                }
+            }
+
+            // checkbox problem fix
             if ($(this).attr('type') == 'checkbox') {
-                $(this).unbind().bind('change', function(){
+                $(this).unbind().bind('change', function () {
                     if ($(this).is(':checked')) {
                         $(this).val(1);
                     } else {
@@ -157,10 +166,6 @@ function mblock_reindex(element) {
                     }
                 });
             }
-
-            // if ($(this).attr('id')) {
-            //     mblock_replace_for(element, $(this), index);
-            // }
 
             // select rex button
             if ($(this).prop("nodeName") == 'SELECT' && $(this).attr('id') && (
@@ -208,7 +213,7 @@ function mblock_reindex(element) {
 
                     // button
                     $(this).parent().find('a.btn-popup').each(function () {
-                        if($(this).attr('onclick')) {
+                        if ($(this).attr('onclick')) {
                             $(this).attr('onclick', $(this).attr('onclick').replace(/\(\d+/, '(' + sindex + '00' + eindex));
                             $(this).attr('onclick', $(this).attr('onclick').replace(/_\d+/, '_' + sindex + '00' + eindex));
                         }
@@ -222,41 +227,41 @@ function mblock_reindex(element) {
             mform_multiple_select(mselect);
         }
 
-        $(this).find('.custom-link').each(function(key){
+        $(this).find('.custom-link').each(function (key) {
             eindex = key + 1;
             sindex = index + 1;
             customlink = $(this);
-            $(this).find('input').each(function(){
-                if($(this).attr('id')) {
+            $(this).find('input').each(function () {
+                if ($(this).attr('id')) {
                     $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '00' + eindex));
                 }
             });
-            $(this).find('a.btn-popup').each(function(){
-                if($(this).attr('id')) {
+            $(this).find('a.btn-popup').each(function () {
+                if ($(this).attr('id')) {
                     $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '00' + eindex));
                 }
             });
             customlink.attr('data-id', sindex + '00' + eindex);
-            if(typeof mform_custom_link === 'function') mform_custom_link(customlink);
+            if (typeof mform_custom_link === 'function') mform_custom_link(customlink);
         });
 
-        $(this).find('.redactor-box').each(function(key){
+        $(this).find('.redactor-box').each(function (key) {
             initredactor = true;
             eindex = key + 1;
             sindex = index + 1;
-            $(this).find('textarea').each(function(){
-                if($(this).attr('id')) {
+            $(this).find('textarea').each(function () {
+                if ($(this).attr('id')) {
                     $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '00' + eindex));
                 }
             });
         });
 
-        $(this).find('.markitup_markdown, .markitup_textile').each(function(key){
+        $(this).find('.markitup_markdown, .markitup_textile').each(function (key) {
             initmarkitup = true;
             eindex = key + 1;
             sindex = index + 1;
-            $(this).find('textarea').each(function(){
-                if($(this).attr('id')) {
+            $(this).find('textarea').each(function () {
+                if ($(this).attr('id')) {
                     $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '00' + eindex));
                 }
             })
@@ -266,7 +271,7 @@ function mblock_reindex(element) {
 
     if (initredactor) {
 
-        $('.redactor-box').each(function(){
+        $('.redactor-box').each(function () {
             var area;
             var content = '';
             $(this).find('div.redactor-in').each(function () {
@@ -274,11 +279,11 @@ function mblock_reindex(element) {
                     content = $(this).html();
                 }
             });
-            $(this).find('textarea').each(function(){
+            $(this).find('textarea').each(function () {
                 var attr = $(this).attr('class');
                 if (typeof attr !== typeof undefined && attr !== false) {
                     if ($(this).attr('class').indexOf("redactor") >= 0) {
-                        area = $(this).clone().css('display','block');
+                        area = $(this).clone().css('display', 'block');
                     }
                 }
             });
@@ -291,14 +296,14 @@ function mblock_reindex(element) {
             }
         });
 
-        if(typeof redactorInit === 'function') redactorInit();
+        if (typeof redactorInit === 'function') redactorInit();
     }
 
     if (initmarkitup) {
 
-        $('.markitup_markdown, .markitup_textile').each(function(){
+        $('.markitup_markdown, .markitup_textile').each(function () {
             var area;
-            $(this).find('textarea').each(function(){
+            $(this).find('textarea').each(function () {
                 area = $(this).clone();
             });
             if (typeof area === 'object') {
@@ -309,7 +314,7 @@ function mblock_reindex(element) {
             }
         });
 
-        if(typeof markitupInit === 'function' && typeof autosize === 'function') {
+        if (typeof markitupInit === 'function' && typeof autosize === 'function') {
             markitupInit();
             autosize($("textarea[class*=\'markitupEditor-\']"));
         }
@@ -323,9 +328,9 @@ function mblock_reindex(element) {
 
 function mblock_replace_for(element) {
 
-    element.find(' > div').each(function(index) {
+    element.find(' > div').each(function (index) {
         var mblock = $(this);
-        mblock.find('input,textarea,select').each(function(key) {
+        mblock.find('input,textarea,select').each(function (key) {
             var el = $(this);
             var id = el.attr('id');
             if (typeof id !== typeof undefined && id !== false) {
@@ -334,18 +339,12 @@ function mblock_replace_for(element) {
                     id.indexOf("redactor") >= 0 ||
                     id.indexOf("markitup") >= 0)
                 ) {
-                    var label = mblock.find('label[for="'+id+'"]');
+                    var label = mblock.find('label[for="' + id + '"]');
                     el.attr('id', el.attr('name'));
                     label.attr('for', el.attr('name'));
                 }
             }
         });
-    });
-}
-
-function mblock_replace_checkbox_for(element) {
-    element.find('input:checkbox').each(function() {
-        $(this).parent().find('label').attr('for', $(this).attr('id'));
     });
 }
 
@@ -355,19 +354,21 @@ function mblock_add_item(element, item) {
         // unset sortable
         element.mblock_sortable("destroy");
         // add element
-        item.after(item.clone());
+        item.after(item[0].outerHTML);
+        // item.after(item.clone());
 
-        if(element.data().hasOwnProperty('input_delete')) {
+        // delete values
+        if (element.data().hasOwnProperty('input_delete')) {
             if (element.data('input_delete') == true) {
                 item.next().find('div.redactor-in').html('');
-                item.next().find('input, textarea').val('');
+                item.next().find('input:not(.not_delete), textarea').val('');
                 item.next().find('textarea').html('');
                 item.next().find('option:selected').removeAttr("selected");
                 item.next().find('input:checked').removeAttr("checked");
                 item.next().find('select').each(function () {
                     if ($(this).attr('id') && ($(this).attr('id').indexOf("REX_MEDIALIST") >= 0
-                        || $(this).attr('id').indexOf("REX_LINKLIST") >= 0
-                    )) {
+                            || $(this).attr('id').indexOf("REX_LINKLIST") >= 0
+                        )) {
                         $(this).find('option').remove();
                     }
                 });
@@ -385,9 +386,9 @@ function mblock_add_item(element, item) {
 }
 
 function mblock_set_unique_id(item, input_delete) {
-    item.find('input').each(function() {
+    item.find('input').each(function () {
         var unique_id = Math.random().toString(16).slice(2),
-            unique_int = parseInt(Math.random()*1000000000000);
+            unique_int = parseInt(Math.random() * 1000000000000);
 
         if ($(this).attr('data-unique-int') == 1) {
             unique_id = unique_int;
@@ -417,7 +418,7 @@ function mblock_set_count(element, item) {
 
 function mblock_remove_item(element, item) {
 
-    if(element.data().hasOwnProperty('delete_confirm')) {
+    if (element.data().hasOwnProperty('delete_confirm')) {
         if (!confirm(element.data('delete_confirm'))) {
             return false;
         }
@@ -444,34 +445,34 @@ function mblock_remove_item(element, item) {
 function mblock_moveup(element, item) {
     var prev = item.prev();
     if (prev.length == 0) return;
-    prev.css('z-index', 99).addClass('mblock_animate').css({ 'position': 'relative', 'top': item.outerHeight(true) });
-    item.css('z-index', 100).addClass('mblock_animate').css({ 'position': 'relative', 'top': - prev.outerHeight(true) });
+    prev.css('z-index', 99).addClass('mblock_animate').css({'position': 'relative', 'top': item.outerHeight(true)});
+    item.css('z-index', 100).addClass('mblock_animate').css({'position': 'relative', 'top': -prev.outerHeight(true)});
 
-    setTimeout(function(){
-        prev.removeClass('mblock_animate').css({ 'z-index': '', 'top': '', 'position': '' });
-        item.removeClass('mblock_animate').css({ 'z-index': '', 'top': '', 'position': '' });
+    setTimeout(function () {
+        prev.removeClass('mblock_animate').css({'z-index': '', 'top': '', 'position': ''});
+        item.removeClass('mblock_animate').css({'z-index': '', 'top': '', 'position': ''});
         item.insertBefore(prev);
         mblock_reindex(element);
-    },150);
+    }, 150);
 }
 
 function mblock_movedown(element, item) {
     var next = item.next();
     if (next.length == 0) return;
 
-    next.css('z-index', 99).addClass('mblock_animate').css({ 'position': 'relative', 'top': - item.outerHeight(true) });
-    item.css('z-index', 100).addClass('mblock_animate').css({ 'position': 'relative', 'top': next.outerHeight(true) });
+    next.css('z-index', 99).addClass('mblock_animate').css({'position': 'relative', 'top': -item.outerHeight(true)});
+    item.css('z-index', 100).addClass('mblock_animate').css({'position': 'relative', 'top': next.outerHeight(true)});
 
-    setTimeout(function(){
-        next.removeClass('mblock_animate').css({ 'z-index': '', 'top': '', 'position': '' });
-        item.removeClass('mblock_animate').css({ 'z-index': '', 'top': '', 'position': '' });
+    setTimeout(function () {
+        next.removeClass('mblock_animate').css({'z-index': '', 'top': '', 'position': ''});
+        item.removeClass('mblock_animate').css({'z-index': '', 'top': '', 'position': ''});
         item.insertAfter(next);
         mblock_reindex(element);
-    },150);
+    }, 150);
 }
 
 function mblock_scroll(element, item) {
-    if(element.data().hasOwnProperty('smooth_scroll')) {
+    if (element.data().hasOwnProperty('smooth_scroll')) {
         if (element.data('smooth_scroll') == true) {
             $.mblockSmoothScroll({
                 scrollTarget: item,
@@ -482,25 +483,25 @@ function mblock_scroll(element, item) {
 }
 
 function mblock_add(element) {
-    element.find('> div .addme').unbind().bind('click', function() {
+    element.find('> div .addme').unbind().bind('click', function () {
         if (!$(this).prop('disabled')) {
             mblock_add_item(element, $(this).closest('div[class^="sortitem"]'));
         }
         return false;
     });
-    element.find('> div .removeme').unbind().bind('click', function() {
+    element.find('> div .removeme').unbind().bind('click', function () {
         if (!$(this).prop('disabled')) {
             mblock_remove_item(element, $(this).closest('div[class^="sortitem"]'));
         }
         return false;
     });
-    element.find('> div .moveup').unbind().bind('click', function() {
+    element.find('> div .moveup').unbind().bind('click', function () {
         if (!$(this).prop('disabled')) {
             mblock_moveup(element, $(this).closest('div[class^="sortitem"]'));
         }
         return false;
     });
-    element.find('> div .movedown').unbind().bind('click', function() {
+    element.find('> div .movedown').unbind().bind('click', function () {
         if (!$(this).prop('disabled')) {
             mblock_movedown(element, $(this).closest('div[class^="sortitem"]'));
         }
