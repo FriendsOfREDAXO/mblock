@@ -14,6 +14,8 @@ var mblock_module = (function () {
         reindex_end: [],
     };
     var mod = {}
+    
+    mod.affectedItem = {};
 
     // Register a callback
     // @input evnt string name of the event
@@ -39,7 +41,7 @@ var mblock_module = (function () {
     mod.executeRegisteredCallbacks = function (evnt) {
         var list = mod.getRegisteredCallbacks(evnt);
         for (var i = 0; i < list.length; i++) {
-            list[i]();
+            list[i](evnt == 'reindex_end' && mod.affectedItem);
         }
     }
 
@@ -375,12 +377,12 @@ function mblock_add_item(element, item) {
         // delete values
         if (element.data().hasOwnProperty('input_delete')) {
             if (element.data('input_delete') == true) {
-                item.next().find('div.redactor-in').html('');
-                item.next().find('input:not(.not_delete), textarea').val('');
-                item.next().find('textarea').html('');
-                item.next().find('option:selected').removeAttr("selected");
-                item.next().find('input:checked').removeAttr("checked");
-                item.next().find('select').each(function () {
+                iClone.find('div.redactor-in').html('');
+                iClone.find('input:not(.not_delete), textarea').val('');
+                iClone.find('textarea').html('');
+                iClone.find('option:selected').removeAttr("selected");
+                iClone.find('input:checked').removeAttr("checked");
+                iClone.find('select').each(function () {
                     if ($(this).attr('id') && ($(this).attr('id').indexOf("REX_MEDIALIST") >= 0
                             || $(this).attr('id').indexOf("REX_LINKLIST") >= 0
                         )) {
@@ -390,14 +392,17 @@ function mblock_add_item(element, item) {
             }
         }
 
-        mblock_set_unique_id(item.next(), true);
+        // set currently affected item
+        mblock_module.affectedItem = iClone;
+
+        mblock_set_unique_id(iClone, true);
         // set count
         mblock_set_count(element, item);
         // reinit
         mblock_init_sort(element);
         // scroll to item
-        mblock_scroll(element, item.next());
-        element.trigger('mblock:add', [element]);
+        mblock_scroll(element, iClone);
+        //element.trigger('mblock:add', [element]);
     }
 }
 
@@ -449,6 +454,8 @@ function mblock_remove_item(element, item) {
         if (!prevItem.hasClass('sortitem')) {
             prevItem = item.next(); // go to next
         }
+        // set currently affected item
+        mblock_module.affectedItem = item;
         // remove element
         item.remove();
         // reinit
@@ -467,6 +474,10 @@ function mblock_moveup(element, item) {
     setTimeout(function () {
         prev.removeClass('mblock_animate').css({'z-index': '', 'top': '', 'position': ''});
         item.removeClass('mblock_animate').css({'z-index': '', 'top': '', 'position': ''});
+        
+        // set currently affected item
+        mblock_module.affectedItem = item;
+        
         item.insertBefore(prev);
         mblock_reindex(element);
     }, 150);
@@ -482,6 +493,10 @@ function mblock_movedown(element, item) {
     setTimeout(function () {
         next.removeClass('mblock_animate').css({'z-index': '', 'top': '', 'position': ''});
         item.removeClass('mblock_animate').css({'z-index': '', 'top': '', 'position': ''});
+
+        // set currently affected item
+        mblock_module.affectedItem = item;
+
         item.insertAfter(next);
         mblock_reindex(element);
     }, 150);
