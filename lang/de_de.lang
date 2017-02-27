@@ -26,7 +26,7 @@ mblock_modul_input = Modul-Eingabe
 mblock_modul_output = Modul-Ausgabe
 
 mblock_help_subheadline_1 = MBlock - multiple Datenblöcke innerhalb eines Moduls anlegen und sortieren
-mblock_help_infotext_1 = Mit MBlock ist es möglich, innerhalb eines Moduls beliebig viele Datenblöcke zu erzeugen. Die Datenblöcke können dann einfach per Button oder Drag & Drop sortiert werden.
+mblock_help_infotext_1 = Mit MBlock ist es möglich, innerhalb eines Moduls beliebig viele Datenblöcke zu erzeugen. Diese können dann einfach per Button oder Drag & Drop sortiert werden.
 mblock_github = MBlock bei Friends Of REDAXO
 
 mblock_info = Info

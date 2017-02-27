@@ -74,6 +74,9 @@ class MBlock
                 $item->setForm(MBlockSystemButtonReplacer::replaceCustomLinkText($item));
             }
 
+            // set only checkbox block holder
+            $item->setForm(MBlockCheckboxReplacer::replaceCheckboxesBlockHolder($item, ($count+1)));
+
             // parse form item
             $element = new MBlockElement();
             $element->setForm($item->getForm());
