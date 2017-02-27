@@ -144,16 +144,8 @@ function mblock_reindex(element) {
             // For some browsers, `attr` is undefined; for others,
             // `attr` is false. Check for both.
             if (typeof attr !== typeof undefined && attr !== false) {
-                var value = $(this).attr('name').replace($(this).attr('name').match(/\]\[\d+\]\[/g), '][' + index + '][');
+                var value = attr.replace($(this).attr('name').match(/\]\[\d+\]\[/g), '][' + index + '][').replace('mblock_new_','');
                 $(this).attr('name', value);
-            }
-
-            // remove for for checkbox and radio boxes
-            if ($(this).attr('type') == 'checkbox' || $(this).attr('type') == 'radio') {
-                if ($(this).parent().is('label')) {
-                    // remove for
-                    $(this).parent().removeAttr('for');
-                }
             }
 
             // checkbox problem fix
@@ -165,6 +157,11 @@ function mblock_reindex(element) {
                         $(this).val(0);
                     }
                 });
+            }
+
+            // radio problem fix
+            if ($(this).attr('type') == 'radio' && $(this).attr('data-value')) {
+                $(this).val($(this).attr('data-value'));
             }
 
             // select rex button
@@ -353,9 +350,27 @@ function mblock_add_item(element, item) {
     if (item.parent().hasClass(element.attr('class'))) {
         // unset sortable
         element.mblock_sortable("destroy");
-        // add element
-        item.after(item[0].outerHTML);
+
+        // item.after(item[0].outerHTML);
         // item.after(item.clone());
+
+        var iClone = item.clone();
+
+        // fix for checkbox and radio bug
+        iClone.find('input:radio, input:checkbox').each(function(){
+            $(this).parent().removeAttr('for');
+        });
+
+        // fix radio bug
+        iClone.find('input:radio, input:checkbox').each(function(){
+            // fix lost checked from parent item
+            $(this).attr('name', 'mblock_new_' + $(this).attr('name'));
+            // fix lost value
+            $(this).attr('data-value', $(this).val());
+        });
+
+        // add clone
+        item.after(iClone);
 
         // delete values
         if (element.data().hasOwnProperty('input_delete')) {
@@ -374,6 +389,7 @@ function mblock_add_item(element, item) {
                 });
             }
         }
+
         mblock_set_unique_id(item.next(), true);
         // set count
         mblock_set_count(element, item);
