@@ -329,7 +329,7 @@ function mblock_replace_for(element) {
 
     element.find(' > div').each(function (index) {
         var mblock = $(this);
-        mblock.find('input,textarea,select').each(function (key) {
+        mblock.find('input:not(:checkbox):not(:radio),textarea,select').each(function (key) {
             var el = $(this);
             var id = el.attr('id');
             if (typeof id !== typeof undefined && id !== false) {
