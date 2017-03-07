@@ -12,6 +12,7 @@ var mblock_module = (function () {
     var callbacks = {
         add_item_start: [],
         reindex_end: [],
+        lastAction: ''
     };
     var mod = {}
     
@@ -131,8 +132,6 @@ function mblock_sort_it(element) {
 }
 
 function mblock_reindex(element) {
-    // remove mblock_remove
-    mblock_remove(element);
 
     var initredactor = false,
         initmarkitup = false;
@@ -319,8 +318,10 @@ function mblock_reindex(element) {
         }
 
     }
-    // sets for attribute for most elements to make them work accordingly
-    mblock_replace_for(element);
+    // if not removing, sets "for" attribute for most elements to make them work properly
+    if(mblock_module.lastAction != 'remove_item') {
+	    mblock_replace_for(element);
+    }
 
     mblock_module.executeRegisteredCallbacks('reindex_end');
 }
@@ -398,6 +399,8 @@ function mblock_add_item(element, item) {
         mblock_set_unique_id(iClone, true);
         // set count
         mblock_set_count(element, item);
+		// set last user action
+		mblock_module.lastAction = 'add_item';
         // reinit
         mblock_init_sort(element);
         // scroll to item
@@ -458,6 +461,8 @@ function mblock_remove_item(element, item) {
         mblock_module.affectedItem = item;
         // remove element
         item.remove();
+		// set last user action
+		mblock_module.lastAction = 'remove_item';
         // reinit
         mblock_init_sort(element);
         // scroll to item
@@ -479,6 +484,8 @@ function mblock_moveup(element, item) {
         mblock_module.affectedItem = item;
         
         item.insertBefore(prev);
+		// set last user action
+		mblock_module.lastAction = 'moveup';
         mblock_reindex(element);
     }, 150);
 }
@@ -498,6 +505,8 @@ function mblock_movedown(element, item) {
         mblock_module.affectedItem = item;
 
         item.insertAfter(next);
+		// set last user action
+		mblock_module.lastAction = 'movedown';
         mblock_reindex(element);
     }, 150);
 }
