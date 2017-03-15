@@ -340,8 +340,10 @@ function mblock_replace_for(element) {
                     id.indexOf("markitup") >= 0)
                 ) {
                     var label = mblock.find('label[for="' + id + '"]');
-                    el.attr('id', el.attr('name'));
-                    label.attr('for', el.attr('name'));
+                    var name = el.attr('name').replace(/(\[|\])/gm, '');
+                    el.attr('id', name);
+                    label.attr('for', name);
+
                 }
             }
         });
