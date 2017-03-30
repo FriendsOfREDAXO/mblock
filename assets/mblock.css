@@ -46,6 +46,10 @@ div.sortable-ghost {
     cursor: default;
 }
 
+.mblock_wrapper span.removeadded .btn .rex-icon {
+    margin: 0 !important;
+}
+
 .mblock_wrapper > div:after, .mblock_wrapper > div:before {
     content: "";
     display: table
