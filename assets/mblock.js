@@ -430,7 +430,7 @@ function mblock_add_item(element, item) {
         mblock_init_sort(element);
         // scroll to item
         mblock_scroll(element, iClone);
-        //element.trigger('mblock:add', [element]);
+        element.trigger('mblock:add', [element]);
     }
 }
 
