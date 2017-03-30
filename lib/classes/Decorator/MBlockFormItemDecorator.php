@@ -1,8 +1,8 @@
 <?php
 /**
- * Author: Joachim Doerr
- * Date: 31.07.16
- * Time: 08:48
+ * @author mail[at]joachim-doerr[dot]com Joachim Doerr
+ * @package redaxo5
+ * @license MIT
  */
 
 class MBlockFormItemDecorator
