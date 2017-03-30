@@ -18,7 +18,7 @@ class MBlock
     /**
      * @var array
      */
-    private static $result;
+    private static $result = array();
 
     /**
      * @var array
@@ -33,8 +33,20 @@ class MBlock
      */
     public static function show($id, $form, $settings = array())
     {
-        // load rex value by id
-        self::$result = MBlockValueHandler::loadRexVars();
+        $_SESSION['mblock_count']++;
+
+        if (is_integer($id) or is_numeric($id)) {
+            // load rex value by id
+            self::$result = MBlockValueHandler::loadRexVars();
+        } else {
+            // is table::column
+            $table = explode('::', $id);
+            self::$result = MBlockValueHandler::loadFromTable($table);
+
+            if (sizeof($table) > 2) {
+                $id = $table[0] . '::' . $table[1];
+            }
+        }
 
         // is loaded
         if (array_key_exists('value', self::$result) && is_array(self::$result['value'][$id])) {
@@ -66,6 +78,9 @@ class MBlock
             $item->setForm(MBlockSystemButtonReplacer::replaceSystemButtons($item, ($count+1)));
             $item->setForm(MBlockEditorReplacer::replaceEditorArea($item, ($count+1)));
             $item->setForm(MBlockCountReplacer::replaceCountKeys($item, ($count+1)));
+            // do not use unfinished replacer resources
+            // $item->setForm(MBlockWidgetReplacer::replaceYFormManagerWidget($item, ($count+1)));
+            $item->setForm(MBlockBootstrapReplacer::replaceTabIds($item, ($count+1)));
 
             // decorate item form
             if ($item->getResult()) {
