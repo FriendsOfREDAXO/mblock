@@ -20,14 +20,6 @@ if (rex::isBackend() && is_object(rex::getUser())) {
     }
 
     // register extensions
-    // pre pre post
-    rex_extension::register('REX_FORM_GET', function (rex_extension_point $params) {
-        /** @var rex_form $form */
-        $form = $params->getSubject();
-        if ($form instanceof mblock_rex_form)
-            MBlockRexFormProcessor::prePostSaveAction($form, $_POST); // execute pre post
-    });
-
     // alfred post post
     rex_extension::register('REX_FORM_SAVED', function (rex_extension_point $params) {
         /** @var rex_form|null $form */
