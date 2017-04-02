@@ -45,6 +45,7 @@ class MBlock
 
             if (sizeof($table) > 2) {
                 $id = $table[0] . '::' . $table[1];
+                $settings['type_key'] = array_pop($table);
             }
         }
 
