@@ -76,7 +76,7 @@ class MBlockValueHandler
             if (array_key_exists($tableName . '.' . $columnName, $sql->getRow())) {
                 $jsonResult = json_decode(htmlspecialchars_decode($sql->getRow()[$tableName . '.' . $columnName]),true);
 
-                if (!is_null($attrType) && array_key_exists($attrType, $jsonResult)) {
+                if (!is_null($attrType) && is_array($jsonResult) && array_key_exists($attrType, $jsonResult)) {
                     $jsonResult = $jsonResult[$attrType];
                 }
 
