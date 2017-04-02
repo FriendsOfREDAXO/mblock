@@ -14,7 +14,7 @@ var mblock_module = (function () {
         reindex_end: [],
         lastAction: ''
     };
-    var mod = {}
+    var mod = {};
     
     mod.affectedItem = {};
 
@@ -24,7 +24,7 @@ var mblock_module = (function () {
     // @output void
     mod.registerCallback = function (evnt, f) {
         callbacks[evnt].push(f);
-    }
+    };
 
     // @input evnt string name of the event
     // @output []function
@@ -35,7 +35,7 @@ var mblock_module = (function () {
         else {
             return callbacks[evnt];
         }
-    }
+    };
 
     // @input evnt string name of the event
     // @output void
@@ -44,7 +44,7 @@ var mblock_module = (function () {
         for (var i = 0; i < list.length; i++) {
             list[i](evnt == 'reindex_end' && mod.affectedItem);
         }
-    }
+    };
 
     return mod;
 })();
@@ -54,8 +54,11 @@ function mblock_init() {
     // init by siteload
     if (($('#REX_FORM').length || $('#rex-addon-editmode').length) && mblock.length) {
         mblock.each(function () {
-            mblock_sort($(this));
-            mblock_set_unique_id($(this), false);
+            if (!$(this).data('mblock_run')) {
+                $(this).data('mblock_run', 1);
+                mblock_sort($(this));
+                mblock_set_unique_id($(this), false);
+            }
         });
     }
 }
