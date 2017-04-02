@@ -98,6 +98,45 @@ class mblock_rex_form extends rex_form
     }
 
     /**
+     * @return string
+     * @author Joachim Doerr
+     */
+    public function get()
+    {
+        if (rex_request::get('redirected', 'int', 0) == 1) {
+            $list_name = rex_request::get('list', 'string');
+            $message = rex_request::get($list_name . '_msg', 'string');
+
+            if ($message)
+                if (rex_request::get('msg_is_warning', 'int', 0) == 1)
+                    $this->setWarning($message);
+                else
+                    $this->setMessage($message);
+        }
+        return parent::get();
+    }
+
+    /**
+     * @return bool
+     * @author Joachim Doerr
+     */
+    public function validate()
+    {
+        return parent::validate();
+    }
+
+    /**
+     * @param string $listMessage
+     * @param string $listWarning
+     * @param array $params
+     * @author Joachim Doerr
+     */
+    public function redirect($listMessage = '', $listWarning = '', array $params = [])
+    {
+        parent::redirect($listMessage, $listWarning, $params);
+    }
+
+    /**
      * @return bool
      * @author Joachim Doerr
      */
