@@ -1,0 +1,47 @@
+mblock_title = MBlock
+
+mblock_overview = Visão geral
+mblock_config_save = Salvar configurações
+
+mblock_config_label_template = Tema para MBlock sort-fields
+mblock_config_saved = Configurações salvas.
+mblock_config = Configuração
+
+mblock_demo = Exemplos
+mblock_demo_base = Exemplos de módulos
+mblock_demo_mform = Exemplos de módulos MForm
+mblock_demo_html = Exemplos de módulos HTML
+
+mblock_example_base_teammember_example = Membros do time
+mblock_example_base_link_example = Link e lista de links
+mblock_example_base_media_example = Mídia e lista de mídias
+mblock_example_base_defaults_example = Elementos de formulário diversos
+
+mblock_example_html_teammember_example = Membros do time
+mblock_example_html_link_example = Link e lista de links
+mblock_example_html_media_example = Mídia e lista de mídias
+mblock_example_html_defaults_example = Elementos de formulário diversos
+
+mblock_modul_input = Módulo de entrada
+mblock_modul_output = Módulo de saída
+
+mblock_help_subheadline_1 = MBlock - criar e gerenciar vários blocos de dados dentro de um único módulo
+mblock_help_infotext_1 = O MBlock permite criar um número ilimitado de blocos de dados dentro de um único módulo. Esses blocos de dados podem ser classificados por clique ou arrastando e soltando.
+mblock_github = MBlock em amigos de REDAXO
+
+mblock_info = Informações
+mblock_example_description_base = Exemplos que demonstram como configurar vários blocos dentro de um único módulo.<br><b>Importante:</b>Todos os exemplos requerem que o addon MForm seja instalado
+mblock_example_description_html = Os exemplos a seguir demonstram como configurar vários blocos dentro de um único módulo, sem MForm.
+
+mblock_defaults = Configurações
+mblock_delete = Remover conteúdo do formulário ao duplicar blocos de dados
+mblock_not_delete = Manter conteúdo de formulário ao duplicar blocos de dados
+mblock_theme_options = Opções de tema
+mblock_delete_label = Conteúdo do formulário
+mblock_scroll = SmoothScroll ativado
+mblock_not_scroll = SmoothScroll desativado
+mblock_scroll_label = SmoothScrool
+mblock_not_delete_confirm = Desativada a confirmação antes da exclusão de Blocos
+mblock_ok_delete_confirm = Ativada a confirmação antes da exclusão de Blocos
+mblock_delete_confirm_label = Confirmação antes da exclusão
+mblock_delete_confirm = Deletar o bloco?
