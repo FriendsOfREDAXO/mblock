@@ -68,3 +68,9 @@ div.sortable-ghost {
     -moz-transition: opacity 249ms linear, top 149ms ease;
     transition: opacity 249ms linear, top 149ms ease;
 }
+
+.panel.mblock-hidden-panel {
+    background: inherit;
+    border: inherit;
+    margin: inherit;
+}
