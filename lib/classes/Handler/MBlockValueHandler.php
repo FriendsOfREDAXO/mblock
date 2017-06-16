@@ -47,12 +47,44 @@ class MBlockValueHandler
 
                     $jsonResult = json_decode(htmlspecialchars_decode($result['value'][$i]),true);
 
-                    if (is_array($jsonResult)) {
+                    if (is_array($jsonResult))
                         $result['value'][$i] = $jsonResult;
-                    }
                 }
             }
         }
+        return $result;
+    }
+
+    /**
+     * @param $table
+     * @return array
+     * @author Joachim Doerr
+     */
+    public static function loadFromTable($table)
+    {
+        $id = rex_request::get('id', 'int', 0);
+        $tableName = $table[0];
+        $columnName = $table[1];
+        $attrType = (isset($table[2])) ? $table[2] : null;
+
+        $result = array();
+
+        $sql = rex_sql::factory();
+        $sql->setQuery("SELECT * FROM $tableName WHERE id='$id' LIMIT 1");
+        if ($sql->getRows() > 0) {
+
+            if (array_key_exists($tableName . '.' . $columnName, $sql->getRow())) {
+                $jsonResult = json_decode(htmlspecialchars_decode($sql->getRow()[$tableName . '.' . $columnName]),true);
+
+                if (!is_null($attrType) && is_array($jsonResult) && array_key_exists($attrType, $jsonResult)) {
+                    $jsonResult = $jsonResult[$attrType];
+                }
+
+                if (is_array($jsonResult))
+                    $result['value'][$tableName . '::' . $columnName] = $jsonResult;
+            }
+        }
+
         return $result;
     }
 }

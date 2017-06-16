@@ -14,7 +14,7 @@ var mblock_module = (function () {
         reindex_end: [],
         lastAction: ''
     };
-    var mod = {}
+    var mod = {};
     
     mod.affectedItem = {};
 
@@ -24,7 +24,7 @@ var mblock_module = (function () {
     // @output void
     mod.registerCallback = function (evnt, f) {
         callbacks[evnt].push(f);
-    }
+    };
 
     // @input evnt string name of the event
     // @output []function
@@ -35,7 +35,7 @@ var mblock_module = (function () {
         else {
             return callbacks[evnt];
         }
-    }
+    };
 
     // @input evnt string name of the event
     // @output void
@@ -44,7 +44,7 @@ var mblock_module = (function () {
         for (var i = 0; i < list.length; i++) {
             list[i](evnt == 'reindex_end' && mod.affectedItem);
         }
-    }
+    };
 
     return mod;
 })();
@@ -52,10 +52,13 @@ var mblock_module = (function () {
 function mblock_init() {
     var mblock = $('.mblock_wrapper');
     // init by siteload
-    if ($('#REX_FORM').length && mblock.length) {
+    if (($('#REX_FORM').length || $('#rex-addon-editmode').length) && mblock.length) {
         mblock.each(function () {
-            mblock_sort($(this));
-            mblock_set_unique_id($(this), false);
+            if (!$(this).data('mblock_run')) {
+                $(this).data('mblock_run', 1);
+                mblock_sort($(this));
+                mblock_set_unique_id($(this), false);
+            }
         });
     }
 }
@@ -134,7 +137,8 @@ function mblock_sort_it(element) {
 function mblock_reindex(element) {
 
     var initredactor = false,
-        initmarkitup = false;
+        initmarkitup = false,
+        mblock_count = element.data('mblock_count');
 
     element.find('> div').each(function (index) {
         // find input elements
@@ -171,9 +175,9 @@ function mblock_reindex(element) {
                     $(this).attr('id').indexOf("REX_LINKLIST_SELECT_") >= 0
                 )) {
                 $(this).parent().data('eindex', eindex);
-                $(this).attr('id', $(this).attr('id').replace(/_\d+/, '_' + sindex + '00' + eindex));
+                $(this).attr('id', $(this).attr('id').replace(/_\d+/, '_' + sindex + '' + mblock_count +   '00' + eindex));
                 if ($(this).attr('name') != undefined) {
-                    $(this).attr('name', $(this).attr('name').replace(/_\d+/, '_' + sindex + '00' + eindex));
+                    $(this).attr('name', $(this).attr('name').replace(/_\d+/, '_' + sindex + '' + mblock_count + '00' + eindex));
                 }
             }
 
@@ -185,12 +189,12 @@ function mblock_reindex(element) {
                 if ($(this).parent().data('eindex')) {
                     eindex = $(this).parent().data('eindex');
                 }
-                $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '00' + eindex));
+                $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '' + mblock_count + '00' + eindex));
 
                 // button
                 $(this).parent().find('a.btn-popup').each(function () {
-                    $(this).attr('onclick', $(this).attr('onclick').replace(/\(\d+/, '(' + sindex + '00' + eindex));
-                    $(this).attr('onclick', $(this).attr('onclick').replace(/_\d+/, '_' + sindex + '00' + eindex));
+                    $(this).attr('onclick', $(this).attr('onclick').replace(/\(\d+/, '(' + sindex + '' + mblock_count + '00' + eindex));
+                    $(this).attr('onclick', $(this).attr('onclick').replace(/_\d+/, '_' + sindex + '' + mblock_count + '00' + eindex));
                 });
             }
 
@@ -203,17 +207,17 @@ function mblock_reindex(element) {
                     if ($(this).parent().data('eindex')) {
                         eindex = $(this).parent().data('eindex');
                     }
-                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '00' + eindex));
+                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '' + mblock_count + '00' + eindex));
 
                     if ($(this).next().attr('type') == 'hidden') {
-                        $(this).next().attr('id', $(this).next().attr('id').replace(/\d+/, sindex + '00' + eindex));
+                        $(this).next().attr('id', $(this).next().attr('id').replace(/\d+/, sindex + '' + mblock_count + '00' + eindex));
                     }
 
                     // button
                     $(this).parent().find('a.btn-popup').each(function () {
                         if ($(this).attr('onclick')) {
-                            $(this).attr('onclick', $(this).attr('onclick').replace(/\(\d+/, '(' + sindex + '00' + eindex));
-                            $(this).attr('onclick', $(this).attr('onclick').replace(/_\d+/, '_' + sindex + '00' + eindex));
+                            $(this).attr('onclick', $(this).attr('onclick').replace(/\(\d+/, '(' + sindex + '' + mblock_count + '00' + eindex));
+                            $(this).attr('onclick', $(this).attr('onclick').replace(/_\d+/, '_' + sindex + '' + mblock_count + '00' + eindex));
                         }
                     });
                 }
@@ -225,21 +229,43 @@ function mblock_reindex(element) {
             mform_multiple_select(mselect);
         }
 
+        $(this).find('a[data-toggle="tab"]').each(function (key) {
+            eindex = key + 1;
+            sindex = index + 1;
+            toggletab = $(this);
+            href = $(this).attr('href');
+            container = toggletab.parent().parent().parent().find('.tab-content ' + href);
+            nexit = container.attr('id').replace(/_\d+/, '_' + sindex + '' + mblock_count + '00' + eindex);
+
+            container.attr('id', nexit);
+            toggletab.attr('href', '#' + nexit);
+
+            toggletab.unbind().bind("shown.bs.tab", function (e) {
+                var id = $(e.target).attr("href");
+                localStorage.setItem('selectedTab', id)
+            });
+
+            var selectedTab = localStorage.getItem('selectedTab');
+            if (selectedTab != null) {
+                $('a[data-toggle="tab"][href="' + selectedTab + '"]').tab('show');
+            }
+        });
+
         $(this).find('.custom-link').each(function (key) {
             eindex = key + 1;
             sindex = index + 1;
             customlink = $(this);
             $(this).find('input').each(function () {
                 if ($(this).attr('id')) {
-                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '00' + eindex));
+                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '' + mblock_count + '00' + eindex));
                 }
             });
             $(this).find('a.btn-popup').each(function () {
                 if ($(this).attr('id')) {
-                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '00' + eindex));
+                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '' + mblock_count + '00' + eindex));
                 }
             });
-            customlink.attr('data-id', sindex + '00' + eindex);
+            customlink.attr('data-id', sindex + '' + mblock_count + '00' + eindex);
             if (typeof mform_custom_link === 'function') mform_custom_link(customlink);
         });
 
@@ -249,7 +275,7 @@ function mblock_reindex(element) {
             sindex = index + 1;
             $(this).find('textarea').each(function () {
                 if ($(this).attr('id')) {
-                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '00' + eindex));
+                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '' + mblock_count + '00' + eindex));
                 }
             });
         });
@@ -260,7 +286,7 @@ function mblock_reindex(element) {
             sindex = index + 1;
             $(this).find('textarea').each(function () {
                 if ($(this).attr('id')) {
-                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '00' + eindex));
+                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '' + mblock_count + '00' + eindex));
                 }
             })
         });

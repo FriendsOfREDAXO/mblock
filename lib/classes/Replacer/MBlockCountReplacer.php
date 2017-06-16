@@ -1,10 +1,10 @@
 <?php
-
 /**
- * Author Joachim Doerr
- * Date: 25.10.16
- * Time: 19:56
+ * @author mail[at]joachim-doerr[dot]com Joachim Doerr
+ * @package redaxo5
+ * @license MIT
  */
+
 class MBlockCountReplacer
 {
     /**

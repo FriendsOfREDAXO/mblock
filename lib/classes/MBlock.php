@@ -18,7 +18,7 @@ class MBlock
     /**
      * @var array
      */
-    private static $result;
+    private static $result = array();
 
     /**
      * @var array
@@ -33,8 +33,22 @@ class MBlock
      */
     public static function show($id, $form, $settings = array())
     {
-        // load rex value by id
-        self::$result = MBlockValueHandler::loadRexVars();
+        $plain = false;
+        $_SESSION['mblock_count']++;
+
+        if (is_integer($id) or is_numeric($id)) {
+            // load rex value by id
+            self::$result = MBlockValueHandler::loadRexVars();
+        } else {
+            // is table::column
+            $table = explode('::', $id);
+            self::$result = MBlockValueHandler::loadFromTable($table);
+
+            if (sizeof($table) > 2) {
+                $id = $table[0] . '::' . $table[1];
+                $settings['type_key'] = array_pop($table);
+            }
+        }
 
         // is loaded
         if (array_key_exists('value', self::$result) && is_array(self::$result['value'][$id])) {
@@ -51,7 +65,10 @@ class MBlock
 
         // don't loaded?
         if (!self::$items) {
+
             // set plain item for add
+            $plain = true;
+
             self::$items[0] = new MBlockItem();
             self::$items[0]->setId(0)
                 ->setValueId($id)
@@ -63,9 +80,12 @@ class MBlock
         /** @var MBlockItem $item */
         foreach (static::$items as $count => $item) {
             // replace system button data
-            $item->setForm(MBlockSystemButtonReplacer::replaceSystemButtons($item, ($count+1)));
-            $item->setForm(MBlockEditorReplacer::replaceEditorArea($item, ($count+1)));
-            $item->setForm(MBlockCountReplacer::replaceCountKeys($item, ($count+1)));
+            $item->setForm(MBlockSystemButtonReplacer::replaceSystemButtons($item, ($count + 1)));
+            $item->setForm(MBlockEditorReplacer::replaceEditorArea($item, ($count + 1)));
+            $item->setForm(MBlockCountReplacer::replaceCountKeys($item, ($count + 1)));
+            // do not use unfinished replacer resources
+            // $item->setForm(MBlockWidgetReplacer::replaceYFormManagerWidget($item, ($count+1)));
+            $item->setForm(MBlockBootstrapReplacer::replaceTabIds($item, ($count + 1)));
 
             // decorate item form
             if ($item->getResult()) {
@@ -75,7 +95,7 @@ class MBlock
             }
 
             // set only checkbox block holder
-            $item->setForm(MBlockCheckboxReplacer::replaceCheckboxesBlockHolder($item, ($count+1)));
+            $item->setForm(MBlockCheckboxReplacer::replaceCheckboxesBlockHolder($item, ($count + 1)));
 
             // parse form item
             $element = new MBlockElement();
@@ -96,11 +116,32 @@ class MBlock
 
         // wrap parsed form items
         $wrapper = new MBlockElement();
-        $wrapper->setOutput(implode('',static::$output))
+        $wrapper->setOutput(implode('', static::$output))
             ->setSettings(MBlockSettingsHelper::getSettings($settings));
 
         // return wrapped from elements
         $output = MBlockParser::parseElement($wrapper, 'wrapper');
+
+
+        if (($plain && array_key_exists('disable_null_view', $settings) && $settings['disable_null_view'] == true) and rex_request::get('function', 'string') != 'add') {
+
+            $buttonText = 'Show MBlock';
+            if (array_key_exists('null_view_button_text', $settings) && !empty($settings['null_view_button_text'])) {
+                $buttonText = $settings['null_view_button_text'];
+            }
+
+            $uniqueId = uniqid();
+            $output = '
+                <div id="accordion' . $uniqueId . '" role="tablist">
+                  <div class="panel mblock-hidden-panel">
+                    <div id="collapse' . uniqid() . '" class="collapse in" role="tabpanel">
+                        <a class="btn btn-primary" role="button" data-toggle="collapse" data-parent="#accordion' . $uniqueId . '" href="#collapse' . $uniqueId . '" aria-expanded="false" aria-controls="collapseTwo">' . $buttonText . '</a>
+                    </div>
+                  </div>
+                  <div id="collapse' . $uniqueId . '" class="collapse" role="tabpanel">' . $output . '</div>
+                </div>
+            ';
+        }
 
         // reset for multi block fields
         self::reset();
