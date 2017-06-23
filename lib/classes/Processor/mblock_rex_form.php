@@ -8,15 +8,6 @@
 class mblock_rex_form extends rex_form
 {
     /**
-     * @param rex_form $form
-     * @return static a rex_form instance
-     */
-    public static function mblock_factory(rex_form $form)
-    {
-        return self::factory($form->getTableName(), $form->getName(), $form->getWhereCondition(), $form->method, $form->debug);
-    }
-
-    /**
      * Speichert das Formular.
      *
      * Übernimmt die Werte aus den FormElementen in die Datenbank.
