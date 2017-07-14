@@ -25,3 +25,25 @@ rex_dir::copy($this->getPath('data'), $this->getDataPath());
 rex_dir::deleteFiles($this->getAssetsPath(), true);
 // copy assets
 rex_dir::copy($this->getPath('assets'), $this->getAssetsPath());
+
+
+// rex media and link updater
+$values = array();
+
+for ($i = 1; $i < 21; $i++) {
+    $values[] = " value{$i} = REPLACE(value{$i}, 'REX_INPUT_L', 'REX_L')";
+    $values[] = " value{$i} = REPLACE(value{$i}, 'REX_INPUT_M', 'REX_M')";
+}
+
+$values = implode(",\n\t", $values);
+$prefix = rex::getTablePrefix();
+$query= "UPDATE\n\t {$prefix}article_slice \nSET\n\t{$values};\n";
+
+$sql = rex_sql::factory();
+$sql->setDebug(true);
+$sql->setQuery($query);
+$rows = $sql->getRows();
+
+if ($rows > 0) {
+    echo rex_view::info(sprintf(rex_i18n::msg('mblock_system_sql_update_info'), $rows));
+}

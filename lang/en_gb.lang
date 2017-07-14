@@ -4,7 +4,7 @@ mblock_overview = Overview
 mblock_config_save = Save settings
 
 mblock_config_label_template = Theme for MBlock sort-fields
-mblock_config_saved = Settings saved.
+mblock_config_saved = Settings saved
 mblock_config = Configuration
 
 mblock_demo = Examples
@@ -45,3 +45,5 @@ mblock_not_delete_confirm = Delete-confirm disabled
 mblock_ok_delete_confirm = Delete-confirm enabled
 mblock_delete_confirm_label = Block delete confirmation
 mblock_delete_confirm = Delete block?
+
+mblock_system_sql_update_info = There was %s datasets changed
