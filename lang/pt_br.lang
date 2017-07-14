@@ -45,5 +45,3 @@ mblock_not_delete_confirm = Desativada a confirmação antes da exclusão de Blo
 mblock_ok_delete_confirm = Ativada a confirmação antes da exclusão de Blocos
 mblock_delete_confirm_label = Confirmação antes da exclusão
 mblock_delete_confirm = Deletar o bloco?
-
-mblock_system_sql_update_info = There was %s datasets changed

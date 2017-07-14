@@ -43,7 +43,3 @@ $sql = rex_sql::factory();
 $sql->setDebug(true);
 $sql->setQuery($query);
 $rows = $sql->getRows();
-
-if ($rows > 0) {
-    echo rex_view::info(sprintf(rex_i18n::msg('mblock_system_sql_update_info'), $rows));
-}

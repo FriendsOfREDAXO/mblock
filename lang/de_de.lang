@@ -45,5 +45,3 @@ mblock_not_delete_confirm = Bestätigung vor dem Löschen von Blocken deaktivier
 mblock_ok_delete_confirm = Bestätigung vor dem Löschen von Blocken aktiviert
 mblock_delete_confirm_label = Bestätigung vor dem Löschen
 mblock_delete_confirm = Block löschen?
-
-mblock_system_sql_update_info = Es wurden %s datensätze korrigiert
