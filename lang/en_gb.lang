@@ -4,7 +4,7 @@ mblock_overview = Overview
 mblock_config_save = Save settings
 
 mblock_config_label_template = Theme for MBlock sort-fields
-mblock_config_saved = Settings saved.
+mblock_config_saved = Settings saved
 mblock_config = Configuration
 
 mblock_demo = Examples
