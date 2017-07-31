@@ -40,6 +40,6 @@ $prefix = rex::getTablePrefix();
 $query= "UPDATE\n\t {$prefix}article_slice \nSET\n\t{$values};\n";
 
 $sql = rex_sql::factory();
-$sql->setDebug(true);
+$sql->setDebug(false);
 $sql->setQuery($query);
 $rows = $sql->getRows();
