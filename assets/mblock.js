@@ -332,6 +332,7 @@ function mblock_reindex(element) {
             });
             if (typeof area === 'object') {
                 if (area.length) {
+                    area.removeClass('markItUpEditor').removeClass('markitupActive');
                     $(this).parent().append(area);
                     $(this).remove();
                 }
