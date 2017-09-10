@@ -74,3 +74,15 @@ div.sortable-ghost {
     border: inherit;
     margin: inherit;
 }
+
+.hide_sorthandle .sorthandle,
+.hide_removeadded .removeadded {
+    display: none;
+}
+
+.mblock_wrapper.hide_sorthandle > div {
+    padding-left: 15px;
+}
+.mblock_wrapper.hide_removeadded > div {
+    padding-top: 15px;
+}

@@ -58,6 +58,10 @@ function mblock_init() {
                 $(this).data('mblock_run', 1);
                 mblock_sort($(this));
                 mblock_set_unique_id($(this), false);
+
+                if ($(this).data('min') == 1 && $(this).data('max') == 1) {
+                    $(this).addClass('hide_removeadded').addClass('hide_sorthandle');
+                }
             }
         });
     }
