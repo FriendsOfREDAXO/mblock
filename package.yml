@@ -19,3 +19,5 @@ page:
 
 requires:
     redaxo: ^5.1.0
+    php:
+        extensions: [xml]
