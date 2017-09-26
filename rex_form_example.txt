@@ -1,7 +1,7 @@
             // TODO MACH DAS RICHTIG... TEST TEST TEST...
             // TODO als beispiel für mform nutzen...
 //
-//                $nf = mblock_rex_form::mblock_factory($this->getForm());
+//                $nf = mblock_rex_form::factory($this->getForm());
 //
 //                $element1 = $nf->addTextField('texttest2][attr_type][0][test');
 //                $element1->setLabel('test22');
@@ -28,7 +28,7 @@
 //
 //                $this->form->addRawField(mblock::show($this->form->getTableName().'::texttest2::attr_type', $nf->getElements()));
 //
-//                $nf = mblock_rex_form::mblock_factory($this->getForm());
+//                $nf = mblock_rex_form::factory($this->getForm());
 //
 //                $element1 = $nf->addTextField('texttest2][0][test');
 //                $element1->setLabel('test11');
