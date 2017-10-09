@@ -1,0 +1,47 @@
+mblock_title = MBlock
+
+mblock_overview = Översikt
+mblock_config_save = Spara inställningar
+
+mblock_config_label_template = Theme for MBlock sort-fields
+mblock_config_saved = Inställningar sparades.
+mblock_config = Konfiguration
+
+mblock_demo = Exempelsamling
+mblock_demo_base = Modul-exemplar
+mblock_demo_mform = MForm Modul exemplar
+mblock_demo_html = HTML modul exemplar
+
+mblock_example_base_teammember_example = Teammedlemmar
+mblock_example_base_link_example = Länk och länklista
+mblock_example_base_media_example = Media och medialista
+mblock_example_base_defaults_example = diverse formulärelement
+
+mblock_example_html_teammember_example = Teammedlemmar
+mblock_example_html_link_example = Länk och länklista
+mblock_example_html_media_example = Media och medialista
+mblock_example_html_defaults_example = diverse formulärelement
+
+mblock_modul_input = Modul input
+mblock_modul_output = Modul output
+
+mblock_help_subheadline_1 = MBlock - skapa och hantera flera datablock i en enda modul
+mblock_help_infotext_1 = MBlock låter dig skapa ett obegränsat antal datablock inom en enda modul. Dessa datablock kan sorteras per klick eller dra och släpp.
+mblock_github = MBlock at Friends Of REDAXO
+
+mblock_info = Info
+mblock_example_description_base = Exempel som visar hur man generera flera block i en enda modul. <br> <b> Viktigt: </ b> Alla exempel kräver att MForm addon är installerat!
+mblock_example_description_html = Följande exempel visar hur man generera flera block i en enda modul, utan MForm.
+
+mblock_defaults = Inställningar
+mblock_delete = Remove form content when duplicating data blocks
+mblock_not_delete = Hold form content when duplicating data blocks
+mblock_theme_options = Theme settings
+mblock_delete_label = Form content
+mblock_scroll = SmoothScroll aktiverat
+mblock_not_scroll = SmoothScroll deaktiverat
+mblock_scroll_label = SmoothScroll
+mblock_not_delete_confirm = Bekräftelse före radering av avsnitt deaktiverat
+mblock_ok_delete_confirm = Bekräftelse före radering av avsnitt aktiverat
+mblock_delete_confirm_label = Bekräfta före radering
+mblock_delete_confirm = Radera avsnittet?
