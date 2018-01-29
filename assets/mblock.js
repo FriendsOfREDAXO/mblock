@@ -132,7 +132,9 @@ function mblock_sort_it(element) {
     element.mblock_sortable({
         handle: '.sorthandle',
         animation: 150,
-        onEnd: function () {
+        onEnd: function (event) {
+            mblock_module.lastAction = 'sort';
+            mblock_module.affectedItem = $(event.item);
             mblock_reindex(element);
         }
     });
