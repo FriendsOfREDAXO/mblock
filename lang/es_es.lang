@@ -1,0 +1,47 @@
+mblock_title = MBlock
+
+mblock_overview = Vista general
+mblock_config_save = Guardar configuraciones
+
+mblock_config_label_template = Tema para ordenar campos MBlock
+mblock_config_saved = La configuración se ha guardado
+mblock_config = Configuración
+
+mblock_demo = Ejemplos
+mblock_demo_base = Ejemplos de módulos
+mblock_demo_mform = Ejemplos de módulos MForm
+mblock_demo_html = Ejemplos de módulos HTML
+
+mblock_example_base_teammember_example = Miembros del equipo
+mblock_example_base_link_example = Enlace y lista de enlaces
+mblock_example_base_media_example = Medios y medialista
+mblock_example_base_defaults_example = Varios elementos de forma
+
+mblock_example_html_teammember_example = Miembros del equipo
+mblock_example_html_link_example = Enlace y lista de enlaces
+mblock_example_html_media_example = Medios y medialista
+mblock_example_html_defaults_example = Varios elementos de forma
+
+mblock_modul_input = Entrada del módulo
+mblock_modul_output = Salida del módulo
+
+mblock_help_subheadline_1 = MBlock: crea y ordena múltiples bloques de datos dentro de un módulo
+mblock_help_infotext_1 = Con MBlock es posible generar cualquier cantidad de bloques de datos dentro de Un módulo. Estos pueden ser fácilmente ordenados por botón o arrastrar y soltar.
+mblock_github = MBlock en Friends Of REDAXO
+
+mblock_info = Info
+mblock_example_description_base = Ejemplos que muestran cómo se pueden crear múltiples bloques dentro de un módulo. <br> <b> Importante: </ b> ¡Para todos los ejemplos, se necesita el Complemento MForm!
+mblock_example_description_html = Los siguientes ejemplos muestran cómo, sin MForm, se pueden crear múltiples bloques dentro de un módulo.
+
+mblock_defaults = Ajustes
+mblock_delete = Eliminar contenido del formulario al duplicar bloques de datos
+mblock_not_delete = Transferir contenidos del formulario al duplicar bloques de datos
+mblock_theme_options = Opciones del tema
+mblock_delete_label = Contenido del formulario
+mblock_scroll = Desplazamiento habilitado
+mblock_not_scroll = Desplazamiento deshabilitado
+mblock_scroll_label = Desplazamiento suave
+mblock_not_delete_confirm = Confirmación desactivada antes de eliminar bloques
+mblock_ok_delete_confirm = Confirmación activada antes de eliminar bloques
+mblock_delete_confirm_label = Confirmación antes de la eliminación
+mblock_delete_confirm = Eliminar bloque?
