@@ -18,3 +18,6 @@ if (!$this->hasConfig('mblock_scroll')) {
 
 // copy data directory
 rex_dir::copy($this->getPath('data'), $this->getDataPath());
+
+// add demo table
+rex_sql_util::importDump($this->getPath('rexform_demo.sql'));

@@ -16,6 +16,7 @@ page:
             subpages:
                 demo_mform: { title: translate:demo_mform }
                 demo_html: { title: translate:demo_html }
+        rexform_demo: { title: translate:rexform_demo }
 
 requires:
     redaxo: ^5.3.0
