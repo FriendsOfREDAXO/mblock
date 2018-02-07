@@ -45,7 +45,7 @@ class MBlockValueHandler
                         $result['link'][$i] = $sql->getValue('link' . $i);
                     }
 
-                    $jsonResult = json_decode(htmlspecialchars_decode($result['value'][$i]),true);
+                    $jsonResult = json_decode(htmlspecialchars_decode($result['value'][$i]), true);
 
                     if (is_array($jsonResult))
                         $result['value'][$i] = $jsonResult;
@@ -57,31 +57,34 @@ class MBlockValueHandler
 
     /**
      * @param $table
+     * @param null|int $id
      * @return array
      * @author Joachim Doerr
      */
-    public static function loadFromTable($table)
+    public static function loadFromTable($table, $id = 0)
     {
-        $id = rex_request::get('id', 'int', 0);
-        $tableName = $table[0];
+        $tableName = str_replace('yform_', '', $table[0]);
         $columnName = $table[1];
         $attrType = (isset($table[2])) ? $table[2] : null;
+        $id = ($id == 0 && isset($table[3])) ? $table[3] : null;
 
         $result = array();
 
         $sql = rex_sql::factory();
         $sql->setQuery("SELECT * FROM $tableName WHERE id='$id' LIMIT 1");
-        if ($sql->getRows() > 0) {
 
+        if ($sql->getRows() > 0) {
             if (array_key_exists($tableName . '.' . $columnName, $sql->getRow())) {
-                $jsonResult = json_decode(htmlspecialchars_decode($sql->getRow()[$tableName . '.' . $columnName]),true);
+                $jsonResult = json_decode(htmlspecialchars_decode($sql->getRow()[$tableName . '.' . $columnName]), true);
 
                 if (!is_null($attrType) && is_array($jsonResult) && array_key_exists($attrType, $jsonResult)) {
                     $jsonResult = $jsonResult[$attrType];
                 }
 
+                $tableKey = ($table[0] != $tableName) ? $table[0] : $tableName;
+
                 if (is_array($jsonResult))
-                    $result['value'][$tableName . '::' . $columnName] = $jsonResult;
+                    $result['value'][$tableKey . '::' . $columnName] = $jsonResult;
             }
         }
 

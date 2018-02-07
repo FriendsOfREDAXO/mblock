@@ -40,15 +40,39 @@ class MBlock
             // load rex value by id
             self::$result = MBlockValueHandler::loadRexVars();
         } else {
-            // is table::column
-            $table = explode('::', $id);
-            self::$result = MBlockValueHandler::loadFromTable($table);
+            if (strpos($id, 'yform') !== false) {
+                $table = explode('::', $id);
 
-            if (sizeof($table) > 2) {
-                $id = $table[0] . '::' . $table[1];
-                $settings['type_key'] = array_pop($table);
+                if (sizeof($table) > 2) {
+                    $id = $table[0] . '::' . $table[1];
+                    $settings['type_key'] = $table[2];
+                    $post = rex_request::post($table[1]);
+                    if (!is_null($post)) {
+                        self::$result['value'][$id] = $post[$settings['type_key']];
+                    }
+                    if (sizeof($table) > 3) {
+                        dump($table);
+                        self::$result = MBlockValueHandler::loadFromTable($table);
+                    }
+                } else {
+                    self::$result = rex_request::post($table[1]);
+                }
+            } else {
+                // is table::column
+                $table = explode('::', $id);
+                self::$result = MBlockValueHandler::loadFromTable($table, rex_request::get('id', 'int', 0));
+
+                if (sizeof($table) > 2) {
+                    $id = $table[0] . '::' . $table[1];
+                    $settings['type_key'] = array_pop($table);
+                }
+
+                dump(self::$result);
+
             }
         }
+
+        dump(self::$result);
 
         // is loaded
         if (array_key_exists('value', self::$result) && is_array(self::$result['value'][$id])) {
