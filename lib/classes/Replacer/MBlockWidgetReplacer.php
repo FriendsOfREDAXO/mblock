@@ -7,6 +7,12 @@
 
 class MBlockWidgetReplacer
 {
+    /**
+     * @param MBlockItem $item
+     * @param $count
+     * @return String
+     * @author Joachim Doerr
+     */
     public static function replaceYFormManagerWidget(MBlockItem $item, $count)
     {
         ## yform_MANAGER

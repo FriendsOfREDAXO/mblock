@@ -148,6 +148,7 @@ function mblock_reindex(element) {
 
     element.find('> div').each(function (index) {
         // find input elements
+        $(this).attr('data-mblock_index', index);
         $(this).find('input,textarea,select,button').each(function (key) {
             var attr = $(this).attr('name');
             eindex = key + 1;
@@ -229,11 +230,6 @@ function mblock_reindex(element) {
                 }
             }
         });
-
-        var mselect = $(this).find('.multiple-select');
-        if (mselect.length > 0) {
-            mform_multiple_select(mselect);
-        }
 
         $(this).find('a[data-toggle="tab"]').each(function (key) {
             eindex = key + 1;

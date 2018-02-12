@@ -7,6 +7,11 @@
 
 class MBlockSystemButtonReplacer
 {
+    /**
+     * @param MBlockItem $item
+     * @return String
+     * @author Joachim Doerr
+     */
     public static function replaceCustomLinkText(MBlockItem $item)
     {
         // set phpquery document

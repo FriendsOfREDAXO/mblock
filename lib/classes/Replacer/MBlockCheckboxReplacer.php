@@ -7,6 +7,12 @@
 
 class MBlockCheckboxReplacer
 {
+    /**
+     * @param MBlockItem $item
+     * @param $count
+     * @return String
+     * @author Joachim Doerr
+     */
     public static function replaceCheckboxesBlockHolder(MBlockItem $item, $count)
     {
         // set phpquery document
