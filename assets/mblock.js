@@ -510,14 +510,15 @@ function mblock_moveup(element, item) {
     setTimeout(function () {
         prev.removeClass('mblock_animate').css({'z-index': '', 'top': '', 'position': ''});
         item.removeClass('mblock_animate').css({'z-index': '', 'top': '', 'position': ''});
-        
+
         // set currently affected item
         mblock_module.affectedItem = item;
-        
+
         item.insertBefore(prev);
 		// set last user action
 		mblock_module.lastAction = 'moveup';
         mblock_reindex(element);
+        mblock_remove(element);
     }, 150);
 }
 
@@ -539,6 +540,7 @@ function mblock_movedown(element, item) {
 		// set last user action
 		mblock_module.lastAction = 'movedown';
         mblock_reindex(element);
+        mblock_remove(element);
     }, 150);
 }
 
