@@ -148,7 +148,7 @@ function mblock_reindex(element) {
 
     element.find('> div').each(function (index) {
         // find input elements
-        $(this).attr('data-mblock_index', index);
+        $(this).attr('data-mblock_index', (index + 1));
         $(this).find('input,textarea,select,button').each(function (key) {
             var attr = $(this).attr('name');
             eindex = key + 1;
