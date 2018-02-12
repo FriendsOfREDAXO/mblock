@@ -15,7 +15,7 @@ var mblock_module = (function () {
         lastAction: ''
     };
     var mod = {};
-    
+
     mod.affectedItem = {};
 
     // Register a callback
@@ -231,6 +231,27 @@ function mblock_reindex(element) {
             }
         });
 
+        $(this).find('a[data-toggle="collapse"]').each(function (key) {
+            eindex = key + 1;
+            sindex = index + 1;
+            togglecollase = $(this);
+            if (!$(this).attr('data-ignore-mblock')) {
+                href = $(this).attr('data-target');
+                container = togglecollase.parent().find(href);
+                group = togglecollase.parent().parent().parent().find('.panel-group');
+                nexit = container.attr('id').replace(/_\d+/, '_' + sindex + '' + mblock_count + '00' + eindex);
+
+                container.attr('id', nexit);
+                togglecollase.attr('data-target', '#' + nexit);
+
+                if (group.length) {
+                    parentit = group.attr('id').replace(/_\d+/, '_' + sindex + '' + mblock_count + '00');
+                    group.attr('id', parentit);
+                    togglecollase.attr('data-parent', '#' + parentit);
+                }
+            }
+        });
+
         $(this).find('a[data-toggle="tab"]').each(function (key) {
             eindex = key + 1;
             sindex = index + 1;
@@ -415,6 +436,7 @@ function mblock_add_item(element, item) {
                 iClone.find('option:selected').removeAttr("selected");
                 iClone.find('input:checked').removeAttr("checked");
                 iClone.find('select').each(function () {
+                    $(this).attr('data-selected', '');
                     if ($(this).attr('id') && ($(this).attr('id').indexOf("REX_MEDIALIST") >= 0
                             || $(this).attr('id').indexOf("REX_LINKLIST") >= 0
                         )) {

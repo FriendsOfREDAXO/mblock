@@ -110,6 +110,7 @@ class MBlock
             // do not use unfinished replacer resources
             // $item->setForm(MBlockWidgetReplacer::replaceYFormManagerWidget($item, ($count+1)));
             $item->setForm(MBlockBootstrapReplacer::replaceTabIds($item, ($count + 1)));
+            $item->setForm(MBlockBootstrapReplacer::replaceCollapseIds($item, ($count + 1)));
 
             // decorate item form
             if ($item->getResult()) {
