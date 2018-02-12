@@ -25,6 +25,11 @@ class MBlockElement
     public $form;
 
     /**
+     * @var int
+     */
+    public $index;
+
+    /**
      * @return mixed
      * @author Joachim Doerr
      */
@@ -61,6 +66,26 @@ class MBlockElement
     public function setForm($form)
     {
         $this->form = $form;
+        return $this;
+    }
+
+    /**
+     * @return int
+     * @author Joachim Doerr
+     */
+    public function getIndex()
+    {
+        return $this->index;
+    }
+
+    /**
+     * @param int $index
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setIndex($index)
+    {
+        $this->index = $index;
         return $this;
     }
 

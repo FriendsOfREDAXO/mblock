@@ -51,7 +51,7 @@ class MBlock
                         self::$result['value'][$id] = $post[$settings['type_key']];
                     }
                     if (sizeof($table) > 3) {
-                        dump($table);
+//                        dump($table);
                         self::$result = MBlockValueHandler::loadFromTable($table);
                     }
                 } else {
@@ -67,12 +67,12 @@ class MBlock
                     $settings['type_key'] = array_pop($table);
                 }
 
-                dump(self::$result);
+//                dump(self::$result);
 
             }
         }
 
-        dump(self::$result);
+//        dump(self::$result);
 
         // is loaded
         if (array_key_exists('value', self::$result) && is_array(self::$result['value'][$id])) {
@@ -123,7 +123,8 @@ class MBlock
 
             // parse form item
             $element = new MBlockElement();
-            $element->setForm($item->getForm());
+            $element->setForm($item->getForm())
+                ->setIndex(($count + 1));
 
             // parse element to output
             $output = MBlockParser::parseElement($element, 'element');

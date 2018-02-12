@@ -16,7 +16,7 @@ class MBlockParser
     public static function parseElement(MBlockElement $element, $templateType)
     {
         return str_replace(
-            array_merge(array(' />'),$element->getKeys()),
+            array_merge(array(' />'), $element->getKeys()),
             array_merge(array('/>'), $element->getValues()),
             MBlockTemplateFileProvider::loadTemplate($templateType));
     }
