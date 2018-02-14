@@ -70,7 +70,9 @@ class MBlockBootstrapReplacer
                 $href = str_replace('#','',$match->getAttribute('data-target'));
                 $newHref = $href . '_' . $count . $_SESSION['mblock_count'] . '00' . $key;
                 $match->setAttribute('data-target', '#' . $newHref);
-                $match->setAttribute('data-parent', '#accgr' . '_' . $count . $_SESSION['mblock_count'] . '00');
+                if ($match->hasAttribute('data-parent')) {
+                    $match->setAttribute('data-parent', '#accgr' . '_' . $count . $_SESSION['mblock_count'] . '00');
+                }
 
                 $next = $match->nextSibling;
 
@@ -80,7 +82,7 @@ class MBlockBootstrapReplacer
 
                 $parent = $match->parentNode->parentNode;
 
-                if ($parent->getAttribute('data-group-accordion') == 1) {
+                if ($parent->hasAttribute('data-group-accordion') && $parent->getAttribute('data-group-accordion') == 1) {
                     $parent->setAttribute('id', 'accgr' . '_' . $count . $_SESSION['mblock_count'] . '00');
                 }
             }

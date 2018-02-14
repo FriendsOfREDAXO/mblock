@@ -67,11 +67,18 @@ class MBlockValueHandler
         $columnName = $table[1];
         $attrType = (isset($table[2])) ? $table[2] : null;
         $id = ($id == 0 && isset($table[3])) ? $table[3] : null;
+        $idField = 'id';
+
+        if (strpos($id, '>>') !== false) {
+            $explodedId = explode('>>', $id);
+            $idField = $explodedId[0];
+            $id = $explodedId[1];
+        }
 
         $result = array();
 
         $sql = rex_sql::factory();
-        $sql->setQuery("SELECT * FROM $tableName WHERE id='$id' LIMIT 1");
+        $sql->setQuery("SELECT * FROM $tableName WHERE $idField='$id' LIMIT 1");
 
         if ($sql->getRows() > 0) {
             if (array_key_exists($tableName . '.' . $columnName, $sql->getRow())) {

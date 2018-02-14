@@ -51,12 +51,25 @@ class MBlock
                         self::$result['value'][$id] = $post[$settings['type_key']];
                     }
                     if (sizeof($table) > 3) {
-//                        dump($table);
                         self::$result = MBlockValueHandler::loadFromTable($table);
                     }
                 } else {
                     self::$result = rex_request::post($table[1]);
                 }
+
+                if ($form instanceof rex_yform) {
+                    // get fields
+                    $form->executeFields();
+                    $formFields = $form->getObjectparams('form_output');
+
+                    // rmeove submit button
+                    array_pop($formFields);
+                    array_pop($formFields);
+
+                    // implode fields to html string
+                    $form = implode('', $formFields);
+                }
+
             } else {
                 // is table::column
                 $table = explode('::', $id);
@@ -66,13 +79,8 @@ class MBlock
                     $id = $table[0] . '::' . $table[1];
                     $settings['type_key'] = array_pop($table);
                 }
-
-//                dump(self::$result);
-
             }
         }
-
-//        dump(self::$result);
 
         // is loaded
         if (array_key_exists('value', self::$result) && is_array(self::$result['value'][$id])) {
