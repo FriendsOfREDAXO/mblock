@@ -27,7 +27,7 @@ class MBlock
 
     /**
      * @param $id
-     * @param $form
+     * @param string|MForm|mblock_rex_form|rex_yform $form
      * @param array $settings
      * @return mixed
      */
@@ -39,6 +39,10 @@ class MBlock
         if (is_integer($id) or is_numeric($id)) {
             // load rex value by id
             self::$result = MBlockValueHandler::loadRexVars();
+
+            if ($form instanceof MForm) {
+                $form = $form->show();
+            }
         } else {
             if (strpos($id, 'yform') !== false) {
                 $table = explode('::', $id);
@@ -78,6 +82,10 @@ class MBlock
                 if (sizeof($table) > 2) {
                     $id = $table[0] . '::' . $table[1];
                     $settings['type_key'] = array_pop($table);
+                }
+
+                if ($form instanceof mblock_rex_form) {
+                    $form = $form->getElements();
                 }
             }
         }
