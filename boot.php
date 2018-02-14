@@ -5,6 +5,9 @@
  * @license MIT
  */
 
+// we need the vendors
+include_once rex_path::addon('mblock', 'vendors/phpQuery/phpQuery.php');
+
 if (rex::isBackend() && is_object(rex::getUser())) {
 
     // check theme css is exists

@@ -5,9 +5,6 @@
  * @license MIT
  */
 
-// we need the vendors
-include_once rex_path::addon('mblock', 'vendors/phpQuery/phpQuery.php');
-
 class MBlock
 {
     /**
