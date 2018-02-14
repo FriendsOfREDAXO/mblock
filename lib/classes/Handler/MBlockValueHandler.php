@@ -66,7 +66,7 @@ class MBlockValueHandler
         $tableName = str_replace('yform_', '', $table[0]);
         $columnName = $table[1];
         $attrType = (isset($table[2])) ? $table[2] : null;
-        $id = ($id == 0 && isset($table[3])) ? $table[3] : null;
+        $id = ($id == 0 && isset($table[3])) ? $table[3] : $id;
         $idField = 'id';
 
         if (strpos($id, '>>') !== false) {
