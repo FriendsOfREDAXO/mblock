@@ -26,9 +26,10 @@ class MBlock
      * @param $id
      * @param string|MForm|mblock_rex_form|rex_yform $form
      * @param array $settings
+     * @param null $theme
      * @return mixed
      */
-    public static function show($id, $form, $settings = array())
+    public static function show($id, $form, $settings = array(), $theme = null)
     {
         $plain = false;
         $_SESSION['mblock_count']++;
@@ -141,7 +142,7 @@ class MBlock
                 ->setIndex(($count + 1));
 
             // parse element to output
-            $output = MBlockParser::parseElement($element, 'element');
+            $output = MBlockParser::parseElement($element, 'element', $theme);
 
             // fix & error
             foreach ($item->getResult() as $result) {
@@ -159,7 +160,7 @@ class MBlock
             ->setSettings(MBlockSettingsHelper::getSettings($settings));
 
         // return wrapped from elements
-        $output = MBlockParser::parseElement($wrapper, 'wrapper');
+        $output = MBlockParser::parseElement($wrapper, 'wrapper', $theme);
 
 
         if (($plain && array_key_exists('disable_null_view', $settings) && $settings['disable_null_view'] == true) and rex_request::get('function', 'string') != 'add') {

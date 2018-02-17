@@ -10,14 +10,15 @@ class MBlockParser
     /**
      * @param MBlockElement $element
      * @param string $templateType
+     * @param null $theme
      * @return mixed
      * @author Joachim Doerr
      */
-    public static function parseElement(MBlockElement $element, $templateType)
+    public static function parseElement(MBlockElement $element, $templateType, $theme = null)
     {
         return str_replace(
             array_merge(array(' />'), $element->getKeys()),
             array_merge(array('/>'), $element->getValues()),
-            MBlockTemplateFileProvider::loadTemplate($templateType));
+            MBlockTemplateFileProvider::loadTemplate($templateType, '', $theme));
     }
 }
