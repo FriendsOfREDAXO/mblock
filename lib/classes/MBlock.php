@@ -70,6 +70,21 @@ class MBlock
 
                     // implode fields to html string
                     $form = implode('', $formFields);
+
+                    preg_match_all('/name="([^"]*)"/', $form, $matches, PREG_SET_ORDER, 0);
+
+                    foreach ($matches as $match) {
+
+                        preg_match_all('/(-\d{1,2}-)|(-\w*-)/', $match[1], $subMatches);
+                        $toReplace = $match[0];
+                        $replaceWith = $match[0];
+
+                        foreach ($subMatches[0] as $subMatch) {
+                            $replaceWith = str_replace($subMatch, '[' . substr($subMatch, 1, -1) . ']', $replaceWith);
+                        }
+
+                        $form = str_replace($toReplace, $replaceWith, $form);
+                    }
                 }
 
             } else {
