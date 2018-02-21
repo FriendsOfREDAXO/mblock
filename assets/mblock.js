@@ -89,8 +89,10 @@ function mblock_remove(element) {
 
     if (finded.length == 1) {
         finded.find('.removeme').prop('disabled', true);
+        finded.find('.removeme').attr('data-disabled', true);
     } else {
         finded.find('.removeme').prop('disabled', false);
+        finded.find('.removeme').attr('data-disabled', false);
     }
 
     // has data?
@@ -580,6 +582,8 @@ function mblock_scroll(element, item) {
 function mblock_add(element) {
     element.find('> div .addme').unbind().bind('click', function () {
         if (!$(this).prop('disabled')) {
+            $item = $(this).parents('.sortitem');
+            element.attr('data-mblock_clicked_add_item',$item.attr('data-mblock_index'));
             mblock_add_item(element, $(this).closest('div[class^="sortitem"]'));
         }
         return false;
