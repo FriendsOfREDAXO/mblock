@@ -52,7 +52,7 @@ var mblock_module = (function () {
 function mblock_init() {
     var mblock = $('.mblock_wrapper');
     // init by siteload
-    if (($('#REX_FORM').length || $('#rex-addon-editmode').length) && mblock.length) {
+    if (mblock.length) {
         mblock.each(function () {
             if (!$(this).data('mblock_run')) {
                 $(this).data('mblock_run', 1);
