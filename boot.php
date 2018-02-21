@@ -39,6 +39,9 @@ if (rex::isBackend() && is_object(rex::getUser())) {
     rex_view::addJsFile($this->getAssetsUrl('mblock.js'));
     rex_view::addCssFile($this->getAssetsUrl('mblock.css'));
 
+}
+
+if (isset($_SESSION['mblock_count'])) {
     // reset mblock page count
     $_SESSION['mblock_count'] = 0;
 }
