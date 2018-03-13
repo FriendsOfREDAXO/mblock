@@ -10,6 +10,7 @@ $(function () {
 
 var mblock_module = (function () {
     var callbacks = {
+        remove_item_start: [],
         add_item_start: [],
         reindex_end: [],
         lastAction: ''
@@ -496,7 +497,7 @@ function mblock_set_count(element, item) {
 }
 
 function mblock_remove_item(element, item) {
-
+    mblock_module.executeRegisteredCallbacks('remove_item_start');
     if (element.data().hasOwnProperty('delete_confirm')) {
         if (!confirm(element.data('delete_confirm'))) {
             return false;
