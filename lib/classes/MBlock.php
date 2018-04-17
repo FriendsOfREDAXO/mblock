@@ -49,7 +49,7 @@ class MBlock
                     $id = $table[0] . '::' . $table[1];
                     $settings['type_key'] = $table[2];
                     $post = rex_request::post($table[1]);
-                    if (!is_null($post)) {
+                    if (!is_null($post) && isset($post[$settings['type_key']])) {
                         self::$result['value'][$id] = $post[$settings['type_key']];
                     }
                     if (sizeof($table) > 3) {
