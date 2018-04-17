@@ -419,7 +419,7 @@ class MBlockSystemButtonReplacer
                 /** @var DOMElement $child */
                 foreach ($dom->childNodes as $child) {
                     $child->setAttribute('value', $child->nodeValue);
-                    $child->nodeValue = self::getLinkInfo($child->getAttribute('value'))['art_name'];
+                    $child->nodeValue = htmlentities(self::getLinkInfo($child->getAttribute('value'))['art_name']);
                     $child->removeAttribute('selected');
                 }
             }
