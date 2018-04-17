@@ -8,7 +8,6 @@ $func = rex_request::request('func', 'string');
 $id = rex_request::request('id', 'int');
 $start = rex_request::request('start', 'int', NULL);
 
-$table = rex::getTablePrefix() . "sked_venues";
 $message = '';
 
 if ($func == '') {
@@ -36,8 +35,8 @@ if ($func == '') {
     $list->removeColumn('id');
 
     // Column 1: Action (add/edit button)
-    $thIcon = '<a href="' . $list->getUrl(['func' => 'add']) . '" title="'.rex_i18n::msg('sked_add_venue').'"><i class="rex-icon rex-icon-add-action"></i></a>';
-    $tdIcon = '<i class="rex-icon fa-map-marker"></i>';
+    $thIcon = '<a href="' . $list->getUrl(['func' => 'add']) . '" title="'.rex_i18n::msg('rex_form_mblock_demo_entries_add').'"><i class="rex-icon rex-icon-add-action"></i></a>';
+    $tdIcon = '<i class="rex-icon fa-cube"></i>';
 
     $list->addColumn($thIcon, $tdIcon, 0, ['<th class="rex-table-icon">###VALUE###</th>', '<td class="rex-table-icon">###VALUE###</td>']);
     $list->setColumnParams($thIcon, ['func' => 'edit', 'id' => '###id###']);
@@ -46,7 +45,7 @@ if ($func == '') {
     // show
     $content = $list->get();
     $fragment = new rex_fragment();
-    $fragment->setVar('title', rex_i18n::msg('sked_venues_title'));
+    $fragment->setVar('title', rex_i18n::msg('rex_form_mblock_demo_entries'));
     $fragment->setVar('content', $message . $content, false);
     echo $fragment->parse('core/page/section.php');
 
@@ -58,16 +57,16 @@ if ($func == '') {
     if ($func == 'edit') $form->addParam('id', $id);
 
     // add text.
-    $field = $form->addTextField('name');
+    $field = $form->addTextField('Name');
     $field->setLabel('name');
 
     $nf = mblock_rex_form::factory('rex_mblock_rexform_demo', '', 'id=' . $id);
 
+    $element = $nf->addRawField('<br>');
     $element1 = $nf->addTextField('mblock_field][attr_type][0][test');
-    $element1->setLabel('test11');
+    $element1->setLabel('Feld 1');
     $element2 = $nf->addTextField('mblock_field][attr_type][0][test2');
-    $element2->setLabel('test11');
-
+    $element2->setLabel('Feld 2');
 
     $form->addRawField(mblock::show('rex_mblock_rexform_demo::mblock_field::attr_type', $nf->getElements()));
 
@@ -75,7 +74,7 @@ if ($func == '') {
     $content = $form->get();
     $fragment = new rex_fragment();
     $fragment->setVar('class', 'edit', false);
-    $fragment->setVar('title', ($func == 'edit') ? rex_i18n::msg('sked_venue_edit') : rex_i18n::msg('sked_venue_add'));
+    $fragment->setVar('title', ($func == 'edit') ? rex_i18n::msg('rex_form_mblock_demo_entries_edit') : rex_i18n::msg('rex_form_mblock_demo_entries_add'));
     $fragment->setVar('body', $content, false);
     echo $fragment->parse('core/page/section.php');
 }
