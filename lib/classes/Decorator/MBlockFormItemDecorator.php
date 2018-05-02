@@ -77,7 +77,7 @@ class MBlockFormItemDecorator
                                     self::replaceOptionSelect($match, $nodeChild, $item);
                                 break;
                             default:
-                                if($child->tagName) {
+                                if(isset($child->tagName)) {
                                     self::replaceOptionSelect($match, $child, $item);
                                     break;
                                 }
