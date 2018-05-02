@@ -7,6 +7,7 @@
 
 class MBlock
 {
+
     /**
      * @var array
      */
@@ -21,6 +22,18 @@ class MBlock
      * @var array
      */
     private static $output = array();
+
+    /**
+     * MBlock constructor.
+     * @author Joachim Doerr
+     */
+    public function __construct()
+    {
+        // create mblock page count is not exist
+        if (!isset($_SESSION['mblock_count'])) {
+            $_SESSION['mblock_count'] = 0;
+        }
+    }
 
     /**
      * @param $id
