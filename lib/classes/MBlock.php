@@ -100,6 +100,7 @@ class MBlock
                 if ($form instanceof mblock_rex_form) {
                     $form = $form->getElements();
                 }
+
             }
         }
 
@@ -116,12 +117,17 @@ class MBlock
             }
         }
 
+        // key must be integer
+        foreach (self::$items as $key => $item) {
+            if (!is_int($key)) {
+                unset(self::$items[$key]);
+            }
+        }
+
         // don't loaded?
         if (!self::$items) {
-
             // set plain item for add
             $plain = true;
-
             self::$items[0] = new MBlockItem();
             self::$items[0]->setId(0)
                 ->setValueId($id)
