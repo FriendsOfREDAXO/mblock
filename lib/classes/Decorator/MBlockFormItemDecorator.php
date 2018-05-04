@@ -242,7 +242,7 @@ class MBlockFormItemDecorator
             return false;
         }
 
-        $id = preg_replace('/(_\d+){2}/i', '_' . $item->getId(), $domId);
+        $id = preg_replace('/(_\d+){2}/i', '_' . $item->getId(), str_replace('-','_', $domId));
         $dom->setAttribute('id', $id);
         // find label with for
         $matches = $document->find('label');
