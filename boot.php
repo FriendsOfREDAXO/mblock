@@ -10,7 +10,7 @@ include_once rex_path::addon('mblock', 'vendors/phpQuery/phpQuery.php');
 
 if (rex::isBackend() && is_object(rex::getUser())) {
 
-    // check theme css is exists
+    // check theme css exists
     MBlockThemeHelper::themeBootCheck($this->getConfig('mblock_theme'));
 
     // use theme helper class
