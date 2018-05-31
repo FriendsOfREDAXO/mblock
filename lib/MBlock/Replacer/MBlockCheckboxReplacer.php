@@ -7,6 +7,8 @@
 
 class MBlockCheckboxReplacer
 {
+    use \MBlock\Decorator\MBlockDOMTrait;
+
     /**
      * @param MBlockItem $item
      * @param $count
@@ -16,12 +18,12 @@ class MBlockCheckboxReplacer
     public static function replaceCheckboxesBlockHolder(MBlockItem $item, $count)
     {
         // set phpquery document
-        $document = phpQuery::newDocumentHTML($item->getForm());
+        $dom = self::createDom($item->getForm());
         $holderInput = false;
         $holderName = "REX_INPUT_VALUE[{$item->getValueId()}][{$item->getId()}][checkbox_block_hold]";
 
         // find input group
-        if ($matches = $document->find('input')) {
+        if ($matches = $dom->getElementsByTagName('input')) {
             /** @var DOMElement $match */
             foreach ($matches as $key => $match) {
                 switch ($match->getAttribute('type')) {
@@ -33,6 +35,6 @@ class MBlockCheckboxReplacer
         }
 
         // return the manipulated html output
-        return ($holderInput) ? '<input type="hidden" class="not_delete" name="' . $holderName . '" value="hold_block">' . $document->htmlOuter() : $document->htmlOuter();
+        return ($holderInput) ? '<input type="hidden" class="not_delete" name="' . $holderName . '" value="hold_block">' . $dom->saveHTML() : $dom->saveHTML();
     }
 }
