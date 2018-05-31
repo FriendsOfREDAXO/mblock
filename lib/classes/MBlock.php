@@ -45,6 +45,10 @@ class MBlock
     public static function show($id, $form, $settings = array(), $theme = null)
     {
         $plain = false;
+        if (!isset($_SESSION['mblock_count'])) {
+            // set mblock count is not exist
+            $_SESSION['mblock_count'] = 0;
+        }
         $_SESSION['mblock_count']++;
 
         if (is_integer($id) or is_numeric($id)) {
