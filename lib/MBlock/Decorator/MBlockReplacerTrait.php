@@ -23,7 +23,7 @@ trait MBlockDOMTrait
         // set phpquery document
         $dom = new DOMDocument();
         $string = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
-        @$dom->loadHTML($string);
+        @$dom->loadHTML($string, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
         $dom->preserveWhiteSpace = false;
 
         return $dom;
