@@ -7,6 +7,8 @@
 
 class MBlockBootstrapReplacer
 {
+    use \MBlock\Decorator\MBlockDOMTrait;
+
     /**
      * @param MBlockItem $item
      * @param $count
@@ -15,11 +17,11 @@ class MBlockBootstrapReplacer
      */
     public static function replaceTabIds(MBlockItem $item, $count)
     {
-        // set phpquery document
-        $document = phpQuery::newDocumentHTML($item->getForm());
+        // set dom document
+        $dom = self::createDom($item->getForm());
         $item->addPayload('count-id', $count);
-        // find input group
-        if ($matches = $document->find('a[data-toggle="tab"]')) {
+        // find tab group
+        if ($matches = self::getElementsByData($dom, 'a[data-toggle="tab"]')) {
             /** @var DOMElement $match */
             foreach ($matches as $key => $match) {
                 $item->addPayload('replace-id', $key);
@@ -45,9 +47,8 @@ class MBlockBootstrapReplacer
                 }
             }
         }
-
         // return the manipulated html output
-        return $document->htmlOuter();
+        return $dom->saveHTML();
     }
 
     /**
@@ -58,11 +59,11 @@ class MBlockBootstrapReplacer
      */
     public static function replaceCollapseIds(MBlockItem $item, $count)
     {
-        // set phpquery document
-        $document = phpQuery::newDocumentHTML($item->getForm());
+        // set dom document
+        $dom = self::createDom($item->getForm());
         $item->addPayload('count-id', $count);
-
-        if ($matches = $document->find('a[data-toggle="collapse"]')) {
+        // find tab group
+        if ($matches = self::getElementsByData($dom, 'a[data-toggle="collapse"]')) {
             /** @var DOMElement $match */
             foreach ($matches as $key => $match) {
                 $item->addPayload('replace-id', $key);
@@ -87,8 +88,7 @@ class MBlockBootstrapReplacer
                 }
             }
         }
-
         // return the manipulated html output
-        return $document->htmlOuter();
+        return $dom->saveHTML();
     }
 }

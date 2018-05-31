@@ -157,10 +157,7 @@ class MBlock
         foreach (static::$items as $count => $item) {
             // replace system button data
             $item->setForm(MBlockSystemButtonReplacer::replaceSystemButtons($item, ($count + 1)));
-            $item->setForm(MBlockEditorReplacer::replaceEditorArea($item, ($count + 1)));
             $item->setForm(MBlockCountReplacer::replaceCountKeys($item, ($count + 1)));
-            // do not use unfinished replacer resources
-            // $item->setForm(MBlockWidgetReplacer::replaceYFormManagerWidget($item, ($count+1)));
             $item->setForm(MBlockBootstrapReplacer::replaceTabIds($item, ($count + 1)));
             $item->setForm(MBlockBootstrapReplacer::replaceCollapseIds($item, ($count + 1)));
 

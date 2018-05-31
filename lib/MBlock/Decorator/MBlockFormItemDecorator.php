@@ -7,6 +7,8 @@
 
 class MBlockFormItemDecorator
 {
+    use \MBlock\Decorator\MBlockDOMTrait;
+
     /**
      * @param MBlockItem $item
      * @return String
@@ -14,15 +16,14 @@ class MBlockFormItemDecorator
      */
     static public function decorateFormItem(MBlockItem $item)
     {
-        // set phpquery document
-        $document = phpQuery::newDocumentHTML($item->getForm());
+        $dom = self::createDom($item->getForm());
 
         // find inputs
-        if ($matches = $document->find('input')) {
+        if ($matches = $dom->getElementsByTagName('input')) {
             /** @var DOMElement $match */
             foreach ($matches as $match) {
                 // label for and id change
-                self::replaceForId($document, $match, $item);
+                self::replaceForId($dom, $match, $item);
                 // replace attribute id
                 self::replaceName($match, $item);
                 // change checked or value by type
@@ -40,11 +41,11 @@ class MBlockFormItemDecorator
         }
 
         // find textareas
-        if ($matches = $document->find('textarea')) {
+        if ($matches = $dom->getElementsByTagName('textarea')) {
             /** @var DOMElement $match */
             foreach ($matches as $match) {
                 // label for and id change
-                self::replaceForId($document, $match, $item);
+                self::replaceForId($dom, $match, $item);
                 // replace attribute id
                 self::replaceName($match, $item);
                 // replace value by json key
@@ -53,7 +54,7 @@ class MBlockFormItemDecorator
         }
 
         // find selects
-        if ($matches = $document->find('select')) {
+        if ($matches = $dom->getElementsByTagName('select')) {
             /** @var DOMElement $match */
             foreach ($matches as $match) {
                 // continue by media elements
@@ -62,7 +63,7 @@ class MBlockFormItemDecorator
                     continue;
                 }
                 // label for and id change
-                self::replaceForId($document, $match, $item);
+                self::replaceForId($dom, $match, $item);
                 // replace attribute id
                 self::replaceName($match, $item);
                 // replace selected data
@@ -88,38 +89,38 @@ class MBlockFormItemDecorator
         }
 
         // return the manipulated html output
-        return $document->htmlOuter();
+        return $dom->saveHTML();
     }
 
     /**
-     * @param DOMElement $dom
+     * @param DOMElement $element
      * @param MBlockItem $item
      * @author Joachim Doerr
      */
-    protected static function replaceName(DOMElement $dom, MBlockItem $item)
+    protected static function replaceName(DOMElement $element, MBlockItem $item)
     {
         // replace attribute id
-        preg_match('/\]\[\d+\]\[/', $dom->getAttribute('name'), $matches);
-        if ($matches) $dom->setAttribute('name', str_replace($matches[0], '][' . $item->getId() . '][', $dom->getAttribute('name')));
+        preg_match('/\]\[\d+\]\[/', $element->getAttribute('name'), $matches);
+        if ($matches) $element->setAttribute('name', str_replace($matches[0], '][' . $item->getId() . '][', $element->getAttribute('name')));
     }
 
     /**
-     * @param DOMElement $dom
+     * @param DOMElement $element
      * @param MBlockItem $item
      * @author Joachim Doerr
      */
-    protected static function replaceValue(DOMElement $dom, MBlockItem $item)
+    protected static function replaceValue(DOMElement $element, MBlockItem $item)
     {
         // get value key by name
-        $matches = self::getName($dom);
+        $matches = self::getName($element);
 
         // found
         if ($matches) {
             // node name switch
-            switch ($dom->nodeName) {
+            switch ($element->nodeName) {
                 default:
                 case 'input':
-                    if ($matches && array_key_exists($matches[1], $item->getResult())) $dom->setAttribute('value', $item->getResult()[$matches[1]]);
+                    if ($matches && array_key_exists($matches[1], $item->getResult())) $element->setAttribute('value', $item->getResult()[$matches[1]]);
                     break;
                 case 'textarea':
                     if ($matches && array_key_exists($matches[1], $item->getResult())) {
@@ -127,7 +128,7 @@ class MBlockFormItemDecorator
                         $id = uniqid(md5(rand(1000,9999)),true);
                         // node value cannot contains &
                         // so set a unique id there we replace later with the right value
-                        $dom->nodeValue = $id;
+                        $element->nodeValue = $id;
 
                         // add the id to the result value
                         $result[$matches[1]] = array('id'=>$id, 'value'=>$result[$matches[1]]);
@@ -141,46 +142,46 @@ class MBlockFormItemDecorator
     }
 
     /**
-     * @param DOMElement $dom
+     * @param DOMElement $element
      * @param MBlockItem $item
      * @author Joachim Doerr
      */
-    protected static function replaceSelectedData(DOMElement $dom, MBlockItem $item)
+    protected static function replaceSelectedData(DOMElement $element, MBlockItem $item)
     {
         // get value key by name
-        $matches = self::getName($dom);
+        $matches = self::getName($element);
 
         // found
         if ($matches) {
             // node name switch
-            switch ($dom->nodeName) {
+            switch ($element->nodeName) {
                 default:
                 case 'select':
-                    if ($matches && array_key_exists($matches[1], $item->getResult())) $dom->setAttribute('data-selected', $item->getResult()[$matches[1]]);
+                    if ($matches && array_key_exists($matches[1], $item->getResult())) $element->setAttribute('data-selected', $item->getResult()[$matches[1]]);
                     break;
             }
         }
     }
 
     /**
-     * @param DOMElement $dom
+     * @param DOMElement $element
      * @param MBlockItem $item
      * @author Joachim Doerr
      */
-    protected static function replaceChecked(DOMElement $dom, MBlockItem $item)
+    protected static function replaceChecked(DOMElement $element, MBlockItem $item)
     {
         // get value key by name
-        $matches = self::getName($dom);
+        $matches = self::getName($element);
 
         // found
         if ($matches) {
             // unset select
-            if ($dom->getAttribute('checked')) {
-                $dom->removeAttribute('checked');
+            if ($element->getAttribute('checked')) {
+                $element->removeAttribute('checked');
             }
             // set select by value = result
-            if ($matches && array_key_exists($matches[1], $item->getResult()) && $item->getResult()[$matches[1]] == $dom->getAttribute('value')) {
-                $dom->setAttribute('checked', 'checked');
+            if ($matches && array_key_exists($matches[1], $item->getResult()) && $item->getResult()[$matches[1]] == $element->getAttribute('value')) {
+                $element->setAttribute('checked', 'checked');
             }
         }
     }
@@ -221,37 +222,33 @@ class MBlockFormItemDecorator
     }
 
     /**
-     * @param phpQueryObject $document
-     * @param DOMElement $dom
+     * @param DOMDocument $dom
+     * @param DOMElement $element
      * @param MBlockItem $item
      * @return bool
      * @author Joachim Doerr
      */
-    protected static function replaceForId(phpQueryObject $document, DOMElement $dom, MBlockItem $item)
+    protected static function replaceForId(DOMDocument $dom, DOMElement $element, MBlockItem $item)
     {
         // get input id
-        $domId = $dom->getAttribute('id');
-        
-        if (!$domId) {
-            return true;
-        }
+        if (!$elementId = $element->getAttribute('id')) return true;
 
-        if (strpos($domId, 'REX_MEDIA') !== false
-            or strpos($dom->getAttribute('class'), 'redactorEditor') !== false
-            or strpos($domId, 'REX_LINK') !== false) {
+        // ignore system elements
+        if (strpos($elementId, 'REX_MEDIA') !== false
+            or strpos($elementId, 'REX_LINK') !== false) {
             return false;
         }
 
-        $id = preg_replace('/(_\d+){2}/i', '_' . $item->getId(), str_replace('-','_', $domId));
-        $dom->setAttribute('id', $id);
+        $id = preg_replace('/(_\d+){2}/i', '_' . $item->getId(), str_replace('-','_', $elementId));
+        $element->setAttribute('id', $id);
         // find label with for
-        $matches = $document->find('label');
+        $matches = $dom->getElementsByTagName('label');
 
         if ($matches) {
             /** @var DOMElement $match */
             foreach ($matches as $match) {
                 $for = $match->getAttribute('for');
-                if ($for == $domId) {
+                if ($for == $elementId) {
                     $match->setAttribute('for', $id);
                 }
             }
@@ -260,26 +257,13 @@ class MBlockFormItemDecorator
     }
 
     /**
-     * @param DOMElement $dom
+     * @param DOMElement $element
      * @return mixed
      * @author Joachim Doerr
      */
-    public static function getName(DOMElement $dom)
+    public static function getName(DOMElement $element)
     {
-        preg_match('/^.*?\[(\w+)\]$/i', str_replace('[]','',$dom->getAttribute('name')), $matches);
+        preg_match('/^.*?\[(\w+)\]$/i', str_replace('[]','',$element->getAttribute('name')), $matches);
         return $matches;
     }
-
-//    static protected function get_html_from_node($node){
-//        $html = '';
-//        $children = $node->childNodes;
-//
-//        foreach ($children as $child) {
-//            $tmp_doc = new DOMDocument();
-//            $tmp_doc->appendChild($tmp_doc->importNode($child,true));
-//            $html .= $tmp_doc->saveHTML();
-//        }
-//        return $html;
-//    }
-
 }
