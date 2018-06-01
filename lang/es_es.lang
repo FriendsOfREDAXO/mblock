@@ -45,3 +45,8 @@ mblock_not_delete_confirm = Confirmación desactivada antes de eliminar bloques
 mblock_ok_delete_confirm = Confirmación activada antes de eliminar bloques
 mblock_delete_confirm_label = Confirmación antes de la eliminación
 mblock_delete_confirm = Eliminar bloque?
+
+mblock_rexform_demo = Demostración de RexForm MBlock
+rex_form_mblock_demo_entries = Entradas de demostración
+rex_form_mblock_demo_entries_add = Agregue una entrada de demostración
+rex_form_mblock_demo_entries_edit = Editar una entrada de demostración
