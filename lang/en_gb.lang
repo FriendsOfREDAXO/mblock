@@ -45,3 +45,8 @@ mblock_not_delete_confirm = Delete-confirm disabled
 mblock_ok_delete_confirm = Delete-confirm enabled
 mblock_delete_confirm_label = Block delete confirmation
 mblock_delete_confirm = Delete block?
+
+mblock_rexform_demo = RexForm MBlock demo
+rex_form_mblock_demo_entries = Demo entries
+rex_form_mblock_demo_entries_add = Add demo entry
+rex_form_mblock_demo_entries_edit = Edit demo entry
