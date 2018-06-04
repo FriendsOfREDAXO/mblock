@@ -128,7 +128,6 @@ class MBlock
 
         if (array_key_exists('value', self::$result)) {
             $resultValue = (!is_null($sid)) ? self::$result['value'][$id][$sid] : self::$result['value'][$id];
-            dump($resultValue);
             // is loaded
             if (is_array($resultValue)) {
                 // item result to item
