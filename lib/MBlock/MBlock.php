@@ -44,6 +44,7 @@ class MBlock
      */
     public static function show($id, $form, $settings = array(), $theme = null)
     {
+        $settings['id'] = $id;
         $plain = false;
         if (!isset($_SESSION['mblock_count'])) {
             // set mblock count is not exist
@@ -121,16 +122,25 @@ class MBlock
             }
         }
 
-        // is loaded
-        if (array_key_exists('value', self::$result) && is_array(self::$result['value'][$id])) {
-            // item result to item
-            foreach (self::$result['value'][$id] as $jId => $values) {
-                // init item
-                self::$items[$jId] = new MBlockItem;
-                self::$items[$jId]->setId($jId)
-                    ->setValueId($id)
-                    ->setResult($values)
-                    ->setForm($form);
+        $aid = explode('.', $id);
+        $id = $aid[0];
+        $sid = (isset($aid[1])) ? $aid[1] : null;
+
+        if (array_key_exists('value', self::$result)) {
+            $resultValue = (!is_null($sid)) ? self::$result['value'][$id][$sid] : self::$result['value'][$id];
+            dump($resultValue);
+            // is loaded
+            if (is_array($resultValue)) {
+                // item result to item
+                foreach ($resultValue as $jId => $values) {
+                    // init item
+                    self::$items[$jId] = new MBlockItem;
+                    self::$items[$jId]->setId($jId)
+                        ->setSubId($sid)
+                        ->setValueId($id)
+                        ->setResult($values)
+                        ->setForm($form);
+                }
             }
         }
 

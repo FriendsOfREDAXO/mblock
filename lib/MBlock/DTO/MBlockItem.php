@@ -20,6 +20,11 @@ class MBlockItem
     /**
      * @var integer
      */
+    public $subId;
+
+    /**
+     * @var integer
+     */
     public $valueId;
 
     /**
@@ -79,6 +84,26 @@ class MBlockItem
     public function setId($id)
     {
         $this->id = $id;
+        return $this;
+    }
+
+    /**
+     * @return int
+     * @author Joachim Doerr
+     */
+    public function getSubId()
+    {
+        return $this->subId;
+    }
+
+    /**
+     * @param int $subId
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setSubId($subId)
+    {
+        $this->subId = $subId;
         return $this;
     }
 

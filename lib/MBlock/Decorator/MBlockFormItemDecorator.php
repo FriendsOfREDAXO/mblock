@@ -22,20 +22,23 @@ class MBlockFormItemDecorator
         if ($matches = $dom->getElementsByTagName('input')) {
             /** @var DOMElement $match */
             foreach ($matches as $match) {
-                // label for and id change
-                self::replaceForId($dom, $match, $item);
-                // replace attribute id
-                self::replaceName($match, $item);
-                // change checked or value by type
-                switch ($match->getAttribute('type')) {
-                    case 'checkbox':
-                    case 'radio':
-                        // replace checked
-                        self::replaceChecked($match, $item);
-                        break;
-                    default:
-                        // replace value by json key
-                        self::replaceValue($match, $item);
+                if (!$match->hasAttribute('data-mblock')) {
+                    // label for and id change
+                    self::replaceForId($dom, $match, $item);
+                    // replace attribute id
+                    self::replaceName($match, $item);
+                    // change checked or value by type
+                    switch ($match->getAttribute('type')) {
+                        case 'checkbox':
+                        case 'radio':
+                            // replace checked
+                            self::replaceChecked($match, $item);
+                            break;
+                        default:
+                            // replace value by json key
+                            self::replaceValue($match, $item);
+                    }
+                    $match->setAttribute('data-mblock', true);
                 }
             }
         }
@@ -44,12 +47,15 @@ class MBlockFormItemDecorator
         if ($matches = $dom->getElementsByTagName('textarea')) {
             /** @var DOMElement $match */
             foreach ($matches as $match) {
-                // label for and id change
-                self::replaceForId($dom, $match, $item);
-                // replace attribute id
-                self::replaceName($match, $item);
-                // replace value by json key
-                self::replaceValue($match, $item);
+                if (!$match->hasAttribute('data-mblock')) {
+                    // label for and id change
+                    self::replaceForId($dom, $match, $item);
+                    // replace attribute id
+                    self::replaceName($match, $item);
+                    // replace value by json key
+                    self::replaceValue($match, $item);
+                    $match->setAttribute('data-mblock', true);
+                }
             }
         }
 
@@ -57,33 +63,36 @@ class MBlockFormItemDecorator
         if ($matches = $dom->getElementsByTagName('select')) {
             /** @var DOMElement $match */
             foreach ($matches as $match) {
-                // continue by media elements
-                if (strpos($match->getAttribute('id'), 'REX_MEDIA') !== false
-                    or strpos($match->getAttribute('id'), 'REX_LINK') !== false) {
-                    continue;
-                }
-                // label for and id change
-                self::replaceForId($dom, $match, $item);
-                // replace attribute id
-                self::replaceName($match, $item);
-                // replace selected data
-                self::replaceSelectedData($match, $item);
-                // replace value by json key
-                if ($match->hasChildNodes()) {
-                    /** @var DOMElement $child */
-                    foreach ($match->childNodes as $child) {
-                        switch ($child->nodeName) {
-                            case 'optgroup':
-                                foreach ($child->childNodes as $nodeChild)
-                                    self::replaceOptionSelect($match, $nodeChild, $item);
-                                break;
-                            default:
-                                if(isset($child->tagName)) {
-                                    self::replaceOptionSelect($match, $child, $item);
+                if (!$match->hasAttribute('data-mblock')) {
+                    // continue by media elements
+                    if (strpos($match->getAttribute('id'), 'REX_MEDIA') !== false
+                        or strpos($match->getAttribute('id'), 'REX_LINK') !== false) {
+                        continue;
+                    }
+                    // label for and id change
+                    self::replaceForId($dom, $match, $item);
+                    // replace attribute id
+                    self::replaceName($match, $item);
+                    // replace selected data
+                    self::replaceSelectedData($match, $item);
+                    // replace value by json key
+                    if ($match->hasChildNodes()) {
+                        /** @var DOMElement $child */
+                        foreach ($match->childNodes as $child) {
+                            switch ($child->nodeName) {
+                                case 'optgroup':
+                                    foreach ($child->childNodes as $nodeChild)
+                                        self::replaceOptionSelect($match, $nodeChild, $item);
                                     break;
-                                }
+                                default:
+                                    if (isset($child->tagName)) {
+                                        self::replaceOptionSelect($match, $child, $item);
+                                        break;
+                                    }
+                            }
                         }
                     }
+                    $match->setAttribute('data-mblock', true);
                 }
             }
         }
@@ -99,9 +108,15 @@ class MBlockFormItemDecorator
      */
     protected static function replaceName(DOMElement $element, MBlockItem $item)
     {
-        // replace attribute id
-        preg_match('/\]\[\d+\]\[/', $element->getAttribute('name'), $matches);
-        if ($matches) $element->setAttribute('name', str_replace($matches[0], '][' . $item->getId() . '][', $element->getAttribute('name')));
+        if (!is_null($item->getSubId())) {
+            // replace attribute id
+            preg_match('/\]\[\d+\]\[\d+\]\[/', $element->getAttribute('name'), $matches);
+            if ($matches) $element->setAttribute('name', str_replace($matches[0], '][' . $item->getSubId() . '][' . $item->getId() . '][', $element->getAttribute('name')));
+        } else {
+            // replace attribute id
+            preg_match('/\]\[\d+\]\[/', $element->getAttribute('name'), $matches);
+            if ($matches) $element->setAttribute('name', str_replace($matches[0], '][' . $item->getId() . '][', $element->getAttribute('name')));
+        }
     }
 
     /**

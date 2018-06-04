@@ -22,7 +22,7 @@ class MBlockSystemButtonReplacer
         if ($matches = self::getElementsByClass($dom, 'div.custom-link')) {
             /** @var DOMElement $match */
             foreach ($matches as $key => $match) {
-                if ($match->hasChildNodes()) {
+                if ($match->hasChildNodes() && $match->hasAttribute('data-mblock')) {
                     $value = '';
                     /** @var DOMElement $child */
                     foreach ($match->getElementsByTagName('input') as $child) {
@@ -45,6 +45,7 @@ class MBlockSystemButtonReplacer
                             break;
                         }
                     }
+                    $match->setAttribute('data-mblock', true);
                 }
             }
         }
@@ -68,7 +69,7 @@ class MBlockSystemButtonReplacer
             /** @var DOMElement $match */
             foreach ($matches as $key => $match) {
                 $item->addPayload('replace-id', $key);
-                if ($match->hasChildNodes()) {
+                if ($match->hasChildNodes() && $match->hasAttribute('data-mblock')) {
                     /** @var DOMElement $child */
                     foreach ($match->getElementsByTagName('input') as $child) {
                         if ($child instanceof DOMElement) { // && $child->getAttribute('type') == 'hidden') {
@@ -100,6 +101,7 @@ class MBlockSystemButtonReplacer
                             }
                         }
                     }
+                    $match->setAttribute('data-mblock', true);
                 }
             }
         }

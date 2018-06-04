@@ -29,6 +29,11 @@ trait MBlockDOMTrait
         return $dom;
     }
 
+    private static function isParsed(DOMDocument $dom)
+    {
+        $dom->getElementsByTagName('');
+    }
+
     /**
      * @param DOMDocument $dom
      * @param $element
