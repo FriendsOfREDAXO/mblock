@@ -45,3 +45,8 @@ mblock_not_delete_confirm = Bekräftelse före radering av avsnitt deaktiverat
 mblock_ok_delete_confirm = Bekräftelse före radering av avsnitt aktiverat
 mblock_delete_confirm_label = Bekräfta före radering
 mblock_delete_confirm = Radera avsnittet?
+
+mblock_rexform_demo = RexForm MBlock demo
+rex_form_mblock_demo_entries = Demo inlägg
+rex_form_mblock_demo_entries_add = Tillfoga demo inlägg
+rex_form_mblock_demo_entries_edit = Redigera demo inlägg
