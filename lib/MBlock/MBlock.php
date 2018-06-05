@@ -1,4 +1,7 @@
 <?php
+
+use MBlock\Provider\ValueProvider;
+
 /**
  * @author mail[at]joachim-doerr[dot]com Joachim Doerr
  * @package redaxo5
@@ -36,7 +39,7 @@ class MBlock
     }
 
     /**
-     * @param $id
+     * @param int|bool $id
      * @param string|MForm|mblock_rex_form|rex_yform $form
      * @param array $settings
      * @param null $theme
@@ -54,11 +57,13 @@ class MBlock
 
         if (is_integer($id) or is_numeric($id)) {
             // load rex value by id
-            self::$result = MBlockValueHandler::loadRexVars();
+            self::$result = ValueProvider::loadRexVars();
 
             if ($form instanceof MForm) {
                 $form = $form->show();
             }
+        } else if (is_bool($id)) {
+
         } else {
             if (strpos($id, 'yform') !== false) {
                 $table = explode('::', $id);
@@ -71,7 +76,7 @@ class MBlock
                         self::$result['value'][$id] = $post[$settings['type_key']];
                     }
                     if (sizeof($table) > 3) {
-                        self::$result = MBlockValueHandler::loadFromTable($table);
+                        self::$result = ValueProvider::loadFromTable($table);
                     }
                 } else {
                     self::$result = rex_request::post($table[1]);
@@ -108,7 +113,7 @@ class MBlock
             } else {
                 // is table::column
                 $table = explode('::', $id);
-                self::$result = MBlockValueHandler::loadFromTable($table, rex_request::get('id', 'int', 0));
+                self::$result = ValueProvider::loadFromTable($table, rex_request::get('id', 'int', 0));
 
                 if (sizeof($table) > 2) {
                     $id = $table[0] . '::' . $table[1];
