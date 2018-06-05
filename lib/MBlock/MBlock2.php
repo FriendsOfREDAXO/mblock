@@ -8,7 +8,7 @@ use MBlock\Provider\ValueProvider;
  * @license MIT
  */
 
-class MBlock
+class MBlock2
 {
 
     /**
@@ -52,24 +52,6 @@ class MBlock
      */
     public static function show($id, $form, $settings = array(), $theme = null)
     {
-        self::$mblockHandler = new \Mblock\Handler\MBlockHandler($id, $form, $settings);
-
-        // duplicate form elements by values
-        self::$mblockHandler->createItems();
-
-        // iterate items and create blocks
-        self::$mblockHandler->iterateItems();
-
-        dump(self::$mblockHandler);
-
-        // add mblock wrapper to form
-
-        // show form
-
-
-
-
-
         $settings['id'] = $id;
         $plain = false;
         if (!isset($_SESSION['mblock_count'])) {

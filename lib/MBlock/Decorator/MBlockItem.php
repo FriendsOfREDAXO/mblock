@@ -5,20 +5,17 @@
  * @license MIT
  */
 
-namespace MBlock\DTO;
-
-
 class MBlockItem
 {
     /**
      * @var array
      */
-    public $val;
+    public $result;
 
     /**
      * @var integer
      */
-    public $itemId;
+    public $id;
 
     /**
      * @var integer
@@ -41,7 +38,7 @@ class MBlockItem
     public $systemName;
 
     /**
-     * @var \DOMDocument
+     * @var string
      */
     public $form;
 
@@ -54,19 +51,19 @@ class MBlockItem
      * @return array
      * @author Joachim Doerr
      */
-    public function getVal()
+    public function getResult()
     {
-        return $this->val;
+        return $this->result;
     }
 
     /**
-     * @param array $val
+     * @param array $result
      * @return MBlockItem
      * @author Joachim Doerr
      */
-    public function setVal($val)
+    public function setResult($result)
     {
-        $this->val = $val;
+        $this->result = $result;
         return $this;
     }
 
@@ -74,19 +71,19 @@ class MBlockItem
      * @return int
      * @author Joachim Doerr
      */
-    public function getItemId()
+    public function getId()
     {
-        return $this->itemId;
+        return $this->id;
     }
 
     /**
-     * @param int $itemId
+     * @param int $id
      * @return MBlockItem
      * @author Joachim Doerr
      */
-    public function setItemId($itemId)
+    public function setId($id)
     {
-        $this->itemId = $itemId;
+        $this->id = $id;
         return $this;
     }
 
@@ -171,7 +168,7 @@ class MBlockItem
     }
 
     /**
-     * @return \DOMDocument
+     * @return string
      * @author Joachim Doerr
      */
     public function getForm()
@@ -180,7 +177,7 @@ class MBlockItem
     }
 
     /**
-     * @param \DOMDocument $form
+     * @param string $form
      * @return MBlockItem
      * @author Joachim Doerr
      */
