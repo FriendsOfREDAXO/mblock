@@ -306,10 +306,9 @@ class MBlockHandler
             $subMblockHandler->parseItemElements();
 
             // add blocks to element
-            $itemElements = self::createDom($subMblockHandler->getElementOutputs());
-
-            foreach ($itemElements->childNodes as $node) {
-                $newnode = $element->ownerDocument->importNode($node, true);
+            foreach ($subMblockHandler->items as $item) {
+                $elementNode = self::createDom($item->getElement()->getOutput());
+                $newnode = $element->ownerDocument->importNode($elementNode->firstChild, true);
                 $element->appendChild($newnode);
             }
 
