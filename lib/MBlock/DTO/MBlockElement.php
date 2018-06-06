@@ -5,6 +5,9 @@
  * @license MIT
  */
 
+namespace MBlock\DTO;
+
+
 class MBlockElement
 {
     const KEY = "<mblock:%s/>";
@@ -50,6 +53,15 @@ class MBlockElement
     }
 
     /**
+     * @return string
+     * @author Joachim Doerr
+     */
+    public function getOutput()
+    {
+        return $this->output;
+    }
+
+    /**
      * @param string $output
      * @return $this
      */
@@ -57,6 +69,15 @@ class MBlockElement
     {
         $this->output = $output;
         return $this;
+    }
+
+    /**
+     * @return string
+     * @author Joachim Doerr
+     */
+    public function getForm()
+    {
+        return $this->form;
     }
 
     /**

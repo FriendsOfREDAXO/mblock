@@ -5,6 +5,12 @@
  * @license MIT
  */
 
+namespace MBlock\Replacer;
+
+
+use DOMElement;
+use MBlock\DTO\MBlockItem;
+
 class MBlockCheckboxReplacer
 {
     use \MBlock\Decorator\MBlockDOMTrait;
@@ -17,29 +23,31 @@ class MBlockCheckboxReplacer
      */
     public static function replaceCheckboxesBlockHolder(MBlockItem $item, $count)
     {
-        // set phpquery document
-        $dom = self::createDom($item->getForm());
-        $holderInput = false;
-        if (!is_null($item->getSubId())) {
-            $holderName = "REX_INPUT_VALUE[{$item->getValueId()}][{$item->getSubId()}][{$item->getId()}][checkbox_block_hold]";
-        } else {
-            $holderName = "REX_INPUT_VALUE[{$item->getValueId()}][{$item->getId()}][checkbox_block_hold]";
-        }
-        // find input group
-        if ($matches = $dom->getElementsByTagName('input')) {
-            /** @var DOMElement $match */
-            foreach ($matches as $key => $match) {
-                if (!$match->hasAttribute('data-mblock')) {
-                    switch ($match->getAttribute('type')) {
-                        case 'checkbox':
-                            $holderInput = true;
-                            break;
+        // set dom document
+        $dom = $item->getForm();
+        if ($dom instanceof \DOMDocument) {
+            $holderInput = false;
+            if (!is_null($item->getSubId())) {
+                $holderName = "REX_INPUT_VALUE[{$item->getValueId()}][{$item->getSubId()}][{$item->getItemId()}][checkbox_block_hold]";
+            } else {
+                $holderName = "REX_INPUT_VALUE[{$item->getValueId()}][{$item->getItemId()}][checkbox_block_hold]";
+            }
+            // find input group
+            if ($matches = $dom->getElementsByTagName('input')) {
+                /** @var DOMElement $match */
+                foreach ($matches as $key => $match) {
+                    if (!$match->hasAttribute('data-mblock')) {
+                        switch ($match->getAttribute('type')) {
+                            case 'checkbox':
+                                $holderInput = true;
+                                break;
+                        }
+                        $match->setAttribute('data-mblock', true);
                     }
-                    $match->setAttribute('data-mblock', true);
                 }
             }
+            // return the manipulated html output
+            return ($holderInput) ? '<input type="hidden" class="not_delete" name="' . $holderName . '" value="hold_block">' . $dom->saveHTML() : $dom->saveHTML();
         }
-        // return the manipulated html output
-        return ($holderInput) ? '<input type="hidden" class="not_delete" name="' . $holderName . '" value="hold_block">' . $dom->saveHTML() : $dom->saveHTML();
     }
 }

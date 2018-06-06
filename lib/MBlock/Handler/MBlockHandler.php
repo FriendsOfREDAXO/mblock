@@ -9,9 +9,17 @@ namespace Mblock\Handler;
 
 
 use MBlock\Decorator\MBlockDOMTrait;
+use MBlock\Decorator\MBlockFormItemDecorator;
+use MBlock\DTO\MBlockElement;
 use MBlock\DTO\MBlockItem;
-use MBlock\Provider\ValueProvider;
+use MBlock\Parser\MBlockParser;
+use MBlock\Provider\MBlockValueProvider;
+use MBlock\Replacer\MBlockBootstrapReplacer;
+use MBlock\Replacer\MBlockCheckboxReplacer;
+use MBlock\Replacer\MBlockCountReplacer;
+use MBlock\Replacer\MBlockSystemButtonReplacer;
 use mblock_rex_form;
+use MBlockSettingsHelper;
 use MForm;
 use rex_request;
 use rex_yform;
@@ -56,19 +64,30 @@ class MBlockHandler
     private $plain = false;
 
     /**
+     * @var mixed|string
+     */
+    protected $themeKey;
+
+    /**
      * MBlockHandler constructor.
      * @param mixed $id
      * @param mixed|string $form
      * @param array $settings
      * @param array $values
+     * @param string $theme
      * @author Joachim Doerr
      */
-    public function __construct($id, $form, array $settings = array(), array $values = null)
+    public function __construct($id, $form, array $settings = array(), array $values = null, $theme = 'default')
     {
         $this->id = $id;
         $this->values = $values;
         $this->settings = $settings;
         $this->settings['id'] = $id;
+        $this->themeKey = $theme;
+
+        if (isset($settings['theme']) && is_string($settings['theme'])) {
+            $this->themeKey = $settings['theme'];
+        }
 
         $this->setForm($form);
 
@@ -110,27 +129,143 @@ class MBlockHandler
         return $this->items;
     }
 
+    /**
+     * @return \MBlockItem[]
+     * @author Joachim Doerr
+     */
     public function iterateItems()
     {
         if (sizeof($this->items) > 0) {
-            foreach ($this->items as $item) {
+            /** @var MBlockItem $item */
+            foreach ($this->items as $count => $item) {
                 // nested mblock?
                 $mblockWrapper = self::getElementsByClass($item->getForm(), 'div.mblock_wrapper');
                 if (sizeof($mblockWrapper) > 0) {
-                    foreach ($mblockWrapper as $wrapper) {
-                        $this->handleNestedMBlock($item, $wrapper);
+                    foreach ($mblockWrapper as $mKey => $wrapper) {
+                        $this->handleNestedMBlock($item, $wrapper, $mKey);
                     }
                 }
 
+                // TODO add EP
+                $this->executeItemManipulations($item, $count);
+                // TODO add EP
+
+                // parse form item
+                $element = new MBlockElement();
+                $element->setForm($item->getForm()->saveHTML())
+                    ->setIndex(($count + 1))
+                    ->setSettings($this->settings);
+
+                $item->setElement($element);
             }
         }
+
+        return $this->items;
     }
 
-    public function handleNestedMBlock(MBlockItem $item, \DOMElement $element)
+    /**
+     * @return \MBlockItem[]
+     * @author Joachim Doerr
+     */
+    public function parseItemElements()
     {
-        $sortitem = $element->firstChild;
-        if ($sortitem->getAttribute('class') == 'sortitem') { // sort item === mblock sort wrapper
-            $nodes = $sortitem->childNodes;
+        if (sizeof($this->items) > 0) {
+            /** @var MBlockItem $item */
+            foreach ($this->items as $count => $item) {
+                // TODO add EP
+                $this->elementParse($item->getElement(), $this->themeKey);
+                // TODO add EP
+            }
+        }
+
+        return $this->items;
+    }
+
+    /**
+     * @return mixed|string
+     * @author Joachim Doerr
+     */
+    public function parseMBlockWrapper()
+    {
+        $output = '';
+        if (sizeof($this->items) > 0) {
+            // wrap parsed form items
+            $wrapper = new MBlockElement();
+            $wrapper->setOutput($this->getElementOutputs())
+                ->setSettings(MBlockSettingsHelper::getSettings($this->settings));
+
+            // return wrapped from elements
+            $output = MBlockParser::parseElement($wrapper, 'wrapper', $this->themeKey);
+        }
+        return $output;
+    }
+
+    /**
+     * @return string
+     * @author Joachim Doerr
+     */
+    private function getElementOutputs()
+    {
+        $output = '';
+        if (sizeof($this->items) > 0) {
+            /** @var MBlockItem $item */
+            foreach ($this->items as $count => $item) {
+                $output .= $item->getElement()->getOutput();
+            }
+        }
+        return $output;
+    }
+
+    /**
+     * @param MBlockElement $element
+     * @param string $themeKey
+     * @author Joachim Doerr
+     * @return MBlockElement
+     */
+    private function elementParse(MBlockElement $element, $themeKey = 'default')
+    {
+        // parse element to output
+        $element->setOutput(MBlockParser::parseElement($element, 'element', $themeKey));
+        return $element;
+    }
+
+    /**
+     * @param MBlockItem $item
+     * @param $count
+     * @author Joachim Doerr
+     */
+    private function executeItemManipulations(MBlockItem $item, $count)
+    {
+        // replace system button data
+        MBlockSystemButtonReplacer::replaceSystemButtons($item, ($count + 1));
+        MBlockCountReplacer::replaceCountKeys($item, ($count + 1));
+        MBlockBootstrapReplacer::replaceTabIds($item, ($count + 1));
+        MBlockBootstrapReplacer::replaceCollapseIds($item, ($count + 1));
+
+        // decorate item form
+        if ($item->getVal()) {
+            MBlockFormItemDecorator::decorateFormItem($item);
+            // custom link hidden to text
+            MBlockSystemButtonReplacer::replaceCustomLinkText($item);
+        }
+
+        // set only checkbox block holder
+        MBlockCheckboxReplacer::replaceCheckboxesBlockHolder($item, ($count + 1));
+    }
+
+    /**
+     * @param MBlockItem $item
+     * @param \DOMElement $element
+     * @param $key
+     * @author Joachim Doerr
+     */
+    private function handleNestedMBlock(MBlockItem $item, \DOMElement $element, $key)
+    {
+        // TODO read settings from mblock html settings
+
+        $sortItem = $element->firstChild;
+        if ($sortItem->getAttribute('class') == 'sortitem') { // sort item === mblock sort wrapper
+            $nodes = $sortItem->childNodes;
             /** @var \DOMElement $node */
             foreach ($nodes as $node) {
                 if ($node instanceof \DOMElement && $node->nodeName == 'div') { // first div in sort item === form wrapper
@@ -146,19 +281,59 @@ class MBlockHandler
                 $newnode = $form->importNode($node, true);
                 $form->appendChild($newnode);
             }
-
             // dump($newdoc->saveHTML());
-
             // remove mblock forms
-            $element->removeChild($sortitem);
+            $element->removeChild($sortItem);
+
+            $arrV = array();
+            foreach ($item->getVal() as $vkey => $val) {
+                if (is_array($val)) {
+                    $arrV[] = $val;
+                }
+            }
+            $value = array('value' => array($this->id => $arrV[$key]));
 
             // add new nodes
-            $subMblockHandler = new MBlockHandler($this->id, $form, array(), $this->values);
+            $subMblockHandler = new MBlockHandler($this->id, $form, array(), $value);
 
-            dump($subMblockHandler);
-            die;
+            // duplicate form elements by values
+            $subMblockHandler->createItems();
+
+            // iterate items and create blocks
+            $subMblockHandler->iterateItems();
+
+            // parse elements to mblock blocks
+            $subMblockHandler->parseItemElements();
+
+            // add blocks to element
+            $itemElements = self::createDom($subMblockHandler->getElementOutputs());
+
+            foreach ($itemElements->childNodes as $node) {
+                $newnode = $element->ownerDocument->importNode($node, true);
+                $element->appendChild($newnode);
+            }
+
+            // set mblock count data
+            $element->setAttribute('data-mblock_count', count($subMblockHandler->items));
+            // dump($this->innerHTML($element->parentNode));
         }
     }
+
+    /**
+     * @param \DOMElement $element
+     * @return string
+     * @author Joachim Doerr
+     */
+    protected function innerHTML(\DOMElement $element)
+    {
+        $doc = $element->ownerDocument;
+        $html = '';
+        foreach ($element->childNodes as $node) {
+            $html .= $doc->saveHTML($node);
+        }
+        return $html;
+    }
+
 
     /**
      * @return $this
@@ -179,7 +354,7 @@ class MBlockHandler
     {
         if (is_integer($id) or is_numeric($id)) {
             // load rex value by id
-            $this->values = ValueProvider::loadRexVars();
+            $this->values = MBlockValueProvider::loadRexVars();
         } else if (is_bool($id)) {
         } else {
             if (strpos($id, 'yform') !== false) {
@@ -193,7 +368,7 @@ class MBlockHandler
                         $this->values['value'][$id] = $post[$this->settings['type_key']];
                     }
                     if (sizeof($table) > 3) {
-                        $this->values = ValueProvider::loadFromTable($table);
+                        $this->values = MBlockValueProvider::loadFromTable($table);
                     }
                 } else {
                     $this->values = rex_request::post($table[1]);
@@ -202,7 +377,7 @@ class MBlockHandler
             } else {
                 // is table::column
                 $table = explode('::', $id);
-                $this->values = ValueProvider::loadFromTable($table, rex_request::get('id', 'int', 0));
+                $this->values = MBlockValueProvider::loadFromTable($table, rex_request::get('id', 'int', 0));
 
                 if (sizeof($table) > 2) {
                     $this->id = $table[0] . '::' . $table[1];

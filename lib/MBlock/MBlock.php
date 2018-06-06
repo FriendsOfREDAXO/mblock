@@ -1,6 +1,6 @@
 <?php
 
-use MBlock\Provider\ValueProvider;
+use MBlock\Provider\MBlockValueProvider;
 
 /**
  * @author mail[at]joachim-doerr[dot]com Joachim Doerr
@@ -10,22 +10,6 @@ use MBlock\Provider\ValueProvider;
 
 class MBlock
 {
-
-    /**
-     * @var array
-     */
-    private static $items = array();
-
-    /**
-     * @var array
-     */
-    private static $result = array();
-
-    /**
-     * @var array
-     */
-    private static $output = array();
-
     /**
      * @var \Mblock\Handler\MBlockHandler
      */
@@ -52,7 +36,10 @@ class MBlock
      */
     public static function show($id, $form, $settings = array(), $theme = null)
     {
-        self::$mblockHandler = new \Mblock\Handler\MBlockHandler($id, $form, $settings);
+        $theme = (!is_null($theme)) ? $theme : 'default';
+
+        // init handler
+        self::$mblockHandler = new \Mblock\Handler\MBlockHandler($id, $form, $settings, null, $theme);
 
         // duplicate form elements by values
         self::$mblockHandler->createItems();
@@ -60,221 +47,10 @@ class MBlock
         // iterate items and create blocks
         self::$mblockHandler->iterateItems();
 
-        dump(self::$mblockHandler);
+        // parse elements to mblock blocks
+        self::$mblockHandler->parseItemElements();
 
-        // add mblock wrapper to form
-
-        // show form
-
-
-
-
-
-        $settings['id'] = $id;
-        $plain = false;
-        if (!isset($_SESSION['mblock_count'])) {
-            // set mblock count is not exist
-            $_SESSION['mblock_count'] = 0;
-        }
-        $_SESSION['mblock_count']++;
-
-        if (is_integer($id) or is_numeric($id)) {
-            // load rex value by id
-            self::$result = ValueProvider::loadRexVars();
-
-            if ($form instanceof MForm) {
-                $form = $form->show();
-            }
-        } else if (is_bool($id)) {
-
-        } else {
-            if (strpos($id, 'yform') !== false) {
-                $table = explode('::', $id);
-
-                if (sizeof($table) > 2) {
-                    $id = $table[0] . '::' . $table[1];
-                    $settings['type_key'] = $table[2];
-                    $post = rex_request::post($table[1]);
-                    if (!is_null($post) && isset($post[$settings['type_key']])) {
-                        self::$result['value'][$id] = $post[$settings['type_key']];
-                    }
-                    if (sizeof($table) > 3) {
-                        self::$result = ValueProvider::loadFromTable($table);
-                    }
-                } else {
-                    self::$result = rex_request::post($table[1]);
-                }
-
-                if ($form instanceof rex_yform) {
-                    // get fields
-                    $form->executeFields();
-                    $formFields = $form->getObjectparams('form_output');
-
-                    // rmeove submit button
-                    array_pop($formFields);
-                    array_pop($formFields);
-
-                    // implode fields to html string
-                    $form = implode('', $formFields);
-
-                    preg_match_all('/name="([^"]*)"/', $form, $matches, PREG_SET_ORDER, 0);
-
-                    foreach ($matches as $match) {
-
-                        preg_match_all('/(-\d{1,2}-)|(-\w*-)/', $match[1], $subMatches);
-                        $toReplace = $match[0];
-                        $replaceWith = $match[0];
-
-                        foreach ($subMatches[0] as $subMatch) {
-                            $replaceWith = str_replace($subMatch, '[' . substr($subMatch, 1, -1) . ']', $replaceWith);
-                        }
-
-                        $form = str_replace($toReplace, $replaceWith, $form);
-                    }
-                }
-
-            } else {
-                // is table::column
-                $table = explode('::', $id);
-                self::$result = ValueProvider::loadFromTable($table, rex_request::get('id', 'int', 0));
-
-                if (sizeof($table) > 2) {
-                    $id = $table[0] . '::' . $table[1];
-                    $settings['type_key'] = array_pop($table);
-                }
-
-                if ($form instanceof mblock_rex_form) {
-                    $form = $form->getElements();
-                }
-
-            }
-        }
-
-        $aid = explode('.', $id);
-        $id = $aid[0];
-        $sid = (isset($aid[1])) ? $aid[1] : null;
-
-        if (array_key_exists('value', self::$result)) {
-            $resultValue = (!is_null($sid)) ? self::$result['value'][$id][$sid] : self::$result['value'][$id];
-            // is loaded
-            if (is_array($resultValue)) {
-                // item result to item
-                foreach ($resultValue as $jId => $values) {
-                    // init item
-                    self::$items[$jId] = new MBlockItem;
-                    self::$items[$jId]->setId($jId)
-                        ->setSubId($sid)
-                        ->setValueId($id)
-                        ->setResult($values)
-                        ->setForm($form);
-                }
-            }
-        }
-
-        // key must be integer
-        foreach (self::$items as $key => $item) {
-            if (!is_int($key)) {
-                unset(self::$items[$key]);
-            }
-        }
-
-        // don't loaded?
-        if (!self::$items) {
-            // set plain item for add
-            $plain = true;
-            self::$items[0] = new MBlockItem();
-            self::$items[0]->setId(0)
-                ->setValueId($id)
-                ->setResult(array())
-                ->setForm($form);
-        }
-
-        // foreach rex value json items
-        /** @var MBlockItem $item */
-        foreach (static::$items as $count => $item) {
-            // replace system button data
-            $item->setForm(MBlockSystemButtonReplacer::replaceSystemButtons($item, ($count + 1)));
-            $item->setForm(MBlockCountReplacer::replaceCountKeys($item, ($count + 1)));
-            $item->setForm(MBlockBootstrapReplacer::replaceTabIds($item, ($count + 1)));
-            $item->setForm(MBlockBootstrapReplacer::replaceCollapseIds($item, ($count + 1)));
-
-            // decorate item form
-            if ($item->getResult()) {
-                $item->setForm(MBlockFormItemDecorator::decorateFormItem($item));
-                // custom link hidden to text
-                $item->setForm(MBlockSystemButtonReplacer::replaceCustomLinkText($item));
-            }
-
-            // set only checkbox block holder
-            $item->setForm(MBlockCheckboxReplacer::replaceCheckboxesBlockHolder($item, ($count + 1)));
-
-            // parse form item
-            $element = new MBlockElement();
-            $element->setForm($item->getForm())
-                ->setIndex(($count + 1));
-
-            // parse element to output
-            $output = MBlockParser::parseElement($element, 'element', $theme);
-
-            // fix & error
-            foreach ($item->getResult() as $result) {
-                if (is_array($result) && array_key_exists('id', $result)) {
-                    $output = str_replace($result['id'], $result['value'], $output);
-                }
-            }
-            // add to output
-            static::$output[] = $output;
-        }
-
-        // wrap parsed form items
-        $wrapper = new MBlockElement();
-        $wrapper->setOutput(implode('', static::$output))
-            ->setSettings(MBlockSettingsHelper::getSettings($settings));
-
-        // return wrapped from elements
-        $output = MBlockParser::parseElement($wrapper, 'wrapper', $theme);
-
-
-        if (($plain && array_key_exists('disable_null_view', $settings) && $settings['disable_null_view'] == true) and rex_request::get('function', 'string') != 'add') {
-
-            $buttonText = 'Show MBlock';
-            if (array_key_exists('null_view_button_text', $settings) && !empty($settings['null_view_button_text'])) {
-                $buttonText = $settings['null_view_button_text'];
-            }
-
-            $uniqueId = uniqid();
-            $output = '
-                <div id="accordion' . $uniqueId . '" role="tablist">
-                  <div class="panel mblock-hidden-panel">
-                    <div id="collapse' . uniqid() . '" class="collapse in" role="tabpanel">
-                        <a class="btn btn-primary" role="button" data-toggle="collapse" data-parent="#accordion' . $uniqueId . '" href="#collapse' . $uniqueId . '" aria-expanded="false" aria-controls="collapseTwo">' . $buttonText . '</a>
-                    </div>
-                  </div>
-                  <div id="collapse' . $uniqueId . '" class="collapse" role="tabpanel">' . $output . '</div>
-                </div>
-            ';
-        }
-
-        // reset for multi block fields
-        self::reset();
-
-        // return output
-        return $output;
-    }
-
-    /**
-     * @author Joachim Doerr
-     */
-    private static function reset()
-    {
-        foreach (self::$items as $key => $item) {
-            unset(self::$items[$key]);
-        }
-        foreach (self::$result as $key => $value) {
-            unset(self::$result[$key]);
-        }
-        foreach (self::$output as $key => $value) {
-            unset(self::$output[$key]);
-        }
+        // final parse elements into mblock wrapper
+        return self::$mblockHandler->parseMBlockWrapper();
     }
 }

@@ -46,6 +46,11 @@ class MBlockItem
     public $form;
 
     /**
+     * @var MBlockElement
+     */
+    public $element;
+
+    /**
      * @var array
      */
     public $payload = array();
@@ -167,6 +172,26 @@ class MBlockItem
     public function setSystemName($systemName)
     {
         $this->systemName = $systemName;
+        return $this;
+    }
+
+    /**
+     * @return MBlockElement
+     * @author Joachim Doerr
+     */
+    public function getElement()
+    {
+        return $this->element;
+    }
+
+    /**
+     * @param MBlockElement $element
+     * @return MBlockItem
+     * @author Joachim Doerr
+     */
+    public function setElement($element)
+    {
+        $this->element = $element;
         return $this;
     }
 

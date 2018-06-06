@@ -11,7 +11,7 @@ namespace MBlock\Provider;
 use rex;
 use rex_sql;
 
-class ValueProvider
+class MBlockValueProvider
 {
     /**
      * @return array

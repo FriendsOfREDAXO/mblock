@@ -5,108 +5,117 @@
  * @license MIT
  */
 
+namespace MBlock\Replacer;
+
+
+use DOMElement;
+use MBlock\DTO\MBlockItem;
+use rex_article;
+
 class MBlockSystemButtonReplacer
 {
     use \MBlock\Decorator\MBlockDOMTrait;
 
     /**
      * @param MBlockItem $item
-     * @return String
      * @author Joachim Doerr
      */
     public static function replaceCustomLinkText(MBlockItem $item)
     {
         // set dom document
-        $dom = self::createDom($item->getForm());
-        // find custom-link
-        if ($matches = self::getElementsByClass($dom, 'div.custom-link')) {
-            /** @var DOMElement $match */
-            foreach ($matches as $key => $match) {
-                if ($match->hasChildNodes() && $match->hasAttribute('data-mblock')) {
-                    $value = '';
-                    /** @var DOMElement $child */
-                    foreach ($match->getElementsByTagName('input') as $child) {
-                        if ($child->getAttribute('type') == 'hidden') {
-                            $value = $child->getAttribute('value');
-                            break;
-                        }
-                    }
-                    /** @var DOMElement $child */
-                    foreach ($match->getElementsByTagName('input') as $child) {
-                        if ($child->getAttribute('type') == 'text') {
-                            // is numeric also link
-                            if (is_numeric($value)) {
-                                // add link art name
-                                $linkInfo = self::getLinkInfo($value);
-                                $child->setAttribute('value', $linkInfo['art_name']);
-                            } else {
-                                $child->setAttribute('value', $value);
+        $dom = $item->getForm();
+        if ($dom instanceof \DOMDocument) {
+            // find custom-link
+            if ($matches = self::getElementsByClass($dom, 'div.custom-link')) {
+                /** @var DOMElement $match */
+                foreach ($matches as $key => $match) {
+                    if ($match->hasChildNodes() && $match->hasAttribute('data-mblock')) {
+                        $value = '';
+                        /** @var DOMElement $child */
+                        foreach ($match->getElementsByTagName('input') as $child) {
+                            if ($child->getAttribute('type') == 'hidden') {
+                                $value = $child->getAttribute('value');
+                                break;
                             }
-                            break;
                         }
+                        /** @var DOMElement $child */
+                        foreach ($match->getElementsByTagName('input') as $child) {
+                            if ($child->getAttribute('type') == 'text') {
+                                // is numeric also link
+                                if (is_numeric($value)) {
+                                    // add link art name
+                                    $linkInfo = self::getLinkInfo($value);
+                                    $child->setAttribute('value', $linkInfo['art_name']);
+                                } else {
+                                    $child->setAttribute('value', $value);
+                                }
+                                break;
+                            }
+                        }
+                        $match->setAttribute('data-mblock', true);
                     }
-                    $match->setAttribute('data-mblock', true);
                 }
             }
+            // return the manipulated html output
+            // return $dom->saveHTML();
         }
-        // return the manipulated html output
-        return $dom->saveHTML();
     }
 
     /**
      * @param MBlockItem $item
-     * @param $count
-     * @return String
+     * @param int $count
      * @author Joachim Doerr
      */
     public static function replaceSystemButtons(MBlockItem $item, $count)
     {
         // set dom document
-        $dom = self::createDom($item->getForm());
-        $item->addPayload('count-id', $count);
-        // find input group
-        if ($matches = self::getElementsByClass($dom, 'div.input-group')) {
-            /** @var DOMElement $match */
-            foreach ($matches as $key => $match) {
-                $item->addPayload('replace-id', $key);
-                if ($match->hasChildNodes() && $match->hasAttribute('data-mblock')) {
-                    /** @var DOMElement $child */
-                    foreach ($match->getElementsByTagName('input') as $child) {
-                        if ($child instanceof DOMElement) { // && $child->getAttribute('type') == 'hidden') {
-                            // set id and name
-                            $id = $child->getAttribute('id');
-                            $name = $child->getAttribute('name');
-                            $type = $child->getAttribute('type');
+        $dom = $item->getForm();
+        if ($dom instanceof \DOMDocument) {
+            $item->addPayload('count-id', $count);
+            // find input group
+            if ($matches = self::getElementsByClass($dom, 'div.input-group')) {
+                /** @var DOMElement $match */
+                foreach ($matches as $key => $match) {
+                    $item->addPayload('replace-id', $key);
+                    if ($match->hasChildNodes() && $match->hasAttribute('data-mblock')) {
+                        /** @var DOMElement $child */
+                        foreach ($match->getElementsByTagName('input') as $child) {
+                            if ($child instanceof DOMElement) { // && $child->getAttribute('type') == 'hidden') {
+                                // set id and name
+                                $id = $child->getAttribute('id');
+                                $name = $child->getAttribute('name');
+                                $type = $child->getAttribute('type');
 
-                            // process by type
-                            if (strpos($id, 'REX_MEDIA_') !== false && $type == 'text') {
-                                // media button
-                                self::processMedia($match, $item);
-                            }
-                            if (strpos($id, 'REX_MEDIALIST_') !== false) {
-                                // medialist button
-                                self::processMediaList($match, $item);
-                            }
-                            if (strpos($name, 'REX_LINK_') !== false && $type == 'text') {
-                                // link button
-                                if (strpos($match->getAttribute('class'), 'custom-link') !== false) {
-                                    self::processCustomLink($match, $item);
-                                } else {
-                                    self::processLink($match, $item);
+                                // process by type
+                                if (strpos($id, 'REX_MEDIA_') !== false && $type == 'text') {
+                                    // media button
+                                    self::processMedia($match, $item);
+                                }
+                                if (strpos($id, 'REX_MEDIALIST_') !== false) {
+                                    // medialist button
+                                    self::processMediaList($match, $item);
+                                }
+                                if (strpos($name, 'REX_LINK_') !== false && $type == 'text') {
+                                    // link button
+                                    if (strpos($match->getAttribute('class'), 'custom-link') !== false) {
+                                        self::processCustomLink($match, $item);
+                                    } else {
+                                        self::processLink($match, $item);
+                                    }
+                                }
+                                if (strpos($id, 'REX_LINKLIST_') !== false) {
+                                    // linklist button
+                                    self::processLinkList($match, $item);
                                 }
                             }
-                            if (strpos($id, 'REX_LINKLIST_') !== false) {
-                                // linklist button
-                                self::processLinkList($match, $item);
-                            }
                         }
+                        $match->setAttribute('data-mblock', true);
                     }
-                    $match->setAttribute('data-mblock', true);
                 }
             }
+            // return the manipulated html output
+            // return $dom->saveHTML();
         }
-        // return the manipulated html output
-        return $dom->saveHTML();
     }
 
     /**

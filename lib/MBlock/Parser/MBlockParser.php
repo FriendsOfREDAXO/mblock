@@ -5,6 +5,12 @@
  * @license MIT
  */
 
+namespace MBlock\Parser;
+
+
+use MBlock\DTO\MBlockElement;
+use MBlock\Provider\MBlockTemplateFileProvider;
+
 class MBlockParser
 {
     /**
