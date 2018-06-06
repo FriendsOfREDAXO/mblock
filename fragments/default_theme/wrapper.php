@@ -1,6 +1,1 @@
-<?php
-/**
- * Author: Joachim Doerr
- * Date: 06.06.18
- * Time: 10:40
- */
+<div class="mblock_wrapper"<?= $this->settings; ?>><?= $this->output; ?></div>

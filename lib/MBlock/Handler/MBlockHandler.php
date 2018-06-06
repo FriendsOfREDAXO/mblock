@@ -340,7 +340,7 @@ class MBlockHandler
      */
     private function setValByValue()
     {
-        $this->val = (array_key_exists('value', $this->values) && isset($this->values['value'][$this->id])) ? $this->values['value'][$this->id] : null;
+        $this->val = (is_array($this->values) && array_key_exists('value', $this->values) && isset($this->values['value'][$this->id])) ? $this->values['value'][$this->id] : null;
         return $this;
     }
 
