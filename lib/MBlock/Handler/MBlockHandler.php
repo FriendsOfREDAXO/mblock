@@ -285,13 +285,14 @@ class MBlockHandler
             $element->removeChild($sortItem);
 
             $arrV = array();
-            foreach ($item->getVal() as $vkey => $val) {
+            foreach ($item->getVal() as $val) {
                 if (is_array($val)) {
                     $arrV[] = $val;
                 }
             }
-            $value = array('value' => array($this->id => $arrV[$key]));
+            $value = (isset($arrV[$key])) ? array('value' => array($this->id => $arrV[$key])) : array('value' => array());
 
+            // TODO add settings from mblock html settings
             // add new nodes
             $subMblockHandler = new MBlockHandler($this->id, $form, array(), $value);
 
