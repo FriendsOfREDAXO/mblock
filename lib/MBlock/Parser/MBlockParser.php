@@ -9,7 +9,6 @@ namespace MBlock\Parser;
 
 
 use MBlock\DTO\MBlockElement;
-use MBlock\Provider\MBlockTemplateFileProvider;
 use rex_exception;
 use rex_fragment;
 use rex_logger;
@@ -39,10 +38,5 @@ class MBlockParser
             rex_logger::logException($e);
             return null;
         }
-
-//        return str_replace(
-//            array_merge(array(' />'), $element->getKeys()),
-//            array_merge(array('/>'), $element->getValues()),
-//            MBlockTemplateFileProvider::loadTemplate($templateType, '', $theme));
     }
 }
