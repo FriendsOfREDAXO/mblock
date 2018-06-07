@@ -49,7 +49,7 @@ class MBlockHandler
     protected $settings = array();
 
     /**
-     * @var \MBlockItem[]
+     * @var MBlockItem[]
      */
     protected $items = array();
 
@@ -99,7 +99,7 @@ class MBlockHandler
     }
 
     /**
-     * @return \MBlockItem[]
+     * @return MBlockItem[]
      * @author Joachim Doerr
      */
     public function createItems()
@@ -131,7 +131,7 @@ class MBlockHandler
 
     /**
      * @param null $nestedCount
-     * @return \MBlockItem[]
+     * @return MBlockItem[]
      * @author Joachim Doerr
      */
     public function iterateItems($nestedCount = null)
@@ -164,7 +164,7 @@ class MBlockHandler
     }
 
     /**
-     * @return \MBlockItem[]
+     * @return MBlockItem[]
      * @author Joachim Doerr
      */
     public function parseItemElements()
@@ -242,7 +242,7 @@ class MBlockHandler
         MBlockBootstrapReplacer::replaceCollapseIds($item, ($count + 1));
 
         // decorate item form
-        if ($item->getVal()) {
+        if ($item->getVal() or !is_null($nestedCount)) {
             MBlockFormItemDecorator::decorateFormItem($item, $nestedCount);
             // custom link hidden to text
             MBlockSystemButtonReplacer::replaceCustomLinkText($item);
@@ -337,6 +337,7 @@ class MBlockHandler
     }
 
     /**
+     * @return MBlockItem[]
      * @author Joachim Doerr
      */
     private function clearItems()
@@ -357,6 +358,7 @@ class MBlockHandler
                 }
             }
         }
+        return $this->items;
     }
 
     /**
