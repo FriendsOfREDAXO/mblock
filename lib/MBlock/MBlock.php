@@ -36,7 +36,16 @@ class MBlock
      */
     public static function show($id, $form, $settings = array(), $theme = null)
     {
-        $theme = (!is_null($theme)) ? $theme : 'default';
+        // set mblock theme
+        $theme = (!is_null($theme)) ? $theme : 'default'; // TODO by settings
+
+        // TODO use mblock count as property
+        // session mblock count++
+        if (!isset($_SESSION['mblock_count'])) {
+            // set mblock count is not exist
+            $_SESSION['mblock_count'] = 0;
+        }
+        $_SESSION['mblock_count']++;
 
         // init handler
         self::$mblockHandler = new \Mblock\Handler\MBlockHandler($id, $form, $settings, null, $theme);

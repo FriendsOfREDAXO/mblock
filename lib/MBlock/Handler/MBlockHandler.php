@@ -130,25 +130,25 @@ class MBlockHandler
     }
 
     /**
+     * @param null $nestedCount
      * @return \MBlockItem[]
      * @author Joachim Doerr
      */
-    public function iterateItems()
+    public function iterateItems($nestedCount = null)
     {
         if (sizeof($this->items) > 0) {
             /** @var MBlockItem $item */
             foreach ($this->items as $count => $item) {
                 // nested mblock?
                 $mblockWrapper = self::getElementsByClass($item->getForm(), 'div.mblock_wrapper');
+
                 if (sizeof($mblockWrapper) > 0) {
                     foreach ($mblockWrapper as $mKey => $wrapper) {
                         $this->handleNestedMBlock($item, $wrapper, $mKey);
                     }
                 }
 
-                // TODO add EP
-                $this->executeItemManipulations($item, $count);
-                // TODO add EP
+                $this->executeItemManipulations($item, $count, $nestedCount);
 
                 // parse form item
                 $element = new MBlockElement();
@@ -172,9 +172,7 @@ class MBlockHandler
         if (sizeof($this->items) > 0) {
             /** @var MBlockItem $item */
             foreach ($this->items as $count => $item) {
-                // TODO add EP
                 $this->elementParse($item->getElement(), $this->themeKey);
-                // TODO add EP
             }
         }
 
@@ -232,9 +230,10 @@ class MBlockHandler
     /**
      * @param MBlockItem $item
      * @param $count
+     * @param null $nestedCount
      * @author Joachim Doerr
      */
-    private function executeItemManipulations(MBlockItem $item, $count)
+    private function executeItemManipulations(MBlockItem $item, $count, $nestedCount = null)
     {
         // replace system button data
         MBlockSystemButtonReplacer::replaceSystemButtons($item, ($count + 1));
@@ -244,7 +243,7 @@ class MBlockHandler
 
         // decorate item form
         if ($item->getVal()) {
-            MBlockFormItemDecorator::decorateFormItem($item);
+            MBlockFormItemDecorator::decorateFormItem($item, $nestedCount);
             // custom link hidden to text
             MBlockSystemButtonReplacer::replaceCustomLinkText($item);
         }
@@ -299,8 +298,11 @@ class MBlockHandler
             // duplicate form elements by values
             $subMblockHandler->createItems();
 
+            // remove data mblock flag
+            $subMblockHandler->clearItems();
+
             // iterate items and create blocks
-            $subMblockHandler->iterateItems();
+            $subMblockHandler->iterateItems($item->getItemId());
 
             // parse elements to mblock blocks
             $subMblockHandler->parseItemElements();
@@ -313,7 +315,7 @@ class MBlockHandler
             }
 
             // set mblock count data
-            $element->setAttribute('data-mblock_count', count($subMblockHandler->items));
+            $element->setAttribute('data-mblock_count', $_SESSION['mblock_count']);
             // dump($this->innerHTML($element->parentNode));
         }
     }
@@ -333,6 +335,28 @@ class MBlockHandler
         return $html;
     }
 
+    /**
+     * @author Joachim Doerr
+     */
+    private function clearItems()
+    {
+        if (sizeof($this->items) > 0) {
+            /** @var MBlockItem $item */
+            foreach ($this->items as $count => $item) {
+
+                foreach (array('input', 'textarea', 'select') as $value) {
+                    if ($item->getForm() instanceof \DOMDocument && $matches = $item->getForm()->getElementsByTagName($value)) {
+                        /** @var \DOMElement $match */
+                        foreach ($matches as $match) {
+                            if ($match->hasAttribute('data-mblock')) {
+                                $match->removeAttribute('data-mblock');
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * @return $this

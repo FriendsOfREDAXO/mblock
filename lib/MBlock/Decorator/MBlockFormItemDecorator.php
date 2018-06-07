@@ -15,12 +15,15 @@ use MBlock\DTO\MBlockItem;
 class MBlockFormItemDecorator
 {
     use MBlockDOMTrait;
+    const PATTERN = '/(\[\d+\])(\[\w+\])\Z/';
+    const PATTERN_NESTED = '/(\[\d+\])(\[\d+\])/';
 
     /**
      * @param MBlockItem $item
+     * @param null $nestedCount
      * @author Joachim Doerr
      */
-    static public function decorateFormItem(MBlockItem $item)
+    static public function decorateFormItem(MBlockItem $item, $nestedCount = null)
     {
         $dom = $item->getForm();
         if ($dom instanceof \DOMDocument) {
@@ -32,7 +35,7 @@ class MBlockFormItemDecorator
                         // label for and id change
                         self::replaceForId($dom, $match, $item);
                         // replace attribute id
-                        self::replaceName($match, $item);
+                        self::replaceName($match, $item, $nestedCount);
                         // change checked or value by type
                         switch ($match->getAttribute('type')) {
                             case 'checkbox':
@@ -57,7 +60,7 @@ class MBlockFormItemDecorator
                         // label for and id change
                         self::replaceForId($dom, $match, $item);
                         // replace attribute id
-                        self::replaceName($match, $item);
+                        self::replaceName($match, $item, $nestedCount);
                         // replace value by json key
                         self::replaceValue($match, $item);
                         $match->setAttribute('data-mblock', true);
@@ -78,7 +81,7 @@ class MBlockFormItemDecorator
                         // label for and id change
                         self::replaceForId($dom, $match, $item);
                         // replace attribute id
-                        self::replaceName($match, $item);
+                        self::replaceName($match, $item, $nestedCount);
                         // replace selected data
                         self::replaceSelectedData($match, $item);
                         // replace value by json key
@@ -110,18 +113,17 @@ class MBlockFormItemDecorator
     /**
      * @param DOMElement $element
      * @param MBlockItem $item
+     * @param null $nestedCount
      * @author Joachim Doerr
      */
-    protected static function replaceName(DOMElement $element, MBlockItem $item)
+    protected static function replaceName(DOMElement $element, MBlockItem $item, $nestedCount = null)
     {
-        if (!is_null($item->getSubId())) {
-            // replace attribute id
-            preg_match('/\]\[\d+\]\[\d+\]\[/', $element->getAttribute('name'), $matches);
-            if ($matches) $element->setAttribute('name', str_replace($matches[0], '][' . $item->getSubId() . '][' . $item->getItemId() . '][', $element->getAttribute('name')));
-        } else {
-            // replace attribute id
-            preg_match('/\]\[\d+\]\[/', $element->getAttribute('name'), $matches);
-            if ($matches) $element->setAttribute('name', str_replace($matches[0], '][' . $item->getItemId() . '][', $element->getAttribute('name')));
+        preg_match(self::PATTERN, $element->getAttribute('name'), $matches);
+        if ($matches) $element->setAttribute('name', str_replace($matches[0], sprintf('[%d]%s', $item->getItemId(), $matches[2]), $element->getAttribute('name')));
+
+        if (is_int($nestedCount)) {
+            preg_match(self::PATTERN_NESTED, $element->getAttribute('name'), $matches);
+            if ($matches) $element->setAttribute('name', str_replace($matches[0], sprintf('%s[%d]', $matches[1], $nestedCount), $element->getAttribute('name')));
         }
     }
 
