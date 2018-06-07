@@ -15,8 +15,8 @@ use MBlock\DTO\MBlockItem;
 class MBlockFormItemDecorator
 {
     use MBlockDOMTrait;
-    const PATTERN = '/(\[\d+\])(\[\w+\])\Z/';
-    const PATTERN_NESTED = '/(\[\d+\])(\[\d+\])/';
+    const PATTERN = '/(\[\d+\])(\[\d+\])/';
+    const PATTERN_NESTED = '/(\[\d+\])(\[\d+\])(\[\w+\])(\[\d\])/';
 
     /**
      * @param MBlockItem $item
@@ -40,7 +40,7 @@ class MBlockFormItemDecorator
                         switch ($match->getAttribute('type')) {
                             case 'checkbox':
                             case 'radio':
-                                // replace checked
+                                // replace checkeds
                                 self::replaceChecked($match, $item);
                                 break;
                             default:
@@ -118,12 +118,13 @@ class MBlockFormItemDecorator
      */
     protected static function replaceName(DOMElement $element, MBlockItem $item, $nestedCount = null)
     {
-        preg_match(self::PATTERN, $element->getAttribute('name'), $matches);
-        if ($matches) $element->setAttribute('name', str_replace($matches[0], sprintf('[%d]%s', $item->getItemId(), $matches[2]), $element->getAttribute('name')));
-
         if (is_int($nestedCount)) {
             preg_match(self::PATTERN_NESTED, $element->getAttribute('name'), $matches);
-            if ($matches) $element->setAttribute('name', str_replace($matches[0], sprintf('%s[%d]', $matches[1], $nestedCount), $element->getAttribute('name')));
+//            dump(array($matches, $nestedCount));
+            if ($matches) $element->setAttribute('name', str_replace($matches[0], sprintf('%s[%d]%s[%d]', $matches[1], $nestedCount, $matches[3], $item->getItemId()), $element->getAttribute('name')));
+        } else {
+            preg_match(self::PATTERN, $element->getAttribute('name'), $matches);
+            if ($matches) $element->setAttribute('name', str_replace($matches[0], sprintf('%s[%d]', $matches[1], $item->getItemId()), $element->getAttribute('name')));
         }
     }
 
