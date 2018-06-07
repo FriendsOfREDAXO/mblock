@@ -15,7 +15,11 @@ if (rex::isBackend() && is_object(rex::getUser())) {
         // foreach all css files
         foreach (MBlockThemeHelper::getCssAssets($this->getConfig('mblock_theme')) as $css) {
             // add assets css file
-            rex_view::addCssFile($this->getAssetsUrl($css));
+            try {
+                rex_view::addCssFile($this->getAssetsUrl($css));
+            } catch (rex_exception $e) {
+                rex_logger::logException($e);
+            }
         }
     }
 
@@ -31,10 +35,14 @@ if (rex::isBackend() && is_object(rex::getUser())) {
     });
 
     // assets
-    rex_view::addJsFile($this->getAssetsUrl('mblock_sortable.min.js'));
-    rex_view::addJsFile($this->getAssetsUrl('mblock_smooth_scroll.min.js'));
-    rex_view::addJsFile($this->getAssetsUrl('mblock.js'));
-    rex_view::addCssFile($this->getAssetsUrl('mblock.css'));
+    try {
+        rex_view::addJsFile($this->getAssetsUrl('mblock_sortable.min.js'));
+        rex_view::addJsFile($this->getAssetsUrl('mblock_smooth_scroll.min.js'));
+        rex_view::addJsFile($this->getAssetsUrl('mblock.js'));
+        rex_view::addCssFile($this->getAssetsUrl('mblock.css'));
+    } catch (rex_exception $e) {
+        rex_logger::logException($e);
+    }
 
 }
 
