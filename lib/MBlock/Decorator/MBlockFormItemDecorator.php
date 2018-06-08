@@ -15,8 +15,8 @@ use MBlock\DTO\MBlockItem;
 class MBlockFormItemDecorator
 {
     use MBlockDOMTrait;
-    const PATTERN = '/(\[\d+\])(\[\d+\])/';
-    const PATTERN_NESTED = '/(\[\d+\])(\[\d+\])(\[\w+\])(\[\d\])/';
+    const PATTERN = '/(\[\w+\])(\[\w+\])/';
+    const PATTERN_NESTED = '/(\[\w+\])(\[\w+\])(\[\w+\])(\[\w\])/';
 
     /**
      * @param MBlockItem $item
@@ -120,7 +120,6 @@ class MBlockFormItemDecorator
     {
         if (is_int($nestedCount)) {
             preg_match(self::PATTERN_NESTED, $element->getAttribute('name'), $matches);
-//            dump(array($matches, $nestedCount));
             if ($matches) $element->setAttribute('name', str_replace($matches[0], sprintf('%s[%d]%s[%d]', $matches[1], $nestedCount, $matches[3], $item->getItemId()), $element->getAttribute('name')));
         } else {
             preg_match(self::PATTERN, $element->getAttribute('name'), $matches);
