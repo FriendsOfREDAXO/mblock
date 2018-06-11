@@ -173,6 +173,12 @@ class MBlockHandler
             /** @var MBlockItem $item */
             foreach ($this->items as $count => $item) {
                 $this->elementParse($item->getElement(), $this->themeKey);
+                // fix & error
+                foreach ($item->getResult() as $result) {
+                    if (is_array($result) && array_key_exists('id', $result)) {
+                        $item->getElement()->setOutput(str_replace($result['id'], $result['value'], $item->getElement()->getOutput()));
+                    }
+                }
             }
         }
 

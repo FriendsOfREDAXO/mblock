@@ -13,6 +13,11 @@ class MBlockItem
     /**
      * @var array
      */
+    public $result;
+
+    /**
+     * @var array
+     */
     public $val;
 
     /**
@@ -54,6 +59,26 @@ class MBlockItem
      * @var array
      */
     public $payload = array();
+
+    /**
+     * @return array
+     * @author Joachim Doerr
+     */
+    public function getResult()
+    {
+        return $this->result;
+    }
+
+    /**
+     * @param array $result
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setResult($result)
+    {
+        $this->result = $result;
+        return $this;
+    }
 
     /**
      * @return array
