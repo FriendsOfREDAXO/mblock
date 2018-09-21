@@ -1,7 +1,9 @@
 # MBlock - REDAXO Addon für Modul-Input-Blöcke
 
 ### Version 2.2.2
+
 Selectfix  - danke @tbaddade 
+
 https://github.com/FriendsOfREDAXO/mblock/pull/96
 
 ### Version 2.2.1
