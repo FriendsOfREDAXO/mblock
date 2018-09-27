@@ -2,9 +2,9 @@
 
 ### Version 2.2.3
 
-Selectfix  - danke @tbaddade 
-
-https://github.com/FriendsOfREDAXO/mblock/pull/96
+* Installfix for 2.2.2
+* Selectfix  - danke @tbaddade 
+* https://github.com/FriendsOfREDAXO/mblock/pull/96
 
 ### Version 2.2.1
 
