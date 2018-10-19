@@ -36,6 +36,7 @@ div.sortable-ghost {
     position: absolute;
     right: 15px;
     top: 9px;
+    z-index: 1;
 }
 
 .mblock_wrapper span.removeadded .btn {
