@@ -30,7 +30,7 @@ class MBlockElement
     /**
      * @var int
      */
-    public $index;
+    public $iterateIndex;
 
     /**
      * @return mixed
@@ -94,19 +94,19 @@ class MBlockElement
      * @return int
      * @author Joachim Doerr
      */
-    public function getIndex()
+    public function getIterateIndex()
     {
-        return $this->index;
+        return $this->iterateIndex;
     }
 
     /**
-     * @param int $index
+     * @param int $iterateIndex
      * @return $this
      * @author Joachim Doerr
      */
-    public function setIndex($index)
+    public function setIterateIndex($iterateIndex)
     {
-        $this->index = $index;
+        $this->iterateIndex = $iterateIndex;
         return $this;
     }
 

@@ -99,14 +99,18 @@ class MBlockHandler
     }
 
     /**
+     * Create all form items by loaded values
      * @return MBlockItem[]
      * @author Joachim Doerr
      */
     public function createItems()
     {
+        // loaded values?
         if (!is_null($this->val)) {
+            // iterate value levels
             foreach ($this->val as $key => $value) {
                 if (isset($this->val[$key])) {
+                    // create block items by value
                     $this->items[$key] = new MBlockItem();
                     $this->items[$key]->setItemId($key)
                         ->setValueId($this->id)
@@ -147,13 +151,11 @@ class MBlockHandler
                         $this->handleNestedMBlock($item, $wrapper, $mKey);
                     }
                 }
-
-                $this->executeItemManipulations($item, $count, $nestedCount);
-
+                $this->executeItemManipulations($item, ($count +1), $nestedCount);
                 // parse form item
                 $element = new MBlockElement();
                 $element->setForm($item->getForm()->saveHTML())
-                    ->setIndex(($count + 1))
+                    ->setIterateIndex(($count + 1))
                     ->setSettings($this->settings);
 
                 $item->setElement($element);
@@ -242,10 +244,10 @@ class MBlockHandler
     private function executeItemManipulations(MBlockItem $item, $count, $nestedCount = null)
     {
         // replace system button data
-        MBlockSystemButtonReplacer::replaceSystemButtons($item, ($count + 1));
-        MBlockCountReplacer::replaceCountKeys($item, ($count + 1));
-        MBlockBootstrapReplacer::replaceTabIds($item, ($count + 1));
-        MBlockBootstrapReplacer::replaceCollapseIds($item, ($count + 1));
+        MBlockSystemButtonReplacer::replaceSystemButtons($item, $count);
+        MBlockCountReplacer::replaceCountKeys($item, $count);
+        MBlockBootstrapReplacer::replaceTabIds($item, $count);
+        MBlockBootstrapReplacer::replaceCollapseIds($item, $count);
 
         // decorate item form
         if ($item->getVal() or !is_null($nestedCount)) {
@@ -255,7 +257,7 @@ class MBlockHandler
         }
 
         // set only checkbox block holder
-        MBlockCheckboxReplacer::replaceCheckboxesBlockHolder($item, ($count + 1));
+        MBlockCheckboxReplacer::replaceCheckboxesBlockHolder($item, $count);
     }
 
     /**
@@ -269,7 +271,7 @@ class MBlockHandler
         // TODO read settings from mblock html settings
 
         $sortItem = $element->firstChild;
-        if ($sortItem->getAttribute('class') == 'sortitem') { // sort item === mblock sort wrapper
+        if ($sortItem instanceof \DOMElement && $sortItem->getAttribute('class') == 'sortitem') { // sort item === mblock sort wrapper
             $nodes = $sortItem->childNodes;
             /** @var \DOMElement $node */
             foreach ($nodes as $node) {
@@ -322,8 +324,10 @@ class MBlockHandler
             }
 
             // set mblock count data
-            $element->setAttribute('data-mblock_count', $_SESSION['mblock_count']);
+            $element->setAttribute('data-mblock_count', rex_session('mblock_count'));
             // dump($this->innerHTML($element->parentNode));
+        } else {
+            dump($key);
         }
     }
 

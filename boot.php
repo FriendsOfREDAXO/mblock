@@ -46,7 +46,5 @@ if (rex::isBackend() && is_object(rex::getUser())) {
 
 }
 
-if (isset($_SESSION['mblock_count'])) {
-    // reset mblock page count
-    $_SESSION['mblock_count'] = 0;
-}
+// reset count per page init
+rex_set_session('mblock_count', 0);

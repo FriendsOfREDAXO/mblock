@@ -22,8 +22,9 @@ class MBlock
     public function __construct()
     {
         // create mblock page count is not exist
-        if (!isset($_SESSION['mblock_count'])) {
-            $_SESSION['mblock_count'] = 0;
+        if (is_null(rex_session('mblock_count', 'integer', null))) {
+            // set mblock count is not exist
+            rex_set_session('mblock_count', 0);
         }
     }
 
@@ -40,12 +41,13 @@ class MBlock
         $theme = (!is_null($theme)) ? $theme : 'default'; // TODO by settings
 
         // TODO use mblock count as property
+
         // session mblock count++
-        if (!isset($_SESSION['mblock_count'])) {
+        if (is_null(rex_session('mblock_count', 'integer', null))) {
             // set mblock count is not exist
-            $_SESSION['mblock_count'] = 0;
+            rex_set_session('mblock_count', 0);
         }
-        $_SESSION['mblock_count']++;
+        rex_set_session('mblock_count', rex_session('mblock_count') + 1);
 
         // init handler
         self::$mblockHandler = new \Mblock\Handler\MBlockHandler($id, $form, $settings, null, $theme);

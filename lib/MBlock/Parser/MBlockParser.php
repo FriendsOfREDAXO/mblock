@@ -26,7 +26,7 @@ class MBlockParser
     {
         $fragment = new rex_fragment(
             array(
-                'index' => $element->getIndex(),
+                'iterate_index' => $element->getIterateIndex(),
                 'settings' => $element->getSettings(),
                 'output' => $element->getOutput(),
                 'form' => $element->getForm(),

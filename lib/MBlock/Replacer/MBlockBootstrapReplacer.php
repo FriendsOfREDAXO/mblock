@@ -35,7 +35,7 @@ class MBlockBootstrapReplacer
                         $item->addPayload('replace-id', $key);
 
                         $href = str_replace('#', '', $match->getAttribute('href'));
-                        $newHref = $href . '_' . $count . $_SESSION['mblock_count'] . '00' . $key;
+                        $newHref = $href . '_' . $count . rex_session('mblock_count') . '00' . $key;
                         $match->setAttribute('href', '#' . $newHref);
 
                         $parent = $match->parentNode->parentNode->parentNode;
@@ -82,10 +82,10 @@ class MBlockBootstrapReplacer
                         $item->addPayload('replace-id', $key);
 
                         $href = str_replace('#', '', $match->getAttribute('data-target'));
-                        $newHref = $href . '_' . $count . $_SESSION['mblock_count'] . '00' . $key;
+                        $newHref = $href . '_' . $count . rex_session('mblock_count') . '00' . $key;
                         $match->setAttribute('data-target', '#' . $newHref);
                         if ($match->hasAttribute('data-parent')) {
-                            $match->setAttribute('data-parent', '#accgr' . '_' . $count . $_SESSION['mblock_count'] . '00');
+                            $match->setAttribute('data-parent', '#accgr' . '_' . $count . rex_session('mblock_count') . '00');
                         }
 
                         $next = $match->nextSibling;
@@ -97,7 +97,7 @@ class MBlockBootstrapReplacer
                         $parent = $match->parentNode->parentNode;
 
                         if ($parent->hasAttribute('data-group-accordion') && $parent->getAttribute('data-group-accordion') == 1) {
-                            $parent->setAttribute('id', 'accgr' . '_' . $count . $_SESSION['mblock_count'] . '00');
+                            $parent->setAttribute('id', 'accgr' . '_' . $count . rex_session('mblock_count') . '00');
                         }
                         $match->setAttribute('data-mblock', true);
                     }

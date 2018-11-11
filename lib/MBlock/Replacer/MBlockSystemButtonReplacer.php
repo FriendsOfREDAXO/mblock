@@ -234,7 +234,7 @@ class MBlockSystemButtonReplacer
         }
         // set system name
         $item->setSystemName('REX_LINK');
-        $id = $item->getPayload('count-id') . $_SESSION['mblock_count'] . '00' . $item->getPayload('replace-id');
+        $id = $item->getPayload('count-id') . rex_session('mblock_count') . '00' . $item->getPayload('replace-id');
         // has children ?
         if ($dom->hasChildNodes()) {
             /** @var DOMElement $child */
@@ -322,7 +322,7 @@ class MBlockSystemButtonReplacer
             foreach($dom->getElementsByTagName('a') as $child) {
                 if ($child->hasAttribute('onclick')) {
                     if (strpos($child->getAttribute('onclick'), $btnFindKey) !== false) {
-                        $child->setAttribute('onclick', preg_replace('/\\'.$prefix.'\d\\'.$suffix.'/', $prefix . $item->getPayload('count-id') . $_SESSION['mblock_count'] . '00' . $item->getPayload('replace-id') . $suffix, $child->getAttribute('onclick')));
+                        $child->setAttribute('onclick', preg_replace('/\\'.$prefix.'\d\\'.$suffix.'/', $prefix . $item->getPayload('count-id') . rex_session('mblock_count') . '00' . $item->getPayload('replace-id') . $suffix, $child->getAttribute('onclick')));
                     }
                 }
             }
@@ -338,7 +338,7 @@ class MBlockSystemButtonReplacer
     protected static function replaceId(DOMElement $dom, MBlockItem $item)
     {
         // get input id
-        $dom->setAttribute('id', preg_replace('/\_\d+/', '_' . $item->getPayload('count-id') . $_SESSION['mblock_count'] . '00' . $item->getPayload('replace-id'), $dom->getAttribute('id')));
+        $dom->setAttribute('id', preg_replace('/\_\d+/', '_' . $item->getPayload('count-id') . rex_session('mblock_count') . '00' . $item->getPayload('replace-id'), $dom->getAttribute('id')));
         return $dom->getAttribute('id');
     }
 
@@ -350,7 +350,7 @@ class MBlockSystemButtonReplacer
     protected static function replaceDataId(DOMElement $dom, MBlockItem $item)
     {
         // get input id
-        $dom->setAttribute('data-id', $item->getPayload('count-id') . $_SESSION['mblock_count'] . '00' . $item->getPayload('replace-id'));
+        $dom->setAttribute('data-id', $item->getPayload('count-id') . rex_session('mblock_count') . '00' . $item->getPayload('replace-id'));
     }
 
     /**

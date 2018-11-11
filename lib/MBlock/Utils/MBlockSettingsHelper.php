@@ -36,8 +36,8 @@ class MBlockSettingsHelper
             if ($settings['delete_confirm'] === 0)
                 unset($settings['delete_confirm']);
         }
-        if (isset($_SESSION['mblock_count'])) {
-            $settings['mblock_count'] = $_SESSION['mblock_count'];
+        if (is_null(rex_session('mblock_count', 'integer', null))) {
+            $settings['mblock_count'] = rex_session('mblock_count');
         } else {
             $settings['mblock_count'] = 0;
         }

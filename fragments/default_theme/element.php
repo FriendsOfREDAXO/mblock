@@ -1,4 +1,4 @@
-<div class="sortitem" data-mblock_index="<?= $this->index; ?>">
+<div class="sortitem" data-mblock-iterate-index="<?= $this->iterate_index; ?>">
     <span class="sorthandle"></span>
     <span class="removeadded">
       <div class="btn-group btn-group-xs">
@@ -11,4 +11,5 @@
       </div>
    </span>
     <div><?= $this->form; ?></div>
+    <div>index:<?= $this->iterate_index; ?></div>
 </div>
