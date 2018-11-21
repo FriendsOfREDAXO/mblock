@@ -1,57 +1,64 @@
 /**
- * Created by joachimdoerr on 30.07.16.
+ * @author mail[at]doerr-softwaredevelopment[dot]com Joachim Doerr
+ * @package redaxo5
+ * @license MIT
  */
-$(function () {
-    mblock_init();
-    $(document).on('pjax:end', function () {
-        mblock_init();
+
+let mblock = '.mblock_wrapper',
+    debug_view = true,
+    timer,
+    scroll_delay = 200,
+    scroll_speed = 500;
+
+$(document).on('rex:ready', function (e, container) {
+    container.find(mblock).each(function () {
+        mblock_init($(this));
     });
 });
 
-var mblock_module = (function () {
-    var callbacks = {
+const mblock_module = (function () {
+    let callbacks = {
         remove_item_start: [],
         add_item_start: [],
         reindex_end: [],
         lastAction: ''
     };
-    var mod = {};
+    let mod = {};
 
     mod.affectedItem = {};
 
     // Register a callback
-    // @input evnt string name of the event
+    // @input event string name of the event
     // @input f function callback
     // @output void
-    mod.registerCallback = function (evnt, f) {
-        callbacks[evnt].push(f);
+    mod.registerCallback = function (event, f) {
+        callbacks[event].push(f);
     };
 
-    // @input evnt string name of the event
+    // @input event string name of the event
     // @output []function
-    mod.getRegisteredCallbacks = function (evnt) {
-        if (typeof callbacks[evnt] === 'undefined') {
+    mod.getRegisteredCallbacks = function (event) {
+        if (typeof callbacks[event] === 'undefined') {
             return [];
         }
         else {
-            return callbacks[evnt];
+            return callbacks[event];
         }
     };
 
-    // @input evnt string name of the event
+    // @input event string name of the event
     // @output void
-    mod.executeRegisteredCallbacks = function (evnt) {
-        var list = mod.getRegisteredCallbacks(evnt);
-        for (var i = 0; i < list.length; i++) {
-            list[i](evnt == 'reindex_end' && mod.affectedItem);
+    mod.executeRegisteredCallbacks = function (event) {
+        let list = mod.getRegisteredCallbacks(event);
+        for (let i = 0; i < list.length; i++) {
+            list[i](event === 'reindex_end' && mod.affectedItem);
         }
     };
 
     return mod;
 })();
 
-function mblock_init() {
-    var mblock = $('.mblock_wrapper');
+function mblock_init(mblock) {
     // init by siteload
     if (mblock.length) {
         mblock.each(function () {
@@ -60,7 +67,7 @@ function mblock_init() {
                 mblock_sort($(this));
                 mblock_set_unique_id($(this), false);
 
-                if ($(this).data('min') == 1 && $(this).data('max') == 1) {
+                if ($(this).data('min') === 1 && $(this).data('max') === 1) {
                     $(this).addClass('hide_removeadded').addClass('hide_sorthandle');
                 }
             }
@@ -86,9 +93,9 @@ function mblock_sort(element) {
 }
 
 function mblock_remove(element) {
-    var finded = element.find('> div');
+    let finded = element.find('> div');
 
-    if (finded.length == 1) {
+    if (finded.length === 1) {
         finded.find('.removeme').prop('disabled', true);
         finded.find('.removeme').attr('data-disabled', true);
     } else {
@@ -115,15 +122,15 @@ function mblock_remove(element) {
 
     finded.each(function (index) {
         // min removeme hide
-        if ((index + 1) == element.data('min') && finded.length == element.data('min')) {
+        if ((index + 1) === element.data('min') && finded.length === element.data('min')) {
             $(this).find('.removeme').prop('disabled', true);
         }
-        if (index == 0) {
+        if (index === 0) {
             $(this).find('.moveup').prop('disabled', true);
         } else {
             $(this).find('.moveup').prop('disabled', false);
         }
-        if ((index + 1) == finded.length) { // if max count?
+        if ((index + 1) === finded.length) { // if max count?
             $(this).find('.movedown').prop('disabled', true);
         } else {
             $(this).find('.movedown').prop('disabled', false);
@@ -143,112 +150,186 @@ function mblock_sort_it(element) {
     });
 }
 
-function mblock_reindex(element) {
+function mblock_debug_view_msg(element, msg, view_class) {
+    if (debug_view) { // if debug mode active add a debug msg
+        element.find('.' + view_class).remove();
+        element.append('<div class="' + view_class + '">elementvalue:' + msg + '</div>');
+    }
+}
 
-    var initredactor = false,
-        initmarkitup = false,
-        mblock_count = element.data('mblock_count');
+function mblock_debug_view_border(element, color) {
+    if (debug_view) { // if debug mode active add a border
+        element.css('border', '1px solid ' + color);
+    }
+}
 
-    element.find('> div').each(function (index) {
+function mblock_set_index(element, item_index, nested, nested_item_index) {
+    element.data('item-count', item_index);
+    if (nested) element.data('parent-item-count', nested_item_index);
+
+    let name_value = element.data('name-value'),
+        value_id = element.data('value-id'),
+        group_value = element.data('group-value'),
+        parent_item_count = element.data('parent-item-count'),
+        item_count = element.data('item-count'),
+        item_value = element.data('item-value');
+
+    if (typeof parent_item_count !== "undefined" && typeof group_value !== "undefined") {
+        nested = true;
+    }
+
+    // create value name for nested or default
+    let value_name = (nested)
+        ? name_value + '[' + value_id + '][' + parent_item_count + '][' + group_value + '][' + item_count + '][' + item_value + ']'
+        : name_value + '[' + value_id + '][' + item_count + '][' + item_value + ']';
+
+    // final set attr name to element
+    element.attr('name', value_name);
+
+    // debug view
+    mblock_debug_view_msg(element.parent(), 'elementvalue: ' + value_name, 'mblock-debug-view-index');
+    if (nested) mblock_debug_view_border(element, 'blue'); else mblock_debug_view_border(element, 'red');
+}
+
+function mblock_reindex_element_fix(element, item_index, nested, nested_item_index) {
+    // checkbox problem fix
+    if (element.attr('type') === 'checkbox') {
+        element.unbind().bind('change', function () {
+            if (element.is(':checked')) {
+                element.val(1);
+            } else {
+                element.val(0);
+            }
+        });
+        return; // break
+    }
+    // radio problem fix
+    if (element.attr('type') === 'radio' && element.attr('data-value')) {
+        element.val(element.attr('data-value'));
+        return; // break
+    }
+    // // select rex button
+    // if (element.prop("nodeName") === 'SELECT' && element.attr('id') && (
+    //     element.attr('id').indexOf("REX_MEDIALIST_SELECT_") >= 0 ||
+    //     element.attr('id').indexOf("REX_LINKLIST_SELECT_") >= 0
+    // )) {
+    //     element.parent().data('eindex', eindex);
+    //     element.attr('id', element.attr('id').replace(/_\d+/, '_' + sindex + '' + mblock_instance +   '00' + eindex));
+    //     if (element.attr('name') !== undefined) {
+    //         element.attr('name', element.attr('name').replace(/_\d+/, '_' + sindex + '' + mblock_instance + '00' + eindex));
+    //     }
+    // }
+    //
+    // // input rex button
+    // if ($(this).prop("nodeName") == 'INPUT' && $(this).attr('id') && (
+    //     $(this).attr('id').indexOf("REX_LINKLIST_") >= 0 ||
+    //     $(this).attr('id').indexOf("REX_MEDIALIST_") >= 0
+    // )) {
+    //     if ($(this).parent().data('eindex')) {
+    //         eindex = $(this).parent().data('eindex');
+    //     }
+    //     $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '' + mblock_instance + '00' + eindex));
+    //
+    //     // button
+    //     $(this).parent().find('a.btn-popup').each(function () {
+    //         $(this).attr('onclick', $(this).attr('onclick').replace(/\(\d+/, '(' + sindex + '' + mblock_instance + '00' + eindex));
+    //         $(this).attr('onclick', $(this).attr('onclick').replace(/_\d+/, '_' + sindex + '' + mblock_instance + '00' + eindex));
+    //     });
+    // }
+    //
+    // // input rex button
+    // if ($(this).prop("nodeName") == 'INPUT' && $(this).attr('id') && (
+    //     $(this).attr('id').indexOf("REX_LINK_") >= 0 ||
+    //     $(this).attr('id').indexOf("REX_MEDIA_") >= 0
+    // )) {
+    //     if ($(this).attr('type') != 'hidden') {
+    //         if ($(this).parent().data('eindex')) {
+    //             eindex = $(this).parent().data('eindex');
+    //         }
+    //         $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '' + mblock_instance + '00' + eindex));
+    //
+    //         if ($(this).next().attr('type') == 'hidden') {
+    //             $(this).next().attr('id', $(this).next().attr('id').replace(/\d+/, sindex + '' + mblock_instance + '00' + eindex));
+    //         }
+    //
+    //         // button
+    //         $(this).parent().find('a.btn-popup').each(function () {
+    //             if ($(this).attr('onclick')) {
+    //                 $(this).attr('onclick', $(this).attr('onclick').replace(/\(\d+/, '(' + sindex + '' + mblock_instance + '00' + eindex));
+    //                 $(this).attr('onclick', $(this).attr('onclick').replace(/_\d+/, '_' + sindex + '' + mblock_instance + '00' + eindex));
+    //             }
+    //         });
+    //     }
+    // }
+
+}
+
+function mblock_reindex_flow(elements, nested = false, nested_item_index = 0) {
+    // iterate block items
+    elements.each(function (item_index) {
+        let nested_elements = [];
+        let instance_id = $(this).parent().data('mblock-instance');
+
+        // set item index
+        $(this).data('mblock-iterate-index', (item_index + 1));
+
+        // debug view
+        mblock_debug_view_msg($(this), 'iterate-index:' + (item_index + 1), 'mblock-debug-view-iterate');
+
         // find input elements
-        $(this).attr('data-mblock_index', (index + 1));
-        $(this).find('input,textarea,select,button').each(function (key) {
-            var attr = $(this).attr('name');
-            eindex = key + 1;
-            sindex = index + 1;
-            // For some browsers, `attr` is undefined; for others,
-            // `attr` is false. Check for both.
-            if (typeof attr !== typeof undefined && attr !== false) {
-                var value = attr.replace($(this).attr('name').match(/\]\[\d+\]\[/g), '][' + index + '][').replace('mblock_new_','');
-                $(this).attr('name', value);
+        $(this).find('input,textarea,select,button:not(.addme,.removeme,.moveup,.movedown)').each(function (element_each_index) {
+            let parent_mblock = $(this).parents(mblock).eq(0);
+            if (parent_mblock.data('mblock-instance') !== instance_id) {
+                nested_elements[parent_mblock.data('mblock-instance')] = parent_mblock;
+                return;
             }
-
-            // checkbox problem fix
-            if ($(this).attr('type') == 'checkbox') {
-                $(this).unbind().bind('change', function () {
-                    if ($(this).is(':checked')) {
-                        $(this).val(1);
-                    } else {
-                        $(this).val(0);
-                    }
-                });
-            }
-
-            // radio problem fix
-            if ($(this).attr('type') == 'radio' && $(this).attr('data-value')) {
-                $(this).val($(this).attr('data-value'));
-            }
-
-            // select rex button
-            if ($(this).prop("nodeName") == 'SELECT' && $(this).attr('id') && (
-                    $(this).attr('id').indexOf("REX_MEDIALIST_SELECT_") >= 0 ||
-                    $(this).attr('id').indexOf("REX_LINKLIST_SELECT_") >= 0
-                )) {
-                $(this).parent().data('eindex', eindex);
-                $(this).attr('id', $(this).attr('id').replace(/_\d+/, '_' + sindex + '' + mblock_count +   '00' + eindex));
-                if ($(this).attr('name') != undefined) {
-                    $(this).attr('name', $(this).attr('name').replace(/_\d+/, '_' + sindex + '' + mblock_count + '00' + eindex));
-                }
-            }
-
-            // input rex button
-            if ($(this).prop("nodeName") == 'INPUT' && $(this).attr('id') && (
-                    $(this).attr('id').indexOf("REX_LINKLIST_") >= 0 ||
-                    $(this).attr('id').indexOf("REX_MEDIALIST_") >= 0
-                )) {
-                if ($(this).parent().data('eindex')) {
-                    eindex = $(this).parent().data('eindex');
-                }
-                $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '' + mblock_count + '00' + eindex));
-
-                // button
-                $(this).parent().find('a.btn-popup').each(function () {
-                    $(this).attr('onclick', $(this).attr('onclick').replace(/\(\d+/, '(' + sindex + '' + mblock_count + '00' + eindex));
-                    $(this).attr('onclick', $(this).attr('onclick').replace(/_\d+/, '_' + sindex + '' + mblock_count + '00' + eindex));
-                });
-            }
-
-            // input rex button
-            if ($(this).prop("nodeName") == 'INPUT' && $(this).attr('id') && (
-                    $(this).attr('id').indexOf("REX_LINK_") >= 0 ||
-                    $(this).attr('id').indexOf("REX_MEDIA_") >= 0
-                )) {
-                if ($(this).attr('type') != 'hidden') {
-                    if ($(this).parent().data('eindex')) {
-                        eindex = $(this).parent().data('eindex');
-                    }
-                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '' + mblock_count + '00' + eindex));
-
-                    if ($(this).next().attr('type') == 'hidden') {
-                        $(this).next().attr('id', $(this).next().attr('id').replace(/\d+/, sindex + '' + mblock_count + '00' + eindex));
-                    }
-
-                    // button
-                    $(this).parent().find('a.btn-popup').each(function () {
-                        if ($(this).attr('onclick')) {
-                            $(this).attr('onclick', $(this).attr('onclick').replace(/\(\d+/, '(' + sindex + '' + mblock_count + '00' + eindex));
-                            $(this).attr('onclick', $(this).attr('onclick').replace(/_\d+/, '_' + sindex + '' + mblock_count + '00' + eindex));
-                        }
-                    });
-                }
+            if (nested) {
+                // set tag name value by index
+                mblock_set_index($(this), item_index, true, nested_item_index);
+                // fix for checkbox, radio and system buttons
+                mblock_reindex_element_fix($(this), item_index, true, nested_item_index);
+            } else {
+                // set tag name value by index
+                mblock_set_index($(this), item_index, false);
+                // fix for checkbox, radio and system buttons
+                mblock_reindex_element_fix($(this), item_index, false);
             }
         });
 
+        // there are nested elements exist?
+        if (nested_elements.length) {
+            // each nested elements
+            nested_elements.forEach(function (nested_element) {
+                // execute the reindex flow for the nested elements
+                mblock_reindex_flow(nested_element.find('> div.sortitem'), true, item_index);
+            });
+        }
+    });
+}
+
+function mblock_reindex(element) {
+    mblock_reindex_flow(element.find('> div.sortitem'));
+
+    /*
+    // TODO DO WE NEED THAT?
+    // iterate block items
+    element.find('> div.sortitem').each(function (item_index) {
+
         $(this).find('a[data-toggle="collapse"]').each(function (key) {
             eindex = key + 1;
-            sindex = index + 1;
+            sindex = item_index + 1;
             togglecollase = $(this);
             if (!$(this).attr('data-ignore-mblock')) {
                 href = $(this).attr('data-target');
                 container = togglecollase.parent().find(href);
                 group = togglecollase.parent().parent().parent().find('.panel-group');
-                nexit = container.attr('id').replace(/_\d+/, '_' + sindex + '' + mblock_count + '00' + eindex);
+                nexit = container.attr('id').replace(/_\d+/, '_' + sindex + '' + mblock_instance + '00' + eindex);
 
                 container.attr('id', nexit);
                 togglecollase.attr('data-target', '#' + nexit);
 
                 if (group.length) {
-                    parentit = group.attr('id').replace(/_\d+/, '_' + sindex + '' + mblock_count + '00');
+                    parentit = group.attr('id').replace(/_\d+/, '_' + sindex + '' + mblock_instance + '00');
                     group.attr('id', parentit);
                     togglecollase.attr('data-parent', '#' + parentit);
                 }
@@ -257,11 +338,11 @@ function mblock_reindex(element) {
 
         $(this).find('a[data-toggle="tab"]').each(function (key) {
             eindex = key + 1;
-            sindex = index + 1;
+            sindex = item_index + 1;
             toggletab = $(this);
             href = $(this).attr('href');
             container = toggletab.parent().parent().parent().find('.tab-content ' + href);
-            nexit = container.attr('id').replace(/_\d+/, '_' + sindex + '' + mblock_count + '00' + eindex);
+            nexit = container.attr('id').replace(/_\d+/, '_' + sindex + '' + mblock_instance + '00' + eindex);
 
             container.attr('id', nexit);
             toggletab.attr('href', '#' + nexit);
@@ -279,124 +360,48 @@ function mblock_reindex(element) {
 
         $(this).find('.custom-link').each(function (key) {
             eindex = key + 1;
-            sindex = index + 1;
+            sindex = item_index + 1;
             customlink = $(this);
             $(this).find('input').each(function () {
                 if ($(this).attr('id')) {
-                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '' + mblock_count + '00' + eindex));
+                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '' + mblock_instance + '00' + eindex));
                 }
             });
             $(this).find('a.btn-popup').each(function () {
                 if ($(this).attr('id')) {
-                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '' + mblock_count + '00' + eindex));
+                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '' + mblock_instance + '00' + eindex));
                 }
             });
-            customlink.attr('data-id', sindex + '' + mblock_count + '00' + eindex);
+            customlink.attr('data-id', sindex + '' + mblock_instance + '00' + eindex);
             if (typeof mform_custom_link === 'function') mform_custom_link(customlink);
         });
-
-        $(this).find('.redactor-box').each(function (key) {
-            initredactor = true;
-            eindex = key + 1;
-            sindex = index + 1;
-            $(this).find('textarea').each(function () {
-                if ($(this).attr('id')) {
-                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '' + mblock_count + '00' + eindex));
-                }
-            });
-        });
-
-        $(this).find('.markitup_markdown, .markitup_textile').each(function (key) {
-            initmarkitup = true;
-            eindex = key + 1;
-            sindex = index + 1;
-            $(this).find('textarea').each(function () {
-                if ($(this).attr('id')) {
-                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '' + mblock_count + '00' + eindex));
-                }
-            })
-        });
-
     });
+    */
 
-    if (initredactor) {
-
-        $('.redactor-box').each(function () {
-            var area;
-            var content = '';
-            $(this).find('div.redactor-in').each(function () {
-                if ($(this).attr('role')) {
-                    content = $(this).html();
-                }
-            });
-            $(this).find('textarea').each(function () {
-                var attr = $(this).attr('class');
-                if (typeof attr !== typeof undefined && attr !== false) {
-                    if ($(this).attr('class').indexOf("redactor") >= 0) {
-                        area = $(this).clone().css('display', 'block');
-                    }
-                }
-            });
-            if (typeof area === 'object') {
-                if (area.length) {
-                    $(this).parent().append(area);
-                    $(this).parent().find('textarea').val(content);
-                    $(this).remove();
-                }
-            }
-        });
-
-        if (typeof redactorInit === 'function') redactorInit();
-    }
-
-    if (initmarkitup) {
-
-        $('.markitup_markdown, .markitup_textile').each(function () {
-            var area;
-            $(this).find('textarea').each(function () {
-                area = $(this).clone();
-            });
-            if (typeof area === 'object') {
-                if (area.length) {
-                    area.removeClass('markItUpEditor').removeClass('markitupActive');
-                    $(this).parent().append(area);
-                    $(this).remove();
-                }
-            }
-        });
-
-        if (typeof markitupInit === 'function' && typeof autosize === 'function') {
-            markitupInit();
-            autosize($("textarea[class*=\'markitupEditor-\']"));
-        }
-
-    }
+    // TODO DO WE NEED THAT?
     // if not removing, sets "for" attribute for most elements to make them work properly
-    if(mblock_module.lastAction != 'remove_item') {
-	    mblock_replace_for(element);
+    if (mblock_module.lastAction != 'remove_item') {
+        mblock_replace_for(element);
     }
 
     mblock_module.executeRegisteredCallbacks('reindex_end');
 }
 
-function mblock_replace_for(element) {
 
-    element.find(' > div').each(function (index) {
-        var mblock = $(this);
-        mblock.find('input:not(:checkbox):not(:radio),textarea,select').each(function (key) {
-            var el = $(this);
-            var id = el.attr('id');
+function mblock_replace_for(element) {
+    element.find(' > div').each(function () {
+        let mblock = $(this);
+        mblock.find('input:not(:checkbox):not(:radio),textarea,select').each(function () {
+            let el = $(this);
+            let id = el.attr('id');
             if (typeof id !== typeof undefined && id !== false) {
                 if (!(id.indexOf("REX_MEDIA") >= 0 ||
                     id.indexOf("REX_LINK") >= 0 ||
-                    id.indexOf("redactor") >= 0 ||
                     id.indexOf("markitup") >= 0)
                 ) {
-                    var label = mblock.find('label[for="' + id + '"]');
-                    var name = el.attr('name').replace(/(\[|\])/gm, '');
+                    let name = el.attr('name').replace(/(\[|\])/gm, '');
                     el.attr('id', name);
-                    label.attr('for', name);
-
+                    mblock.find('label[for="' + id + '"]').attr('for', name);
                 }
             }
         });
@@ -404,50 +409,57 @@ function mblock_replace_for(element) {
 }
 
 function mblock_add_item(element, item) {
+
     mblock_module.executeRegisteredCallbacks('add_item_start');
+
     if (item.parent().hasClass(element.attr('class'))) {
         // unset sortable
         element.mblock_sortable("destroy");
 
-        // item.after(item[0].outerHTML);
-        // item.after(item.clone());
-
-        var iClone = item.clone();
+        let iClone = item.clone();
 
         // fix for checkbox and radio bug
-        iClone.find('input:radio, input:checkbox').each(function(){
+        iClone.find('input:radio, input:checkbox').each(function () {
             $(this).parent().removeAttr('for');
         });
 
         // fix radio bug
-        iClone.find('input:radio, input:checkbox').each(function(){
+        iClone.find('input:radio, input:checkbox').each(function () {
             // fix lost checked from parent item
             $(this).attr('name', 'mblock_new_' + $(this).attr('name'));
             // fix lost value
             $(this).attr('data-value', $(this).val());
         });
 
-        // add clone
-        item.after(iClone);
-
         // delete values
-        if (element.data().hasOwnProperty('input_delete')) {
-            if (element.data('input_delete') == true) {
-                iClone.find('div.redactor-in').html('');
-                iClone.find('input:not(.not_delete), textarea').val('');
-                iClone.find('textarea').html('');
-                iClone.find('option:selected').removeAttr("selected");
-                iClone.find('input:checked').removeAttr("checked");
-                iClone.find('select').each(function () {
-                    $(this).attr('data-selected', '');
-                    if ($(this).attr('id') && ($(this).attr('id').indexOf("REX_MEDIALIST") >= 0
-                            || $(this).attr('id').indexOf("REX_LINKLIST") >= 0
-                        )) {
-                        $(this).find('option').remove();
-                    }
+        if (element.data('input-delete') === 1) {
+
+            if (iClone.find('.mblock_wrapper').length) {
+                iClone.find('.mblock_wrapper').each(function () {
+                    $(this).find('> div.sortitem').each(function (index) {
+                        if (index > 0) {
+                            $(this).remove();
+                        }
+                    });
                 });
             }
+
+            iClone.find('input:not(.not_delete), textarea').val('');
+            iClone.find('textarea').html('');
+            iClone.find('option:selected').removeAttr("selected");
+            iClone.find('input:checked').removeAttr("checked");
+            iClone.find('select').each(function () {
+                $(this).attr('data-selected', '');
+                if ($(this).attr('id') && ($(this).attr('id').indexOf("REX_MEDIALIST") >= 0
+                    || $(this).attr('id').indexOf("REX_LINKLIST") >= 0
+                )) {
+                    $(this).find('option').remove();
+                }
+            });
         }
+
+        // add clone
+        item.after(iClone);
 
         // set currently affected item
         mblock_module.affectedItem = iClone;
@@ -455,29 +467,30 @@ function mblock_add_item(element, item) {
         mblock_set_unique_id(iClone, true);
         // set count
         mblock_set_count(element, item);
-		// set last user action
-		mblock_module.lastAction = 'add_item';
+        // set last user action
+        mblock_module.lastAction = 'add_item';
         // reinit
         mblock_init_sort(element);
         // scroll to item
         mblock_scroll(element, iClone);
+
         element.trigger('mblock:add', [element]);
     }
 }
 
 function mblock_set_unique_id(item, input_delete) {
     item.find('input').each(function () {
-        var unique_id = Math.random().toString(16).slice(2),
+        let unique_id = Math.random().toString(16).slice(2),
             unique_int = parseInt(Math.random() * 1000000000000);
 
-        if ($(this).attr('data-unique-int') == 1) {
+        if ($(this).attr('data-unique-int') === 1) {
             unique_id = unique_int;
         }
-        if ($(this).attr('data-unique') == 1 || $(this).attr('data-unique-int') == 1) {
-            if (input_delete == true) {
+        if ($(this).attr('data-unique') === 1 || $(this).attr('data-unique-int') === 1) {
+            if (input_delete === true) {
                 $(this).val('');
             }
-            if ($(this).val() == '') {
+            if ($(this).val() === '') {
                 $(this).val(unique_id);
             }
         }
@@ -485,7 +498,7 @@ function mblock_set_unique_id(item, input_delete) {
 }
 
 function mblock_set_count(element, item) {
-    var countItem = item.next().find('span.mb_count'),
+    let countItem = item.next().find('span.mb_count'),
         count = element.find('> div').length;
 
     if (element.data('latest')) {
@@ -498,8 +511,8 @@ function mblock_set_count(element, item) {
 
 function mblock_remove_item(element, item) {
     mblock_module.executeRegisteredCallbacks('remove_item_start');
-    if (element.data().hasOwnProperty('delete_confirm')) {
-        if (!confirm(element.data('delete_confirm'))) {
+    if (element.data().hasOwnProperty('delete-confirm')) {
+        if (!confirm(element.data('delete-confirm'))) {
             return false;
         }
     }
@@ -508,7 +521,7 @@ function mblock_remove_item(element, item) {
         // unset sortable
         element.mblock_sortable("destory");
         // set prev item
-        var prevItem = item.prev();
+        let prevItem = item.prev();
         // is prev exist?
         if (!prevItem.hasClass('sortitem')) {
             prevItem = item.next(); // go to next
@@ -517,8 +530,8 @@ function mblock_remove_item(element, item) {
         mblock_module.affectedItem = item;
         // remove element
         item.remove();
-		// set last user action
-		mblock_module.lastAction = 'remove_item';
+        // set last user action
+        mblock_module.lastAction = 'remove_item';
         // reinit
         mblock_init_sort(element);
         // scroll to item
@@ -527,64 +540,54 @@ function mblock_remove_item(element, item) {
 }
 
 function mblock_moveup(element, item) {
-    var prev = item.prev();
-    if (prev.length == 0) return;
-    prev.css('z-index', 99).addClass('mblock_animate').css({'position': 'relative', 'top': item.outerHeight(true)});
-    item.css('z-index', 100).addClass('mblock_animate').css({'position': 'relative', 'top': -prev.outerHeight(true)});
+    let prev = item.prev();
+    if (prev.length === 0) return;
 
-    setTimeout(function () {
-        prev.removeClass('mblock_animate').css({'z-index': '', 'top': '', 'position': ''});
-        item.removeClass('mblock_animate').css({'z-index': '', 'top': '', 'position': ''});
+    // set currently affected item
+    mblock_module.affectedItem = item;
 
-        // set currently affected item
-        mblock_module.affectedItem = item;
-
-        item.insertBefore(prev);
-		// set last user action
-		mblock_module.lastAction = 'moveup';
-        mblock_reindex(element);
-        mblock_remove(element);
-    }, 150);
+    item.insertBefore(prev);
+    // set last user action
+    mblock_module.lastAction = 'moveup';
+    mblock_reindex(element);
+    mblock_remove(element);
 }
 
 function mblock_movedown(element, item) {
-    var next = item.next();
-    if (next.length == 0) return;
+    let next = item.next();
+    if (next.length === 0) return;
 
-    next.css('z-index', 99).addClass('mblock_animate').css({'position': 'relative', 'top': -item.outerHeight(true)});
-    item.css('z-index', 100).addClass('mblock_animate').css({'position': 'relative', 'top': next.outerHeight(true)});
+    // set currently affected item
+    mblock_module.affectedItem = item;
 
-    setTimeout(function () {
-        next.removeClass('mblock_animate').css({'z-index': '', 'top': '', 'position': ''});
-        item.removeClass('mblock_animate').css({'z-index': '', 'top': '', 'position': ''});
-
-        // set currently affected item
-        mblock_module.affectedItem = item;
-
-        item.insertAfter(next);
-		// set last user action
-		mblock_module.lastAction = 'movedown';
-        mblock_reindex(element);
-        mblock_remove(element);
-    }, 150);
+    item.insertAfter(next);
+    // set last user action
+    mblock_module.lastAction = 'movedown';
+    mblock_reindex(element);
+    mblock_remove(element);
 }
 
 function mblock_scroll(element, item) {
-    if (element.data().hasOwnProperty('smooth_scroll')) {
-        if (element.data('smooth_scroll') == true) {
-            $.mblockSmoothScroll({
-                scrollTarget: item,
-                speed: 500
-            });
-        }
+    if (element.data('smooth-scroll') === 1) {
+        let scrolling_delay = (element.data('smooth-scroll-delay') > 0) ? element.data('smooth-scroll-delay') : scroll_delay,
+            scrolling_speed = (element.data('smooth-scroll-speed') > 0) ? element.data('smooth-scroll-speed') : scroll_speed;
+        window.clearTimeout(timer);
+        timer = window.setTimeout(mblock_smooth_scroll_it(item, scrolling_speed), scrolling_delay, clearTimeout(timer));
     }
+}
+
+function mblock_smooth_scroll_it(element, scrolling_speed) {
+    $.mblockSmoothScroll({
+        scrollTarget: element,
+        speed: scrolling_speed
+    });
 }
 
 function mblock_add(element) {
     element.find('> div .addme').unbind().bind('click', function () {
         if (!$(this).prop('disabled')) {
-            $item = $(this).parents('.sortitem');
-            element.attr('data-mblock_clicked_add_item',$item.attr('data-mblock_index'));
+            let $item = $(this).parents('.sortitem');
+            element.attr('data-mblock_clicked_add_item', $item.data('mblock-iterate-index'));
             mblock_add_item(element, $(this).closest('div[class^="sortitem"]'));
         }
         return false;
