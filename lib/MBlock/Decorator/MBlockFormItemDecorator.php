@@ -120,10 +120,26 @@ class MBlockFormItemDecorator
     {
         if (is_int($nestedCount)) {
             preg_match(self::PATTERN_NESTED, $element->getAttribute('name'), $matches);
-            if ($matches) $element->setAttribute('name', str_replace($matches[0], sprintf('%s[%d]%s[%d]', $matches[1], $nestedCount, $matches[3], $item->getItemId()), $element->getAttribute('name')));
+            if ($matches) {
+                $element->setAttribute('name', str_replace($matches[0], sprintf('%s[%d]%s[%d]', $matches[1], $nestedCount, $matches[3], $item->getItemId()), $element->getAttribute('name')));
+                $name = explode('[', $element->getAttribute('name'));
+                $element->setAttribute('data-name-value', $name[0]);
+                $element->setAttribute('data-value-id', str_replace(array('[', ']'), '', $matches[1]));
+                $element->setAttribute('data-parent-item-count', $nestedCount);
+                $element->setAttribute('data-group-value', str_replace(array('[', ']'), '', $matches[3]));
+                $element->setAttribute('data-item-count', str_replace(array('[', ']'), '', $item->getItemId()));
+                $element->setAttribute('data-item-value', str_replace(']', '', array_pop($name)));
+            }
         } else {
             preg_match(self::PATTERN, $element->getAttribute('name'), $matches);
-            if ($matches) $element->setAttribute('name', str_replace($matches[0], sprintf('%s[%d]', $matches[1], $item->getItemId()), $element->getAttribute('name')));
+            if ($matches) {
+                $element->setAttribute('name', str_replace($matches[0], sprintf('%s[%d]', $matches[1], $item->getItemId()), $element->getAttribute('name')));
+                $name = explode('[', $element->getAttribute('name'));
+                $element->setAttribute('data-name-value', $name[0]);
+                $element->setAttribute('data-value-id', str_replace(array('[', ']'), '', $matches[1]));
+                $element->setAttribute('data-item-count', $item->getItemId());
+                $element->setAttribute('data-item-value', str_replace(']', '', array_pop($name)));
+            }
         }
     }
 
