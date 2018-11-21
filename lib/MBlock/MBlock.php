@@ -1,7 +1,4 @@
 <?php
-
-use MBlock\Provider\MBlockValueProvider;
-
 /**
  * @author mail[at]joachim-doerr[dot]com Joachim Doerr
  * @package redaxo5
@@ -28,7 +25,7 @@ class MBlock
         }
     }
 
-    /**
+    /*
      * @param int|bool $id
      * @param string|MForm|mblock_rex_form|rex_yform $form
      * @param array $settings
@@ -38,15 +35,8 @@ class MBlock
     public static function show($id, $form, $settings = array(), $theme = null)
     {
         // set mblock theme
-        $theme = (!is_null($theme)) ? $theme : 'default'; // TODO by settings
+        $theme = (!is_null($theme)) ? $theme : 'default';
 
-        // TODO use mblock count as property
-
-        // session mblock count++
-        if (is_null(rex_session('mblock_count', 'integer', null))) {
-            // set mblock count is not exist
-            rex_set_session('mblock_count', 0);
-        }
         rex_set_session('mblock_count', rex_session('mblock_count') + 1);
 
         // init handler
