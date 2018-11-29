@@ -284,10 +284,11 @@ function mblock_add_item(element, item) {
         // unset sortable
         element.mblock_sortable("destroy");
 
-        // item.after(item[0].outerHTML);
-        // item.after(item.clone());
+        var iClone = element.find('> div.plain_sortitem > div').clone();
 
-        var iClone = element.find('> div.plain_sortitem div.sortitem').clone();
+        iClone.find('[data-mblock-class]').each(function(){
+            $(this).attr('class', $(this).data('mblock-class'));
+        });
 
         // fix for checkbox and radio bug
         iClone.find('input:radio, input:checkbox').each(function () {

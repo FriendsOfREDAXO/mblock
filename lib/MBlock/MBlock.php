@@ -167,7 +167,7 @@ class MBlock
             static::$output[] = self::createOutput($item, ($count + 1), $theme);
         }
 
-        $plainItem = '<div class="plain_sortitem">' . self::createOutput($plainItem,0) . '</div>';
+        $plainItem = '<div class="plain_sortitem">' . str_replace('class="', 'data-mblock-class="', self::createOutput($plainItem,0)) . '</div>';
 
         // wrap parsed form items
         $wrapper = new MBlockElement();
