@@ -1,10 +1,12 @@
 /**
  * Created by joachimdoerr on 30.07.16.
  */
-$(function () {
-    mblock_init();
-    $(document).on('pjax:end', function () {
-        mblock_init();
+
+let mblock = '.mblock_wrapper';
+
+$(document).on('rex:ready', function (e, container) {
+    container.find(mblock).each(function () {
+        mblock_init($(this));
     });
 });
 
@@ -145,9 +147,7 @@ function mblock_sort_it(element) {
 
 function mblock_reindex(element) {
 
-    var initredactor = false,
-        initmarkitup = false,
-        mblock_count = element.data('mblock_count');
+    var mblock_count = element.data('mblock_count');
 
     element.find('> div').each(function (index) {
         // find input elements
@@ -159,7 +159,7 @@ function mblock_reindex(element) {
             // For some browsers, `attr` is undefined; for others,
             // `attr` is false. Check for both.
             if (typeof attr !== typeof undefined && attr !== false) {
-                var value = attr.replace($(this).attr('name').match(/\]\[\d+\]\[/g), '][' + index + '][').replace('mblock_new_','');
+                var value = attr.replace($(this).attr('name').match(/\]\[\d+\]\[/g), '][' + index + '][').replace('mblock_new_', '');
                 $(this).attr('name', value);
             }
 
@@ -181,11 +181,11 @@ function mblock_reindex(element) {
 
             // select rex button
             if ($(this).prop("nodeName") == 'SELECT' && $(this).attr('id') && (
-                    $(this).attr('id').indexOf("REX_MEDIALIST_SELECT_") >= 0 ||
-                    $(this).attr('id').indexOf("REX_LINKLIST_SELECT_") >= 0
-                )) {
+                $(this).attr('id').indexOf("REX_MEDIALIST_SELECT_") >= 0 ||
+                $(this).attr('id').indexOf("REX_LINKLIST_SELECT_") >= 0
+            )) {
                 $(this).parent().data('eindex', eindex);
-                $(this).attr('id', $(this).attr('id').replace(/_\d+/, '_' + sindex + '' + mblock_count +   '00' + eindex));
+                $(this).attr('id', $(this).attr('id').replace(/_\d+/, '_' + sindex + '' + mblock_count + '00' + eindex));
                 if ($(this).attr('name') != undefined) {
                     $(this).attr('name', $(this).attr('name').replace(/_\d+/, '_' + sindex + '' + mblock_count + '00' + eindex));
                 }
@@ -193,9 +193,9 @@ function mblock_reindex(element) {
 
             // input rex button
             if ($(this).prop("nodeName") == 'INPUT' && $(this).attr('id') && (
-                    $(this).attr('id').indexOf("REX_LINKLIST_") >= 0 ||
-                    $(this).attr('id').indexOf("REX_MEDIALIST_") >= 0
-                )) {
+                $(this).attr('id').indexOf("REX_LINKLIST_") >= 0 ||
+                $(this).attr('id').indexOf("REX_MEDIALIST_") >= 0
+            )) {
                 if ($(this).parent().data('eindex')) {
                     eindex = $(this).parent().data('eindex');
                 }
@@ -210,9 +210,9 @@ function mblock_reindex(element) {
 
             // input rex button
             if ($(this).prop("nodeName") == 'INPUT' && $(this).attr('id') && (
-                    $(this).attr('id').indexOf("REX_LINK_") >= 0 ||
-                    $(this).attr('id').indexOf("REX_MEDIA_") >= 0
-                )) {
+                $(this).attr('id').indexOf("REX_LINK_") >= 0 ||
+                $(this).attr('id').indexOf("REX_MEDIA_") >= 0
+            )) {
                 if ($(this).attr('type') != 'hidden') {
                     if ($(this).parent().data('eindex')) {
                         eindex = $(this).parent().data('eindex');
@@ -294,86 +294,11 @@ function mblock_reindex(element) {
             customlink.attr('data-id', sindex + '' + mblock_count + '00' + eindex);
             if (typeof mform_custom_link === 'function') mform_custom_link(customlink);
         });
-
-        $(this).find('.redactor-box').each(function (key) {
-            initredactor = true;
-            eindex = key + 1;
-            sindex = index + 1;
-            $(this).find('textarea').each(function () {
-                if ($(this).attr('id')) {
-                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '' + mblock_count + '00' + eindex));
-                }
-            });
-        });
-
-        $(this).find('.markitup_markdown, .markitup_textile').each(function (key) {
-            initmarkitup = true;
-            eindex = key + 1;
-            sindex = index + 1;
-            $(this).find('textarea').each(function () {
-                if ($(this).attr('id')) {
-                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '' + mblock_count + '00' + eindex));
-                }
-            })
-        });
-
     });
 
-    if (initredactor) {
-
-        $('.redactor-box').each(function () {
-            var area;
-            var content = '';
-            $(this).find('div.redactor-in').each(function () {
-                if ($(this).attr('role')) {
-                    content = $(this).html();
-                }
-            });
-            $(this).find('textarea').each(function () {
-                var attr = $(this).attr('class');
-                if (typeof attr !== typeof undefined && attr !== false) {
-                    if ($(this).attr('class').indexOf("redactor") >= 0) {
-                        area = $(this).clone().css('display', 'block');
-                    }
-                }
-            });
-            if (typeof area === 'object') {
-                if (area.length) {
-                    $(this).parent().append(area);
-                    $(this).parent().find('textarea').val(content);
-                    $(this).remove();
-                }
-            }
-        });
-
-        if (typeof redactorInit === 'function') redactorInit();
-    }
-
-    if (initmarkitup) {
-
-        $('.markitup_markdown, .markitup_textile').each(function () {
-            var area;
-            $(this).find('textarea').each(function () {
-                area = $(this).clone();
-            });
-            if (typeof area === 'object') {
-                if (area.length) {
-                    area.removeClass('markItUpEditor').removeClass('markitupActive');
-                    $(this).parent().append(area);
-                    $(this).remove();
-                }
-            }
-        });
-
-        if (typeof markitupInit === 'function' && typeof autosize === 'function') {
-            markitupInit();
-            autosize($("textarea[class*=\'markitupEditor-\']"));
-        }
-
-    }
     // if not removing, sets "for" attribute for most elements to make them work properly
-    if(mblock_module.lastAction != 'remove_item') {
-	    mblock_replace_for(element);
+    if (mblock_module.lastAction != 'remove_item') {
+        mblock_replace_for(element);
     }
 
     mblock_module.executeRegisteredCallbacks('reindex_end');
@@ -384,19 +309,19 @@ function mblock_replace_for(element) {
     element.find(' > div').each(function (index) {
         var mblock = $(this);
         mblock.find('input:not(:checkbox):not(:radio),textarea,select').each(function (key) {
-            var el = $(this);
-            var id = el.attr('id');
-            if (typeof id !== typeof undefined && id !== false) {
+            var el = $(this),
+                id = el.attr('id'),
+                name = el.attr('name');
+            if ((typeof id !== typeof undefined && id !== false) && (typeof name !== typeof undefined && name !== false)) {
                 if (!(id.indexOf("REX_MEDIA") >= 0 ||
                     id.indexOf("REX_LINK") >= 0 ||
                     id.indexOf("redactor") >= 0 ||
                     id.indexOf("markitup") >= 0)
                 ) {
                     var label = mblock.find('label[for="' + id + '"]');
-                    var name = el.attr('name').replace(/(\[|\])/gm, '');
+                    name = name.replace(/(\[|\])/gm, '');
                     el.attr('id', name);
                     label.attr('for', name);
-
                 }
             }
         });
@@ -415,12 +340,12 @@ function mblock_add_item(element, item) {
         var iClone = item.clone();
 
         // fix for checkbox and radio bug
-        iClone.find('input:radio, input:checkbox').each(function(){
+        iClone.find('input:radio, input:checkbox').each(function () {
             $(this).parent().removeAttr('for');
         });
 
         // fix radio bug
-        iClone.find('input:radio, input:checkbox').each(function(){
+        iClone.find('input:radio, input:checkbox').each(function () {
             // fix lost checked from parent item
             $(this).attr('name', 'mblock_new_' + $(this).attr('name'));
             // fix lost value
@@ -441,8 +366,8 @@ function mblock_add_item(element, item) {
                 iClone.find('select').each(function () {
                     $(this).attr('data-selected', '');
                     if ($(this).attr('id') && ($(this).attr('id').indexOf("REX_MEDIALIST") >= 0
-                            || $(this).attr('id').indexOf("REX_LINKLIST") >= 0
-                        )) {
+                        || $(this).attr('id').indexOf("REX_LINKLIST") >= 0
+                    )) {
                         $(this).find('option').remove();
                     }
                 });
@@ -455,13 +380,16 @@ function mblock_add_item(element, item) {
         mblock_set_unique_id(iClone, true);
         // set count
         mblock_set_count(element, item);
-		// set last user action
-		mblock_module.lastAction = 'add_item';
+        // set last user action
+        mblock_module.lastAction = 'add_item';
         // reinit
         mblock_init_sort(element);
         // scroll to item
         mblock_scroll(element, iClone);
+        // trigger mblock events
         element.trigger('mblock:add', [element]);
+        // trigger rex ready
+        iClone.trigger('rex:ready', [iClone]);
     }
 }
 
@@ -517,8 +445,8 @@ function mblock_remove_item(element, item) {
         mblock_module.affectedItem = item;
         // remove element
         item.remove();
-		// set last user action
-		mblock_module.lastAction = 'remove_item';
+        // set last user action
+        mblock_module.lastAction = 'remove_item';
         // reinit
         mblock_init_sort(element);
         // scroll to item
@@ -529,19 +457,14 @@ function mblock_remove_item(element, item) {
 function mblock_moveup(element, item) {
     var prev = item.prev();
     if (prev.length == 0) return;
-    prev.css('z-index', 99).addClass('mblock_animate').css({'position': 'relative', 'top': item.outerHeight(true)});
-    item.css('z-index', 100).addClass('mblock_animate').css({'position': 'relative', 'top': -prev.outerHeight(true)});
 
     setTimeout(function () {
-        prev.removeClass('mblock_animate').css({'z-index': '', 'top': '', 'position': ''});
-        item.removeClass('mblock_animate').css({'z-index': '', 'top': '', 'position': ''});
-
         // set currently affected item
         mblock_module.affectedItem = item;
 
         item.insertBefore(prev);
-		// set last user action
-		mblock_module.lastAction = 'moveup';
+        // set last user action
+        mblock_module.lastAction = 'moveup';
         mblock_reindex(element);
         mblock_remove(element);
     }, 150);
@@ -551,19 +474,13 @@ function mblock_movedown(element, item) {
     var next = item.next();
     if (next.length == 0) return;
 
-    next.css('z-index', 99).addClass('mblock_animate').css({'position': 'relative', 'top': -item.outerHeight(true)});
-    item.css('z-index', 100).addClass('mblock_animate').css({'position': 'relative', 'top': next.outerHeight(true)});
-
     setTimeout(function () {
-        next.removeClass('mblock_animate').css({'z-index': '', 'top': '', 'position': ''});
-        item.removeClass('mblock_animate').css({'z-index': '', 'top': '', 'position': ''});
-
         // set currently affected item
         mblock_module.affectedItem = item;
 
         item.insertAfter(next);
-		// set last user action
-		mblock_module.lastAction = 'movedown';
+        // set last user action
+        mblock_module.lastAction = 'movedown';
         mblock_reindex(element);
         mblock_remove(element);
     }, 150);
@@ -584,7 +501,7 @@ function mblock_add(element) {
     element.find('> div .addme').unbind().bind('click', function () {
         if (!$(this).prop('disabled')) {
             $item = $(this).parents('.sortitem');
-            element.attr('data-mblock_clicked_add_item',$item.attr('data-mblock_index'));
+            element.attr('data-mblock_clicked_add_item', $item.attr('data-mblock_index'));
             mblock_add_item(element, $(this).closest('div[class^="sortitem"]'));
         }
         return false;
