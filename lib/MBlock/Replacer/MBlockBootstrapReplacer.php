@@ -77,7 +77,7 @@ class MBlockBootstrapReplacer
 
                 $next = $match->nextSibling;
 
-                if ($next->getAttribute('id') == $href) {
+                if ($next instanceof DOMElement && $next->hasAttribute('id') && $next->getAttribute('id') == $href) {
                     $next->setAttribute('id', $newHref);
                 }
 
