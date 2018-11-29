@@ -88,7 +88,7 @@ function mblock_sort(element) {
 }
 
 function mblock_remove(element) {
-    var finded = element.find('> div');
+    var finded = element.find('> div.sortitem');
 
     if (finded.length == 1) {
         finded.find('.removeme').prop('disabled', true);
@@ -149,7 +149,7 @@ function mblock_reindex(element) {
 
     var mblock_count = element.data('mblock_count');
 
-    element.find('> div').each(function (index) {
+    element.find('> div.sortitem').each(function (index) {
         // find input elements
         $(this).attr('data-mblock_index', (index + 1));
         $(this).find('input,textarea,select,button').each(function (key) {
@@ -306,7 +306,7 @@ function mblock_reindex(element) {
 
 function mblock_replace_for(element) {
 
-    element.find(' > div').each(function (index) {
+    element.find(' > div.sortitem').each(function (index) {
         var mblock = $(this);
         mblock.find('input:not(:checkbox):not(:radio),textarea,select').each(function (key) {
             var el = $(this),
@@ -337,7 +337,7 @@ function mblock_add_item(element, item) {
         // item.after(item[0].outerHTML);
         // item.after(item.clone());
 
-        var iClone = item.clone();
+        var iClone = element.find('> div.plain_sortitem div.sortitem').clone();
 
         // fix for checkbox and radio bug
         iClone.find('input:radio, input:checkbox').each(function () {
@@ -354,25 +354,6 @@ function mblock_add_item(element, item) {
 
         // add clone
         item.after(iClone);
-
-        // delete values
-        if (element.data().hasOwnProperty('input_delete')) {
-            if (element.data('input_delete') == true) {
-                iClone.find('div.redactor-in').html('');
-                iClone.find('input:not(.not_delete), textarea').val('');
-                iClone.find('textarea').html('');
-                iClone.find('option:selected').removeAttr("selected");
-                iClone.find('input:checked').removeAttr("checked");
-                iClone.find('select').each(function () {
-                    $(this).attr('data-selected', '');
-                    if ($(this).attr('id') && ($(this).attr('id').indexOf("REX_MEDIALIST") >= 0
-                        || $(this).attr('id').indexOf("REX_LINKLIST") >= 0
-                    )) {
-                        $(this).find('option').remove();
-                    }
-                });
-            }
-        }
 
         // set currently affected item
         mblock_module.affectedItem = iClone;
@@ -414,7 +395,7 @@ function mblock_set_unique_id(item, input_delete) {
 
 function mblock_set_count(element, item) {
     var countItem = item.next().find('span.mb_count'),
-        count = element.find('> div').length;
+        count = element.find('> div.sortitem').length;
 
     if (element.data('latest')) {
         count = element.data('latest') + 1;
@@ -498,7 +479,7 @@ function mblock_scroll(element, item) {
 }
 
 function mblock_add(element) {
-    element.find('> div .addme').unbind().bind('click', function () {
+    element.find('> div.sortitem .addme').unbind().bind('click', function () {
         if (!$(this).prop('disabled')) {
             $item = $(this).parents('.sortitem');
             element.attr('data-mblock_clicked_add_item', $item.attr('data-mblock_index'));
@@ -506,19 +487,19 @@ function mblock_add(element) {
         }
         return false;
     });
-    element.find('> div .removeme').unbind().bind('click', function () {
+    element.find('> div.sortitem .removeme').unbind().bind('click', function () {
         if (!$(this).prop('disabled')) {
             mblock_remove_item(element, $(this).closest('div[class^="sortitem"]'));
         }
         return false;
     });
-    element.find('> div .moveup').unbind().bind('click', function () {
+    element.find('> div.sortitem .moveup').unbind().bind('click', function () {
         if (!$(this).prop('disabled')) {
             mblock_moveup(element, $(this).closest('div[class^="sortitem"]'));
         }
         return false;
     });
-    element.find('> div .movedown').unbind().bind('click', function () {
+    element.find('> div.sortitem .movedown').unbind().bind('click', function () {
         if (!$(this).prop('disabled')) {
             mblock_movedown(element, $(this).closest('div[class^="sortitem"]'));
         }

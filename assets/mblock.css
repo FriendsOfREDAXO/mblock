@@ -63,10 +63,8 @@ div.sortable-ghost {
     zoom: 1
 }
 
-.mblock_animate {
-    -webkit-transition: opacity 249ms linear, top 149ms ease;
-    -moz-transition: opacity 249ms linear, top 149ms ease;
-    transition: opacity 249ms linear, top 149ms ease;
+.plain_sortitem {
+    display: none;
 }
 
 .panel.mblock-hidden-panel {
