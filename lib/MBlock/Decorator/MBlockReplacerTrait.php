@@ -20,13 +20,28 @@ trait MBlockDOMTrait
      */
     private static function createDom($html)
     {
-        // set phpquery document
         $dom = new DOMDocument();
-        $string = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
-        @$dom->loadHTML($string, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
+        $dom->loadHTML("<html xmlns=\"http://www.w3.org/1999/xhtml\"><body>$html</body></html>");
         $dom->preserveWhiteSpace = false;
-
         return $dom;
+    }
+
+    /**
+     * @param DOMDocument $dom
+     * @return string
+     * @author Joachim Doerr
+     */
+    private static function saveHtml(DOMDocument $dom)
+    {
+        $html = $dom->saveHTML();
+        if (strpos($html, '<body') !== false) {
+            preg_match("/<body>(.*)<\/body>/ism", $html, $matches);
+            if (isset($matches[1])) {
+                $html = $matches[1];
+            }
+        }
+        return $html;
     }
 
     /**

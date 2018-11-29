@@ -35,6 +35,6 @@ class MBlockCheckboxReplacer
         }
 
         // return the manipulated html output
-        return ($holderInput) ? '<input type="hidden" class="not_delete" name="' . $holderName . '" value="hold_block">' . $dom->saveHTML() : $dom->saveHTML();
+        return ($holderInput) ? '<input type="hidden" class="not_delete" name="' . $holderName . '" value="hold_block">' . self::saveHtml($dom) : self::saveHtml($dom);
     }
 }

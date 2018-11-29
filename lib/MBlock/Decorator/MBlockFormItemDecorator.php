@@ -89,7 +89,7 @@ class MBlockFormItemDecorator
         }
 
         // return the manipulated html output
-        return $dom->saveHTML();
+        return self::saveHtml($dom);
     }
 
     /**

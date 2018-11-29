@@ -48,7 +48,7 @@ class MBlockBootstrapReplacer
             }
         }
         // return the manipulated html output
-        return $dom->saveHTML();
+        return self::saveHtml($dom);
     }
 
     /**
@@ -89,6 +89,6 @@ class MBlockBootstrapReplacer
             }
         }
         // return the manipulated html output
-        return $dom->saveHTML();
+        return self::saveHtml($dom);
     }
 }

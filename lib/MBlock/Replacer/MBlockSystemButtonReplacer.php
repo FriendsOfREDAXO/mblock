@@ -49,7 +49,7 @@ class MBlockSystemButtonReplacer
             }
         }
         // return the manipulated html output
-        return $dom->saveHTML();
+        return self::saveHtml($dom);
     }
 
     /**
@@ -62,49 +62,49 @@ class MBlockSystemButtonReplacer
     {
         // set dom document
         $dom = self::createDom($item->getForm());
-        $item->addPayload('count-id', $count);
-        // find input group
-        if ($matches = self::getElementsByClass($dom, 'div.input-group')) {
-            /** @var DOMElement $match */
-            foreach ($matches as $key => $match) {
-                $item->addPayload('replace-id', $key);
-                if ($match->hasChildNodes()) {
-                    /** @var DOMElement $child */
-                    foreach ($match->getElementsByTagName('input') as $child) {
-                        if ($child instanceof DOMElement) { // && $child->getAttribute('type') == 'hidden') {
-                            // set id and name
-                            $id = $child->getAttribute('id');
-                            $name = $child->getAttribute('name');
-                            $type = $child->getAttribute('type');
-
-                            // process by type
-                            if (strpos($id, 'REX_MEDIA_') !== false && $type == 'text') {
-                                // media button
-                                self::processMedia($match, $item);
-                            }
-                            if (strpos($id, 'REX_MEDIALIST_') !== false) {
-                                // medialist button
-                                self::processMediaList($match, $item);
-                            }
-                            if (strpos($name, 'REX_LINK_') !== false && $type == 'text') {
-                                // link button
-                                if (strpos($match->getAttribute('class'), 'custom-link') !== false) {
-                                    self::processCustomLink($match, $item);
-                                } else {
-                                    self::processLink($match, $item);
-                                }
-                            }
-                            if (strpos($id, 'REX_LINKLIST_') !== false) {
-                                // linklist button
-                                self::processLinkList($match, $item);
-                            }
-                        }
-                    }
-                }
-            }
-        }
+//        $item->addPayload('count-id', $count);
+//        // find input group
+//        if ($matches = self::getElementsByClass($dom, 'div.input-group')) {
+//            /** @var DOMElement $match */
+//            foreach ($matches as $key => $match) {
+//                $item->addPayload('replace-id', $key);
+//                if ($match->hasChildNodes()) {
+//                    /** @var DOMElement $child */
+//                    foreach ($match->getElementsByTagName('input') as $child) {
+//                        if ($child instanceof DOMElement) { // && $child->getAttribute('type') == 'hidden') {
+//                            // set id and name
+//                            $id = $child->getAttribute('id');
+//                            $name = $child->getAttribute('name');
+//                            $type = $child->getAttribute('type');
+//
+//                            // process by type
+//                            if (strpos($id, 'REX_MEDIA_') !== false && $type == 'text') {
+//                                // media button
+//                                self::processMedia($match, $item);
+//                            }
+//                            if (strpos($id, 'REX_MEDIALIST_') !== false) {
+//                                // medialist button
+//                                self::processMediaList($match, $item);
+//                            }
+//                            if (strpos($name, 'REX_LINK_') !== false && $type == 'text') {
+//                                // link button
+//                                if (strpos($match->getAttribute('class'), 'custom-link') !== false) {
+//                                    self::processCustomLink($match, $item);
+//                                } else {
+//                                    self::processLink($match, $item);
+//                                }
+//                            }
+//                            if (strpos($id, 'REX_LINKLIST_') !== false) {
+//                                // linklist button
+//                                self::processLinkList($match, $item);
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
         // return the manipulated html output
-        return $dom->saveHTML();
+        return self::saveHtml($dom);
     }
 
     /**
