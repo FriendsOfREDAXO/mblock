@@ -2,7 +2,7 @@
 
 ### Version 2.3.0
 
-* add saveHtml method to traid and remove @ by load html 
+* add saveHtml method to traid and remove libxml special
 * use saveHtml from traid in replacer and decorator classes
 * use for iclone item a hidden sortitem containter
 * use rex:ready by add block

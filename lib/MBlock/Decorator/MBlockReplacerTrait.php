@@ -22,7 +22,7 @@ trait MBlockDOMTrait
     {
         $dom = new DOMDocument();
         $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
-        $dom->loadHTML("<html xmlns=\"http://www.w3.org/1999/xhtml\"><body>$html</body></html>");
+        @$dom->loadHTML("<html xmlns=\"http://www.w3.org/1999/xhtml\"><body>$html</body></html>");
         $dom->preserveWhiteSpace = false;
         return $dom;
     }
