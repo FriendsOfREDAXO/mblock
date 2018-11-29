@@ -121,6 +121,14 @@ class MBlock
             }
         }
 
+        // crate plain element
+        $plainItem = new MBlockItem();
+        $plainItem->setId(0)
+            ->setValueId($id)
+            ->setResult(array())
+            ->setForm($form)
+            ->addPayload('plain_item', true);
+
         // is loaded
         if (array_key_exists('value', self::$result) && is_array(self::$result['value'][$id])) {
             // item result to item
@@ -141,6 +149,7 @@ class MBlock
             }
         }
 
+        // create first element
         // don't loaded?
         if (!self::$items) {
             // set plain item for add
@@ -155,43 +164,14 @@ class MBlock
         // foreach rex value json items
         /** @var MBlockItem $item */
         foreach (static::$items as $count => $item) {
-            // replace system button data
-            $item->setForm(MBlockSystemButtonReplacer::replaceSystemButtons($item, ($count + 1)));
-            $item->setForm(MBlockCountReplacer::replaceCountKeys($item, ($count + 1)));
-            $item->setForm(MBlockBootstrapReplacer::replaceTabIds($item, ($count + 1)));
-            $item->setForm(MBlockBootstrapReplacer::replaceCollapseIds($item, ($count + 1)));
-
-            // decorate item form
-            if ($item->getResult()) {
-                $item->setForm(MBlockFormItemDecorator::decorateFormItem($item));
-                // custom link hidden to text
-                $item->setForm(MBlockSystemButtonReplacer::replaceCustomLinkText($item));
-            }
-
-            // set only checkbox block holder
-            $item->setForm(MBlockCheckboxReplacer::replaceCheckboxesBlockHolder($item, ($count + 1)));
-
-            // parse form item
-            $element = new MBlockElement();
-            $element->setForm($item->getForm())
-                ->setIndex(($count + 1));
-
-            // parse element to output
-            $output = MBlockParser::parseElement($element, 'element', $theme);
-
-            // fix & error
-            foreach ($item->getResult() as $result) {
-                if (is_array($result) && array_key_exists('id', $result)) {
-                    $output = str_replace($result['id'], $result['value'], $output);
-                }
-            }
-            // add to output
-            static::$output[] = $output;
+            static::$output[] = self::createOutput($item, ($count + 1), $theme);
         }
+
+        $plainItem = '<div class="plain_sortitem">' . self::createOutput($plainItem,0) . '</div>';
 
         // wrap parsed form items
         $wrapper = new MBlockElement();
-        $wrapper->setOutput(implode('', static::$output))
+        $wrapper->setOutput($plainItem . implode('', static::$output))
             ->setSettings(MBlockSettingsHelper::getSettings($settings));
 
         // return wrapped from elements
@@ -222,6 +202,48 @@ class MBlock
         self::reset();
 
         // return output
+        return $output;
+    }
+
+    /**
+     * @param MBlockItem $item
+     * @param $count
+     * @param null $theme
+     * @return mixed
+     * @author Joachim Doerr
+     */
+    private static function createOutput(MBlockItem $item, $count, $theme = null)
+    {
+        $item->setForm(MBlockSystemButtonReplacer::replaceSystemButtons($item, $count));
+        $item->setForm(MBlockCountReplacer::replaceCountKeys($item, $count));
+        $item->setForm(MBlockBootstrapReplacer::replaceTabIds($item, $count));
+        $item->setForm(MBlockBootstrapReplacer::replaceCollapseIds($item, $count));
+
+        // decorate item form
+        if ($item->getResult()) {
+            $item->setForm(MBlockFormItemDecorator::decorateFormItem($item));
+            // custom link hidden to text
+            $item->setForm(MBlockSystemButtonReplacer::replaceCustomLinkText($item));
+        }
+
+        // set only checkbox block holder
+        $item->setForm(MBlockCheckboxReplacer::replaceCheckboxesBlockHolder($item, $count));
+
+        // parse form item
+        $element = new MBlockElement();
+        $element->setForm($item->getForm())
+            ->setIndex($count);
+
+        // parse element to output
+        $output = MBlockParser::parseElement($element, 'element', $theme);
+
+        // fix & error
+        foreach ($item->getResult() as $result) {
+            if (is_array($result) && array_key_exists('id', $result)) {
+                $output = str_replace($result['id'], $result['value'], $output);
+            }
+        }
+
         return $output;
     }
 
