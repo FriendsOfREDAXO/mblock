@@ -167,12 +167,12 @@ class MBlock
             static::$output[] = self::createOutput($item, ($count + 1), $theme);
         }
 
-        $plainItem = '<div class="plain_sortitem">' . str_replace('class="', 'data-mblock-class="', self::createOutput($plainItem,0)) . '</div>';
+        $plainItem = rex_escape( self::createOutput($plainItem,0));
 
         // wrap parsed form items
         $wrapper = new MBlockElement();
-        $wrapper->setOutput($plainItem . implode('', static::$output))
-            ->setSettings(MBlockSettingsHelper::getSettings($settings));
+        $wrapper->setOutput(implode('', static::$output))
+            ->setSettings(MBlockSettingsHelper::getSettings(array_merge($settings, ['mblock-plain-sortitem' => $plainItem])));
 
         // return wrapped from elements
         $output = MBlockParser::parseElement($wrapper, 'wrapper', $theme);

@@ -7,6 +7,7 @@
 * use for iclone item a hidden sortitem containter
 * use rex:ready by add block
 * remove all mblock callback events
+* fix `Call to a member function getAttribute() on null` bug in bootstrap replacer
 
 ### Version 2.2.3
 
