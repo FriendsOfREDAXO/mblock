@@ -286,6 +286,7 @@ function mblock_add_item(element, item) {
 
         var iClone = element.find('> div.plain_sortitem > div').clone();
 
+        iClone.attr('class', iClone.data('mblock-class'));
         iClone.find('[data-mblock-class]').each(function(){
             $(this).attr('class', $(this).data('mblock-class'));
         });
