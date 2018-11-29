@@ -1,5 +1,11 @@
 # MBlock - REDAXO Addon für Modul-Input-Blöcke
 
+### Version 2.3.0
+
+* use for iclone item a hidden sortitem containter
+* use rex:ready by add block
+* remove all mblock callback events
+
 ### Version 2.2.3
 
 * Installfix for 2.2.2
