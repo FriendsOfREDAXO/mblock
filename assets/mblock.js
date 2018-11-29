@@ -10,48 +10,6 @@ $(document).on('rex:ready', function (e, container) {
     });
 });
 
-var mblock_module = (function () {
-    var callbacks = {
-        remove_item_start: [],
-        add_item_start: [],
-        reindex_end: [],
-        lastAction: ''
-    };
-    var mod = {};
-
-    mod.affectedItem = {};
-
-    // Register a callback
-    // @input evnt string name of the event
-    // @input f function callback
-    // @output void
-    mod.registerCallback = function (evnt, f) {
-        callbacks[evnt].push(f);
-    };
-
-    // @input evnt string name of the event
-    // @output []function
-    mod.getRegisteredCallbacks = function (evnt) {
-        if (typeof callbacks[evnt] === 'undefined') {
-            return [];
-        }
-        else {
-            return callbacks[evnt];
-        }
-    };
-
-    // @input evnt string name of the event
-    // @output void
-    mod.executeRegisteredCallbacks = function (evnt) {
-        var list = mod.getRegisteredCallbacks(evnt);
-        for (var i = 0; i < list.length; i++) {
-            list[i](evnt == 'reindex_end' && mod.affectedItem);
-        }
-    };
-
-    return mod;
-})();
-
 function mblock_init() {
     var mblock = $('.mblock_wrapper');
     // init by siteload
@@ -138,8 +96,6 @@ function mblock_sort_it(element) {
         handle: '.sorthandle',
         animation: 150,
         onEnd: function (event) {
-            mblock_module.lastAction = 'sort';
-            mblock_module.affectedItem = $(event.item);
             mblock_reindex(element);
         }
     });
@@ -296,17 +252,12 @@ function mblock_reindex(element) {
         });
     });
 
-    // if not removing, sets "for" attribute for most elements to make them work properly
-    if (mblock_module.lastAction != 'remove_item') {
-        mblock_replace_for(element);
-    }
-
-    mblock_module.executeRegisteredCallbacks('reindex_end');
+    mblock_replace_for(element);
 }
 
 function mblock_replace_for(element) {
 
-    element.find(' > div.sortitem').each(function (index) {
+    element.find('> div.sortitem').each(function (index) {
         var mblock = $(this);
         mblock.find('input:not(:checkbox):not(:radio),textarea,select').each(function (key) {
             var el = $(this),
@@ -329,7 +280,6 @@ function mblock_replace_for(element) {
 }
 
 function mblock_add_item(element, item) {
-    mblock_module.executeRegisteredCallbacks('add_item_start');
     if (item.parent().hasClass(element.attr('class'))) {
         // unset sortable
         element.mblock_sortable("destroy");
@@ -355,20 +305,13 @@ function mblock_add_item(element, item) {
         // add clone
         item.after(iClone);
 
-        // set currently affected item
-        mblock_module.affectedItem = iClone;
-
         mblock_set_unique_id(iClone, true);
         // set count
         mblock_set_count(element, item);
-        // set last user action
-        mblock_module.lastAction = 'add_item';
         // reinit
         mblock_init_sort(element);
         // scroll to item
         mblock_scroll(element, iClone);
-        // trigger mblock events
-        element.trigger('mblock:add', [element]);
         // trigger rex ready
         iClone.trigger('rex:ready', [iClone]);
     }
@@ -406,7 +349,6 @@ function mblock_set_count(element, item) {
 }
 
 function mblock_remove_item(element, item) {
-    mblock_module.executeRegisteredCallbacks('remove_item_start');
     if (element.data().hasOwnProperty('delete_confirm')) {
         if (!confirm(element.data('delete_confirm'))) {
             return false;
@@ -422,12 +364,8 @@ function mblock_remove_item(element, item) {
         if (!prevItem.hasClass('sortitem')) {
             prevItem = item.next(); // go to next
         }
-        // set currently affected item
-        mblock_module.affectedItem = item;
         // remove element
         item.remove();
-        // set last user action
-        mblock_module.lastAction = 'remove_item';
         // reinit
         mblock_init_sort(element);
         // scroll to item
@@ -440,12 +378,8 @@ function mblock_moveup(element, item) {
     if (prev.length == 0) return;
 
     setTimeout(function () {
-        // set currently affected item
-        mblock_module.affectedItem = item;
-
         item.insertBefore(prev);
         // set last user action
-        mblock_module.lastAction = 'moveup';
         mblock_reindex(element);
         mblock_remove(element);
     }, 150);
@@ -456,12 +390,8 @@ function mblock_movedown(element, item) {
     if (next.length == 0) return;
 
     setTimeout(function () {
-        // set currently affected item
-        mblock_module.affectedItem = item;
-
         item.insertAfter(next);
         // set last user action
-        mblock_module.lastAction = 'movedown';
         mblock_reindex(element);
         mblock_remove(element);
     }, 150);
