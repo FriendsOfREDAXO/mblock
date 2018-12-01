@@ -157,7 +157,9 @@ class MBlockFormItemDecorator
             switch ($element->nodeName) {
                 default:
                 case 'select':
-                    if ($matches && array_key_exists($matches[1], $item->getResult())) $element->setAttribute('data-selected', $item->getResult()[$matches[1]]);
+                    if ($matches && array_key_exists($matches[1], $item->getResult()) && !$element->hasAttribute('multiple')) {
+                        $element->setAttribute('data-selected', $item->getResult()[$matches[1]]);
+                    }
                     break;
             }
         }
