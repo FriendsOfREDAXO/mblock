@@ -9,14 +9,13 @@
 * remove all mblock callback events
 * fix `Call to a member function getAttribute() on null` bug in bootstrap replacer
 * added initial_hidden option for initial without formular element, it will be add only a [+] button
+* added initial_button_text optional
     ```
     <?php
-    
     $mform = new MForm();
     $mform->addFieldset('Text');
     $mform->addTextField('1.0.1', ['label' => 'Text']);
-    
-    echo MBlock::show(1, $mform->show(), ['initial_hidden' => 1, 'min' => 0]);
+    echo MBlock::show(1, $mform->show(), ['initial_hidden' => 1, 'min' => 0, 'initial_button_text' => 'Press [+] to create MBlock']);
     ```
 
 ### Version 2.2.3

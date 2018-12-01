@@ -168,8 +168,9 @@ class MBlock
             static::$output[] = self::createOutput($item, ($count + 1), $theme);
         }
 
-        $addItem = rex_escape('<div class="mblock-single-add"><span class="singleadded"><button type="button" class="btn btn-default addme" title="duplicate"><i class="rex-icon rex-icon-add-module"></i></button></span></div>');
-        $plainItem = rex_escape( self::createOutput($plainItem,0));
+        $addText = (isset($settings['initial_button_text'])) ? ' ' . $settings['initial_button_text'] : '';
+        $addItem = rex_escape('<div class="mblock-single-add"><span class="singleadded"><button type="button" class="btn btn-default addme" title="duplicate"><i class="rex-icon rex-icon-add-module"></i>' . $addText . '</button></span></div>');
+        $plainItem = rex_escape(self::createOutput($plainItem, 0));
 
         // wrap parsed form items
         $wrapper = new MBlockElement();
