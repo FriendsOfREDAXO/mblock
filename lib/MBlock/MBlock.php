@@ -151,7 +151,7 @@ class MBlock
 
         // create first element
         // don't loaded?
-        if (!self::$items) {
+        if (!self::$items && (!isset($settings['initial_hidden']) or $settings['initial_hidden'] != 1)) {
             // set plain item for add
             $plain = true;
             self::$items[0] = new MBlockItem();
@@ -161,18 +161,20 @@ class MBlock
                 ->setForm($form);
         }
 
+
         // foreach rex value json items
         /** @var MBlockItem $item */
         foreach (static::$items as $count => $item) {
             static::$output[] = self::createOutput($item, ($count + 1), $theme);
         }
 
+        $addItem = rex_escape('<div class="mblock-single-add"><span class="singleadded"><button type="button" class="btn btn-default addme" title="duplicate"><i class="rex-icon rex-icon-add-module"></i></button></span></div>');
         $plainItem = rex_escape( self::createOutput($plainItem,0));
 
         // wrap parsed form items
         $wrapper = new MBlockElement();
         $wrapper->setOutput(implode('', static::$output))
-            ->setSettings(MBlockSettingsHelper::getSettings(array_merge($settings, ['mblock-plain-sortitem' => $plainItem])));
+            ->setSettings(MBlockSettingsHelper::getSettings(array_merge($settings, ['mblock-plain-sortitem' => $plainItem, 'mblock-single-add' => $addItem])));
 
         // return wrapped from elements
         $output = MBlockParser::parseElement($wrapper, 'wrapper', $theme);

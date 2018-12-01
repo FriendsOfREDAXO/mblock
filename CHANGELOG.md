@@ -8,6 +8,16 @@
 * use rex:ready by add block
 * remove all mblock callback events
 * fix `Call to a member function getAttribute() on null` bug in bootstrap replacer
+* added initial_hidden option for initial without formular element, it will be add only a [+] button
+    ```
+    <?php
+    
+    $mform = new MForm();
+    $mform->addFieldset('Text');
+    $mform->addTextField('1.0.1', ['label' => 'Text']);
+    
+    echo MBlock::show(1, $mform->show(), ['initial_hidden' => 1, 'min' => 0]);
+    ```
 
 ### Version 2.2.3
 
