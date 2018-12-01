@@ -11,7 +11,6 @@ class MBlockFormItemDecorator
 
     /**
      * @param MBlockItem $item
-     * @param bool $valueEmpty
      * @return String
      * @author Joachim Doerr
      */
