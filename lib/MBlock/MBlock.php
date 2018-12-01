@@ -170,7 +170,7 @@ class MBlock
 
         $addText = (isset($settings['initial_button_text'])) ? ' ' . $settings['initial_button_text'] : '';
         $addItem = rex_escape('<div class="mblock-single-add"><span class="singleadded"><button type="button" class="btn btn-default addme" title="duplicate"><i class="rex-icon rex-icon-add-module"></i>' . $addText . '</button></span></div>');
-        $plainItem = rex_escape(self::createOutput($plainItem, 0));
+        $plainItem = rex_escape(self::createOutput($plainItem, 0, $theme));
 
         // wrap parsed form items
         $wrapper = new MBlockElement();
@@ -227,6 +227,9 @@ class MBlock
             $item->setForm(MBlockFormItemDecorator::decorateFormItem($item));
             // custom link hidden to text
             $item->setForm(MBlockSystemButtonReplacer::replaceCustomLinkText($item));
+        } else {
+            // no result set values to empty!
+            $item->setForm(MBlockValueReplacer::replaceValueSetEmpty($item));
         }
 
         // set only checkbox block holder

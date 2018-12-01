@@ -11,6 +11,7 @@ class MBlockFormItemDecorator
 
     /**
      * @param MBlockItem $item
+     * @param bool $valueEmpty
      * @return String
      * @author Joachim Doerr
      */
@@ -78,7 +79,7 @@ class MBlockFormItemDecorator
                                     self::replaceOptionSelect($match, $nodeChild, $item);
                                 break;
                             case 'option':
-                                if(isset($child->tagName)) {
+                                if (isset($child->tagName)) {
                                     self::replaceOptionSelect($match, $child, $item);
                                     break;
                                 }
@@ -107,9 +108,10 @@ class MBlockFormItemDecorator
     /**
      * @param DOMElement $element
      * @param MBlockItem $item
+     * @param bool $valueEmpty
      * @author Joachim Doerr
      */
-    protected static function replaceValue(DOMElement $element, MBlockItem $item)
+    protected static function replaceValue(DOMElement $element, MBlockItem $item, $valueEmpty = false)
     {
         // get value key by name
         $matches = self::getName($element);
@@ -120,21 +122,32 @@ class MBlockFormItemDecorator
             switch ($element->nodeName) {
                 default:
                 case 'input':
-                    if ($matches && array_key_exists($matches[1], $item->getResult())) $element->setAttribute('value', $item->getResult()[$matches[1]]);
+                    if ($matches && array_key_exists($matches[1], $item->getResult())) {
+                        $element->setAttribute('value', $item->getResult()[$matches[1]]);
+                    }
+                    // set default value or empty it
+                    if ($valueEmpty) {
+                        $element->setAttribute('value', ($element->hasAttribute('data-default-value')) ? $element->getAttribute('data-default-value') : '');
+                    }
                     break;
                 case 'textarea':
                     if ($matches && array_key_exists($matches[1], $item->getResult())) {
                         $result = $item->getResult();
-                        $id = uniqid(md5(rand(1000,9999)),true);
+                        $id = uniqid(md5(rand(1000, 9999)), true);
                         // node value cannot contains &
                         // so set a unique id there we replace later with the right value
                         $element->nodeValue = $id;
 
+                        $valueResult = $result[$matches[1]];
+
                         // add the id to the result value
-                        $result[$matches[1]] = array('id'=>$id, 'value'=>$result[$matches[1]]);
+                        $result[$matches[1]] = array('id' => $id, 'value' => $valueResult);
 
                         // reset result
                         $item->setResult($result);
+                    }
+                    if ($valueEmpty) {
+                        $element->nodeValue = ($element->hasAttribute('data-default-value')) ? $element->getAttribute('data-default-value') : '';
                     }
                     break;
             }
@@ -158,7 +171,7 @@ class MBlockFormItemDecorator
                 default:
                 case 'select':
                     if ($matches && array_key_exists($matches[1], $item->getResult())) {
-                        $element->setAttribute('data-selected', (!$element->hasAttribute('multiple')) ? $item->getResult()[$matches[1]] : rex_escape(json_encode($item->getResult()[$matches[1]])),'html_attr');
+                        $element->setAttribute('data-selected', (!$element->hasAttribute('multiple')) ? $item->getResult()[$matches[1]] : rex_escape(json_encode($item->getResult()[$matches[1]])), 'html_attr');
                     }
                     break;
             }
@@ -211,7 +224,7 @@ class MBlockFormItemDecorator
                 if (is_array($item->getResult()[$matches[1]])) {
                     $values = $item->getResult()[$matches[1]];
                 } else {
-                    $values = explode(',',$item->getResult()[$matches[1]]);
+                    $values = explode(',', $item->getResult()[$matches[1]]);
                 }
 
                 foreach ($values as $value) {
@@ -241,7 +254,7 @@ class MBlockFormItemDecorator
             return false;
         }
 
-        $id = preg_replace('/(_\d+){2}/i', '_' . $item->getId(), str_replace('-','_', $elementId));
+        $id = preg_replace('/(_\d+){2}/i', '_' . $item->getId(), str_replace('-', '_', $elementId));
         $element->setAttribute('id', $id);
         // find label with for
         $matches = $dom->getElementsByTagName('label');
@@ -265,7 +278,7 @@ class MBlockFormItemDecorator
      */
     public static function getName(DOMElement $element)
     {
-        preg_match('/^.*?\[(\w+)\]$/i', str_replace('[]','',$element->getAttribute('name')), $matches);
+        preg_match('/^.*?\[(\w+)\]$/i', str_replace('[]', '', $element->getAttribute('name')), $matches);
         return $matches;
     }
 }
