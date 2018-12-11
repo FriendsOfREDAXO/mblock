@@ -23,7 +23,7 @@ if ($func == '') {
     $select = array_merge($select, array('status'));
 
     // instance list
-    $list = rex_list::factory("SELECT * FROM rex_mblock_rexform_demo ORDER BY id");
+    $list = rex_list::factory("SELECT * FROM ".rex::getTable('mblock_rexform_demo')." ORDER BY id");
     $list->addTableAttribute('class', 'table-striped');
 
     // merge group with default
