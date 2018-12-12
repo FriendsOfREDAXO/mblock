@@ -52,7 +52,7 @@ if ($func == '') {
 } elseif ($func == 'edit' || $func == 'add') {
 
     $id = rex_request('id', 'int');
-    $form = mblock_rex_form::factory('rex_mblock_rexform_demo', '', 'id=' . $id);
+    $form = mblock_rex_form::factory(rex::getTable('mblock_rexform_demo'), '', 'id=' . $id);
     $form->addParam('start', $start);
     if ($func == 'edit') $form->addParam('id', $id);
 
@@ -60,7 +60,7 @@ if ($func == '') {
     $field = $form->addTextField('Name');
     $field->setLabel('name');
 
-    $nf = mblock_rex_form::factory('rex_mblock_rexform_demo', '', 'id=' . $id);
+    $nf = mblock_rex_form::factory(rex::getTable('mblock_rexform_demo'), '', 'id=' . $id);
 
     $element = $nf->addRawField('<br>');
     $element1 = $nf->addTextField('mblock_field][attr_type][0][test');
@@ -68,7 +68,7 @@ if ($func == '') {
     $element2 = $nf->addTextField('mblock_field][attr_type][0][test2');
     $element2->setLabel('Feld 2');
 
-    $form->addRawField(mblock::show('rex_mblock_rexform_demo::mblock_field::attr_type', $nf->getElements()));
+    $form->addRawField(mblock::show(rex::getTable('mblock_rexform_demo').'::mblock_field::attr_type', $nf->getElements()));
 
     // show
     $content = $form->get();
