@@ -10,6 +10,7 @@ class MBlockValueHandler
     /**
      * @return array
      * @author Joachim Doerr
+     * @throws rex_sql_exception
      */
     public static function loadRexVars()
     {
@@ -60,6 +61,7 @@ class MBlockValueHandler
      * @param null|int $id
      * @return array
      * @author Joachim Doerr
+     * @throws rex_sql_exception
      */
     public static function loadFromTable($table, $id = 0)
     {

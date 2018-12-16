@@ -41,6 +41,7 @@ class MBlock
      * @param array $settings
      * @param null $theme
      * @return mixed
+     * @throws rex_sql_exception
      */
     public static function show($id, $form, $settings = array(), $theme = null)
     {
