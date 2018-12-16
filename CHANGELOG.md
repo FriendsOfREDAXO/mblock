@@ -2,15 +2,16 @@
 
 ### Version 2.3.0
 
-* add saveHtml method to traid and remove libxml special
-* use saveHtml from traid in replacer and decorator classes
-* use for iclone item a hidden sortitem containter
+* add saveHtml method to trait and remove libxml special
+* use saveHtml from trait in replacer and decorator classes
+* use for iclone item a hidden sortitem container
 * use rex:ready by add block
 * remove all mblock callback events
 * fix `Call to a member function getAttribute() on null` bug in bootstrap replacer
 * fix bug by multiple selects `DOMElement::setAttribute() expects parameter 2 to be string, array given`
 * fix `Invalid argument supplied for foreach()` issue in `MBlockRexFormProcessor.php`
-* added initial_hidden option for initial without formular element, it will be add only a [+] button
+* added initial_hidden option for initial without form element, it will be add only a [+] button
+* remove default option, empty form content by duplication 
 * added initial_button_text optional
     ```
     <?php

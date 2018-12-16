@@ -34,10 +34,7 @@ mblock_example_description_base = Beispiele, die zeigen, wie mehrfache Blöcke i
 mblock_example_description_html = Die folgende Beispiele zeigen, wie ohne MForm, mehrfache Blöcke innerhalb eines Moduls erzeugt werden können.
 
 mblock_defaults = Einstellungen
-mblock_delete = Formularinhalte beim Duplizieren von Datenblöcken entfernen
-mblock_not_delete = Formularinhalte beim Duplizieren von Datenblöcken übernehmen
 mblock_theme_options = Theme-Optionen
-mblock_delete_label = Formularinhalte
 mblock_scroll = SmoothScroll aktiviert
 mblock_not_scroll = SmoothScroll deaktiviert
 mblock_scroll_label = SmoothScroll

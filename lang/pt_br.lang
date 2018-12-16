@@ -34,10 +34,7 @@ mblock_example_description_base = Exemplos que demonstram como configurar vário
 mblock_example_description_html = Os exemplos a seguir demonstram como configurar vários blocos dentro de um único módulo, sem MForm.
 
 mblock_defaults = Configurações
-mblock_delete = Remover conteúdo do formulário ao duplicar blocos de dados
-mblock_not_delete = Manter conteúdo de formulário ao duplicar blocos de dados
 mblock_theme_options = Opções de tema
-mblock_delete_label = Conteúdo do formulário
 mblock_scroll = SmoothScroll ativado
 mblock_not_scroll = SmoothScroll desativado
 mblock_scroll_label = SmoothScrool

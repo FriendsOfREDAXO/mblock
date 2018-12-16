@@ -34,10 +34,7 @@ mblock_example_description_base = Ejemplos que muestran cómo se pueden crear m�
 mblock_example_description_html = Los siguientes ejemplos muestran cómo, sin MForm, se pueden crear múltiples bloques dentro de un módulo.
 
 mblock_defaults = Ajustes
-mblock_delete = Eliminar contenido del formulario al duplicar bloques de datos
-mblock_not_delete = Transferir contenidos del formulario al duplicar bloques de datos
 mblock_theme_options = Opciones del tema
-mblock_delete_label = Contenido del formulario
 mblock_scroll = Desplazamiento habilitado
 mblock_not_scroll = Desplazamiento deshabilitado
 mblock_scroll_label = Desplazamiento suave

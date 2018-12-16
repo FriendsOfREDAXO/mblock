@@ -34,10 +34,7 @@ mblock_example_description_base = Examples that demonstrate how to set up multip
 mblock_example_description_html = The follow examples demonstrate how to set up multiple block within a single module, without MForm.
 
 mblock_defaults = Settings
-mblock_delete = Remove form content when duplicating data blocks
-mblock_not_delete = Hold form content when duplicating data blocks
 mblock_theme_options = Theme settings
-mblock_delete_label = Form content
 mblock_scroll = SmoothScroll enabled
 mblock_not_scroll = SmoothScroll disabled
 mblock_scroll_label = SmoothScroll

@@ -76,29 +76,6 @@ $form .= $fragment->parse('core/form/form.php');
 $formElements = array();
 $elements = array();
 $elements['label'] = '
-  <label for="rex-mblock-config-delete-label">' . rex_i18n::msg('mblock_delete_label') . '</label>
-';
-// create select
-$select = new rex_select;
-$select->setId('rex-mblock-config-delete-label');
-$select->setSize(1);
-$select->setAttribute('class', 'form-control');
-$select->setName('config[mblock_delete]');
-// add options
-$select->addOption(rex_i18n::msg('mblock_not_delete'), 0);
-$select->addOption(rex_i18n::msg('mblock_delete'), 1);
-$select->setSelected($this->getConfig('mblock_delete'));
-$elements['field'] = $select->get();
-$formElements[] = $elements;
-// parse select element
-$fragment = new rex_fragment();
-$fragment->setVar('elements', $formElements, false);
-$form .= $fragment->parse('core/form/form.php');
-
-// label
-$formElements = array();
-$elements = array();
-$elements['label'] = '
   <label for="rex-mblock-config-scroll-label">' . rex_i18n::msg('mblock_scroll_label') . '</label>
 ';
 // create select

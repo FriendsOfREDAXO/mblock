@@ -34,10 +34,7 @@ mblock_example_description_base = Exempel som visar hur man generera flera block
 mblock_example_description_html = Följande exempel visar hur man generera flera block i en enda modul, utan MForm.
 
 mblock_defaults = Inställningar
-mblock_delete = Remove form content when duplicating data blocks
-mblock_not_delete = Hold form content when duplicating data blocks
 mblock_theme_options = Theme settings
-mblock_delete_label = Form content
 mblock_scroll = SmoothScroll aktiverat
 mblock_not_scroll = SmoothScroll deaktiverat
 mblock_scroll_label = SmoothScroll
