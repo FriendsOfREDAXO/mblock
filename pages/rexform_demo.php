@@ -57,16 +57,19 @@ if ($func == '') {
     if ($func == 'edit') $form->addParam('id', $id);
 
     // add text.
-    $field = $form->addTextField('Name');
-    $field->setLabel('name');
+    $field = $form->addTextField('name');
+    $field->setLabel('Name');
 
+    // create mblock form
     $nf = mblock_rex_form::factory(rex::getTable('mblock_rexform_demo'), '', 'id=' . $id);
-
     $element = $nf->addRawField('<br>');
+
+    // text field 1
     $element1 = $nf->addTextField('mblock_field][attr_type][0][test');
-    $element1->setLabel('Feld 1');
+    $element1->setLabel('Text 1');
+    // text field 2
     $element2 = $nf->addTextField('mblock_field][attr_type][0][test2');
-    $element2->setLabel('Feld 2');
+    $element2->setLabel('Text 2');
 
     $form->addRawField(mblock::show(rex::getTable('mblock_rexform_demo').'::mblock_field::attr_type', $nf->getElements()));
 
