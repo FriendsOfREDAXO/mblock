@@ -71,7 +71,7 @@ if ($func == '') {
     $element2 = $nf->addTextField('mblock_field][attr_type][0][test2');
     $element2->setLabel('Text 2');
 
-    $form->addRawField(mblock::show(rex::getTable('mblock_rexform_demo').'::mblock_field::attr_type', $nf->getElements()));
+    $form->addRawField(mblock::show(rex::getTable('mblock_rexform_demo').'::mblock_field::attr_type', $nf->getElements(), ['initial_hidden' => 1, 'min' => 0, 'initial_button_text' => 'Press [+] to create MBlock']));
 
     // show
     $content = $form->get();
