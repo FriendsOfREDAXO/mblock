@@ -13,6 +13,7 @@ class MBlockRexFormProcessor
      * @param array $post
      * @return mixed
      * @author Joachim Doerr
+     * @throws rex_sql_exception
      */
     public static function postPostSaveAction($status, mblock_rex_form $form, array $post)
     {
@@ -48,6 +49,7 @@ class MBlockRexFormProcessor
      * @param array $post
      * @param null $id
      * @author Joachim Doerr
+     * @throws rex_sql_exception
      */
     private static function update(mblock_rex_form $form, array $post, $id = null)
     {
@@ -63,11 +65,14 @@ class MBlockRexFormProcessor
         $updateValues = array();
         $rows = array();
 
-        foreach ($form->getSql()->getRow() as $row => $value)
-            if(is_array(json_decode($value, true))) {
-                $newRow = explode('.', $row);
-                $rows[] = array_pop($newRow);
-            }
+        $result = $form->getSql()->getRow();
+
+        if (is_array($result) && sizeof($result) > 0)
+            foreach ($result as $row => $value)
+                if(is_array(json_decode($value, true))) {
+                    $newRow = explode('.', $row);
+                    $rows[] = array_pop($newRow);
+                }
 
         if (isset($post[$form->getName()]))
             foreach ($post[$form->getName()] as $row => $field)
@@ -75,9 +80,10 @@ class MBlockRexFormProcessor
                     $updateValues[$row] = json_encode($field);
 
         // is row not in update list?
-        foreach ($rows as $row)
-            if (!array_key_exists($row, $updateValues))
-                $updateValues[$row] = NULL;
+        if (sizeof($rows) > 0)
+            foreach ($rows as $row)
+                if (!array_key_exists($row, $updateValues))
+                    $updateValues[$row] = NULL;
 
         if (sizeof($updateValues) > 0)
             $sql->setValues($updateValues)->update();
