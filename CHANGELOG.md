@@ -11,7 +11,7 @@
 * fix bug by multiple selects `DOMElement::setAttribute() expects parameter 2 to be string, array given`
 * fix `Invalid argument supplied for foreach()` issue in `MBlockRexFormProcessor.php`
 * added initial_hidden option for initial without form element, it will be add only a [+] button
-* remove default option, empty form content by duplication 
+* remove default setting to empty form content by duplication 
 * added initial_button_text optional
     ```
     <?php
