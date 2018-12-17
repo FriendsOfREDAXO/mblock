@@ -1,6 +1,6 @@
 # MBlock - REDAXO Addon für Modul-Input-Blöcke
 
-### Version 2.3.0
+### Version 3.0.0
 
 * add saveHtml method to trait and remove libxml special
 * use saveHtml from trait in replacer and decorator classes
