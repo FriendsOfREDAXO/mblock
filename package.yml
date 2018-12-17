@@ -1,5 +1,5 @@
 package: mblock
-version: 2.2.3
+version: 3.0.0
 name: MBlock
 author: Friends Of REDAXO
 supportpage: https://github.com/FriendsOfREDAXO/mblock
@@ -19,6 +19,6 @@ page:
         rexform_demo: { title: translate:rexform_demo }
 
 requires:
-    redaxo: ^5.3.0
+    redaxo: ^5.6.0
     php:
         extensions: [xml]
