@@ -3,6 +3,7 @@
 ### Version 3.0.1
 
 * fix exactly 2 parameters, 3 given in `MBlockFormItemDecorator`
+* fix ensure demo table on update
 
 ### Version 3.0.0
 
