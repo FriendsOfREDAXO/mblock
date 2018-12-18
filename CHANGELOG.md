@@ -1,5 +1,9 @@
 # MBlock - REDAXO Addon für Modul-Input-Blöcke
 
+### Version 3.0.1
+
+* fix exactly 2 parameters, 3 given in `MBlockFormItemDecorator`
+
 ### Version 3.0.0
 
 * add saveHtml method to trait and remove libxml special
@@ -9,7 +13,7 @@
 * remove all mblock callback events
 * fix `Call to a member function getAttribute() on null` bug in bootstrap replacer
 * fix bug by multiple selects `DOMElement::setAttribute() expects parameter 2 to be string, array given`
-* fix `Invalid argument supplied for foreach()` issue in `MBlockRexFormProcessor.php`
+* fix `Invalid argument supplied for foreach()` issue in `MBlockRexFormProcessor`
 * added initial_hidden option for initial without form element, it will be add only a [+] button
 * remove default setting to empty form content by duplication 
 * added initial_button_text optional

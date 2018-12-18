@@ -170,7 +170,7 @@ class MBlockFormItemDecorator
                 default:
                 case 'select':
                     if ($matches && array_key_exists($matches[1], $item->getResult())) {
-                        $element->setAttribute('data-selected', (!$element->hasAttribute('multiple')) ? $item->getResult()[$matches[1]] : rex_escape(json_encode($item->getResult()[$matches[1]])), 'html_attr');
+                        $element->setAttribute('data-selected', (!$element->hasAttribute('multiple')) ? $item->getResult()[$matches[1]] : rex_escape(json_encode($item->getResult()[$matches[1]]), 'html_attr'));
                     }
                     break;
             }
