@@ -5,9 +5,15 @@
  * @license MIT
  */
 
+namespace Mblock\Replacer;
+
+use DOMElement;
+use MBlock\DOM\MBlockDOMTrait;
+use MBlock\DTO\MBlockItem;
+
 class MBlockCheckboxReplacer
 {
-    use \MBlock\Decorator\MBlockDOMTrait;
+    use MBlockDOMTrait;
 
     /**
      * @param MBlockItem $item
@@ -18,9 +24,9 @@ class MBlockCheckboxReplacer
     public static function replaceCheckboxesBlockHolder(MBlockItem $item, $count)
     {
         // set phpquery document
-        $dom = self::createDom($item->getForm());
+        $dom = $item->getForm();
         $holderInput = false;
-        $holderName = "REX_INPUT_VALUE[{$item->getValueId()}][{$item->getId()}][checkbox_block_hold]";
+        $holderName = "REX_INPUT_VALUE[{$item->getValueId()}][{$item->getItemId()}][checkbox_block_hold]";
 
         // find input group
         if ($matches = $dom->getElementsByTagName('input')) {
@@ -35,6 +41,6 @@ class MBlockCheckboxReplacer
         }
 
         // return the manipulated html output
-        return ($holderInput) ? '<input type="hidden" class="not_delete" name="' . $holderName . '" value="hold_block">' . self::saveHtml($dom) : self::saveHtml($dom);
+        // return ($holderInput) ? '<input type="hidden" class="not_delete" name="' . $holderName . '" value="hold_block">' . self::saveHtml($dom) : self::saveHtml($dom);
     }
 }

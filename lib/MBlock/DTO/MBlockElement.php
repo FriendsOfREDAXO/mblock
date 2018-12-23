@@ -5,6 +5,9 @@
  * @license MIT
  */
 
+namespace MBlock\DTO;
+
+
 class MBlockElement
 {
     const KEY = "<mblock:%s/>";
@@ -27,7 +30,7 @@ class MBlockElement
     /**
      * @var int
      */
-    public $index;
+    public $iterateIndex;
 
     /**
      * @return mixed
@@ -50,6 +53,15 @@ class MBlockElement
     }
 
     /**
+     * @return string
+     * @author Joachim Doerr
+     */
+    public function getOutput()
+    {
+        return $this->output;
+    }
+
+    /**
      * @param string $output
      * @return $this
      */
@@ -57,6 +69,15 @@ class MBlockElement
     {
         $this->output = $output;
         return $this;
+    }
+
+    /**
+     * @return string
+     * @author Joachim Doerr
+     */
+    public function getForm()
+    {
+        return $this->form;
     }
 
     /**
@@ -73,19 +94,19 @@ class MBlockElement
      * @return int
      * @author Joachim Doerr
      */
-    public function getIndex()
+    public function getIterateIndex()
     {
-        return $this->index;
+        return $this->iterateIndex;
     }
 
     /**
-     * @param int $index
+     * @param int $iterateIndex
      * @return $this
      * @author Joachim Doerr
      */
-    public function setIndex($index)
+    public function setIterateIndex($iterateIndex)
     {
-        $this->index = $index;
+        $this->iterateIndex = $iterateIndex;
         return $this;
     }
 

@@ -5,6 +5,12 @@
  * @license MIT
  */
 
+namespace MBlock\Utils;
+
+
+use rex_addon;
+use rex_i18n;
+
 class MBlockSettingsHelper
 {
     /**
@@ -16,31 +22,24 @@ class MBlockSettingsHelper
     {
         $addon = rex_addon::get('mblock');
         $out = '';
-        if (!array_key_exists('input_delete', $settings)) {
+        if (!array_key_exists('smooth-scroll', $settings)) {
             // set default
-            $settings['input_delete'] = $addon->getConfig('mblock_delete');
+            $settings['smooth-scroll'] = $addon->getConfig('mblock_scroll');
         }
-        if (!array_key_exists('smooth_scroll', $settings)) {
-            // set default
-            $settings['smooth_scroll'] = $addon->getConfig('mblock_scroll');
-        }
-        if (!array_key_exists('delete_confirm', $settings)) {
+        if (!array_key_exists('delete-confirm', $settings)) {
             if ($addon->getConfig('mblock_delete_confirm')) {
                 // set default
-                $settings['delete_confirm'] = rex_i18n::msg('mblock_delete_confirm');
+                $settings['delete-confirm'] = rex_i18n::msg('mblock_delete_confirm');
             }
         } else {
-            if ($settings['delete_confirm'] === 1)
-                $settings['delete_confirm'] = rex_i18n::msg('mblock_delete_confirm');
+            if ($settings['delete-confirm'] === 1)
+                $settings['delete-confirm'] = rex_i18n::msg('mblock_delete_confirm');
 
-            if ($settings['delete_confirm'] === 0)
-                unset($settings['delete_confirm']);
+            if ($settings['delete-confirm'] === 0)
+                unset($settings['delete-confirm']);
         }
-        if (isset($_SESSION['mblock_count'])) {
-            $settings['mblock_count'] = $_SESSION['mblock_count'];
-        } else {
-            $settings['mblock_count'] = 0;
-        }
+
+        $settings['mblock-instance'] = rex_session('mblock_count');
 
         foreach ($settings as $key => $value) {
             if (!$value) {

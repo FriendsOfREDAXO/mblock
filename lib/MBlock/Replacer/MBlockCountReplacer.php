@@ -5,6 +5,11 @@
  * @license MIT
  */
 
+namespace MBlock\Replacer;
+
+
+use MBlock\DTO\MBlockItem;
+
 class MBlockCountReplacer
 {
     /**
@@ -15,6 +20,6 @@ class MBlockCountReplacer
      */
     public static function replaceCountKeys(MBlockItem $item, $count)
     {
-        return str_replace(array('%%MB_COUNT%%', '%MB_COUNT%'), array('<span class="mb_count">'.$count.'</span>', $count), $item->getForm());
+//        return str_replace(array('%%MB_COUNT%%', '%MB_COUNT%'), array('<span class="mb_count">'.$count.'</span>', $count), $item->getForm());
     }
 }

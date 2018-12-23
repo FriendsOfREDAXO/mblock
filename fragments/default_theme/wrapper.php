@@ -1,0 +1,1 @@
+<div class="mblock_wrapper"<?= $this->settings; ?>><?= $this->output; ?></div>

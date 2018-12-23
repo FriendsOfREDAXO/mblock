@@ -5,6 +5,9 @@
  * @license MIT
  */
 
+namespace MBlock\DTO;
+
+
 class MBlockItem
 {
     /**
@@ -13,9 +16,19 @@ class MBlockItem
     public $result;
 
     /**
+     * @var array
+     */
+    public $val;
+
+    /**
      * @var integer
      */
-    public $id;
+    public $itemId;
+
+    /**
+     * @var integer
+     */
+    public $subId;
 
     /**
      * @var integer
@@ -33,9 +46,14 @@ class MBlockItem
     public $systemName;
 
     /**
-     * @var string
+     * @var \DOMDocument
      */
     public $form;
+
+    /**
+     * @var MBlockElement
+     */
+    public $element;
 
     /**
      * @var array
@@ -53,7 +71,7 @@ class MBlockItem
 
     /**
      * @param array $result
-     * @return MBlockItem
+     * @return $this
      * @author Joachim Doerr
      */
     public function setResult($result)
@@ -63,22 +81,62 @@ class MBlockItem
     }
 
     /**
-     * @return int
+     * @return array
      * @author Joachim Doerr
      */
-    public function getId()
+    public function getVal()
     {
-        return $this->id;
+        return $this->val;
     }
 
     /**
-     * @param int $id
+     * @param array $val
      * @return MBlockItem
      * @author Joachim Doerr
      */
-    public function setId($id)
+    public function setVal($val)
     {
-        $this->id = $id;
+        $this->val = $val;
+        return $this;
+    }
+
+    /**
+     * @return int
+     * @author Joachim Doerr
+     */
+    public function getItemId()
+    {
+        return $this->itemId;
+    }
+
+    /**
+     * @param int $itemId
+     * @return MBlockItem
+     * @author Joachim Doerr
+     */
+    public function setItemId($itemId)
+    {
+        $this->itemId = $itemId;
+        return $this;
+    }
+
+    /**
+     * @return int
+     * @author Joachim Doerr
+     */
+    public function getSubId()
+    {
+        return $this->subId;
+    }
+
+    /**
+     * @param int $subId
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setSubId($subId)
+    {
+        $this->subId = $subId;
         return $this;
     }
 
@@ -143,7 +201,27 @@ class MBlockItem
     }
 
     /**
-     * @return string
+     * @return MBlockElement
+     * @author Joachim Doerr
+     */
+    public function getElement()
+    {
+        return $this->element;
+    }
+
+    /**
+     * @param MBlockElement $element
+     * @return MBlockItem
+     * @author Joachim Doerr
+     */
+    public function setElement($element)
+    {
+        $this->element = $element;
+        return $this;
+    }
+
+    /**
+     * @return \DOMDocument
      * @author Joachim Doerr
      */
     public function getForm()
@@ -152,7 +230,7 @@ class MBlockItem
     }
 
     /**
-     * @param string $form
+     * @param \DOMDocument $form
      * @return MBlockItem
      * @author Joachim Doerr
      */

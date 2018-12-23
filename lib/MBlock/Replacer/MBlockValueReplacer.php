@@ -1,4 +1,9 @@
 <?php
+
+use MBlock\DOM\MBlockDOMTrait;
+use MBlock\Decorator\MBlockFormItemDecorator;
+use MBlock\DTO\MBlockItem;
+
 /**
  * @author mail[at]joachim-doerr[dot]com Joachim Doerr
  * @package redaxo5
@@ -7,7 +12,7 @@
 
 class MBlockValueReplacer
 {
-    use \MBlock\Decorator\MBlockDOMTrait;
+    use MBlockDOMTrait;
 
     /**
      * @param MBlockItem $item
@@ -18,7 +23,7 @@ class MBlockValueReplacer
     public static function replaceValueSetEmpty(MBlockItem $item, $setDefaultValue = false)
     {
         // set phpquery document
-        $dom = self::createDom($item->getForm());
+        $dom = $item->getForm();
 
         // find inputs
         if ($matches = $dom->getElementsByTagName('input')) {

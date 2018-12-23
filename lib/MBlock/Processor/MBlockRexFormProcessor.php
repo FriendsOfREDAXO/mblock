@@ -5,6 +5,14 @@
  * @license MIT
  */
 
+namespace MBlock\Processor;
+
+
+use mblock_rex_form;
+use rex_i18n;
+use rex_sql;
+use rex_sql_exception;
+
 class MBlockRexFormProcessor
 {
     /**

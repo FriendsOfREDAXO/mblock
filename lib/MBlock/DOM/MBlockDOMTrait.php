@@ -5,7 +5,7 @@
  * Time: 15:07
  */
 
-namespace MBlock\Decorator;
+namespace MBlock\DOM;
 
 
 use DOMDocument;

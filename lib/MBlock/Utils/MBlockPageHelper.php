@@ -5,12 +5,16 @@
  * @license MIT
  */
 
+namespace MBlock\Utils;
+
+
 class MBlockPageHelper
 {
     /**
      * @param $type
      * @return string
      * @author Joachim Doerr
+     * @throws rex_exception
      */
     public static function exchangeExamples($type)
     {

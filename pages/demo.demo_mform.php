@@ -14,5 +14,5 @@ echo $fragment->parse('core/page/section.php');
 // parse info fragment
 $fragment = new rex_fragment();
 $fragment->setVar('title', rex_i18n::msg('mblock_demo_mform'), false);
-$fragment->setVar('body', MBlockPageHelper::exchangeExamples('base'), false);
+$fragment->setVar('body', MBlock\Utils\MBlockPageHelper::exchangeExamples('base'), false);
 echo $fragment->parse('core/page/section.php');
