@@ -50,57 +50,58 @@ class MBlockFormItemDecorator extends MBlockElementReplacer
                     }
                 }
             }
-        }
-        // find textareas
-        if ($matches = $dom->getElementsByTagName('textarea')) {
-            /** @var DOMElement $match */
-            foreach ($matches as $match) {
-                if (!$match->hasAttribute('data-mblock')) {
-                    // label for and id change
+
+            // find textareas
+            if ($matches = $dom->getElementsByTagName('textarea')) {
+                /** @var DOMElement $match */
+                foreach ($matches as $match) {
+                    if (!$match->hasAttribute('data-mblock')) {
+                        // label for and id change
 //                self::replaceForId($dom, $match, $item);
-                    // replace attribute id
-                    self::replaceName($match, $item, $nestedCount);
-                    // replace value by json key
-                    self::replaceValue($match, $item);
-                    $match->setAttribute('data-mblock', true);
+                        // replace attribute id
+                        self::replaceName($match, $item, $nestedCount);
+                        // replace value by json key
+                        self::replaceValue($match, $item);
+                        $match->setAttribute('data-mblock', true);
+                    }
                 }
             }
-        }
 
-        // find selects
-        if ($matches = $dom->getElementsByTagName('select')) {
-            /** @var DOMElement $match */
-            foreach ($matches as $match) {
-                if (!$match->hasAttribute('data-mblock')) {
-                    // continue by media elements
-                    if (strpos($match->getAttribute('id'), 'REX_MEDIA') !== false
-                        or strpos($match->getAttribute('id'), 'REX_LINK') !== false) {
-                        continue;
-                    }
-                    // label for and id change
+            // find selects
+            if ($matches = $dom->getElementsByTagName('select')) {
+                /** @var DOMElement $match */
+                foreach ($matches as $match) {
+                    if (!$match->hasAttribute('data-mblock')) {
+                        // continue by media elements
+                        if (strpos($match->getAttribute('id'), 'REX_MEDIA') !== false
+                            or strpos($match->getAttribute('id'), 'REX_LINK') !== false) {
+                            continue;
+                        }
+                        // label for and id change
 //                self::replaceForId($dom, $match, $item);
-                    // replace attribute id
-                    self::replaceName($match, $item, $nestedCount);
-                    // replace selected data
-                    self::replaceSelectedData($match, $item);
-                    // replace value by json key
-                    if ($match->hasChildNodes()) {
-                        /** @var DOMElement $child */
-                        foreach ($match->childNodes as $child) {
-                            switch ($child->nodeName) {
-                                case 'optgroup':
-                                    foreach ($child->childNodes as $nodeChild)
-                                        self::replaceOptionSelect($match, $nodeChild, $item);
-                                    break;
-                                case 'option':
-                                    if (isset($child->tagName)) {
-                                        self::replaceOptionSelect($match, $child, $item);
+                        // replace attribute id
+                        self::replaceName($match, $item, $nestedCount);
+                        // replace selected data
+                        self::replaceSelectedData($match, $item);
+                        // replace value by json key
+                        if ($match->hasChildNodes()) {
+                            /** @var DOMElement $child */
+                            foreach ($match->childNodes as $child) {
+                                switch ($child->nodeName) {
+                                    case 'optgroup':
+                                        foreach ($child->childNodes as $nodeChild)
+                                            self::replaceOptionSelect($match, $nodeChild, $item);
                                         break;
-                                    }
+                                    case 'option':
+                                        if (isset($child->tagName)) {
+                                            self::replaceOptionSelect($match, $child, $item);
+                                            break;
+                                        }
+                                }
                             }
                         }
+                        $match->setAttribute('data-mblock', true);
                     }
-                    $match->setAttribute('data-mblock', true);
                 }
             }
         }
