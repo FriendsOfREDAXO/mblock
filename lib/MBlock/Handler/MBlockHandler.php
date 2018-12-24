@@ -175,7 +175,7 @@ class MBlockHandler
                 $this->executeItemManipulations($item, ($count +1), $nestedCount);
                 // parse form item
                 $element = new MBlockElement();
-                $element->setForm(self::saveHTML($item->getForm()))
+                $element->setForm(self::saveHtml($item->getForm()))
                     ->setIterateIndex(($count + 1))
                     ->setSettings($this->settings);
 
