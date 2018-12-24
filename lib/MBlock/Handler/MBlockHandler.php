@@ -141,7 +141,7 @@ class MBlockHandler
         }
 
         // don't loaded?
-        if ((is_array($this->items) && sizeof($this->items) > 0) && (!isset($this->settings['initial_hidden']) or $this->settings['initial_hidden'] != 1)) {
+        if (!$this->items && (!isset($this->settings['initial_hidden']) or $this->settings['initial_hidden'] != 1)) {
             // set plain item for base form
             $this->plain = true;
             $this->items[0] = new MBlockItem();
@@ -293,8 +293,9 @@ class MBlockHandler
         MBlockElementReplacer::replaceForId($item);
         // decorate counting
         MBlockCountReplacer::replaceCountKeys($item, $count);
-        // decorate collapse and tabs
+        // decorate tabs
         MBlockBootstrapReplacer::replaceTabIds($item, $count);
+        // decorate collapse
         MBlockBootstrapReplacer::replaceCollapseIds($item, $count);
         // replace system button data
         MBlockSystemButtonReplacer::replaceSystemButtons($item, $count);
@@ -363,7 +364,9 @@ class MBlockHandler
             foreach ($subMblockHandler->items as $item) {
                 $elementNode = self::createDom($item->getElement()->getOutput());
                 $newnode = $element->ownerDocument->importNode($elementNode->firstChild, true);
-                $element->appendChild($newnode);
+                if ($newnode instanceof \DOMNode) {
+                    $element->appendChild($newnode);
+                }
             }
 
             // set mblock count data
