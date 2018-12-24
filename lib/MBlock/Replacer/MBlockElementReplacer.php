@@ -118,6 +118,7 @@ class MBlockElementReplacer
             switch ($element->nodeName) {
                 default:
                 case 'select':
+                    // if ($matches && array_key_exists($matches[1], $item->getVal())) $element->setAttribute('data-selected', $item->getVal()[$matches[1]]);
                     if ($matches && is_array($item->getVal()) && array_key_exists($matches[1], $item->getVal())) {
                         $element->setAttribute('data-selected', (!$element->hasAttribute('multiple')) ? $item->getVal()[$matches[1]] : rex_escape(json_encode($item->getVal()[$matches[1]]), 'html_attr'));
                     }
