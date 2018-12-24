@@ -110,7 +110,7 @@ function mblock_sort_it(element) {
 
 function mblock_reindex(element) {
 
-    var mblock_count = element.data('mblock_count');
+    var mblock_count = element.data('mblock-instance');
 
     element.find('> div.sortitem').each(function (index) {
         // find input elements
@@ -362,8 +362,8 @@ function mblock_set_count(element, item) {
 }
 
 function mblock_remove_item(element, item) {
-    if (element.data().hasOwnProperty('delete_confirm')) {
-        if (!confirm(element.data('delete_confirm'))) {
+    if (element.data().hasOwnProperty('delete-confirm')) {
+        if (!confirm(element.data('delete-confirm'))) {
             return false;
         }
     }
@@ -413,8 +413,8 @@ function mblock_movedown(element, item) {
 }
 
 function mblock_scroll(element, item) {
-    if (element.data().hasOwnProperty('smooth_scroll')) {
-        if (element.data('smooth_scroll') == true) {
+    if (element.data().hasOwnProperty('smooth-scroll')) {
+        if (element.data('smooth-scroll') === true) {
             $.mblockSmoothScroll({
                 scrollTarget: item,
                 speed: 500
