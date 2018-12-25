@@ -64,11 +64,6 @@ class MBlockHandler
     protected $id;
 
     /**
-     * @var boolean
-     */
-    private $plain = false;
-
-    /**
      * @var mixed|string
      */
     protected $themeKey;
@@ -141,9 +136,7 @@ class MBlockHandler
         }
 
         // don't loaded?
-        if (!$this->items && (!isset($this->settings['initial_hidden']) or $this->settings['initial_hidden'] != 1)) {
-            // set plain item for base form
-            $this->plain = true;
+        if ((sizeof($this->items) <= 0 && (!isset($this->settings['initial_hidden']) or $this->settings['initial_hidden'] != 1))) {
             $this->items[0] = new MBlockItem();
             $this->items[0]->setItemId(0)
                 ->setValueId($this->id)
@@ -166,7 +159,6 @@ class MBlockHandler
             foreach ($this->items as $count => $item) {
                 // nested mblock?
                 $mblockWrapper = self::getElementsByClass($item->getForm(), 'div.mblock_wrapper');
-
                 if (sizeof($mblockWrapper) > 0) {
                     foreach ($mblockWrapper as $mKey => $wrapper) {
                         $this->handleNestedMBlock($item, $wrapper, $mKey);
@@ -375,6 +367,21 @@ class MBlockHandler
             // TODO error log
             // dump($key);
         }
+    }
+
+    /**
+     * @param \DOMElement $element
+     * @return string
+     * @author Joachim Doerr
+     */
+    protected function innerHTML(\DOMElement $element)
+    {
+        $doc = $element->ownerDocument;
+        $html = '';
+        foreach ($element->childNodes as $node) {
+            $html .= $doc->saveHTML($node);
+        }
+        return $html;
     }
 
     /**
