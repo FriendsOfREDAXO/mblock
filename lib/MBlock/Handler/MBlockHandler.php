@@ -363,34 +363,18 @@ class MBlockHandler
             // add blocks to element
             foreach ($subMblockHandler->items as $item) {
                 $elementNode = self::createDom($item->getElement()->getOutput());
-                $newnode = $element->ownerDocument->importNode($elementNode->firstChild, true);
-                if ($newnode instanceof \DOMNode) {
-                    $element->appendChild($newnode);
+                $newNode = $element->ownerDocument->importNode($elementNode->firstChild->firstChild, true);
+                if ($newNode instanceof \DOMNode) {
+                    $element->appendChild($newNode);
                 }
             }
 
             // set mblock count data
             $element->setAttribute('data-mblock_count', rex_session('mblock_count'));
-            // dump($this->innerHTML($element->parentNode));
         } else {
             // TODO error log
             // dump($key);
         }
-    }
-
-    /**
-     * @param \DOMElement $element
-     * @return string
-     * @author Joachim Doerr
-     */
-    protected function innerHTML(\DOMElement $element)
-    {
-        $doc = $element->ownerDocument;
-        $html = '';
-        foreach ($element->childNodes as $node) {
-            $html .= $doc->saveHTML($node);
-        }
-        return $html;
     }
 
     /**
