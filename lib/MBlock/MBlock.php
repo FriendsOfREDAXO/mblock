@@ -54,4 +54,9 @@ class MBlock
         // final parse elements into mblock wrapper
         return self::$mblockHandler->parseMBlockWrapper();
     }
+
+    public static function toArray($rexValue)
+    {
+
+    }
 }
