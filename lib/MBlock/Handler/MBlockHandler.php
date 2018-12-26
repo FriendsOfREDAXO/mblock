@@ -270,6 +270,14 @@ class MBlockHandler
         if (sizeof($this->items) > 0) {
             /** @var MBlockItem $item */
             foreach ($this->items as $count => $item) {
+                if (strpos($item->getElement()->getOutput(), 'mblock-sortitem-to-remove') !== false) {
+                    $domElementOutput = self::createDom($item->getElement()->getOutput());
+                    $sortItems = self::getElementsByClass($domElementOutput, 'div.mblock-sortitem-to-remove');
+                    foreach ($sortItems as $nodeChild) {
+                        $nodeChild->parentNode->removeChild($nodeChild);
+                    }
+                    $item->getElement()->setOutput(self::saveHtml($domElementOutput));
+                }
                 $output .= $item->getElement()->getOutput();
             }
         }
@@ -345,8 +353,10 @@ class MBlockHandler
 
         // remove items
         if ($sortItems = self::getElementsByClass($element, 'div.sortitem')) {
-            foreach ($sortItems as $nodeChild) {
-                $nodeChild->parentNode->removeChild($nodeChild);
+            if (is_array($sortItems) && sizeof($sortItems) > 0) {
+                foreach ($sortItems as $key => $nodeChild) {
+                    $nodeChild->setAttribute('class', 'mblock-sortitem-to-remove');
+                }
             }
         }
 
@@ -376,7 +386,7 @@ class MBlockHandler
             $subMblockHandler->parseItemElements();
 
             // add blocks to element
-            foreach ($subMblockHandler->items as $item) {
+            foreach ($subMblockHandler->items as $key => $item) {
                 $this->appendHtml($element, $item->getElement()->getOutput());
             }
 
