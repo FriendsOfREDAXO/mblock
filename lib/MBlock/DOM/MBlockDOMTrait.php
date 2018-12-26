@@ -50,7 +50,7 @@ trait MBlockDOMTrait
      * @param DOMNode $dom
      * @param $element
      * @param $class
-     * @return array
+     * @return DOMElement[]
      * @author Joachim Doerr
      */
     private static function getElementsByClass(DOMNode $dom, $element)
