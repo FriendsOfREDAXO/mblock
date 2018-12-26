@@ -34,6 +34,11 @@ class MBlockHandler
     protected $formDomDocument;
 
     /**
+     * @var string
+     */
+    protected $formHtml;
+
+    /**
      * @var array
      */
     protected $values = array();
@@ -79,6 +84,14 @@ class MBlockHandler
      */
     public function __construct($id, $form, array $settings = array(), array $values = null, $theme = 'default')
     {
+        if (strpos($id, '.') !== false) {
+            $explodedId = explode('.', $id);
+            if (is_numeric($explodedId[0]) && sizeof($explodedId) == 2) {
+                $id = $explodedId[0];
+                $settings['nested-value-key'] = $explodedId[1];
+            }
+        }
+
         $this->id = $id;
         $this->values = $values;
         $this->settings = $settings;
@@ -96,21 +109,26 @@ class MBlockHandler
         }
 
         $this->setValByValue();
-    }
+     }
 
     /**
+     * 1. plain item creation
+     * 2. mblock items for blocks creation
+     *
      * Create all form items by loaded values
      * @return MBlockItem[]
      * @author Joachim Doerr
      */
     public function createItems()
     {
+//        dump($this->val);
+
         // crate plain element
         $this->plainItem = new MBlockItem();
         $this->plainItem->setItemId(0)
+            ->setFormHtml($this->formHtml)
             ->setValueId($this->id)
-            ->setResult(array())
-            ->setForm($this->formDomDocument)
+            ->setFormDomDocument(clone $this->formDomDocument)
             ->addPayload('plain_item', true);
 
         // loaded values?
@@ -121,9 +139,10 @@ class MBlockHandler
                     // create block items by value
                     $this->items[$key] = new MBlockItem();
                     $this->items[$key]->setItemId($key)
+                        ->setFormHtml($this->formHtml)
                         ->setValueId($this->id)
                         ->setVal($this->val[$key])
-                        ->setForm(clone $this->formDomDocument);
+                        ->setFormDomDocument(clone $this->formDomDocument);
                 }
             }
         }
@@ -139,9 +158,9 @@ class MBlockHandler
         if ((sizeof($this->items) <= 0 && (!isset($this->settings['initial_hidden']) or $this->settings['initial_hidden'] != 1))) {
             $this->items[0] = new MBlockItem();
             $this->items[0]->setItemId(0)
+                ->setFormHtml($this->formHtml)
                 ->setValueId($this->id)
-                ->setVal(array())
-                ->setForm(clone $this->formDomDocument);
+                ->setFormDomDocument(clone $this->formDomDocument);
         }
 
         return $this->items;
@@ -158,7 +177,7 @@ class MBlockHandler
             /** @var MBlockItem $item */
             foreach ($this->items as $count => $item) {
                 // nested mblock?
-                $mblockWrapper = self::getElementsByClass($item->getForm(), 'div.mblock_wrapper');
+                $mblockWrapper = self::getElementsByClass($item->getFormDomDocument(), 'div.mblock_wrapper');
                 if (sizeof($mblockWrapper) > 0) {
                     foreach ($mblockWrapper as $mKey => $wrapper) {
                         $this->handleNestedMBlock($item, $wrapper, $mKey);
@@ -167,7 +186,7 @@ class MBlockHandler
                 $this->executeItemManipulations($item, ($count +1), $nestedCount);
                 // parse form item
                 $element = new MBlockElement();
-                $element->setForm(self::saveHtml($item->getForm()))
+                $element->setForm(self::saveHtml($item->getFormDomDocument()))
                     ->setIterateIndex(($count + 1))
                     ->setSettings($this->settings);
 
@@ -225,7 +244,7 @@ class MBlockHandler
 
         // parse form item
         $element = new MBlockElement();
-        $element->setForm(self::saveHtml($this->plainItem->getForm()))
+        $element->setForm(self::saveHtml($this->plainItem->getFormDomDocument()))
             ->setIterateIndex(0)
             ->setSettings($this->settings);
 
@@ -302,63 +321,63 @@ class MBlockHandler
      * @param $key
      * @author Joachim Doerr
      */
-    private function handleNestedMBlock(MBlockItem $item, \DOMElement $element, $key)
+    private function handleNestedMBlock(MBlockItem $item, \DOMElement $element, $mKey)
     {
-        // TODO read settings from mblock html settings
+        $settings = array();
 
-        $sortItem = $element->firstChild;
-        if ($sortItem instanceof \DOMElement && $sortItem->getAttribute('class') == 'sortitem') { // sort item === mblock sort wrapper
-            $nodes = $sortItem->childNodes;
-            /** @var \DOMElement $node */
-            foreach ($nodes as $node) {
-                if ($node instanceof \DOMElement && $node->nodeName == 'div') { // first div in sort item === form wrapper
-                    $nodes = $node->childNodes;
-                    break;
+        /** @var \DOMAttr $attrNode */
+        foreach ($element->attributes as $attrName => $attrNode) {
+            if (strpos($attrName, 'data') !== false) {
+                $settings[str_replace('data-', '', $attrName)] = $attrNode->value;
+            }
+        }
+
+        $formHtml = $element->getAttribute('data-mblock-plain-sortitem');
+        $nestedValueKey = $element->getAttribute('data-nested-value-key');
+        $formHtmlDomDocument = self::createDom(htmlspecialchars_decode($formHtml));
+        $sortItemForm = '';
+
+        // get form
+        foreach (self::getElementsByClass($formHtmlDomDocument, 'div.mblock-sortitem-form') as $nodeChild) {
+            $sortItemForm = $nodeChild;
+            break;
+        }
+
+        // remove items
+        if ($sortItems = self::getElementsByClass($element, 'div.sortitem')) {
+            foreach ($sortItems as $nodeChild) {
+                $nodeChild->parentNode->removeChild($nodeChild);
+            }
+        }
+
+        $values = array();
+
+        if (is_array($item->getVal())) {
+            foreach ($item->getVal() as $key => $val) {
+                if (is_array($val) && $key == $nestedValueKey) {
+                    $values[$key] = $val;
                 }
             }
+        }
 
-            // create new DOM for mblock
-            $form = new \DOMDocument();
-            foreach($nodes as $node)
-            {
-                $newnode = $form->importNode($node, true);
-                $form->appendChild($newnode);
-            }
-            // dump($newdoc->saveHTML());
-            // remove mblock forms
-            $element->removeChild($sortItem);
+        if ($sortItemForm instanceof \DOMElement && $sortItemForm->getAttribute('class') == 'mblock-sortitem-form' && sizeof($values) > 0) { // sort item === mblock sort wrapper
 
-            $arrV = array();
-            foreach ($item->getVal() as $val) {
-                if (is_array($val)) {
-                    $arrV[] = $val;
-                }
-            }
-            $value = (isset($arrV[$key])) ? array('value' => array($this->id => $arrV[$key])) : array('value' => array());
+            $values = array('value' => array($this->id => $values[$nestedValueKey]));
 
-            // TODO add settings from mblock html settings
             // add new nodes
-            $subMblockHandler = new MBlockHandler($this->id, $form, array(), $value);
-
+            $subMblockHandler = new MBlockHandler($this->id . '.' . $nestedValueKey, self::innerHTML($sortItemForm), $settings, $values);
             // duplicate form elements by values
             $subMblockHandler->createItems();
-
             // remove data mblock flag
             $subMblockHandler->clearItems();
-
             // iterate items and create blocks
             $subMblockHandler->iterateItems($item->getItemId());
-
             // parse elements to mblock blocks
             $subMblockHandler->parseItemElements();
 
             // add blocks to element
             foreach ($subMblockHandler->items as $item) {
-                $elementNode = self::createDom($item->getElement()->getOutput());
-                $newNode = $element->ownerDocument->importNode($elementNode->firstChild->firstChild, true);
-                if ($newNode instanceof \DOMNode) {
-                    $element->appendChild($newNode);
-                }
+                $this->appendHtml($element, $item->getElement()->getOutput());
             }
 
             // set mblock count data
@@ -367,21 +386,6 @@ class MBlockHandler
             // TODO error log
             // dump($key);
         }
-    }
-
-    /**
-     * @param \DOMElement $element
-     * @return string
-     * @author Joachim Doerr
-     */
-    protected function innerHTML(\DOMElement $element)
-    {
-        $doc = $element->ownerDocument;
-        $html = '';
-        foreach ($element->childNodes as $node) {
-            $html .= $doc->saveHTML($node);
-        }
-        return $html;
     }
 
     /**
@@ -395,7 +399,7 @@ class MBlockHandler
             foreach ($this->items as $count => $item) {
 
                 foreach (array('input', 'textarea', 'select') as $value) {
-                    if ($item->getForm() instanceof \DOMDocument && $matches = $item->getForm()->getElementsByTagName($value)) {
+                    if ($item->getFormDomDocument() instanceof \DOMDocument && $matches = $item->getFormDomDocument()->getElementsByTagName($value)) {
                         /** @var \DOMElement $match */
                         foreach ($matches as $match) {
                             if ($match->hasAttribute('data-mblock')) {
@@ -415,7 +419,7 @@ class MBlockHandler
      */
     private function setValByValue()
     {
-        $this->val = (is_array($this->values) && array_key_exists('value', $this->values) && isset($this->values['value'][$this->id])) ? $this->values['value'][$this->id] : null;
+        $this->val = (is_array($this->values) && array_key_exists('value', $this->values) && isset($this->values['value'][intval($this->id)])) ? $this->values['value'][intval($this->id)] : null;
         return $this;
     }
 
@@ -486,7 +490,6 @@ class MBlockHandler
 
             // implode fields to html string
             $form = implode('', $formFields);
-
             preg_match_all('/name="([^"]*)"/', $form, $matches, PREG_SET_ORDER, 0);
 
             foreach ($matches as $match) {
@@ -510,9 +513,13 @@ class MBlockHandler
 
         // set directly instance of DOMElement
         if ($form instanceof \DOMDocument) {
+            $this->formHtml = self::saveHtml($form);
             $this->formDomDocument = $form;
             return $this;
         }
+
+        // html form
+        $this->formHtml = $form;
 
         // create dom document by form html
         $this->formDomDocument = self::createDom($form);
