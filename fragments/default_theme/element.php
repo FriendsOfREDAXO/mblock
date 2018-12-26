@@ -10,5 +10,5 @@
          <button type="button" class="btn btn-move movedown" title="move down"><i class="rex-icon rex-icon-down"></i></button>
       </div>
     </span>
-    <div><?= $this->form; ?></div>
+    <div class="mblock-sortitem-form"><?= $this->form; ?></div>
 </div>
