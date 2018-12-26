@@ -23,7 +23,7 @@ class MBlockValueReplacer
     public static function replaceValueSetEmpty(MBlockItem $item, $setDefaultValue = false)
     {
         // set phpquery document
-        $dom = $item->getForm();
+        $dom = $item->getFormDomDocument();
 
         // find inputs
         if ($matches = $dom->getElementsByTagName('input')) {

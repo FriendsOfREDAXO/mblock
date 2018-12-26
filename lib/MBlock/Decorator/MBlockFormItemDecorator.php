@@ -24,7 +24,7 @@ class MBlockFormItemDecorator extends MBlockElementReplacer
      */
     static public function decorateFormItem(MBlockItem $item, $nestedCount = null)
     {
-        $dom = $item->getForm();
+        $dom = $item->getFormDomDocument();
         if ($dom instanceof \DOMDocument) {
             // find inputs
             if ($matches = $dom->getElementsByTagName('input')) {

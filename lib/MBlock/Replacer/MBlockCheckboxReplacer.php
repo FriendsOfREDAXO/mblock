@@ -24,7 +24,7 @@ class MBlockCheckboxReplacer
     public static function replaceCheckboxesBlockHolder(MBlockItem $item, $count)
     {
         // set phpquery document
-        $dom = $item->getForm();
+        $dom = $item->getFormDomDocument();
         $holderInput = false;
         $holderName = "REX_INPUT_VALUE[{$item->getValueId()}][{$item->getItemId()}][checkbox_block_hold]";
 

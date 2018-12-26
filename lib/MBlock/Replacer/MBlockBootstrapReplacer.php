@@ -25,7 +25,7 @@ class MBlockBootstrapReplacer
     public static function replaceTabIds(MBlockItem $item, $count)
     {
         // set dom document
-        $dom = $item->getForm();
+        $dom = $item->getFormDomDocument();
         $item->addPayload('count-id', $count);
         if ($dom instanceof \DOMDocument) {
             // find tab group
@@ -69,7 +69,7 @@ class MBlockBootstrapReplacer
     public static function replaceCollapseIds(MBlockItem $item, $count)
     {
         // set dom document
-        $dom = $item->getForm();
+        $dom = $item->getFormDomDocument();
         $item->addPayload('count-id', $count);
 
         if ($dom instanceof \DOMDocument) {

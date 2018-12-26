@@ -25,7 +25,7 @@ class MBlockSystemButtonReplacer
     public static function replaceCustomLinkText(MBlockItem $item)
     {
         // set dom document
-        $dom = $item->getForm();
+        $dom = $item->getFormDomDocument();
         if ($dom instanceof \DOMDocument) {
             // find custom-link
             if ($matches = self::getElementsByClass($dom, 'div.custom-link')) {
@@ -69,7 +69,7 @@ class MBlockSystemButtonReplacer
     public static function replaceSystemButtons(MBlockItem $item, $count)
     {
         // set dom document
-        $dom = $item->getForm();
+        $dom = $item->getFormDomDocument();
         if ($dom instanceof \DOMDocument) {
             $item->addPayload('count-id', $count);
             // find input group

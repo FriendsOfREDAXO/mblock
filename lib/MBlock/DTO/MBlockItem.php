@@ -11,6 +11,11 @@ namespace MBlock\DTO;
 class MBlockItem
 {
     /**
+     * @var string
+     */
+    public $formHtml;
+
+    /**
      * @var array
      */
     public $result;
@@ -48,7 +53,7 @@ class MBlockItem
     /**
      * @var \DOMDocument
      */
-    public $form;
+    public $formDomDocument;
 
     /**
      * @var MBlockElement
@@ -59,6 +64,26 @@ class MBlockItem
      * @var array
      */
     public $payload = array();
+
+    /**
+     * @return string
+     * @author Joachim Doerr
+     */
+    public function getFormHtml()
+    {
+        return $this->formHtml;
+    }
+
+    /**
+     * @param string $formHtml
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setFormHtml($formHtml)
+    {
+        $this->formHtml = $formHtml;
+        return $this;
+    }
 
     /**
      * @return array
@@ -224,19 +249,19 @@ class MBlockItem
      * @return \DOMDocument
      * @author Joachim Doerr
      */
-    public function getForm()
+    public function getFormDomDocument()
     {
-        return $this->form;
+        return $this->formDomDocument;
     }
 
     /**
-     * @param \DOMDocument $form
+     * @param \DOMDocument $formDomDocument
      * @return MBlockItem
      * @author Joachim Doerr
      */
-    public function setForm($form)
+    public function setFormDomDocument($formDomDocument)
     {
-        $this->form = $form;
+        $this->formDomDocument = $formDomDocument;
         return $this;
     }
 
