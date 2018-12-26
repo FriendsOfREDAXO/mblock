@@ -10,6 +10,7 @@ namespace MBlock\DOM;
 
 use DOMDocument;
 use DOMElement;
+use DOMNode;
 
 trait MBlockDOMTrait
 {
@@ -29,12 +30,13 @@ trait MBlockDOMTrait
 
     /**
      * @param DOMDocument $dom
+     * @param null $node
      * @return string
      * @author Joachim Doerr
      */
-    private static function saveHtml(DOMDocument $dom)
+    private static function saveHtml(DOMDocument $dom, $node = null)
     {
-        $html = $dom->saveHTML();
+        $html = $dom->saveHTML($node);
         if (strpos($html, '<body') !== false) {
             preg_match("/<body>(.*)<\/body>/ism", $html, $matches);
             if (isset($matches[1])) {
@@ -45,24 +47,26 @@ trait MBlockDOMTrait
     }
 
     /**
-     * @param DOMDocument $dom
+     * @param DOMNode $dom
      * @param $element
      * @param $class
      * @return array
      * @author Joachim Doerr
      */
-    private static function getElementsByClass(DOMDocument $dom, $element)
+    private static function getElementsByClass(DOMNode $dom, $element)
     {
         $elementClass= explode('.', $element);
         $element = $elementClass[0];
         $class = $elementClass[1];
         $nodeList = array();
-        $elements = $dom->getElementsByTagName($element);
-        if (sizeof($elements) > 0) {
-            /** @var DOMElement $element */
-            foreach ($elements as $element) {
-                if (strpos($element->getAttribute('class'), $class) !== false) {
-                    $nodeList[] = $element;
+        if ($dom instanceof DOMElement or $dom instanceof DOMDocument) {
+            $elements = $dom->getElementsByTagName($element);
+            if (sizeof($elements) > 0) {
+                /** @var DOMElement $element */
+                foreach ($elements as $element) {
+                    if (strpos($element->getAttribute('class'), $class) !== false) {
+                        $nodeList[] = $element;
+                    }
                 }
             }
         }
@@ -92,5 +96,34 @@ trait MBlockDOMTrait
             }
         }
         return $nodeList;
+    }
+
+    /**
+     * @param \DOMElement $element
+     * @return string
+     * @author Joachim Doerr
+     */
+    private static function innerHTML(\DOMElement $element)
+    {
+        $html = '';
+        foreach ($element->childNodes as $node) {
+            $html .= self::saveHtml($element->ownerDocument, $node);
+        }
+        return $html;
+    }
+
+    /**
+     * @param DOMNode $dom
+     * @param $source
+     * @return DOMNode
+     * @author Joachim Doerr
+     */
+    private static function appendHtml(DOMNode $dom, $source) {
+        $form = self::createDom($source);
+        foreach ($form->getElementsByTagName('body')->item(0)->childNodes as $node) {
+            $node = $dom->ownerDocument->importNode($node, true);
+            $dom->appendChild($node);
+        }
+        return $dom;
     }
 }
