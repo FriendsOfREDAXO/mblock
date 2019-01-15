@@ -1,5 +1,10 @@
 # MBlock - REDAXO Addon für Modul-Input-Blöcke
 
+### Version 3.1.0
+
+* added rex:change event after item movements
+
+
 ### Version 3.0.1
 
 * fix exactly 2 parameters, 3 given in `MBlockFormItemDecorator`
