@@ -108,6 +108,10 @@ class MBlockHandler
             $this->readValues($id);
         }
 
+        if (is_numeric($this->id)) {
+            $this->id = (int) $this->id;
+        }
+
         $this->setValByValue();
      }
 
@@ -121,8 +125,6 @@ class MBlockHandler
      */
     public function createItems()
     {
-//        dump($this->val);
-
         // crate plain element
         $this->plainItem = new MBlockItem();
         $this->plainItem->setItemId(0)
@@ -179,8 +181,8 @@ class MBlockHandler
                 // nested mblock?
                 $mblockWrapper = self::getElementsByClass($item->getFormDomDocument(), 'div.mblock_wrapper');
                 if (sizeof($mblockWrapper) > 0) {
-                    foreach ($mblockWrapper as $mKey => $wrapper) {
-                        $this->handleNestedMBlock($item, $wrapper, $mKey);
+                    foreach ($mblockWrapper as $wrapper) {
+                        $this->handleNestedMBlock($item, $wrapper);
                     }
                 }
                 $this->executeItemManipulations($item, ($count +1), $nestedCount);
@@ -326,10 +328,9 @@ class MBlockHandler
     /**
      * @param MBlockItem $item
      * @param \DOMElement $element
-     * @param $key
      * @author Joachim Doerr
      */
-    private function handleNestedMBlock(MBlockItem $item, \DOMElement $element, $mKey)
+    private function handleNestedMBlock(MBlockItem $item, \DOMElement $element)
     {
         $settings = array();
 
@@ -339,6 +340,8 @@ class MBlockHandler
                 $settings[str_replace('data-', '', $attrName)] = $attrNode->value;
             }
         }
+
+//        dump($element->parentNode->getAttribute('class'));
 
         $formHtml = $element->getAttribute('data-mblock-plain-sortitem');
         $nestedValueKey = $element->getAttribute('data-nested-value-key');
@@ -429,7 +432,7 @@ class MBlockHandler
      */
     private function setValByValue()
     {
-        $this->val = (is_array($this->values) && array_key_exists('value', $this->values) && isset($this->values['value'][intval($this->id)])) ? $this->values['value'][intval($this->id)] : null;
+        $this->val = (is_array($this->values) && array_key_exists('value', $this->values) && isset($this->values['value'][$this->id])) ? $this->values['value'][$this->id] : null;
         return $this;
     }
 
@@ -444,6 +447,7 @@ class MBlockHandler
             // load rex value by id
             $this->values = MBlockValueProvider::loadRexVars();
         } else if (is_bool($id)) {
+            // TODO and now?
         } else {
             if (strpos($id, 'yform') !== false) {
                 $table = explode('::', $id);
