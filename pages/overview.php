@@ -6,6 +6,8 @@
  */
 
 // rex request
+use MBlock\Utils\MBlockThemeHelper;
+
 $config = rex_post('config', array(
     array('mblock_theme', 'string'),
     array('mblock_scroll', 'boolean'),

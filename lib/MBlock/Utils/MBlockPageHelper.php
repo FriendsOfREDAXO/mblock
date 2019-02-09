@@ -8,6 +8,12 @@
 namespace MBlock\Utils;
 
 
+use rex_exception;
+use rex_fragment;
+use rex_i18n;
+use rex_path;
+use rex_string;
+
 class MBlockPageHelper
 {
     /**
