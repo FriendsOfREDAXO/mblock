@@ -1,4 +1,4 @@
-<div class="sortitem" data-mblock-iterate-index="<?= $this->iterate_index; ?>">
+<div class="sortitem" data-mblock-iterate-index="<?= $this->iterate_index; ?>" data-default-count="<?= $this->iterate_index-1; ?>">
     <span class="sorthandle"></span>
     <span class="removeadded">
       <div class="btn-group btn-group-xs">
