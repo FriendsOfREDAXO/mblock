@@ -22,7 +22,7 @@ class MBlockFormItemDecorator extends MBlockElementReplacer
      * @param null $nestedCount
      * @author Joachim Doerr
      */
-    static public function decorateFormItem(MBlockItem $item, $nestedCount = null)
+    static public function decorateFormItem(MBlockItem $item, $nestedCount = array())
     {
         $dom = $item->getFormDomDocument();
         if ($dom instanceof \DOMDocument) {

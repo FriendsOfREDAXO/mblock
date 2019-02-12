@@ -173,7 +173,7 @@ class MBlockHandler
      * @return MBlockItem[]
      * @author Joachim Doerr
      */
-    public function iterateItems($nestedCount = null)
+    public function iterateItems($nestedCount = array())
     {
         if (sizeof($this->items) > 0) {
             /** @var MBlockItem $item */
@@ -182,7 +182,7 @@ class MBlockHandler
                 $mblockWrapper = self::getElementsByClass($item->getFormDomDocument(), 'div.mblock_wrapper');
                 if (sizeof($mblockWrapper) > 0) {
                     foreach ($mblockWrapper as $wrapper) {
-                        $this->handleNestedMBlock($item, $wrapper);
+                        $this->handleNestedMBlock($item, $wrapper, $nestedCount);
                     }
                 }
                 $this->executeItemManipulations($item, ($count +1), $nestedCount);
@@ -330,7 +330,7 @@ class MBlockHandler
      * @param \DOMElement $element
      * @author Joachim Doerr
      */
-    private function handleNestedMBlock(MBlockItem $item, \DOMElement $element)
+    private function handleNestedMBlock(MBlockItem $item, \DOMElement $element, $nestedCount = array())
     {
         $settings = array();
 
@@ -384,7 +384,7 @@ class MBlockHandler
             // remove data mblock flag
             $subMblockHandler->clearItems();
             // iterate items and create blocks
-            $subMblockHandler->iterateItems($item->getItemId());
+            $subMblockHandler->iterateItems(array_merge($nestedCount, array($item->getItemId())));
             // parse elements to mblock blocks
             $subMblockHandler->parseItemElements();
 

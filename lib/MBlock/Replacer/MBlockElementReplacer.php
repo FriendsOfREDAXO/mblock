@@ -25,7 +25,7 @@ class MBlockElementReplacer
      * @param null $nestedCount
      * @author Joachim Doerr
      */
-    protected static function replaceName(DOMElement $element, MBlockItem $item, $nestedCount = null)
+    protected static function replaceName(DOMElement $element, MBlockItem $item, $nestedCount = array())
     {
         $name = $element->getAttribute('name');
 
@@ -36,45 +36,34 @@ class MBlockElementReplacer
         // default
         preg_match("/(\[\w+\])(\[\d\])/", $name, $defaultMatch);
 
-        if (is_int($nestedCount) && !empty($nestedThirdMatch)) {
+        if (sizeof($nestedCount) == 2 && !empty($nestedThirdMatch)) {
 
             $defaultValueName = $nestedThirdMatch[1];
-            $defaultCount = str_replace(['[',']'],'', $nestedThirdMatch[2]);
+            $defaultCount = $nestedCount[sizeof($nestedCount)-2];
             $secondValueName = $nestedThirdMatch[3];
-            $secondCount = $nestedCount; // $nestedThirdMatch[4];
+            $secondCount = $nestedCount[sizeof($nestedCount)-1];
             $thirdValueName = $nestedThirdMatch[5];
-            $thirdCount = $item->getItemId(); // $nestedThirdMatch[6];
+            $thirdCount = $item->getItemId();
 
             $replace = sprintf('%s[%s]%s[%s]%s[%s]', $defaultValueName, $defaultCount, $secondValueName, $secondCount, $thirdValueName, $thirdCount);
             $element->setAttribute('name', str_replace($nestedThirdMatch[0], $replace, $name));
 
-//            dump(array('name'=> $name, 'match' => $nestedThirdMatch[0], '_with' => $replace));
-//            $name = explode('[', $element->getAttribute('name'));
-//            $element->setAttribute('data-name-value', $name[0]);
-//            $element->setAttribute('data-value-id', str_replace(array('[', ']'), '', $nestedMatch[1]));
-//            $element->setAttribute('data-parent-item-count', $nestedCount);
-//            $element->setAttribute('data-group-value', str_replace(array('[', ']'), '', $nestedMatch[3]));
-//            $element->setAttribute('data-item-count', str_replace(array('[', ']'), '', $item->getItemId()));
-//            $element->setAttribute('data-item-value', str_replace(']', '', array_pop($name)));
-
-        } else if (is_int($nestedCount) && !empty($nestedMatch)) {
+        } else if (sizeof($nestedCount) == 1 && !empty($nestedMatch)) {
 
             $defaultValueName = $nestedMatch[1];
-            $defaultCount = $nestedCount;
+            $defaultCount = $nestedCount[sizeof($nestedCount)-1];
             $secondValueName = $nestedMatch[3];
-            $secondCount = $item->getItemId(); // $nestedThirdMatch[4];
+            $secondCount = $item->getItemId();
 
             $replace = sprintf('%s[%s]%s[%s]', $defaultValueName, $defaultCount, $secondValueName, $secondCount);
-
             $element->setAttribute('name', str_replace($nestedMatch[0], $replace, $name));
 
         } else if (!empty($defaultMatch)) {
 
             $defaultValueName = $defaultMatch[1];
-            $defaultCount = $item->getItemId(); // str_replace(['[',']'],'', $defaultMatch[2]);
+            $defaultCount = $item->getItemId();
 
             $replace = sprintf('%s[%s]', $defaultValueName, $defaultCount);
-
             $element->setAttribute('name', str_replace($defaultMatch[0], $replace, $name));
         }
 
