@@ -36,7 +36,7 @@ class MBlockElementReplacer
         // default
         preg_match("/(\[\w+\])(\[\d\])/", $name, $defaultMatch);
 
-        if (sizeof($nestedCount) == 2 && !empty($nestedThirdMatch)) {
+        if (is_array($nestedCount) && sizeof($nestedCount) == 2 && !empty($nestedThirdMatch)) {
 
             $defaultValueName = $nestedThirdMatch[1];
             $defaultCount = $nestedCount[sizeof($nestedCount)-2];
@@ -48,7 +48,7 @@ class MBlockElementReplacer
             $replace = sprintf('%s[%s]%s[%s]%s[%s]', $defaultValueName, $defaultCount, $secondValueName, $secondCount, $thirdValueName, $thirdCount);
             $element->setAttribute('name', str_replace($nestedThirdMatch[0], $replace, $name));
 
-        } else if (sizeof($nestedCount) == 1 && !empty($nestedMatch)) {
+        } else if (is_array($nestedCount) && sizeof($nestedCount) == 1 && !empty($nestedMatch)) {
 
             $defaultValueName = $nestedMatch[1];
             $defaultCount = $nestedCount[sizeof($nestedCount)-1];
