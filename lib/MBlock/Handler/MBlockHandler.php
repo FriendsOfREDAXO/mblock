@@ -8,6 +8,7 @@
 namespace Mblock\Handler;
 
 
+use DOMElement;
 use MBlock\DOM\MBlockDOMTrait;
 use MBlock\Decorator\MBlockFormItemDecorator;
 use MBlock\DTO\MBlockElement;
@@ -242,7 +243,8 @@ class MBlockHandler
         $addText = (isset($this->settings['initial_button_text'])) ? ' ' . $this->settings['initial_button_text'] : '';
         $addItem = rex_escape('<div class="mblock-single-add"><span class="singleadded"><button type="button" class="btn btn-default addme" title="duplicate"><i class="rex-icon rex-icon-add-module"></i>' . $addText . '</button></span></div>');
 
-        $this->executeItemManipulations($this->plainItem, 0, null);
+        $this->executePlainItemManipulation($this->plainItem)
+            ->executeItemManipulations($this->plainItem, 0, null);
 
         // parse form item
         $element = new MBlockElement();
@@ -301,6 +303,31 @@ class MBlockHandler
 
     /**
      * @param MBlockItem $item
+     * @return $this
+     * @author Joachim Doerr
+     */
+    private function executePlainItemManipulation(MBlockItem $item)
+    {
+        if ($matches = $item->formDomDocument->getElementsByTagName('div')) {
+            /** @var DOMElement $match */
+            foreach ($matches as $match) {
+                if ($match->hasAttribute('class') && $match->getAttribute('class') == 'mblock_wrapper') {
+                    if ($match->hasChildNodes()) {
+                        /** @var DOMElement $child */
+                        foreach ($match->childNodes as $key => $child) {
+                            if ($child->hasAttribute('class') && $child->getAttribute('class') == 'sortitem' /* && TODO setting first open - no button if not set */) {
+                                $match->removeChild($child);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @param MBlockItem $item
      * @param $count
      * @param null $nestedCount
      * @author Joachim Doerr
@@ -340,8 +367,6 @@ class MBlockHandler
                 $settings[str_replace('data-', '', $attrName)] = $attrNode->value;
             }
         }
-
-//        dump($element->parentNode->getAttribute('class'));
 
         $formHtml = $element->getAttribute('data-mblock-plain-sortitem');
         $nestedValueKey = $element->getAttribute('data-nested-value-key');
@@ -525,18 +550,32 @@ class MBlockHandler
             $form = $form->getElements();
         }
 
-        // set directly instance of DOMElement
         if ($form instanceof \DOMDocument) {
-            $this->formHtml = self::saveHtml($form);
-            $this->formDomDocument = $form;
-            return $this;
+            // set directly instance of DOMElement
+            $formDomDocument = $form;
+        } else {
+            // create dom document by form html
+            $formDomDocument = self::createDom($form);
         }
 
-        // html form
-        $this->formHtml = $form;
+        // clean up form
+        $inputs = $formDomDocument->getElementsByTagName('input');
 
-        // create dom document by form html
-        $this->formDomDocument = self::createDom($form);
+        /** @var \DOMElement $input */
+        foreach ($inputs as $input) {
+            switch ($input->getAttribute('type')) {
+                default:
+                    $input->setAttribute('value', '');
+                    break;
+            }
+        }
+
+        // set dom document
+        $this->formDomDocument = $formDomDocument;
+
+        // html form
+        $this->formHtml = self::saveHtml($this->formDomDocument);
+
         return $this;
     }
 }
