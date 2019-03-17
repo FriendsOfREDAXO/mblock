@@ -2,12 +2,13 @@
 
 ### Version 4.0.0
 
-* add namespace for lib resources
+* added namespace for lib resources
 * change structure, set DOMtrait into DOM namespace
 * refactor mblock base class, added and use mblock handler class for handling
 * use for parsing fragments, remove the old templating system
 * use `XML_HTML_DOCUMENT_NODE` for nested blocks
-* add `handleNestedMBlock` to handler for nested blocks
+* added `handleNestedMBlock` to handler for nested blocks
+* cleaning for plain item
 
 ### Version 3.0.1
 
