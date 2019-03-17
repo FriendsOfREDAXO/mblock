@@ -327,13 +327,11 @@ function mblock_movedown(element, item) {
 }
 
 function mblock_scroll(element, item) {
-    if (element.data().hasOwnProperty('smooth-scroll')) {
-        if (element.data('smooth-scroll') === true) {
-            $.mblockSmoothScroll({
-                scrollTarget: item,
-                speed: 500
-            });
-        }
+    if (element.data('smooth-scroll') === 1 || element.data('smooth-scroll-prev') === 1) {
+        $.mblockSmoothScroll({
+            scrollTarget: item,
+            speed: 500
+        });
     }
 }
 
