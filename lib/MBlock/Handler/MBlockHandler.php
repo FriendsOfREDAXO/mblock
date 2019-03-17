@@ -313,10 +313,14 @@ class MBlockHandler
             foreach ($matches as $match) {
                 if ($match->hasAttribute('class') && $match->getAttribute('class') == 'mblock_wrapper') {
                     if ($match->hasChildNodes()) {
+                        $initialHidden = ($match->hasAttribute('data-initial_hidden') && $match->getAttribute('data-initial_hidden') == '1');
                         /** @var DOMElement $child */
                         foreach ($match->childNodes as $key => $child) {
-                            if ($child->hasAttribute('class') && $child->getAttribute('class') == 'sortitem' /* && TODO setting first open - no button if not set */) {
-                                $match->removeChild($child);
+                            // $this->settings['initial_hidden']
+                            if ($child->hasAttribute('class') && $child->getAttribute('class') == 'sortitem'
+                            ) {
+                                if (($initialHidden === false && $key > 0) || $initialHidden === true)
+                                    $match->removeChild($child);
                             }
                         }
                     }
