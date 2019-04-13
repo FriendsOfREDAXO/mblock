@@ -562,12 +562,18 @@ class MBlockHandler
             $formDomDocument = self::createDom($form);
         }
 
+        // TODO CLEANING
+
         // clean up form
         $inputs = $formDomDocument->getElementsByTagName('input');
 
         /** @var \DOMElement $input */
         foreach ($inputs as $input) {
             switch ($input->getAttribute('type')) {
+                case 'checkbox':
+                case 'radio':
+                    $input->removeAttribute('checked');
+                    break;
                 default:
                     $input->setAttribute('value', '');
                     break;
