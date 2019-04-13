@@ -13,8 +13,6 @@ use DOMElement;
 use MBlock\DOM\MBlockDOMTrait;
 use MBlock\DTO\MBlockItem;
 
-//use MBlock\DTO\MBlockItem;
-
 class MBlockElementReplacer
 {
     use MBlockDOMTrait;
