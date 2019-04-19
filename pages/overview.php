@@ -50,29 +50,29 @@ $form .= '
     <fieldset><legend class="middle">' . rex_i18n::msg('mblock_defaults') . '</legend>
 ';
 
-// set arrays
-$formElements = array();
-$elements = array();
-$elements['label'] = '
-  <label for="rex-mblock-config-template">' . rex_i18n::msg('mblock_config_label_template') . '</label>
-';
-// create select
-$select = new rex_select;
-$select->setId('rex-mblock-config-template');
-$select->setSize(1);
-$select->setAttribute('class', 'form-control');
-$select->setName('config[mblock_theme]');
-// add options
-foreach ($themes as $theme) {
-    $select->addOption($theme['theme_screen_name'], $theme['theme_path']);
-}
-$select->setSelected($this->getConfig('mblock_theme'));
-$elements['field'] = $select->get();
-$formElements[] = $elements;
-// parse select element
-$fragment = new rex_fragment();
-$fragment->setVar('elements', $formElements, false);
-$form .= $fragment->parse('core/form/form.php');
+//// set arrays
+//$formElements = array();
+//$elements = array();
+//$elements['label'] = '
+//  <label for="rex-mblock-config-template">' . rex_i18n::msg('mblock_config_label_template') . '</label>
+//';
+//// create select
+//$select = new rex_select;
+//$select->setId('rex-mblock-config-template');
+//$select->setSize(1);
+//$select->setAttribute('class', 'form-control');
+//$select->setName('config[mblock_theme]');
+//// add options
+//foreach ($themes as $theme) {
+//    $select->addOption($theme['theme_screen_name'], $theme['theme_path']);
+//}
+//$select->setSelected($this->getConfig('mblock_theme'));
+//$elements['field'] = $select->get();
+//$formElements[] = $elements;
+//// parse select element
+//$fragment = new rex_fragment();
+//$fragment->setVar('elements', $formElements, false);
+//$form .= $fragment->parse('core/form/form.php');
 
 // label
 $formElements = array();
