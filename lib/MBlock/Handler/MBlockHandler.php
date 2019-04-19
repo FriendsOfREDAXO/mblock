@@ -18,6 +18,7 @@ use MBlock\Provider\MBlockValueProvider;
 use MBlock\Replacer\MBlockBootstrapReplacer;
 use MBlock\Replacer\MBlockCountReplacer;
 use MBlock\Replacer\MBlockElementReplacer;
+use MBlock\Replacer\MBlockElementClearer;
 use MBlock\Replacer\MBlockSystemButtonReplacer;
 use MBlock\Utils\MBlockSettingsHelper;
 use mblock_rex_form;
@@ -341,8 +342,6 @@ class MBlockHandler
     {
         // decorate item form
         MBlockFormItemDecorator::decorateFormItem($item, $nestedCount);
-        // decorate item form
-        MBlockElementReplacer::replaceForId($item);
         // decorate counting
         MBlockCountReplacer::replaceCountKeys($item, $count);
         // decorate tabs
@@ -476,7 +475,7 @@ class MBlockHandler
             // load rex value by id
             $this->values = MBlockValueProvider::loadRexVars();
         } else if (is_bool($id)) {
-            // TODO and now?
+            // TODO and now?...
         } else {
             if (strpos($id, 'yform') !== false) {
                 $table = explode('::', $id);
@@ -562,23 +561,8 @@ class MBlockHandler
             $formDomDocument = self::createDom($form);
         }
 
-        // TODO CLEANING
-
         // clean up form
-        $inputs = $formDomDocument->getElementsByTagName('input');
-
-        /** @var \DOMElement $input */
-        foreach ($inputs as $input) {
-            switch ($input->getAttribute('type')) {
-                case 'checkbox':
-                case 'radio':
-                    $input->removeAttribute('checked');
-                    break;
-                default:
-                    $input->setAttribute('value', '');
-                    break;
-            }
-        }
+        MBlockElementClearer::clearFormElements($formDomDocument);
 
         // set dom document
         $this->formDomDocument = $formDomDocument;
