@@ -104,9 +104,13 @@ function mblock_sort_it(element) {
         animation: 150,
         onEnd: function (event) {
             mblock_reindex(element);
+            element.removeClass('sortable_start');
             // trigger event
             let iClone = $(event.item);
             iClone.trigger('rex:change', [iClone]);
+        },
+        onStart: function(event) {
+            element.addClass('sortable_start');
         }
     });
 }
@@ -120,16 +124,20 @@ function mblock_reindex(element) {
             parent_sortitem = sortitem.parents('div.sortitem').first();
 
         sortitem.attr('data-default-count', index)
-            .find('input,textarea,select,button:not(.addme,.removeme,.moveup,.movedown)')
+            .find('input,textarea,select,button')
             .each(function () {
 
             let name = $(this).data('name-value'),
                 this_name = $(this).attr('name'),
-                res_third = this_name.match(/(\[\w+\])(\[\d\])(\[\w+\])(\[\d\])(\[\w+\])(\[\d\])/),
-                res_second = this_name.match(/(\[\w+\])(\[\d\])(\[\w+\])(\[\d\])/),
-                res_default = this_name.match(/(\[\w+\])(\[\d\])/);
+                res_third, res_second, res_default;
 
-            if (res_third !== null && parent_mblocks.length === 2) {
+            if ((typeof this_name !== typeof undefined && this_name !== false)) {
+                    res_third = this_name.match(/(\[\w+\])(\[\d\])(\[\w+\])(\[\d\])(\[\w+\])(\[\d\])/);
+                    res_second = this_name.match(/(\[\w+\])(\[\d\])(\[\w+\])(\[\d\])/);
+                    res_default = this_name.match(/(\[\w+\])(\[\d\])/);
+            }
+
+            if (res_third !== null && Array.isArray(res_third) && parent_mblocks.length === 2) {
 
                 let $defaultValueName = res_third[1],
                     $defaultCount = parent_sortitem.parents('div.sortitem').first().attr('data-default-count'), // res_third[2],
@@ -141,7 +149,7 @@ function mblock_reindex(element) {
 
                 $(this).attr('name', this_name.replace(name + res_third[0], $replace));
 
-            } else if (res_second !== null && parent_mblocks.length === 1) {
+            } else if (res_second !== null && Array.isArray(res_second) && parent_mblocks.length === 1) {
 
                 let $defaultValueName = res_second[1],
                     $defaultCount = parent_sortitem.first().attr('data-default-count'), // res_second[2],
@@ -155,7 +163,7 @@ function mblock_reindex(element) {
                     mblock_reindex($(this));
                 });
 
-            } else if (res_default !== null) {
+            } else if (res_default !== null && Array.isArray(res_default)) {
 
                 let $defaultValueName = res_default[1],
                     $defaultCount = index,
@@ -207,17 +215,8 @@ function mblock_add_item(element, item) {
         $(this).parent().removeAttr('for');
     });
 
-    // fix radio bug
-    iClone.find('input:radio, input:checkbox').each(function () {
-        // fix lost checked from parent item
-        $(this).attr('name', 'mblock_new_' + $(this).attr('name'));
-        // fix lost value
-        $(this).attr('data-value', $(this).val());
-    });
-
     if (item === false) {
-        // add clone
-        element.prepend(iClone);
+        element.prepend(iClone); // add clone
 
     } else if (item.parent().hasClass(element.attr('class'))) {
         // unset sortable
