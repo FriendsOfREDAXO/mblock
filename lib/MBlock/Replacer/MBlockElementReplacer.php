@@ -202,12 +202,12 @@ class MBlockElementReplacer
      * @param DOMDocument $dom
      * @param DOMElement $element
      * @param MBlockItem $item
-     * @return bool
+     * @param array $nestedCount
+     * @return void
      * @author Joachim Doerr
      */
-    public static function replaceForId(MBlockItem $item)
+    public static function replaceForId(DOMDocument $dom, DOMElement $element, MBlockItem $item, $nestedCount = array())
     {
-        /*
         // get input id
         if (!$elementId = $element->getAttribute('id')) return true;
 
@@ -217,25 +217,34 @@ class MBlockElementReplacer
             return false;
         }
 
+        // TODO BRAIN FUCK MAN!!!!
+
+//        dump(array($elementId,$item->getItemId()));
         $id = preg_replace('/(_\d+){2}/i', '_' . $item->getItemId(), str_replace('-','_', $elementId));
-
-        $dom = $item->getForm();
-
-        $element->setAttribute('id', $id);
-        // find label with for
-        $matches = $dom->getElementsByTagName('label');
-
-        if ($matches) {
-            /** @var DOMElement $match *//*
-            foreach ($matches as $match) {
-                $for = $match->getAttribute('for');
-                if ($for == $elementId) {
-                    $match->setAttribute('for', $id);
-                }
-            }
-        }
+//
+//        if (is_array($nestedCount) && sizeof($nestedCount) == 2) {
+//            $defaultCount = $nestedCount[sizeof($nestedCount)-2];
+//            $secondCount = $nestedCount[sizeof($nestedCount)-1];
+//            $id = $id . '_' . $defaultCount . '_' . $secondCount;
+//        } else if (is_array($nestedCount) && sizeof($nestedCount) == 1) {
+//            $defaultCount = $nestedCount[sizeof($nestedCount)-1];
+//            $id = $id . '_' . $defaultCount;
+//        }
+//
+//        $element->setAttribute('id', $id);
+//        // find label with for
+//        $matches = $dom->getElementsByTagName('label');
+//
+//        if ($matches) {
+//            /** @var DOMElement $match */
+//            foreach ($matches as $match) {
+//                $for = $match->getAttribute('for');
+//                if ($for == $elementId) {
+//                    $match->setAttribute('for', $id);
+//                }
+//            }
+//        }
         return true;
-        */
     }
 
     /**
