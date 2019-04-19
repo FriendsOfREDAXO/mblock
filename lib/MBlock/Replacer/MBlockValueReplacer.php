@@ -89,10 +89,7 @@ class MBlockValueReplacer
     protected static function replaceValue(DOMElement $element, MBlockItem $item)
     {
         // get value key by name
-        $matches = MBlockFormItemDecorator::getName($element);
-
-        // found
-        if ($matches) {
+        if ($matches = MBlockFormItemDecorator::getName($element)) {
             // node name switch
             switch ($element->nodeName) {
                 default:
@@ -114,10 +111,7 @@ class MBlockValueReplacer
     protected static function replaceChecked(DOMElement $element, MBlockItem $item)
     {
         // get value key by name
-        $matches = MBlockFormItemDecorator::getName($element);
-
-        // found
-        if ($matches) {
+        if ($matches = MBlockFormItemDecorator::getName($element)) {
             // unset select
             if ($element->getAttribute('checked')) {
                 $element->removeAttribute('checked');
@@ -134,9 +128,7 @@ class MBlockValueReplacer
     protected static function replaceOptionSelect(DOMElement $select, DOMElement $option, MBlockItem $item)
     {
         // get value key by name
-        $matches = MBlockFormItemDecorator::getName($select);
-
-        if ($matches) {
+        if ($matches = MBlockFormItemDecorator::getName($select)) {
             // unset select
             if ($option->hasAttribute('selected')) {
                 $option->removeAttribute('selected');
