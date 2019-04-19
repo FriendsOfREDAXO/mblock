@@ -31,10 +31,10 @@ class MBlockFormItemDecorator extends MBlockElementReplacer
                 /** @var DOMElement $match */
                 foreach ($matches as $match) {
                     if (!$match->hasAttribute('data-mblock')) {
-                        // label for and id change
-//                self::replaceForId($dom, $match, $item);
                         // replace attribute id
                         self::replaceName($match, $item, $nestedCount);
+                        // label for and id change
+                        self::replaceForId($dom, $match, $item, $nestedCount);
                         // change checked or value by type
                         switch ($match->getAttribute('type')) {
                             case 'checkbox':
@@ -56,10 +56,10 @@ class MBlockFormItemDecorator extends MBlockElementReplacer
                 /** @var DOMElement $match */
                 foreach ($matches as $match) {
                     if (!$match->hasAttribute('data-mblock')) {
-                        // label for and id change
-//                self::replaceForId($dom, $match, $item);
                         // replace attribute id
                         self::replaceName($match, $item, $nestedCount);
+                        // label for and id change
+                        self::replaceForId($dom, $match, $item, $nestedCount);
                         // replace value by json key
                         self::replaceValue($match, $item);
                         $match->setAttribute('data-mblock', true);
@@ -77,10 +77,10 @@ class MBlockFormItemDecorator extends MBlockElementReplacer
                             or strpos($match->getAttribute('id'), 'REX_LINK') !== false) {
                             continue;
                         }
-                        // label for and id change
-//                self::replaceForId($dom, $match, $item);
                         // replace attribute id
                         self::replaceName($match, $item, $nestedCount);
+                        // label for and id change
+                        self::replaceForId($dom, $match, $item, $nestedCount);
                         // replace selected data
                         self::replaceSelectedData($match, $item);
                         // replace value by json key
