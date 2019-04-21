@@ -221,7 +221,7 @@ class MBlockElementReplacer
         $element->setAttribute('id', $id);
 
         if ($element->parentNode->nodeName == 'label') {
-            $element->parentNode->removeAttribute('for');
+            $element->parentNode->setAttribute('for', $id);
         } else {
             if ($match = $element->parentNode->parentNode->getElementsByTagName('label')) {
                 /** @var DOMElement $label */
