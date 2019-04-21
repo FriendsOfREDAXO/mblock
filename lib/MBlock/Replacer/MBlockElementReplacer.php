@@ -203,10 +203,10 @@ class MBlockElementReplacer
      * @param DOMElement $element
      * @param MBlockItem $item
      * @param array $nestedCount
-     * @return void
      * @author Joachim Doerr
+     * @return bool
      */
-    public static function replaceForId(DOMDocument $dom, DOMElement $element, MBlockItem $item, $nestedCount = array())
+    public static function replaceForId(DOMElement $element)
     {
         // get input id
         if (!$elementId = $element->getAttribute('id')) return true;
@@ -217,33 +217,22 @@ class MBlockElementReplacer
             return false;
         }
 
-        // TODO BRAIN FUCK MAN!!!!
+        $id = preg_replace('/(\[|\])/m', '', str_replace('-','_', $element->getAttribute('name')));
+        $element->setAttribute('id', $id);
 
-//        dump(array($elementId,$item->getItemId()));
-        $id = preg_replace('/(_\d+){2}/i', '_' . $item->getItemId(), str_replace('-','_', $elementId));
-//
-//        if (is_array($nestedCount) && sizeof($nestedCount) == 2) {
-//            $defaultCount = $nestedCount[sizeof($nestedCount)-2];
-//            $secondCount = $nestedCount[sizeof($nestedCount)-1];
-//            $id = $id . '_' . $defaultCount . '_' . $secondCount;
-//        } else if (is_array($nestedCount) && sizeof($nestedCount) == 1) {
-//            $defaultCount = $nestedCount[sizeof($nestedCount)-1];
-//            $id = $id . '_' . $defaultCount;
-//        }
-//
-//        $element->setAttribute('id', $id);
-//        // find label with for
-//        $matches = $dom->getElementsByTagName('label');
-//
-//        if ($matches) {
-//            /** @var DOMElement $match */
-//            foreach ($matches as $match) {
-//                $for = $match->getAttribute('for');
-//                if ($for == $elementId) {
-//                    $match->setAttribute('for', $id);
-//                }
-//            }
-//        }
+        if ($element->parentNode->nodeName == 'label') {
+            $element->parentNode->removeAttribute('for');
+        } else {
+            if ($match = $element->parentNode->parentNode->getElementsByTagName('label')) {
+                /** @var DOMElement $label */
+                foreach ($match as $label) {
+                    if ($label->getAttribute('for') == $elementId) {
+                        $label->setAttribute('for', $id);
+                    }
+                }
+            }
+        }
+
         return true;
     }
 
