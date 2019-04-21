@@ -343,14 +343,19 @@ class MBlockHandler
         // decorate item form
         MBlockFormItemDecorator::decorateFormItem($item, $nestedCount);
         // decorate counting
+        // TODO!!!!
         MBlockCountReplacer::replaceCountKeys($item, $count);
         // decorate tabs
+        // TODO !!!
         MBlockBootstrapReplacer::replaceTabIds($item, $count);
         // decorate collapse
+        // TODO !!!
         MBlockBootstrapReplacer::replaceCollapseIds($item, $count);
         // replace system button data
-        MBlockSystemButtonReplacer::replaceSystemButtons($item, $count);
+        // TODO !!!
+        MBlockSystemButtonReplacer::replaceSystemButtons($item, $count, $nestedCount);
         // custom link hidden to text
+        // TODO !!!
         MBlockSystemButtonReplacer::replaceCustomLinkText($item);
         return $this;
     }
