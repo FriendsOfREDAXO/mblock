@@ -7,5 +7,5 @@
         <span class="btn-move moveup" title="move up"><i class="rex-icon rex-icon-up"></i></span>
         <span class="btn-move movedown" title="move down"><i class="rex-icon rex-icon-down"></i></span>
     </span>
-    <div class="mblock-sortitem-form"><?= $this->form; ?></div>
+    <div class="mblock-sortitem-form"><input type="hidden" name="%%%_mblock_visibility_status_%%%" value="1"><?= $this->form; ?></div>
 </div>
