@@ -66,7 +66,7 @@ class MBlockSystemButtonReplacer
      * @param int $count
      * @author Joachim Doerr
      */
-    public static function replaceSystemButtons(MBlockItem $item, $count)
+    public static function replaceSystemButtons(MBlockItem $item, $count, $nestedCount = array())
     {
         // set dom document
         $dom = $item->getFormDomDocument();
@@ -100,7 +100,7 @@ class MBlockSystemButtonReplacer
                                     if (strpos($match->getAttribute('class'), 'custom-link') !== false) {
                                         self::processCustomLink($match, $item);
                                     } else {
-                                        self::processLink($match, $item);
+                                        self::processLink($match, $item, $nestedCount);
                                     }
                                 }
                                 if (strpos($id, 'REX_LINKLIST_') !== false) {
@@ -189,7 +189,7 @@ class MBlockSystemButtonReplacer
      * @param MBlockItem $item
      * @author Joachim Doerr
      */
-    protected static function processLink(DOMElement $dom, MBlockItem $item)
+    protected static function processLink(DOMElement $dom, MBlockItem $item, $nestedCount = null)
     {
         // set system name
         $item->setSystemName('REX_LINK');
@@ -201,7 +201,7 @@ class MBlockSystemButtonReplacer
                 // hidden input
                 if (strrpos($child->getAttribute('name'), 'REX_INPUT_LINK') !== false) {
                     // replace name
-                    self::replaceName($child, $item, 'REX_INPUT_LINK');
+                    self::replaceName($child, $item, 'REX_INPUT_LINK', $nestedCount);
                 }
                 // change id
                 self::replaceId($child, $item);
@@ -357,7 +357,7 @@ class MBlockSystemButtonReplacer
      * @param $name
      * @author Joachim Doerr
      */
-    protected static function replaceName(DOMElement $dom, MBlockItem $item, $name)
+    protected static function replaceName(DOMElement $dom, MBlockItem $item, $name, $nestedCount = array())
     {
         // get name
         $matches = MBlockFormItemDecorator::getName($dom);
@@ -367,7 +367,9 @@ class MBlockSystemButtonReplacer
             $item->setSystemId($matches[1]);
             // and replace name attribute
             $replaceName = str_replace(strtoupper('_input'), '', $name);
+//            dump($dom->getAttribute('name'));
             $dom->setAttribute('name', str_replace(array($name, '[' . $item->getSystemId() . ']'), array('REX_INPUT_VALUE', '[' . $item->getValueId() . '][0][' . $replaceName . '_' . $item->getSystemId() . ']'), $dom->getAttribute('name')));
+//            dump($dom->getAttribute('name'));
         }
     }
 
