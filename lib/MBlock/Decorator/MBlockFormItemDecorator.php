@@ -34,7 +34,7 @@ class MBlockFormItemDecorator extends MBlockElementReplacer
                         // replace attribute id
                         self::replaceName($match, $item, $nestedCount);
                         // label for and id change
-                        self::replaceForId($dom, $match, $item, $nestedCount);
+                        self::replaceForId($match);
                         // change checked or value by type
                         switch ($match->getAttribute('type')) {
                             case 'checkbox':
@@ -59,7 +59,7 @@ class MBlockFormItemDecorator extends MBlockElementReplacer
                         // replace attribute id
                         self::replaceName($match, $item, $nestedCount);
                         // label for and id change
-                        self::replaceForId($dom, $match, $item, $nestedCount);
+                        self::replaceForId($match);
                         // replace value by json key
                         self::replaceValue($match, $item);
                         $match->setAttribute('data-mblock', true);
@@ -80,7 +80,7 @@ class MBlockFormItemDecorator extends MBlockElementReplacer
                         // replace attribute id
                         self::replaceName($match, $item, $nestedCount);
                         // label for and id change
-                        self::replaceForId($dom, $match, $item, $nestedCount);
+                        self::replaceForId($match);
                         // replace selected data
                         self::replaceSelectedData($match, $item);
                         // replace value by json key
