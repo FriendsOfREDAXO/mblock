@@ -22,6 +22,7 @@ use MBlock\Replacer\MBlockElementClearer;
 use MBlock\Replacer\MBlockSystemButtonReplacer;
 use MBlock\Utils\MBlockSettingsHelper;
 use mblock_rex_form;
+use MBlockValueReplacer;
 use MForm;
 use rex_request;
 use rex_yform;
@@ -566,8 +567,8 @@ class MBlockHandler
             $formDomDocument = self::createDom($form);
         }
 
-        // clean up form
-        MBlockElementClearer::clearFormElements($formDomDocument);
+        // set default values?
+        MBlockValueReplacer::replaceValueSetEmpty($formDomDocument);
 
         // set dom document
         $this->formDomDocument = $formDomDocument;
