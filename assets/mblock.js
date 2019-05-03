@@ -14,6 +14,7 @@ function mblock_init(element) {
     if (!element.data('mblock_run')) {
         element.data('mblock_run', 1);
         mblock_sort(element);
+        mblock_add(element);
         mblock_set_unique_id(element, false);
 
         if (element.data('min') == 1 && element.data('max') == 1) {
@@ -32,8 +33,6 @@ function mblock_init_sort(element) {
 }
 
 function mblock_sort(element) {
-    // add linking
-    mblock_add(element);
     // remove mblock_remove
     mblock_remove(element);
     // init sortable
@@ -67,16 +66,20 @@ function mblock_remove(element) {
     if (element.data().hasOwnProperty('max')) {
         if (finded.length >= element.data('max')) {
             element.find('.addme').prop('disabled', true);
+            element.find('.addme').attr('data-disabled', true);
         } else {
             element.find('.addme').prop('disabled', false);
+            element.find('.addme').attr('data-disabled', false);
         }
     }
 
     if (element.data().hasOwnProperty('min')) {
         if (finded.length <= element.data('min')) {
             element.find('.removeme').prop('disabled', true);
+            element.find('.removeme').attr('data-disabled', true);
         } else {
             element.find('.removeme').prop('disabled', false);
+            element.find('.removeme').attr('data-disabled', false);
         }
     }
 
@@ -84,16 +87,21 @@ function mblock_remove(element) {
         // min removeme hide
         if ((index + 1) == element.data('min') && finded.length == element.data('min')) {
             $(this).find('.removeme').prop('disabled', true);
+            $(this).find('.removeme').attr('data-disabled', true);
         }
         if (index == 0) {
             $(this).find('.moveup').prop('disabled', true);
+            $(this).find('.moveup').attr('data-disabled', true);
         } else {
             $(this).find('.moveup').prop('disabled', false);
+            $(this).find('.moveup').attr('data-disabled', false);
         }
         if ((index + 1) == finded.length) { // if max count?
             $(this).find('.movedown').prop('disabled', true);
+            $(this).find('.movedown').attr('data-disabled', true);
         } else {
             $(this).find('.movedown').prop('disabled', false);
+            $(this).find('.movedown').attr('data-disabled', false);
         }
     });
 }
@@ -196,7 +204,7 @@ function mblock_replace_for(element) {
                     id.indexOf("redactor") >= 0 ||
                     id.indexOf("markitup") >= 0)
                 ) {
-                    let label = mblock.find('label[for="' + id + '"]');
+                    let label = el.parent().parent().find('label[for="' + id + '"]');
                     name = name.replace(/(\[|\])/gm, '');
                     el.attr('id', name);
                     label.attr('for', name);
@@ -233,6 +241,8 @@ function mblock_add_item(element, item) {
     mblock_init_sort(element);
     // scroll to item
     mblock_scroll(element, iClone);
+    // add buttons
+    mblock_buttons(element, iClone);
     // trigger rex ready
     iClone.trigger('rex:ready', [iClone]);
 }
@@ -335,29 +345,49 @@ function mblock_scroll(element, item) {
 }
 
 function mblock_add(element) {
-    element.find('> div.sortitem .addme').unbind().bind('click', function () {
+    element.find('> div.sortitem').each(function(){
+        mblock_buttons(element, $(this));
+    });
+}
+
+function mblock_buttons(element, sortitem) {
+    sortitem.find('> .removeadded > .addme').on('click',function () {
         if (!$(this).prop('disabled')) {
-            $item = $(this).parents('.sortitem');
-            element.attr('data-mblock_clicked_add_item', $item.attr('data-mblock_index'));
-            mblock_add_item(element, $(this).closest('div[class^="sortitem"]'));
+            let sortitem = $(this).parent().parent();
+            element.attr('data-mblock_clicked_add_item', sortitem.attr('data-mblock_index'));
+            mblock_add_item(element, sortitem);
         }
         return false;
     });
-    element.find('> div.sortitem .removeme').unbind().bind('click', function () {
+    sortitem.find('> .removeadded > .removeme').on('click', function () {
         if (!$(this).prop('disabled')) {
-            mblock_remove_item(element, $(this).closest('div[class^="sortitem"]'));
+            let sortitem = $(this).parent().parent();
+            mblock_remove_item(element, sortitem);
         }
         return false;
     });
-    element.find('> div.sortitem .moveup').unbind().bind('click', function () {
+    sortitem.find('> .removeadded > .moveup').on('click', function () {
         if (!$(this).prop('disabled')) {
-            mblock_moveup(element, $(this).closest('div[class^="sortitem"]'));
+            let sortitem = $(this).parent().parent();
+            mblock_moveup(element, sortitem);
         }
         return false;
     });
-    element.find('> div.sortitem .movedown').unbind().bind('click', function () {
+    sortitem.find('> .removeadded > .movedown').on('click', function () {
         if (!$(this).prop('disabled')) {
-            mblock_movedown(element, $(this).closest('div[class^="sortitem"]'));
+            let sortitem = $(this).parent().parent();
+            mblock_movedown(element, sortitem);
+        }
+        return false;
+    });
+    sortitem.find('> .removeadded > .visibility').on('click', function() {
+        let sortitem = $(this).parent().parent();
+        if (!sortitem.hasClass('visibility-hidden')) {
+            sortitem.addClass('visibility-hidden');
+            $(this).find('i').addClass('rex-icon-invisible').removeClass('rex-icon-visible');
+        } else {
+            sortitem.removeClass('visibility-hidden');
+            $(this).find('i').addClass('rex-icon-visible').removeClass('rex-icon-invisible');
         }
         return false;
     });
