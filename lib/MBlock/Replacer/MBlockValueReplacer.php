@@ -15,17 +15,29 @@ class MBlockValueReplacer
     use MBlockDOMTrait;
 
     /**
-     * @param MBlockItem $item
-     * @param $count
+     * TODO set default values
+     *
+     * @param DOMDocument $dom
+     * @param bool $setDefaultValue
      * @return String
      * @author Joachim Doerr
      */
-    public static function replaceValueSetEmpty(MBlockItem $item, $setDefaultValue = false)
+    public static function replaceValueSetEmpty(DOMDocument $dom, $setDefaultValue = false)
     {
-        // set phpquery document
-        $dom = $item->getFormDomDocument();
-
-        // find inputs
+        // remove unused sortitems
+        if ($matches = $dom->getElementsByTagName('div')) {
+            $count=0;
+            /** @var DOMElement $match */
+            foreach ($matches as $match) {
+                if ($match->getAttribute('class') == 'sortitem') {
+                    $count++;
+                    if ($count > 1) {
+                        $match->parentNode->removeChild($match);
+                    }
+                }
+            }
+        }
+            // find inputs
         if ($matches = $dom->getElementsByTagName('input')) {
             /** @var DOMElement $match */
             foreach ($matches as $match) {
@@ -34,11 +46,11 @@ class MBlockValueReplacer
                     case 'checkbox':
                     case 'radio':
                         // replace checked
-                        self::replaceChecked($match, $item);
+                        self::replaceChecked($match);
                         break;
                     default:
                         // replace value by json key
-                        self::replaceValue($match, $item);
+                        self::replaceValue($match);
                 }
             }
         }
@@ -48,7 +60,7 @@ class MBlockValueReplacer
             /** @var DOMElement $match */
             foreach ($matches as $match) {
                 // replace value by json key
-                self::replaceValue($match, $item);
+                self::replaceValue($match);
             }
         }
 
@@ -63,11 +75,11 @@ class MBlockValueReplacer
                         switch ($child->nodeName) {
                             case 'optgroup':
                                 foreach ($child->childNodes as $nodeChild)
-                                    self::replaceOptionSelect($match, $nodeChild, $item);
+                                    self::replaceOptionSelect($match, $nodeChild);
                                 break;
                             case 'option':
                                 if (isset($child->tagName)) {
-                                    self::replaceOptionSelect($match, $child, $item);
+                                    self::replaceOptionSelect($match, $child);
                                     break;
                                 }
                         }
@@ -75,18 +87,13 @@ class MBlockValueReplacer
                 }
             }
         }
-
-
-        return self::saveHtml($dom);
     }
 
     /**
      * @param DOMElement $element
-     * @param MBlockItem $item
-     * @param bool $valueEmpty
      * @author Joachim Doerr
      */
-    protected static function replaceValue(DOMElement $element, MBlockItem $item)
+    protected static function replaceValue(DOMElement $element)
     {
         // get value key by name
         if ($matches = MBlockFormItemDecorator::getName($element)) {
@@ -105,10 +112,9 @@ class MBlockValueReplacer
 
     /**
      * @param DOMElement $element
-     * @param MBlockItem $item
      * @author Joachim Doerr
      */
-    protected static function replaceChecked(DOMElement $element, MBlockItem $item)
+    protected static function replaceChecked(DOMElement $element)
     {
         // get value key by name
         if ($matches = MBlockFormItemDecorator::getName($element)) {
@@ -122,10 +128,9 @@ class MBlockValueReplacer
     /**
      * @param DOMElement $select
      * @param DOMElement $option
-     * @param MBlockItem $item
      * @author Joachim Doerr
      */
-    protected static function replaceOptionSelect(DOMElement $select, DOMElement $option, MBlockItem $item)
+    protected static function replaceOptionSelect(DOMElement $select, DOMElement $option)
     {
         // get value key by name
         if ($matches = MBlockFormItemDecorator::getName($select)) {
