@@ -17,12 +17,10 @@ use MBlock\Parser\MBlockParser;
 use MBlock\Provider\MBlockValueProvider;
 use MBlock\Replacer\MBlockBootstrapReplacer;
 use MBlock\Replacer\MBlockCountReplacer;
-use MBlock\Replacer\MBlockElementReplacer;
-use MBlock\Replacer\MBlockElementClearer;
 use MBlock\Replacer\MBlockSystemButtonReplacer;
+use MBlock\Replacer\MBlockValueReplacer;
 use MBlock\Utils\MBlockSettingsHelper;
 use mblock_rex_form;
-use MBlockValueReplacer;
 use MForm;
 use rex_request;
 use rex_yform;
@@ -72,6 +70,11 @@ class MBlockHandler
     protected $id;
 
     /**
+     * @var string
+     */
+    protected $plainId;
+
+    /**
      * @var mixed|string
      */
     protected $themeKey;
@@ -87,6 +90,7 @@ class MBlockHandler
      */
     public function __construct($id, $form, array $settings = array(), array $values = null, $theme = 'default')
     {
+        $this->plainId = $id;
         if (strpos($id, '.') !== false) {
             $explodedId = explode('.', $id);
             if (is_numeric($explodedId[0]) && sizeof($explodedId) == 2) {
@@ -133,6 +137,7 @@ class MBlockHandler
         $this->plainItem->setItemId(0)
             ->setFormHtml($this->formHtml)
             ->setValueId($this->id)
+            ->setPlainId($this->plainId)
             ->setFormDomDocument(clone $this->formDomDocument)
             ->addPayload('plain_item', true);
 
@@ -146,6 +151,7 @@ class MBlockHandler
                     $this->items[$key]->setItemId($key)
                         ->setFormHtml($this->formHtml)
                         ->setValueId($this->id)
+                        ->setPlainId($this->plainId)
                         ->setVal($this->val[$key])
                         ->setFormDomDocument(clone $this->formDomDocument);
                 }
@@ -165,6 +171,7 @@ class MBlockHandler
             $this->items[0]->setItemId(0)
                 ->setFormHtml($this->formHtml)
                 ->setValueId($this->id)
+                ->setPlainId($this->plainId)
                 ->setFormDomDocument(clone $this->formDomDocument);
         }
 
@@ -276,6 +283,7 @@ class MBlockHandler
         if (sizeof($this->items) > 0) {
             /** @var MBlockItem $item */
             foreach ($this->items as $count => $item) {
+                // TODO entfernt weil nested mblocks entfernt wurden deswegen siehe zeile 391
                 if (strpos($item->getElement()->getOutput(), 'mblock-sortitem-to-remove') !== false) {
                     $domElementOutput = self::createDom($item->getElement()->getOutput());
                     $sortItems = self::getElementsByClass($domElementOutput, 'div.mblock-sortitem-to-remove');
@@ -341,6 +349,8 @@ class MBlockHandler
      */
     private function executeItemManipulations(MBlockItem $item, $count, $nestedCount = null)
     {
+        // replace system button data
+        MBlockSystemButtonReplacer::replaceSystemButtons($item, $count, $nestedCount);
         // decorate item form
         MBlockFormItemDecorator::decorateFormItem($item, $nestedCount);
         // decorate counting
@@ -352,9 +362,6 @@ class MBlockHandler
         // decorate collapse
         // TODO !!!
         MBlockBootstrapReplacer::replaceCollapseIds($item, $count);
-        // replace system button data
-        // TODO !!!
-        MBlockSystemButtonReplacer::replaceSystemButtons($item, $count, $nestedCount);
         // custom link hidden to text
         // TODO !!!
         MBlockSystemButtonReplacer::replaceCustomLinkText($item);
@@ -364,6 +371,7 @@ class MBlockHandler
     /**
      * @param MBlockItem $item
      * @param \DOMElement $element
+     * @param array $nestedCount
      * @author Joachim Doerr
      */
     private function handleNestedMBlock(MBlockItem $item, \DOMElement $element, $nestedCount = array())
