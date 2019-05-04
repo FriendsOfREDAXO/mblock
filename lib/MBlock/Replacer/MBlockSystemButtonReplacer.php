@@ -10,14 +10,11 @@ namespace MBlock\Replacer;
 
 use DOMElement;
 use MBlock\Decorator\MBlockFormItemDecorator;
-use MBlock\DOM\MBlockDOMTrait;
 use MBlock\DTO\MBlockItem;
 use rex_article;
 
-class MBlockSystemButtonReplacer
+class MBlockSystemButtonReplacer extends MBlockElementReplacer
 {
-    use MBlockDOMTrait;
-
     /**
      * @param MBlockItem $item
      * @author Joachim Doerr
@@ -64,6 +61,7 @@ class MBlockSystemButtonReplacer
     /**
      * @param MBlockItem $item
      * @param int $count
+     * @param array $nestedCount
      * @author Joachim Doerr
      */
     public static function replaceSystemButtons(MBlockItem $item, $count, $nestedCount = array())
@@ -80,7 +78,7 @@ class MBlockSystemButtonReplacer
                     if ($match->hasChildNodes()) {
                         /** @var DOMElement $child */
                         foreach ($match->getElementsByTagName('input') as $child) {
-                            if ($child instanceof DOMElement && $child->hasAttribute('data-mblock')) { // && $child->getAttribute('type') == 'hidden') {
+                            if ($child instanceof DOMElement && !$child->hasAttribute('data-mblock')) { // && $child->getAttribute('type') == 'hidden') {
                                 // set id and name
                                 $id = $child->getAttribute('id');
                                 # $name = $child->getAttribute('name');
@@ -89,23 +87,23 @@ class MBlockSystemButtonReplacer
                                 // process by type
                                 if (strpos($id, 'REX_MEDIA_') !== false && $type == 'text') {
                                     // media button
-                                    self::processMedia($match, $item);
+                                    self::processMedia($match, $item, $nestedCount);
                                 }
                                 if (strpos($id, 'REX_MEDIALIST_') !== false) {
                                     // media list button
-                                    self::processMediaList($match, $item);
+                                    self::processMediaList($match, $item, $nestedCount);
                                 }
                                 if (strpos($id, 'REX_LINK_') !== false && $type == 'text') {
                                     // link button
                                     if (strpos($match->getAttribute('class'), 'custom-link') !== false) {
-                                        self::processCustomLink($match, $item);
+                                        self::processCustomLink($match, $item, $nestedCount);
                                     } else {
                                         self::processLink($match, $item, $nestedCount);
                                     }
                                 }
                                 if (strpos($id, 'REX_LINKLIST_') !== false) {
                                     // link list button
-                                    self::processLinkList($match, $item);
+                                    self::processLinkList($match, $item, $nestedCount);
                                 }
                             }
                         }
@@ -119,9 +117,10 @@ class MBlockSystemButtonReplacer
     /**
      * @param DOMElement $dom
      * @param MBlockItem $item
+     * @param null $nestedCount
      * @author Joachim Doerr
      */
-    protected static function processMedia(DOMElement $dom, MBlockItem $item)
+    protected static function processMedia(DOMElement $dom, MBlockItem $item, $nestedCount = null)
     {
         // set system name
         $item->setSystemName('REX_MEDIA');
@@ -129,7 +128,8 @@ class MBlockSystemButtonReplacer
         if ($dom->hasChildNodes()) {
             // replace name first child is input
             if (strrpos($dom->firstChild->getAttribute('name'), 'REX_INPUT_MEDIA') !== false) {
-                self::replaceName($dom->firstChild, $item, 'REX_INPUT_MEDIA');
+                // REX_INPUT_MEDIA
+                self::replaceSystemName($dom->firstChild, $item, 'REX_INPUT_MEDIA', $nestedCount);
             }
             // change for id
             self::replaceId($dom->firstChild, $item);
@@ -187,6 +187,7 @@ class MBlockSystemButtonReplacer
     /**
      * @param DOMElement $dom
      * @param MBlockItem $item
+     * @param null $nestedCount
      * @author Joachim Doerr
      */
     protected static function processLink(DOMElement $dom, MBlockItem $item, $nestedCount = null)
@@ -354,11 +355,12 @@ class MBlockSystemButtonReplacer
     /**
      * @param DOMElement $dom
      * @param MBlockItem $item
-     * @param $name
+     * @param array $nestedCount
      * @author Joachim Doerr
      */
-    protected static function replaceName(DOMElement $dom, MBlockItem $item, $name, $nestedCount = array())
+    protected static function replaceName(DOMElement $dom, MBlockItem $item, $nestedCount = array())
     {
+
         // get name
         $matches = MBlockFormItemDecorator::getName($dom);
         // found
@@ -374,6 +376,32 @@ class MBlockSystemButtonReplacer
     }
 
     /**
+     * @param DOMElement $element
+     * @param MBlockItem $item
+     * @param $name
+     * @param array $nestedCount
+     * @author Joachim Doerr
+     */
+    protected static function replaceSystemName(DOMElement $element, MBlockItem $item, $name, $nestedCount = array())
+    {
+        // get name
+        $matches = MBlockFormItemDecorator::getName($element);
+        // found
+        if ($matches) {
+            // set system id
+            $item->setSystemId($matches[1]);
+            // and replace name attribute
+            $replaceName = str_replace(strtoupper('_input'), '', $name);
+            $plainId = array_filter(explode('.', $item->getPlainId()));
+            $namePrefix = '';
+            foreach ($plainId as $id) {
+                $namePrefix .= "[$id][0]";
+            }
+            $element->setAttribute('name', str_replace(array($name, '[' . $item->getSystemId() . ']'), array('REX_INPUT_VALUE', $namePrefix . '[' . $replaceName . '_' . $item->getSystemId() . ']'), $element->getAttribute('name')));
+        }
+    }
+
+    /**
      * @param DOMElement $dom
      * @param MBlockItem $item
      * @author Joachim Doerr
@@ -383,7 +411,7 @@ class MBlockSystemButtonReplacer
         self::setSystemIdByName($name, $item);
 
         if (is_array($item->getResult()) && (
-                array_key_exists($item->getSystemName() . '_' . $item->getSystemId(), $item->getResult()) OR
+                array_key_exists($item->getSystemName() . '_' . $item->getSystemId(), $item->getResult()) ||
                 array_key_exists(strtolower($item->getSystemName()) . '_' . $item->getSystemId(), $item->getResult())
             )
         ) {
