@@ -26,6 +26,11 @@ class MBlockItem
     public $val;
 
     /**
+     * @var string
+     */
+    public $plainId;
+
+    /**
      * @var integer
      */
     public $itemId;
@@ -262,6 +267,26 @@ class MBlockItem
     public function setFormDomDocument($formDomDocument)
     {
         $this->formDomDocument = $formDomDocument;
+        return $this;
+    }
+
+    /**
+     * @return string
+     * @author Joachim Doerr
+     */
+    public function getPlainId()
+    {
+        return $this->plainId;
+    }
+
+    /**
+     * @param string $plainId
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setPlainId($plainId)
+    {
+        $this->plainId = $plainId;
         return $this;
     }
 
