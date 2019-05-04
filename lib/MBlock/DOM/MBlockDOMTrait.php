@@ -53,7 +53,7 @@ trait MBlockDOMTrait
      * @return DOMElement[]
      * @author Joachim Doerr
      */
-    private static function getElementsByClass(DOMNode $dom, $element)
+    protected static function getElementsByClass(DOMNode $dom, $element)
     {
         $elementClass= explode('.', $element);
         $element = $elementClass[0];
