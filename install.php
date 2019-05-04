@@ -16,9 +16,6 @@ if (!$this->hasConfig('mblock_scroll')) {
     $this->setConfig('mblock_scroll', 1);
 }
 
-// copy data directory
-rex_dir::copy($this->getPath('data'), $this->getDataPath());
-
 // add demo table
 rex_sql_table::get(rex::getTable('mblock_rexform_demo'))
     ->ensureColumn(new rex_sql_column('id', 'int(11)', false, null, 'auto_increment'))
