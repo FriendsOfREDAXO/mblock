@@ -1,14 +1,17 @@
 <?php
-
-use MBlock\DOM\MBlockDOMTrait;
-use MBlock\Decorator\MBlockFormItemDecorator;
-use MBlock\DTO\MBlockItem;
-
 /**
  * @author mail[at]joachim-doerr[dot]com Joachim Doerr
  * @package redaxo5
  * @license MIT
  */
+
+namespace MBlock\Replacer;
+
+
+use DOMDocument;
+use DOMElement;
+use MBlock\DOM\MBlockDOMTrait;
+use MBlock\Decorator\MBlockFormItemDecorator;
 
 class MBlockValueReplacer
 {
