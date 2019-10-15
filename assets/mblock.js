@@ -402,6 +402,7 @@ function mblock_moveup(element, item) {
         mblock_remove(element);
         // trigger event
         let iClone = prev;
+        iClone.trigger('rex:change', [prev]);
         iClone.trigger('rex:change', [item]);
     }, 150);
 }
@@ -417,6 +418,7 @@ function mblock_movedown(element, item) {
         mblock_remove(element);
         // trigger event
         let iClone = next;
+        iClone.trigger('rex:change', [next]);
         iClone.trigger('rex:change', [item]);
     }, 150);
 }
