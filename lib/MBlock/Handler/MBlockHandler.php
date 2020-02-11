@@ -116,11 +116,11 @@ class MBlockHandler
         }
 
         if (is_numeric($this->id)) {
-            $this->id = (int) $this->id;
+            $this->id = (int)$this->id;
         }
 
         $this->setValByValue();
-     }
+    }
 
     /**
      * 1. plain item creation
@@ -165,21 +165,24 @@ class MBlockHandler
             }
         }
 
+        $this->settings['empty'] = 0;
+
         // don't loaded?
-        if ((sizeof($this->items) <= 0 && (!isset($this->settings['initial_hidden']) or $this->settings['initial_hidden'] != 1))) {
+        if ((sizeof($this->items) <= 0)  && (!isset($this->settings['initial_hidden']) or $this->settings['initial_hidden'] != 1)) {
             $this->items[0] = new MBlockItem();
             $this->items[0]->setItemId(0)
                 ->setFormHtml($this->formHtml)
                 ->setValueId($this->id)
                 ->setPlainId($this->plainId)
                 ->setFormDomDocument(clone $this->formDomDocument);
+            $this->settings['empty'] = 1;
         }
 
         return $this->items;
     }
 
     /**
-     * @param null $nestedCount
+     * @param array $nestedCount
      * @return MBlockItem[]
      * @author Joachim Doerr
      */
@@ -195,7 +198,7 @@ class MBlockHandler
                         $this->handleNestedMBlock($item, $wrapper, $nestedCount);
                     }
                 }
-                $this->executeItemManipulations($item, ($count +1), $nestedCount);
+                $this->executeItemManipulations($item, ($count + 1), $nestedCount);
                 // parse form item
                 $element = new MBlockElement();
                 $element->setForm(self::saveHtml($item->getFormDomDocument()))
@@ -301,8 +304,8 @@ class MBlockHandler
     /**
      * @param MBlockElement $element
      * @param string $themeKey
-     * @author Joachim Doerr
      * @return MBlockElement
+     * @author Joachim Doerr
      */
     private function elementParse(MBlockElement $element, $themeKey = 'default')
     {
@@ -326,9 +329,7 @@ class MBlockHandler
                         $initialHidden = ($match->hasAttribute('data-initial_hidden') && $match->getAttribute('data-initial_hidden') == '1');
                         /** @var DOMElement $child */
                         foreach ($match->childNodes as $key => $child) {
-                            // $this->settings['initial_hidden']
-                            if ($child->hasAttribute('class') && $child->getAttribute('class') == 'sortitem'
-                            ) {
+                            if ($child->hasAttribute('class') && $child->getAttribute('class') == 'sortitem') {
                                 if (($initialHidden === false && $key > 0) || $initialHidden === true)
                                     $match->removeChild($child);
                             }
@@ -344,8 +345,8 @@ class MBlockHandler
      * @param MBlockItem $item
      * @param $count
      * @param null $nestedCount
-     * @author Joachim Doerr
      * @return MBlockHandler
+     * @author Joachim Doerr
      */
     private function executeItemManipulations(MBlockItem $item, $count, $nestedCount = null)
     {
@@ -406,6 +407,7 @@ class MBlockHandler
         }
 
         $values = array();
+        $settings['empty'] = 0;
 
         if (is_array($item->getVal())) {
             foreach ($item->getVal() as $key => $val) {
@@ -415,9 +417,9 @@ class MBlockHandler
             }
         }
 
-        if ($sortItemForm instanceof \DOMElement && $sortItemForm->getAttribute('class') == 'mblock-sortitem-form' && sizeof($values) > 0) { // sort item === mblock sort wrapper
+        if ($sortItemForm instanceof \DOMElement && $sortItemForm->getAttribute('class') == 'mblock-sortitem-form') { //  && sizeof($values) > 0) { // sort item === mblock sort wrapper
 
-            $values = array('value' => array($this->id => $values[$nestedValueKey]));
+            $values = (sizeof($values) > 0) ? array('value' => array($this->id => $values[$nestedValueKey])) : array('value' => []);
 
             // add new nodes
             $subMblockHandler = new MBlockHandler($this->id . '.' . $nestedValueKey, self::innerHTML($sortItemForm), $settings, $values);
@@ -437,6 +439,8 @@ class MBlockHandler
 
             // set mblock count data
             $element->setAttribute('data-mblock_count', rex_session('mblock_count'));
+            // set empty info
+            $element->setAttribute('data-empty', $subMblockHandler->settings['empty']);
         } else {
             // TODO error log
             // dump($key);
