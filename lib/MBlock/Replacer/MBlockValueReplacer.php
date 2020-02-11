@@ -27,19 +27,20 @@ class MBlockValueReplacer
      */
     public static function replaceValueSetEmpty(DOMDocument $dom, $setDefaultValue = false)
     {
-        // remove unused sortitems
-        if ($matches = $dom->getElementsByTagName('div')) {
-            $count=0;
-            /** @var DOMElement $match */
-            foreach ($matches as $match) {
-                if ($match->getAttribute('class') == 'sortitem') {
-                    $count++;
-                    if ($count > 1) {
-                        $match->parentNode->removeChild($match);
-                    }
-                }
-            }
-        }
+        // TODO prüfen ob das wirklich nötig war.
+//        // remove unused sortitems
+//        if ($matches = $dom->getElementsByTagName('div')) {
+//            $count=0;
+//            /** @var DOMElement $match */
+//            foreach ($matches as $match) {
+//                if ($match->getAttribute('class') == 'sortitem') {
+//                    $count++;
+//                    if ($count > 1) {
+//                        $match->parentNode->removeChild($match);
+//                    }
+//                }
+//            }
+//        }
             // find inputs
         if ($matches = $dom->getElementsByTagName('input')) {
             /** @var DOMElement $match */
