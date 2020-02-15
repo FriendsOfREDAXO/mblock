@@ -104,7 +104,6 @@ class MBlockSystemButtonReplacer extends MBlockElementReplacer
                     // create id and stuff
                     $name = $child->getAttribute('name');
                     $id = str_replace(array('REX_INPUT_VALUE', '][', '[', ']'), array('REX_LINK', '_', '_', ''), $name);
-                    dump($id);
                     $child->setAttribute('id', $id);
                     $val = $child->getAttribute('value');
                 }
@@ -244,7 +243,6 @@ class MBlockSystemButtonReplacer extends MBlockElementReplacer
     {
         // get input id
         $name = $dom->getAttribute('name');
-//        dump($name);
         $id = str_replace(array('][', '[', ']'),array('_','_',''), $name);
         $dom->setAttribute('id', $id);
         $dom->setAttribute('data-id', $id);
