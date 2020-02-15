@@ -9,6 +9,7 @@ namespace Mblock\Handler;
 
 
 use DOMElement;
+use MBlock\Decorator\MBlockSystemFormItemDecorator;
 use MBlock\DOM\MBlockDOMTrait;
 use MBlock\Decorator\MBlockFormItemDecorator;
 use MBlock\DTO\MBlockElement;
@@ -333,6 +334,15 @@ class MBlockHandler
                                 if (($initialHidden === false && $key > 0) || $initialHidden === true)
                                     $match->removeChild($child);
                             }
+                            // normalize input do that for link and media widgets
+                            $inputs = $match->getElementsByTagName('input');
+                            if ($inputs) {
+                                /** @var DOMElement $input */
+                                foreach ($inputs as $input) {
+                                    $input->setAttribute('value', '');
+                                }
+                            }
+                            // TODO normalize select for media and link lists?
                         }
                     }
                 }
@@ -350,22 +360,25 @@ class MBlockHandler
      */
     private function executeItemManipulations(MBlockItem $item, $count, $nestedCount = null)
     {
-        // replace system button data
-        MBlockSystemButtonReplacer::replaceSystemButtons($item, $count, $nestedCount);
         // decorate item form
         MBlockFormItemDecorator::decorateFormItem($item, $nestedCount);
+        // replace system button data
+        MBlockSystemFormItemDecorator::decorateSystemFormItem($item, $nestedCount);
+        // custom link hidden to text
+        // MBlockSystemFormItemDecorator::decorateCustomLinkFormItem($item, $nestedCount);
+
         // decorate counting
         // TODO!!!!
-        MBlockCountReplacer::replaceCountKeys($item, $count);
+//        MBlockCountReplacer::replaceCountKeys($item, $count);
         // decorate tabs
         // TODO !!!
-        MBlockBootstrapReplacer::replaceTabIds($item, $count);
+//        MBlockBootstrapReplacer::replaceTabIds($item, $count);
         // decorate collapse
         // TODO !!!
-        MBlockBootstrapReplacer::replaceCollapseIds($item, $count);
+//        MBlockBootstrapReplacer::replaceCollapseIds($item, $count);
         // custom link hidden to text
         // TODO !!!
-        MBlockSystemButtonReplacer::replaceCustomLinkText($item);
+//        MBlockSystemButtonReplacer::replaceCustomLinkText($item);
         return $this;
     }
 
