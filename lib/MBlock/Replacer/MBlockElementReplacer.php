@@ -20,7 +20,7 @@ class MBlockElementReplacer
     /**
      * @param DOMElement $element
      * @param MBlockItem $item
-     * @param null $nestedCount
+     * @param array $nestedCount
      * @author Joachim Doerr
      */
     protected static function replaceName(DOMElement $element, MBlockItem $item, $nestedCount = array())
@@ -199,14 +199,12 @@ class MBlockElementReplacer
     }
 
     /**
-     * @param DOMDocument $dom
      * @param DOMElement $element
-     * @param MBlockItem $item
-     * @param array $nestedCount
-     * @author Joachim Doerr
+     * @param null $index
      * @return bool
+     * @author Joachim Doerr
      */
-    public static function replaceForId(DOMElement $element)
+    public static function replaceForId(DOMElement $element, $index = '')
     {
         // get input id
         if (!$elementId = $element->getAttribute('id')) return true;
@@ -217,7 +215,9 @@ class MBlockElementReplacer
             return false;
         }
 
-        $id = preg_replace('/(\[|\])/m', '', str_replace('-','_', $element->getAttribute('name')));
+        $id = str_replace(array('][', '[', ']'),array('_','_',''), $element->getAttribute('name'));
+        // $id = preg_replace('/(\[|\])/m', '', str_replace('-','_', $element->getAttribute('name')));
+        $id = (!empty($index)) ? $id . '_' . $index : $id;
         $element->setAttribute('id', $id);
 
         if ($element->parentNode->nodeName == 'label') {
@@ -232,8 +232,23 @@ class MBlockElementReplacer
                 }
             }
         }
-
         return true;
+    }
+
+    /**
+     * @param DOMElement $element
+     * @param \DOMNodeList $elements
+     * @author Joachim Doerr
+     */
+    public static function replaceForIdForRadio(DOMElement $element, \DOMNodeList $elements)
+    {
+        $name = $element->getAttribute('name');
+        /** @var DOMElement $item */
+        foreach ($elements as $index => $item) {
+            if ($item->getAttribute('name') == $name) {
+                self::replaceForId($item, $index);
+            }
+        }
     }
 
     /**

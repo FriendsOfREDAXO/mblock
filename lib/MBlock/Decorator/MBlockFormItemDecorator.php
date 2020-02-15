@@ -19,7 +19,7 @@ class MBlockFormItemDecorator extends MBlockElementReplacer
 
     /**
      * @param MBlockItem $item
-     * @param null $nestedCount
+     * @param array $nestedCount
      * @author Joachim Doerr
      */
     static public function decorateFormItem(MBlockItem $item, $nestedCount = array())
@@ -31,18 +31,24 @@ class MBlockFormItemDecorator extends MBlockElementReplacer
                 /** @var DOMElement $match */
                 foreach ($matches as $match) {
                     if (!$match->hasAttribute('data-mblock')) {
+                        // continue by media elements
+                        if (strpos($match->getAttribute('id'), 'REX_MEDIA') !== false
+                            or strpos($match->getAttribute('id'), 'REX_LINK') !== false) {
+                            continue;
+                        }
                         // replace attribute id
                         self::replaceName($match, $item, $nestedCount);
-                        // label for and id change
-                        self::replaceForId($match);
                         // change checked or value by type
                         switch ($match->getAttribute('type')) {
                             case 'checkbox':
                             case 'radio':
                                 // replace checked
                                 self::replaceChecked($match, $item);
-                                break;
+                                self::replaceForIdForRadio($match, $matches);
+                            break;
                             default:
+                                // label for and id change
+                                self::replaceForId($match);
                                 // replace value by json key
                                 self::replaceValue($match, $item);
                         }
@@ -106,5 +112,4 @@ class MBlockFormItemDecorator extends MBlockElementReplacer
             }
         }
     }
-
 }
