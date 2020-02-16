@@ -28,14 +28,16 @@ class MBlockSystemButtonReplacer extends MBlockElementReplacer
         $item->setSystemName('REX_MEDIA');
         // has children ?
         if ($dom->hasChildNodes()) {
-            // replace name first child is input
-            if (strrpos($dom->firstChild->getAttribute('name'), 'REX_INPUT_MEDIA') !== false) {
-                // REX_INPUT_MEDIA
-                self::replaceSystemName($dom->firstChild, $item, 'REX_INPUT_MEDIA', $nestedCount);
-            }
+            // replace name
+            self::replaceName($dom->firstChild, $item, $nestedCount, 'REX_INPUT_MEDIA');
+            // add value
+            self::replaceValue($dom->firstChild, $item);
+            // create id and stuff
+            $name = $dom->firstChild->getAttribute('name');
+            $dom->firstChild->setAttribute('id', str_replace(array('REX_INPUT_VALUE', '][', '[', ']'), array('REX_MEDIA', '_', '_', ''), $name));
+            $dom->firstChild->setAttribute('data-mblock', true);
             // change onclick id
-            self::replaceOnClick($dom, $item, 'REXMedia(', '(', ',');
-            self::replaceOnClick($dom, $item, 'REXMedia(', '(', ')');
+            self::replaceOnClick($dom, $item, 'REXMedia', '(', ')', str_replace('REX_MEDIA_', '', '\'' . $dom->firstChild->getAttribute('id') . '\''));
         }
     }
 
@@ -115,14 +117,8 @@ class MBlockSystemButtonReplacer extends MBlockElementReplacer
             // add link art name
             self::addArtName($dom->firstChild, $item, $val);
             // change click id
-            // REX_LINK_1
-            // openLinkMap('REX_LINK_1', '&clang=1&category_id=0');return false;
-            // REX_LINK_1_0_1
-            // openLinkMap('REX_LINK_1_0_1', '&clang=1&category_id=0');return false;
             self::replaceOnClick($dom, $item, 'openLinkMap', '(\'', '\',', $id);
-            // REX_LINK_1
-            // deleteREXLink(1);return false;
-            self::replaceOnClick($dom, $item, 'REXLink', '(', ')', str_replace('REX_LINK_', '', $id));
+            self::replaceOnClick($dom, $item, 'REXLink', '(', ')', str_replace('REX_LINK_', '', '\'' . $id . '\''));
         }
     }
 
@@ -264,13 +260,14 @@ class MBlockSystemButtonReplacer extends MBlockElementReplacer
      * @param DOMElement $element
      * @param MBlockItem $item
      * @param array $nestedCount
+     * @param string $elementType
      * @author Joachim Doerr
      */
-    protected static function replaceName(DOMElement $element, MBlockItem $item, $nestedCount = array())
+    protected static function replaceName(DOMElement $element, MBlockItem $item, $nestedCount = array(), $elementType = 'REX_INPUT_LINK')
     {
         parent::replaceName($element, $item, $nestedCount);
         $element->setAttribute('name', str_replace('REX_INPUT_LINK', 'REX_INPUT_VALUE', $element->getAttribute('name')));
-        $element->setAttribute('data-base-type', 'REX_INPUT_LINK');
+        $element->setAttribute('data-base-type', $elementType);
         $element->setAttribute('data-name-value', 'REX_INPUT_VALUE');
     }
 
@@ -290,13 +287,12 @@ class MBlockSystemButtonReplacer extends MBlockElementReplacer
             // set system id
             $item->setSystemId($matches[1]);
             // and replace name attribute
-            $replaceName = str_replace(strtoupper('_input'), '', $name);
             $plainId = array_filter(explode('.', $item->getPlainId()));
             $namePrefix = '';
             foreach ($plainId as $id) {
                 $namePrefix .= "[$id][0]";
             }
-            $element->setAttribute('name', str_replace(array($name, '[' . $item->getSystemId() . ']'), array('REX_INPUT_VALUE', $namePrefix . '[' . $replaceName . '_' . $item->getSystemId() . ']'), $element->getAttribute('name')));
+            $element->setAttribute('name', str_replace(array($name, '[' . $item->getSystemId() . ']'), array('REX_INPUT_VALUE', $namePrefix . '[' . $item->getSystemId() . ']'), $element->getAttribute('name')));
         }
     }
 
@@ -371,15 +367,6 @@ class MBlockSystemButtonReplacer extends MBlockElementReplacer
             $linkInfo = self::getLinkInfo($val);
             $dom->setAttribute('value', $linkInfo['art_name'] . ' [' .$val. ']' );
         }
-//        if (is_array($item->getResult()) && (
-//                array_key_exists($item->getSystemName() . '_' . $item->getSystemId(), $item->getResult()) OR
-//                array_key_exists(strtolower($item->getSystemName()) . '_' . $item->getSystemId(), $item->getResult())
-//            )
-//        ) {
-//            $key = (isset($item->getResult()[$item->getSystemName() . '_' . $item->getSystemId()])) ? $item->getSystemName() . '_' . $item->getSystemId() : strtolower($item->getSystemName()) . '_' . $item->getSystemId();
-//            $linkInfo = self::getLinkInfo($item->getResult()[$key]);
-//            $dom->setAttribute('value', $linkInfo['art_name']);
-//        }
     }
 
     /**
