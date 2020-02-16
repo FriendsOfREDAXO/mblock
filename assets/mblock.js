@@ -3,16 +3,21 @@
  */
 
 let mblock = '.mblock_wrapper';
+let DEBUG = true;
 
 $(document).on('rex:ready', function (e, container) {
-    container.find(mblock).each(function () {
-        mblock_init($(this));
+    container.find(mblock).each(function (index) {
+        mblock_init($(this), index);
     });
 });
 
-function mblock_init(element) {
+function mblock_init(element, index) {
     if (!element.data('mblock_run')) {
+
+        if (DEBUG) console.log('execute mblock_init: ' + element.attr('class') + ' index: ' + index);
+
         element.data('mblock_run', 1);
+
         mblock_sort(element);
         mblock_add(element);
         mblock_set_unique_id(element, false);
@@ -34,9 +39,9 @@ function mblock_init_sort(element) {
 
 function mblock_sort(element) {
     // remove mblock_remove
-    mblock_remove(element);
+    mblock_set_addAndRemoveBtn_visibility(element);
     // init sortable
-    mblock_sort_it(element);
+    mblock_init_sortability(element);
 }
 
 function mblock_add_plus(element) {
@@ -51,62 +56,69 @@ function mblock_add_plus(element) {
     }
 }
 
-function mblock_remove(element) {
-    let finded = element.find('> div.sortitem');
+// show or hide add and remove buttons
+function mblock_set_addAndRemoveBtn_visibility(element) {
+    let finded = element.find('> div.sortitem'),
+        removeme = finded.find('> .removeadded .removeme'),
+        addme = finded.find('> .removeadded .addme');
 
     if (finded.length == 1) {
-        finded.find('.removeme').prop('disabled', true);
-        finded.find('.removeme').attr('data-disabled', true);
+        removeme.prop('disabled', true);
+        removeme.attr('data-disabled', true);
     } else {
-        finded.find('.removeme').prop('disabled', false);
-        finded.find('.removeme').attr('data-disabled', false);
+        removeme.prop('disabled', false);
+        removeme.attr('data-disabled', false);
     }
 
     // has data?
     if (element.data().hasOwnProperty('max')) {
         if (finded.length >= element.data('max')) {
-            element.find('.addme').prop('disabled', true);
-            element.find('.addme').attr('data-disabled', true);
+            addme.prop('disabled', true);
+            addme.attr('data-disabled', true);
         } else {
-            element.find('.addme').prop('disabled', false);
-            element.find('.addme').attr('data-disabled', false);
+            addme.prop('disabled', false);
+            addme.attr('data-disabled', false);
         }
     }
 
     if (element.data().hasOwnProperty('min')) {
         if (finded.length <= element.data('min')) {
-            element.find('.removeme').prop('disabled', true);
-            element.find('.removeme').attr('data-disabled', true);
+            removeme.prop('disabled', true);
+            removeme.attr('data-disabled', true);
         } else {
-            element.find('.removeme').prop('disabled', false);
-            element.find('.removeme').attr('data-disabled', false);
+            removeme.prop('disabled', false);
+            removeme.attr('data-disabled', false);
         }
     }
 
     finded.each(function (index) {
         // min removeme hide
+        let tremoveme = $(this).find('> .removeadded .removeme'),
+            taddme = $(this).find('> .removeadded .addme'),
+            tmoveup = $(this).find('> .removeadded .moveup'),
+            tmovedown = $(this).find('> .removeadded .movedown');
         if ((index + 1) == element.data('min') && finded.length == element.data('min')) {
-            $(this).find('.removeme').prop('disabled', true);
-            $(this).find('.removeme').attr('data-disabled', true);
+            tremoveme.prop('disabled', true);
+            tremoveme.attr('data-disabled', true);
         }
         if (index == 0) {
-            $(this).find('.moveup').prop('disabled', true);
-            $(this).find('.moveup').attr('data-disabled', true);
+            tmoveup.prop('disabled', true);
+            tmoveup.attr('data-disabled', true);
         } else {
-            $(this).find('.moveup').prop('disabled', false);
-            $(this).find('.moveup').attr('data-disabled', false);
+            tmoveup.prop('disabled', false);
+            tmoveup.attr('data-disabled', false);
         }
         if ((index + 1) == finded.length) { // if max count?
-            $(this).find('.movedown').prop('disabled', true);
-            $(this).find('.movedown').attr('data-disabled', true);
+            tmovedown.prop('disabled', true);
+            tmovedown.attr('data-disabled', true);
         } else {
-            $(this).find('.movedown').prop('disabled', false);
-            $(this).find('.movedown').attr('data-disabled', false);
+            tmovedown.prop('disabled', false);
+            tmovedown.attr('data-disabled', false);
         }
     });
 }
 
-function mblock_sort_it(element) {
+function mblock_init_sortability(element) {
     element.mblock_sortable({
         handle: '.sorthandle',
         animation: 150,
@@ -131,10 +143,10 @@ function mblock_reindex(element) {
         let sortitem = $(this),
             parent_sortitem = sortitem.parents('div.sortitem').first();
 
-        sortitem.attr('data-default-count', index)
-            .find('input,textarea,select,button')
-            .each(function () {
-
+        sortitem.attr('data-default-count', index).find('input,textarea,select,button').each(function () {
+            
+            if (DEBUG) console.log($(this).attr('type'));
+                
             let name = $(this).data('name-value'),
                 this_name = $(this).attr('name'),
                 res_third, res_second, res_default;
@@ -144,6 +156,8 @@ function mblock_reindex(element) {
                     res_second = this_name.match(/(\[\w+\])(\[\d\])(\[\w+\])(\[\d\])/);
                     res_default = this_name.match(/(\[\w+\])(\[\d\])/);
             }
+
+            if (DEBUG) console.log([name,this_name,res_third,res_second,res_default]);
 
             if (res_third !== null && Array.isArray(res_third) && parent_mblocks.length === 2) {
 
@@ -184,10 +198,54 @@ function mblock_reindex(element) {
                 });
             }
 
+            mblock_modify_system_buttons($(this));
+            // mblock_replace_for($(this));
         });
     });
 
-    mblock_replace_for(element);
+}
+
+function mblock_modify_system_buttons(element) {
+    // modify elements
+    // input rex button
+    if (element.prop("nodeName") === 'INPUT' && element.attr('id') && (
+        element.attr('id').indexOf("REX_LINK_") >= 0 || element.attr('id').indexOf("REX_MEDIA_") >= 0
+    )) {
+        let element_type = (element.attr('id').indexOf("REX_LINK_") >= 0) ? 'REX_LINK' : 'REX_MEDIA',
+            element_attr_type = (element.attr('id').indexOf("REX_LINK_") >= 0) ? 'hidden' : 'text';
+
+        if (element.attr('type') === element_attr_type) {
+            if (DEBUG) console.log(element.attr('name'));
+
+            let this_id = element.attr('name').replace(/\]\[/g, '_'),
+                prevInput = element.prev(),
+                old_id = element.attr('id');
+
+            this_id = this_id.replace(/\[/g, '_');
+            this_id = this_id.replace(/\]/g, '');
+            this_id = this_id.replace('REX_INPUT_VALUE', element_type);
+
+            element.attr('id', this_id);
+            if (DEBUG) console.log(element.attr('id'));
+
+            prevInput.attr('id', this_id + '_NAME');
+            if (DEBUG) console.log(prevInput.attr('id'));
+
+            old_id = old_id.replace(element_type + '_', '');
+            this_id = this_id.replace(element_type + '_', '');
+
+            if (DEBUG) console.log(element.parent().find('a.btn-popup').length);
+
+            // button
+            element.parent().find('a.btn-popup').each(function () {
+                if ($(this).attr('onclick')) {
+                    if (DEBUG) console.log($(this).attr('onclick'));
+                    $(this).attr('onclick', $(this).attr('onclick').replace(old_id, this_id));
+                    if (DEBUG) console.log($(this).attr('onclick'));
+                }
+            });
+        }
+    }
 }
 
 function mblock_replace_for(element) {
@@ -313,7 +371,7 @@ function mblock_moveup(element, item) {
         item.insertBefore(prev);
         // set last user action
         mblock_reindex(element);
-        mblock_remove(element);
+        mblock_set_addAndRemoveBtn_visibility(element);
         // trigger event
         let iClone = prev;
         iClone.trigger('rex:change', [iClone]);
@@ -328,7 +386,7 @@ function mblock_movedown(element, item) {
         item.insertAfter(next);
         // set last user action
         mblock_reindex(element);
-        mblock_remove(element);
+        mblock_set_addAndRemoveBtn_visibility(element);
         // trigger event
         let iClone = next;
         iClone.trigger('rex:change', [iClone]);
