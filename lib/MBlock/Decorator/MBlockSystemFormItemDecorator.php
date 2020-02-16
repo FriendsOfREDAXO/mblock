@@ -41,11 +41,15 @@ class MBlockSystemFormItemDecorator extends MBlockSystemButtonReplacer
                                 $id = $child->getAttribute('id');
                                 $type = $child->getAttribute('type');
 
-                                if (strpos($id, 'REX_LINK') !== false && $type == 'hidden') {
+                                if (strpos($id, 'REX_LINK_') !== false && $type == 'hidden') {
                                     self::processLink($match, $item, $nestedCount);
                                 }
                                 if (strpos($id, 'REX_MEDIA_') !== false && $type == 'text') {
                                     self::processMedia($match, $item, $nestedCount);
+                                }
+                                if (strpos($id, 'REX_LINKLIST_') !== false) {
+                                    // link list button
+                                    self::processLinkList($match, $item, $nestedCount);
                                 }
                             }
 
