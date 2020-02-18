@@ -199,10 +199,42 @@ function mblock_reindex(element) {
             }
 
             mblock_modify_system_buttons($(this));
-            // mblock_replace_for($(this));
+            mblock_modify_system_list_buttons($(this));
+            mblock_replace_for($(this));
         });
     });
 
+}
+
+function mblock_modify_system_list_buttons(element) {
+    if (element.prop("nodeName") === 'INPUT' && element.attr('id') && (
+        element.attr('id').indexOf("REX_LINKLIST_") >= 0 || element.attr('id').indexOf("REX_MEDIALIST_") >= 0
+    )) {
+        let element_type = (element.attr('id').indexOf("REX_LINKLIST_") >= 0) ? 'REX_LINKLIST' : 'REX_MEDIALIST',
+            this_id = element.attr('name').replace(/\]\[/g, ''),
+            old_id = element.attr('id');
+
+        if (element.attr('type') === 'hidden') {
+            if (DEBUG) console.log(this_id);
+
+            this_id = this_id.replace(/\[/g, '_');
+            this_id = this_id.replace(/\]/g, '');
+
+            let select_id = this_id.replace('REX_INPUT_VALUE', element_type + '_SELECT'),
+                select_name = element.attr('name').replace('REX_INPUT_VALUE', element_type + '_SELECT');
+
+            this_id = this_id.replace('REX_INPUT_VALUE', element_type);
+
+            if (DEBUG) console.log(this_id);
+            if (DEBUG) console.log(select_id);
+            if (DEBUG) console.log(select_name);
+
+            element.prev().attr('name', select_name).attr('id', select_id);
+            element.attr('id', this_id);
+
+            replace_btn_popup_id(element, element_type, old_id, this_id);
+        }
+    }
 }
 
 function mblock_modify_system_buttons(element) {
@@ -231,21 +263,25 @@ function mblock_modify_system_buttons(element) {
             prevInput.attr('id', this_id + '_NAME');
             if (DEBUG) console.log(prevInput.attr('id'));
 
-            old_id = old_id.replace(element_type + '_', '');
-            this_id = this_id.replace(element_type + '_', '');
-
-            if (DEBUG) console.log(element.parent().find('a.btn-popup').length);
-
-            // button
-            element.parent().find('a.btn-popup').each(function () {
-                if ($(this).attr('onclick')) {
-                    if (DEBUG) console.log($(this).attr('onclick'));
-                    $(this).attr('onclick', $(this).attr('onclick').replace(old_id, this_id));
-                    if (DEBUG) console.log($(this).attr('onclick'));
-                }
-            });
+            replace_btn_popup_id(element, element_type, old_id, this_id);
         }
     }
+}
+
+function replace_btn_popup_id(element, element_type, old_id, this_id) {
+    old_id = old_id.replace(element_type + '_', '');
+    this_id = this_id.replace(element_type + '_', '');
+
+    if (DEBUG) console.log(element.parent().find('a.btn-popup').length);
+
+    // button
+    element.parent().find('a.btn-popup').each(function () {
+        if ($(this).attr('onclick')) {
+            if (DEBUG) console.log($(this).attr('onclick'));
+            $(this).attr('onclick', $(this).attr('onclick').replace(old_id, this_id));
+            if (DEBUG) console.log($(this).attr('onclick'));
+        }
+    });
 }
 
 function mblock_replace_for(element) {
