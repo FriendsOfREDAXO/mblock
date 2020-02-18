@@ -48,8 +48,10 @@ class MBlockSystemFormItemDecorator extends MBlockSystemButtonReplacer
                                     self::processMedia($match, $item, $nestedCount);
                                 }
                                 if (strpos($id, 'REX_LINKLIST_') !== false) {
-                                    // link list button
                                     self::processLinkList($match, $item, $nestedCount);
+                                }
+                                if (strpos($id, 'REX_MEDIALIST_') !== false) {
+                                    self::processMediaList($match, $item, $nestedCount);
                                 }
                             }
 

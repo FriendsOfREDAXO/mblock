@@ -45,41 +45,22 @@ class MBlockSystemButtonReplacer extends MBlockElementReplacer
     /**
      * @param DOMElement $dom
      * @param MBlockItem $item
+     * @param null $nestedCount
      * @author Joachim Doerr
      */
-    protected static function processMediaList(DOMElement $dom, MBlockItem $item)
+    protected static function processMediaList(DOMElement $dom, MBlockItem $item, $nestedCount = null)
     {
         // set system name
         $item->setSystemName('REX_MEDIALIST');
         $name = '';
         // has children ?
         if ($dom->hasChildNodes()) {
-            if ($dom->firstChild->hasAttribute('name')) {
-                // remove name
-                // $dom->firstChild->removeAttribute('name');
-                /** @var DOMElement $child */
-                foreach ($dom->getElementsByTagName('input') as $child) {
-                    if (strrpos($child->getAttribute('name'), 'REX_INPUT_MEDIALIST') !== false) {
-                        // replace name
-                        self::replaceName($child, $item, 'REX_INPUT_MEDIALIST');
-                    }
-                    if ($child->getAttribute('type') == 'hidden') {
-                        $name = $child->getAttribute('name');
-                    }
-                }
-                /** @var DOMElement $child */
-                foreach ($dom->getElementsByTagName('select') as $child) {
-                    if (strpos($child->getAttribute('id'), 'REX_MEDIALIST_SELECT_') !== false) {
-                        // replace name
-                        $child->setAttribute('name', str_replace($item->getSystemId(), $item->getItemId(), $child->getAttribute('name')));
-                        // add options
-                        self::addMediaSelectOptions($dom->firstChild, $item, $name);
-                    }
-                }
-                // change click id
-                self::replaceOnClick($dom, $item, 'REXMedialist(', '(', ',');
-                self::replaceOnClick($dom, $item, 'REXMedialist(', '(', ')');
-            }
+            // modify input
+            $result = self::listInputHandling($dom, $item, $nestedCount, 'MEDIALIST');
+            // modify select
+            self::listSelectHandling($dom, $item, $nestedCount, 'MEDIALIST', $result['val'], $result['name']);
+            // change click id
+            self::replaceOnClick($dom, $item, 'REXMedialist', '(\'', '\'', str_replace(array('REX_INPUT_VALUE', '][', '[', ']'), '', $result['name']));
         }
     }
 
@@ -179,41 +160,76 @@ class MBlockSystemButtonReplacer extends MBlockElementReplacer
         // set system name
         $item->setSystemName('REX_LINKLIST');
         $name = '';
-        $val = '';
         // has children ?
         if ($dom->hasChildNodes()) {
-            /** @var DOMElement $child */
-            foreach ($dom->getElementsByTagName('input') as $child) {
-                if ($child->getAttribute('type') == 'hidden') {
-                    // replace name
-                    self::replaceName($child, $item, $nestedCount, 'REX_INPUT_LINKLIST');
-                    $name = $child->getAttribute('name');
-                    // change id
-                    $id = str_replace(array('REX_INPUT_VALUE', '][', '[', ']'),array('REX_LINKLIST', '','_',''), $name);
-                    $child->setAttribute('id', $id);
-                    // add value
-                    self::replaceValue($child, $item);
-                    $val = $child->getAttribute('value');
-                    // set mblock data
-                    $child->setAttribute('data-mblock', true);
-                }
-            }
-            /** @var DOMElement $child */
-            foreach ($dom->getElementsByTagName('select') as $child) {
-                if (strpos($child->getAttribute('id'), 'REX_LINKLIST_SELECT_') !== false) {
-                    // replace name
-                    $child->setAttribute('name', str_replace('REX_INPUT_VALUE', 'REX_LINKLIST_SELECT', $name));
-                    // change id
-                    $id = str_replace(array('REX_INPUT_VALUE', '][', '[', ']'),array('REX_LINKLIST_SELECT', '','_',''), $name);
-                    $child->setAttribute('id', $id);
-                    // add options
-                    self::addLinkSelectOptions($child, $item, $val);
-                    // set mblock data
-                    $child->setAttribute('data-mblock', true);
-                }
-            }
+            // modify input
+            $result = self::listInputHandling($dom, $item, $nestedCount, 'LINKLIST');
+            // modify select
+            self::listSelectHandling($dom, $item, $nestedCount, 'LINKLIST', $result['val'], $result['name']);
             // change click id
-            self::replaceOnClick($dom, $item, 'REXLinklist', '(\'', '\'', str_replace(array('REX_INPUT_VALUE', '][', '[', ']'), '', $name));
+            self::replaceOnClick($dom, $item, 'REXLinklist', '(\'', '\'', str_replace(array('REX_INPUT_VALUE', '][', '[', ']'), '', $result['name']));
+        }
+    }
+
+    /**
+     * @param DOMElement $dom
+     * @param MBlockItem $item
+     * @param null $nestedCount
+     * @param string $type
+     * @return array
+     * @author Joachim Doerr
+     */
+    protected static function listInputHandling(DOMElement $dom, MBlockItem $item, $nestedCount = null, $type = 'LINKLIST')
+    {
+        $val = '';
+        $name = '';
+        /** @var DOMElement $child */
+        foreach ($dom->getElementsByTagName('input') as $child) {
+            if ($child->getAttribute('type') == 'hidden') {
+                // replace name
+                self::replaceName($child, $item, $nestedCount, 'REX_INPUT_' . $type);
+                $name = $child->getAttribute('name');
+                // change id
+                $id = str_replace(array('REX_INPUT_VALUE', '][', '[', ']'), array('REX_' . $type, '', '_', ''), $name);
+                $child->setAttribute('id', $id);
+                // add value
+                self::replaceValue($child, $item);
+                $val = $child->getAttribute('value');
+                // set mblock data
+                $child->setAttribute('data-mblock', true);
+            }
+        }
+        return array('name' => $name, 'val' => $val);
+    }
+
+    /**
+     * @param DOMElement $dom
+     * @param MBlockItem $item
+     * @param null $nestedCount
+     * @param string $type
+     * @param string $val
+     * @param string $name
+     * @author Joachim Doerr
+     */
+    protected static function listSelectHandling(DOMElement $dom, MBlockItem $item, $nestedCount = null, $type = 'LINKLIST', $val = '', $name = '')
+    {
+        /** @var DOMElement $child */
+        foreach ($dom->getElementsByTagName('select') as $child) {
+            if (strpos($child->getAttribute('id'), 'REX_' . $type . '_SELECT_') !== false) {
+                // replace name
+                $child->setAttribute('name', str_replace('REX_INPUT_VALUE', 'REX_' . $type . '_SELECT', $name));
+                // change id
+                $id = str_replace(array('REX_INPUT_VALUE', '][', '[', ']'), array('REX_' . $type . '_SELECT', '', '_', ''), $name);
+                $child->setAttribute('id', $id);
+                // add options
+                if ($type === 'LINKLIST') {
+                    self::addLinkSelectOptions($child, $item, $val);
+                } else if ($type === 'MEDIALIST') {
+                    self::addMediaSelectOptions($child, $item, $val);
+                }
+                // set mblock data
+                $child->setAttribute('data-mblock', true);
+            }
         }
     }
 
@@ -231,11 +247,11 @@ class MBlockSystemButtonReplacer extends MBlockElementReplacer
         // find a buttons and replace id
         if ($dom->hasChildNodes()) {
             /** @var DOMElement $child */
-            foreach($dom->getElementsByTagName('a') as $child) {
+            foreach ($dom->getElementsByTagName('a') as $child) {
                 if ($child->hasAttribute('onclick')) {
                     if (strpos($child->getAttribute('onclick'), $btnFindKey) !== false) {
                         $id = str_replace(array('][', '[', ']'), array('_', '_', ''), $name);
-                        $pattern = '/'.$btnFindKey.str_replace(array('(','\''), array('\(','\\\''), $prefix).'(.*?)'.str_replace(')','\)', $suffix).'/i';
+                        $pattern = '/' . $btnFindKey . str_replace(array('(', '\''), array('\(', '\\\''), $prefix) . '(.*?)' . str_replace(')', '\)', $suffix) . '/i';
                         $child->setAttribute('onclick', preg_replace($pattern, $btnFindKey . $prefix . $id . $suffix, $child->getAttribute('onclick')));
                     }
                 }
@@ -271,52 +287,22 @@ class MBlockSystemButtonReplacer extends MBlockElementReplacer
     }
 
     /**
-     * @param DOMElement $element
-     * @param MBlockItem $item
-     * @param $name
-     * @param array $nestedCount
-     * @author Joachim Doerr
-     */
-    protected static function replaceSystemName(DOMElement $element, MBlockItem $item, $name, $nestedCount = array())
-    {
-        // get name
-        $matches = MBlockFormItemDecorator::getName($element);
-        // found
-        if ($matches) {
-            // set system id
-            $item->setSystemId($matches[1]);
-            // and replace name attribute
-            $plainId = array_filter(explode('.', $item->getPlainId()));
-            $namePrefix = '';
-            foreach ($plainId as $id) {
-                $namePrefix .= "[$id][0]";
-            }
-            $element->setAttribute('name', str_replace(array($name, '[' . $item->getSystemId() . ']'), array('REX_INPUT_VALUE', $namePrefix . '[' . $item->getSystemId() . ']'), $element->getAttribute('name')));
-        }
-    }
-
-    /**
      * @param DOMElement $dom
      * @param MBlockItem $item
+     * @param string $val
      * @author Joachim Doerr
      */
-    protected static function addMediaSelectOptions(DOMElement $dom, MBlockItem $item, $name)
+    protected static function addMediaSelectOptions(DOMElement $dom, MBlockItem $item, $val = '')
     {
-        self::setSystemIdByName($name, $item);
-
-        if (is_array($item->getResult()) && (
-                array_key_exists($item->getSystemName() . '_' . $item->getSystemId(), $item->getResult()) ||
-                array_key_exists(strtolower($item->getSystemName()) . '_' . $item->getSystemId(), $item->getResult())
-            )
-        ) {
-            $key = (isset($item->getResult()[$item->getSystemName() . '_' . $item->getSystemId()])) ? $item->getSystemName() . '_' . $item->getSystemId() : strtolower($item->getSystemName()) . '_' . $item->getSystemId();
-            $resultItems = explode(',', $item->getResult()[$key]);
-            foreach ($resultItems as $resultItem) {
-                $dom->appendChild(new DOMElement('option', $resultItem));
+        if (!empty($val)) {
+            $val = explode(',', $val);
+            foreach ($val as $id) {
+                $dom->appendChild(new DOMElement('option', $id));
             }
             /** @var DOMElement $child */
             foreach ($dom->childNodes as $child) {
                 $child->setAttribute('value', $child->nodeValue);
+                $child->nodeValue = htmlentities($child->nodeValue);
                 $child->removeAttribute('selected');
             }
         }
@@ -355,19 +341,8 @@ class MBlockSystemButtonReplacer extends MBlockElementReplacer
         if (!empty($val)) {
             $val = intval($val);
             $linkInfo = self::getLinkInfo($val);
-            $dom->setAttribute('value', $linkInfo['art_name'] . ' [' .$val. ']' );
+            $dom->setAttribute('value', $linkInfo['art_name'] . ' [' . $val . ']');
         }
-    }
-
-    /**
-     * @param $name
-     * @param MBlockItem $item
-     * @author Joachim Doerr
-     */
-    protected static function setSystemIdByName($name, MBlockItem $item)
-    {
-        if ($name != '' && preg_match('/\_\d+/', $name, $matches))
-            $item->setSystemId(str_replace('_','', $matches[0]));
     }
 
     /**
