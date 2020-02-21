@@ -10,6 +10,7 @@ namespace Mblock\Handler;
 
 use DOMElement;
 use MBlock\Decorator\MBlockSystemFormItemDecorator;
+use MBlock\Decorator\MBlockWidgetFormItemDecorator;
 use MBlock\DOM\MBlockDOMTrait;
 use MBlock\Decorator\MBlockFormItemDecorator;
 use MBlock\DTO\MBlockElement;
@@ -18,7 +19,7 @@ use MBlock\Parser\MBlockParser;
 use MBlock\Provider\MBlockValueProvider;
 use MBlock\Replacer\MBlockBootstrapReplacer;
 use MBlock\Replacer\MBlockCountReplacer;
-use MBlock\Replacer\MBlockSystemButtonReplacer;
+use MBlock\Replacer\MBlockWidgetReplacer;
 use MBlock\Replacer\MBlockValueReplacer;
 use MBlock\Utils\MBlockSettingsHelper;
 use mblock_rex_form;
@@ -365,8 +366,7 @@ class MBlockHandler
         // replace system button data
         MBlockSystemFormItemDecorator::decorateSystemFormItem($item, $nestedCount);
         // custom link hidden to text
-        // MBlockSystemFormItemDecorator::decorateCustomLinkFormItem($item, $nestedCount);
-
+        MBlockWidgetFormItemDecorator::decorateCustomLinkFormItem($item, $nestedCount);
         // decorate counting
         // TODO!!!!
 //        MBlockCountReplacer::replaceCountKeys($item, $count);

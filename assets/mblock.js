@@ -3,7 +3,7 @@
  */
 
 let mblock = '.mblock_wrapper';
-let DEBUG = true;
+let DEBUG = false;
 
 $(document).on('rex:ready', function (e, container) {
     container.find(mblock).each(function (index) {
@@ -129,7 +129,7 @@ function mblock_init_sortability(element) {
             let iClone = $(event.item);
             iClone.trigger('rex:change', [iClone]);
         },
-        onStart: function(event) {
+        onStart: function (event) {
             element.addClass('sortable_start');
         }
     });
@@ -144,20 +144,20 @@ function mblock_reindex(element) {
             parent_sortitem = sortitem.parents('div.sortitem').first();
 
         sortitem.attr('data-default-count', index).find('input,textarea,select,button').each(function () {
-            
+
             if (DEBUG) console.log($(this).attr('type'));
-                
+
             let name = $(this).data('name-value'),
                 this_name = $(this).attr('name'),
                 res_third, res_second, res_default;
 
             if ((typeof this_name !== typeof undefined && this_name !== false)) {
-                    res_third = this_name.match(/(\[\w+\])(\[\d\])(\[\w+\])(\[\d\])(\[\w+\])(\[\d\])/);
-                    res_second = this_name.match(/(\[\w+\])(\[\d\])(\[\w+\])(\[\d\])/);
-                    res_default = this_name.match(/(\[\w+\])(\[\d\])/);
+                res_third = this_name.match(/(\[\w+\])(\[\d\])(\[\w+\])(\[\d\])(\[\w+\])(\[\d\])/);
+                res_second = this_name.match(/(\[\w+\])(\[\d\])(\[\w+\])(\[\d\])/);
+                res_default = this_name.match(/(\[\w+\])(\[\d\])/);
             }
 
-            if (DEBUG) console.log([name,this_name,res_third,res_second,res_default]);
+            if (DEBUG) console.log([name, this_name, res_third, res_second, res_default]);
 
             if (res_third !== null && Array.isArray(res_third) && parent_mblocks.length === 2) {
 
@@ -170,6 +170,7 @@ function mblock_reindex(element) {
                     $replace = name + $defaultValueName + '[' + $defaultCount + ']' + $secondValueName + '[' + $secondCount + ']' + $thirdValueName + '[' + $thirdCount + ']';
 
                 $(this).attr('name', this_name.replace(name + res_third[0], $replace));
+                if (DEBUG) console.log($(this).attr('name'));
 
             } else if (res_second !== null && Array.isArray(res_second) && parent_mblocks.length === 1) {
 
@@ -180,6 +181,7 @@ function mblock_reindex(element) {
                     $replace = name + $defaultValueName + '[' + $defaultCount + ']' + $secondValueName + '[' + $secondCount + ']';
 
                 $(this).attr('name', this_name.replace(name + res_second[0], $replace));
+                if (DEBUG) console.log($(this).attr('name'));
 
                 sortitem.find(mblock).each(function () {
                     mblock_reindex($(this));
@@ -191,7 +193,10 @@ function mblock_reindex(element) {
                     $defaultCount = index,
                     $replace = name + $defaultValueName + '[' + $defaultCount + ']';
 
+                if (DEBUG) console.log(name + res_default[0]);
+                if (DEBUG) console.log($replace);
                 $(this).attr('name', this_name.replace(name + res_default[0], $replace));
+                if (DEBUG) console.log($(this).attr('name'));
 
                 sortitem.find(mblock).each(function () {
                     mblock_reindex($(this));
@@ -200,6 +205,7 @@ function mblock_reindex(element) {
 
             mblock_modify_system_buttons($(this));
             mblock_modify_system_list_buttons($(this));
+            mblock_modify_custom_link_buttons($(this));
             mblock_replace_for($(this));
         });
     });
@@ -225,15 +231,73 @@ function mblock_modify_system_list_buttons(element) {
 
             this_id = this_id.replace('REX_INPUT_VALUE', element_type);
 
-            if (DEBUG) console.log(this_id);
-            if (DEBUG) console.log(select_id);
-            if (DEBUG) console.log(select_name);
+            // if (DEBUG) console.log(this_id);
+            // if (DEBUG) console.log(select_id);
+            // if (DEBUG) console.log(select_name);
 
             element.prev().attr('name', select_name).attr('id', select_id);
             element.attr('id', this_id);
 
             replace_btn_popup_id(element, element_type, old_id, this_id);
         }
+    }
+}
+
+function mblock_modify_custom_link_buttons(element) {
+    if (element.prop("nodeName") === 'INPUT' && element.attr('id') &&
+        element.parent().attr('class').indexOf("custom-link") >= 0 && element.attr('name')
+    ) {
+        element = element.parent();
+
+        let inputs = element.find('input'),
+            nameInput;
+
+        inputs.each(function(){
+            if($(this).attr('name')) {
+                nameInput = $(this);
+
+                let this_id = $(this).attr('name').replace(/\]\[/g, '');
+                this_id = this_id.replace(/\[/g, '');
+                this_id = this_id.replace(/\]/g, '');
+                this_id = this_id.replace('REX_INPUT_VALUE', '');
+
+                nameInput.attr('id', 'REX_LINK_' + this_id);
+                nameInput.prev().attr('id', 'REX_LINK_' + this_id + '_NAME');
+
+                element.attr('data-id', this_id);
+                element.find('a.btn-popup').each(function () {
+                    if ($(this).attr('id')) {
+                        $(this).attr('id', $(this).attr('id').replace(/\d+$/g, this_id));
+                    }
+                });
+
+            }
+        });
+
+
+        // let this_id = element.attr('name').replace(/\]\[/g, '');
+        //
+        // this_id = this_id.replace(/\[/g, '');
+        // this_id = this_id.replace(/\]/g, '');
+        // this_id = this_id.replace('REX_INPUT_VALUE', '');
+        //
+        // if (DEBUG) console.log(this_id);
+        // if (DEBUG) console.log(element.attr('id'));
+        // element.parent().attr('data-id', this_id);
+        // // button
+        // element.parent().find('a.btn-popup').each(function () {
+        //     if ($(this).attr('id')) {
+        //         $(this).attr('id', $(this).attr('id').replace(/\d+$/g, this_id));
+        //     }
+        // });
+        // element.attr('id', 'REX_LINK_' + this_id);
+        // if (DEBUG) console.log(element.attr('id'));
+        //
+        // if (element.prev().length) {
+        //     if (DEBUG) console.log('no name: ' + element.prev().attr('id') + ' this_id:' + this_id);
+        //     element.prev().attr('id', 'REX_LINK_' + this_id + '_NAME');
+        //     if (DEBUG) console.log(element.prev().attr('id'));
+        // }
     }
 }
 
@@ -246,7 +310,7 @@ function mblock_modify_system_buttons(element) {
         let element_type = (element.attr('id').indexOf("REX_LINK_") >= 0) ? 'REX_LINK' : 'REX_MEDIA',
             element_attr_type = (element.attr('id').indexOf("REX_LINK_") >= 0) ? 'hidden' : 'text';
 
-        if (element.attr('type') === element_attr_type) {
+        if (element.attr('type') === element_attr_type && element.attr('name')) {
             if (DEBUG) console.log(element.attr('name'));
 
             let this_id = element.attr('name').replace(/\]\[/g, '_'),
@@ -272,7 +336,7 @@ function replace_btn_popup_id(element, element_type, old_id, this_id) {
     old_id = old_id.replace(element_type + '_', '');
     this_id = this_id.replace(element_type + '_', '');
 
-    if (DEBUG) console.log(element.parent().find('a.btn-popup').length);
+    if (DEBUG) console.log(element.parent().find('a.btn-popup').length + ' old_id:' + old_id + ' id:' + this_id);
 
     // button
     element.parent().find('a.btn-popup').each(function () {
@@ -439,13 +503,13 @@ function mblock_scroll(element, item) {
 }
 
 function mblock_add(element) {
-    element.find('> div.sortitem').each(function(){
+    element.find('> div.sortitem').each(function () {
         mblock_buttons(element, $(this));
     });
 }
 
 function mblock_buttons(element, sortitem) {
-    sortitem.find('> .removeadded > .addme').on('click',function () {
+    sortitem.find('> .removeadded > .addme').on('click', function () {
         if (!$(this).prop('disabled')) {
             let sortitem = $(this).parent().parent();
             element.attr('data-mblock_clicked_add_item', sortitem.attr('data-mblock_index'));
@@ -474,7 +538,7 @@ function mblock_buttons(element, sortitem) {
         }
         return false;
     });
-    sortitem.find('> .removeadded > .visibility').on('click', function() {
+    sortitem.find('> .removeadded > .visibility').on('click', function () {
         let sortitem = $(this).parent().parent();
         if (!sortitem.hasClass('visibility-hidden')) {
             sortitem.addClass('visibility-hidden');

@@ -14,7 +14,7 @@ use MBlock\DTO\MBlockItem;
 use rex_article;
 use function Matrix\identity;
 
-class MBlockSystemButtonReplacer extends MBlockElementReplacer
+class MBlockWidgetReplacer extends MBlockElementReplacer
 {
     /**
      * @param DOMElement $dom
@@ -108,28 +108,29 @@ class MBlockSystemButtonReplacer extends MBlockElementReplacer
     /**
      * @param DOMElement $dom
      * @param MBlockItem $item
+     * @param null $nestedCount
      * @author Joachim Doerr
      */
-    protected static function processCustomLink(DOMElement $dom, MBlockItem $item)
+    protected static function processCustomLink(DOMElement $dom, MBlockItem $item, $nestedCount = null)
     {
-        if ($dom->hasAttribute('data-id')) {
-            self::replaceDataId($dom, $item); // TODO check brauchen wird das wirklich?
-        }
         // set system name
         $item->setSystemName('REX_LINK');
-        $id = $item->getPayload('count-id') . rex_session('mblock_count') . '00' . $item->getPayload('replace-id');
+        $id = '';
         // has children ?
         if ($dom->hasChildNodes()) {
             /** @var DOMElement $child */
             foreach ($dom->getElementsByTagName('input') as $child) {
                 // hidden input
-                if (strpos($child->getAttribute('name'), 'REX_INPUT_LINK') !== false) {
-                    // replace name
-                    self::replaceName($child, $item, 'REX_INPUT_LINK');
+                self::replaceName($child, $item, 'REX_INPUT_LINK');
+                $name = $child->getAttribute('name');
+                if (strpos($name, 'REX_INPUT_VALUE') !== false) {
+                    $parent = $child->parentNode;
+                    $id = str_replace(array('REX_INPUT_VALUE','][', '[', ']'), array('', '', '', ''), $name);
+                    $oldId = $parent->getAttribute('data-id');
+                    $parent->setAttribute('data-id', $id);
+                    $child->setAttribute('id', str_replace('REX_LINK_' . $oldId, 'REX_LINK_' . $id, $child->getAttribute('id')));
+                    $dom->firstChild->setAttribute('id', str_replace('REX_LINK_' . $oldId, 'REX_LINK_' . $id, $child->getAttribute('id') . '_NAME'));
                 }
-                // change id
-                $attrId = preg_replace('/\d+/', $id, $child->getAttribute('id'));
-                $child->setAttribute('id', $attrId);
             }
             // remove name
             if ($dom->firstChild) {
@@ -137,7 +138,7 @@ class MBlockSystemButtonReplacer extends MBlockElementReplacer
                 // add link art name
                 self::addArtName($dom->firstChild, $item);
             }
-
+            // set link id
             if ($parent = $dom->parentNode) {
                 if ($parent->hasChildNodes()) {
                     foreach ($parent->getElementsByTagName('a') as $child) {

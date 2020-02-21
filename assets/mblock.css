@@ -1,6 +1,8 @@
 .mblock_wrapper {
     margin: auto;
-    padding: 0
+    padding: 0;
+    clear: both;
+    position: relative;
 }
 
 .mblock_wrapper > div:not(.mblock-single-add) {
@@ -50,6 +52,8 @@
 .sortitem .mblock_wrapper > div {
     border: 1px dashed #bfe0d8;
     background: #fdfdfd;
+    box-shadow:  10px 10px 20px #d7d7d7,
+        -10px -10px 20px #ffffff;
 }
 
 .sortitem .sortitem .mblock_wrapper > div {
@@ -201,4 +205,18 @@ div.sortable-ghost {
 
 .mblock_wrapper.hide_removeadded > div {
     padding-top: 15px;
+}
+
+div.mblock-single-add,
+div.mblock-single-add:hover {
+    border: none !important;
+}
+
+div.mblock-single-add:hover:before {
+    display: none;
+}
+
+.sortitem .mblock_wrapper > div.mblock-single-add .singleadded {
+    display: block;
+    margin: 15px 0 5px 0;
 }
