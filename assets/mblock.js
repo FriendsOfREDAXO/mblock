@@ -206,6 +206,7 @@ function mblock_reindex(element) {
             mblock_modify_system_buttons($(this));
             mblock_modify_system_list_buttons($(this));
             mblock_modify_custom_link_buttons($(this));
+            mblock_modify_custom_imglist_buttons($(this));
             mblock_replace_for($(this));
         });
     });
@@ -243,6 +244,16 @@ function mblock_modify_system_list_buttons(element) {
     }
 }
 
+function mblock_modify_custom_imglist_buttons(element) {
+    if (element.prop("nodeName") === 'INPUT' && element.attr('id') && (
+        element.attr('id').indexOf("REX_LINKLIST_") >= 0 || element.attr('id').indexOf("REX_MEDIALIST_") >= 0
+    )) {
+        let this_id = element.attr('id').replace('REX_MEDIALIST_', '');
+        element.parent().parent().attr('data-widget-id', this_id);
+        element.parent().find('ul').attr('id', 'REX_IMGLIST_' + this_id);
+    }
+}
+
 function mblock_modify_custom_link_buttons(element) {
     if (element.prop("nodeName") === 'INPUT' && element.attr('id') &&
         element.parent().attr('class').indexOf("custom-link") >= 0 && element.attr('name')
@@ -273,31 +284,6 @@ function mblock_modify_custom_link_buttons(element) {
 
             }
         });
-
-
-        // let this_id = element.attr('name').replace(/\]\[/g, '');
-        //
-        // this_id = this_id.replace(/\[/g, '');
-        // this_id = this_id.replace(/\]/g, '');
-        // this_id = this_id.replace('REX_INPUT_VALUE', '');
-        //
-        // if (DEBUG) console.log(this_id);
-        // if (DEBUG) console.log(element.attr('id'));
-        // element.parent().attr('data-id', this_id);
-        // // button
-        // element.parent().find('a.btn-popup').each(function () {
-        //     if ($(this).attr('id')) {
-        //         $(this).attr('id', $(this).attr('id').replace(/\d+$/g, this_id));
-        //     }
-        // });
-        // element.attr('id', 'REX_LINK_' + this_id);
-        // if (DEBUG) console.log(element.attr('id'));
-        //
-        // if (element.prev().length) {
-        //     if (DEBUG) console.log('no name: ' + element.prev().attr('id') + ' this_id:' + this_id);
-        //     element.prev().attr('id', 'REX_LINK_' + this_id + '_NAME');
-        //     if (DEBUG) console.log(element.prev().attr('id'));
-        // }
     }
 }
 

@@ -31,14 +31,31 @@ class MBlockWidgetFormItemDecorator extends MBlockWidgetReplacer
             if ($matches = self::getElementsByClass($dom, 'div.custom-link')) {
                 /** @var DOMElement $match */
                 foreach ($matches as $key => $match) {
-                    if ($match->hasChildNodes()) {
-                        /** @var DOMElement $child */
-                        foreach ($match->getElementsByTagName('input') as $child) {
-                            if ($child instanceof DOMElement && !$child->hasAttribute('data-mblock')) {
-                                self::processCustomLink($match, $item, $nestedCount);
-                            }
-                        }
+                    if ($match->hasChildNodes() && !$match->hasAttribute('data-mblock')) {
+                        self::processCustomLink($match, $item, $nestedCount);
                         $match->setAttribute('data-mblock', true);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @param MBlockItem $item
+     * @param array $nestedCount
+     * @author Joachim Doerr
+     */
+    public static function decorateImagesListFormItem(MBlockItem $item, $nestedCount = array())
+    {
+        // set dom document
+        $dom = $item->getFormDomDocument();
+        if ($dom instanceof \DOMDocument) {
+            if ($matches = self::getElementsByClass($dom, 'div.custom-imglist')) {
+                /** @var DOMElement $match */
+                foreach ($matches as $key => $match) {
+                    if ($match->hasChildNodes() && !$match->hasAttribute('data-mblock')) {
+                        self::processImageList($match, $item, $nestedCount);
+//                        $match->setAttribute('data-mblock', true);
                     }
                 }
             }

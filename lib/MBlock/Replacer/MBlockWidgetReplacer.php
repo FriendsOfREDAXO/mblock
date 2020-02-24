@@ -12,6 +12,7 @@ use DOMElement;
 use MBlock\Decorator\MBlockFormItemDecorator;
 use MBlock\DTO\MBlockItem;
 use rex_article;
+use rex_url;
 use function Matrix\identity;
 
 class MBlockWidgetReplacer extends MBlockElementReplacer
@@ -125,7 +126,7 @@ class MBlockWidgetReplacer extends MBlockElementReplacer
                 $name = $child->getAttribute('name');
                 if (strpos($name, 'REX_INPUT_VALUE') !== false) {
                     $parent = $child->parentNode;
-                    $id = str_replace(array('REX_INPUT_VALUE','][', '[', ']'), array('', '', '', ''), $name);
+                    $id = str_replace(array('REX_INPUT_VALUE', '][', '[', ']'), array('', '', '', ''), $name);
                     $oldId = $parent->getAttribute('data-id');
                     $parent->setAttribute('data-id', $id);
                     $child->setAttribute('id', str_replace('REX_LINK_' . $oldId, 'REX_LINK_' . $id, $child->getAttribute('id')));
@@ -145,6 +146,80 @@ class MBlockWidgetReplacer extends MBlockElementReplacer
                         $attrId = preg_replace('/\d+/', $id, $child->getAttribute('id'));
                         $child->setAttribute('id', $attrId);
                     }
+                }
+            }
+        }
+    }
+
+    /**
+     * @param DOMElement $dom
+     * @param MBlockItem $item
+     * @param null $nestedCount
+     * @author Joachim Doerr
+     */
+    public static function processImageList(DOMElement $dom, MBlockItem $item, $nestedCount = null)
+    {
+        // set system name
+        $item->setSystemName('REX_MEDIALIST');
+        $val = '';
+        $id = '';
+        /** @var DOMElement $child */
+        foreach ($dom->getElementsByTagName('input') as $child) {
+            if ($child->hasAttribute('value')) {
+                $val = $child->getAttribute('value');
+            }
+            if ($child->hasAttribute('name')) {
+                $name = $child->getAttribute('name');
+                $id = str_replace(array('REX_INPUT_VALUE', '][', '[', ']'), '', $name);
+            }
+        }
+
+        if (!empty($val)) {
+            $val = explode(',', $val);
+            if (is_array($val) && sizeof($val) > 0) {
+
+                /** @var DOMElement $child */
+                foreach ($dom->getElementsByTagName('select') as $child) {
+                    /** @var DOMElement $childNode */
+                    foreach ($child->childNodes as $key => $childNode) {
+                        $childNode->setAttribute('value', $childNode->nodeValue);
+                        $childNode->setAttribute('data-key', $key);
+                        $childNode->nodeValue = htmlentities($childNode->nodeValue);
+                        $childNode->removeAttribute('selected');
+                    }
+                }
+                foreach ($dom->getElementsByTagName('ul') as $child) {
+                    foreach ($child->childNodes as $childNode) {
+                        $child->removeChild($childNode);
+                    }
+                    $child->setAttribute('id', 'REX_IMGLIST_' . $id);
+                    foreach ($val as $key => $file) {
+                        if (!empty($file)) {
+                            $li = new DOMElement('li', $file);
+                            $child->appendChild($li);
+                        }
+                    }
+                    /** @var DOMElement $childNode */
+                    foreach ($child->childNodes as $key => $childNode) {
+                        $file = $childNode->nodeValue;
+                        if (!empty($file)) {
+                            $childNode->setAttribute('value', $file);
+                            $childNode->setAttribute('data-value', $file);
+                            $childNode->setAttribute('data-key', $key);
+                            $childNode->nodeValue = '';
+                            $image = new DOMElement('img');
+                            $childNode->appendChild($image);
+                        }
+                    }
+                }
+                foreach ($dom->getElementsByTagName('img') as $child) {
+                    $file = $child->parentNode->getAttribute('value');
+                    $url = rex_url::backendController(['rex_media_type' => 'rex_medialistbutton_preview', 'rex_media_file' => $file], false);
+                    if (pathinfo($file, PATHINFO_EXTENSION) === 'svg') {
+                        $url = rex_url::media($file);
+                    }
+                    $child->setAttribute('src', $url);
+                    $child->setAttribute('class', 'thumbnail');
                 }
             }
         }

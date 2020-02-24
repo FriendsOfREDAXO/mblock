@@ -144,7 +144,7 @@ class MBlockHandler
             ->addPayload('plain_item', true);
 
         // loaded values?
-        if (!is_null($this->val)) {
+        if (!is_null($this->val) && is_array($this->val)) {
             // iterate value levels
             foreach ($this->val as $key => $value) {
                 if (isset($this->val[$key])) {
@@ -343,7 +343,23 @@ class MBlockHandler
                                     $input->setAttribute('value', '');
                                 }
                             }
+                            // ol
+                            $ul = $match->getElementsByTagName('ul');
+                            if ($ul) {
+                                /** @var DOMElement $item */
+                                foreach ($ul as $item) {
+                                    if (strpos($item->getAttribute('id'), 'REX_IMGLIST_') !== false) {
+                                        if ($item->hasChildNodes()) {
+                                            foreach ($item->childNodes as $childNode) {
+                                                $item->removeChild($childNode);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
                             // TODO normalize select for media and link lists?
+
                         }
                     }
                 }
@@ -367,6 +383,8 @@ class MBlockHandler
         MBlockSystemFormItemDecorator::decorateSystemFormItem($item, $nestedCount);
         // custom link hidden to text
         MBlockWidgetFormItemDecorator::decorateCustomLinkFormItem($item, $nestedCount);
+        // custom image list
+        MBlockWidgetFormItemDecorator::decorateImagesListFormItem($item, $nestedCount);
         // decorate counting
         // TODO!!!!
 //        MBlockCountReplacer::replaceCountKeys($item, $count);
