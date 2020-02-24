@@ -3,7 +3,7 @@
  */
 
 let mblock = '.mblock_wrapper';
-let DEBUG = false;
+let DEBUG = true;
 
 $(document).on('rex:ready', function (e, container) {
     container.find(mblock).each(function (index) {
@@ -60,7 +60,8 @@ function mblock_add_plus(element) {
 function mblock_set_addAndRemoveBtn_visibility(element) {
     let finded = element.find('> div.sortitem'),
         removeme = finded.find('> .removeadded .removeme'),
-        addme = finded.find('> .removeadded .addme');
+        addme = finded.find('> .removeadded .addme'),
+        copyme = finded.find('> .removeadded .copyme');
 
     if (finded.length == 1) {
         removeme.prop('disabled', true);
@@ -75,9 +76,13 @@ function mblock_set_addAndRemoveBtn_visibility(element) {
         if (finded.length >= element.data('max')) {
             addme.prop('disabled', true);
             addme.attr('data-disabled', true);
+            copyme.prop('disabled', true);
+            copyme.attr('data-disabled', true);
         } else {
             addme.prop('disabled', false);
             addme.attr('data-disabled', false);
+            copyme.prop('disabled', false);
+            copyme.attr('data-disabled', false);
         }
     }
 
@@ -391,6 +396,47 @@ function mblock_add_item(element, item) {
     iClone.trigger('rex:ready', [iClone]);
 }
 
+
+function mblock_copy_item(element, item) {
+    if (item.parent().hasClass(element.attr('class'))) {
+        // unset sortable
+        element.mblock_sortable("destroy");
+
+        let iClone = item.clone();
+
+        // fix for checkbox and radio bug
+        iClone.find('input:radio, input:checkbox').each(function(){
+            $(this).parent().removeAttr('for');
+        });
+
+        // fix radio bug
+        iClone.find('input:radio, input:checkbox').each(function(){
+            // fix lost checked from parent item
+            $(this).attr('name', 'mblock_new_' + $(this).attr('name'));
+            // fix lost value
+            $(this).attr('data-value', $(this).val());
+        });
+
+        // add clone
+        item.after(iClone);
+
+        // add unique id
+        mblock_set_unique_id(iClone, true);
+        // reinit
+        mblock_init_sort(element);
+        // scroll to item
+        mblock_scroll(element, iClone);
+        // add buttons
+        mblock_buttons(element, iClone);
+        // trigger rex ready
+        iClone.trigger('rex:ready', [iClone]);
+    }
+}
+
+
+
+
+
 function mblock_set_unique_id(item, input_delete) {
     item.find('input').each(function () {
         let unique_id = Math.random().toString(16).slice(2),
@@ -495,6 +541,17 @@ function mblock_add(element) {
 }
 
 function mblock_buttons(element, sortitem) {
+    sortitem.find('> .removeadded > .copyme').on('click', function () {
+        if (!$(this).prop('disabled')) {
+            let sortitem = $(this).parent().parent();
+            element.attr('data-mblock_clicked_copy_item', sortitem.attr('data-mblock_index'));
+            console.log('copy');
+            console.log(sortitem);
+            console.log(element);
+            mblock_copy_item(element, sortitem);
+        }
+        return false;
+    });
     sortitem.find('> .removeadded > .addme').on('click', function () {
         if (!$(this).prop('disabled')) {
             let sortitem = $(this).parent().parent();
