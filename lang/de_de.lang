@@ -38,8 +38,8 @@ mblock_theme_options = Theme-Optionen
 mblock_scroll = SmoothScroll aktiviert
 mblock_not_scroll = SmoothScroll deaktiviert
 mblock_scroll_label = SmoothScroll
-mblock_not_delete_confirm = Bestätigung vor dem Löschen von Blocken deaktiviert
-mblock_ok_delete_confirm = Bestätigung vor dem Löschen von Blocken aktiviert
+mblock_not_delete_confirm = Bestätigung vor dem Löschen von Blöcken deaktiviert
+mblock_ok_delete_confirm = Bestätigung vor dem Löschen von Blöcken aktiviert
 mblock_delete_confirm_label = Bestätigung vor dem Löschen
 mblock_delete_confirm = Block löschen?
 
