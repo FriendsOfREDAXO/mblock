@@ -117,12 +117,15 @@ class MBlockWidgetReplacer extends MBlockElementReplacer
         // set system name
         $item->setSystemName('REX_LINK');
         $id = '';
+        $val = '';
         // has children ?
         if ($dom->hasChildNodes()) {
             /** @var DOMElement $child */
             foreach ($dom->getElementsByTagName('input') as $child) {
                 // hidden input
                 self::replaceName($child, $item, 'REX_INPUT_LINK');
+                // add value
+                self::replaceValue($child, $item);
                 $name = $child->getAttribute('name');
                 if (strpos($name, 'REX_INPUT_VALUE') !== false) {
                     $parent = $child->parentNode;
@@ -131,13 +134,18 @@ class MBlockWidgetReplacer extends MBlockElementReplacer
                     $parent->setAttribute('data-id', $id);
                     $child->setAttribute('id', str_replace('REX_LINK_' . $oldId, 'REX_LINK_' . $id, $child->getAttribute('id')));
                     $dom->firstChild->setAttribute('id', str_replace('REX_LINK_' . $oldId, 'REX_LINK_' . $id, $child->getAttribute('id') . '_NAME'));
+                    $val = $child->getAttribute('value');
                 }
             }
             // remove name
             if ($dom->firstChild) {
                 $dom->firstChild->removeAttribute('name');
                 // add link art name
-                self::addArtName($dom->firstChild, $item);
+                if (is_numeric($val)) {
+                    self::addArtName($dom->firstChild, $item, $val);
+                } else if (is_string($val)) {
+                    $dom->firstChild->setAttribute('value', $val);
+                }
             }
             // set link id
             if ($parent = $dom->parentNode) {

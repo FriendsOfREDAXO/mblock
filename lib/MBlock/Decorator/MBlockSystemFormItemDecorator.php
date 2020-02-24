@@ -34,9 +34,6 @@ class MBlockSystemFormItemDecorator extends MBlockWidgetReplacer
                     if ($match->hasChildNodes() && !(strpos($match->getAttribute('class'), 'custom-link') !== false)) {
                         /** @var DOMElement $child */
                         foreach ($match->getElementsByTagName('input') as $child) {
-                            if (strpos($match->getAttribute('class'), 'custom-link') !== false) {
-                                continue;
-                            }
                             if ($child instanceof DOMElement && !$child->hasAttribute('data-mblock')) {
                                 $id = $child->getAttribute('id');
                                 $type = $child->getAttribute('type');
