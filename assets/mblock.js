@@ -132,9 +132,15 @@ function mblock_init_sortability(element) {
             element.removeClass('sortable_start');
             // trigger event
             let iClone = $(event.item);
+
+            // set checked
+            resetChecked(element);
+
+            // trigger event
             iClone.trigger('rex:change', [iClone]);
         },
         onStart: function (event) {
+            checkedFind(element);
             element.addClass('sortable_start');
         }
     });
@@ -396,7 +402,6 @@ function mblock_add_item(element, item) {
     iClone.trigger('rex:ready', [iClone]);
 }
 
-
 function mblock_copy_item(element, item) {
     if (item.parent().hasClass(element.attr('class'))) {
         // unset sortable
@@ -406,16 +411,13 @@ function mblock_copy_item(element, item) {
 
         // fix for checkbox and radio bug
         iClone.find('input:radio, input:checkbox').each(function(){
-            $(this).parent().removeAttr('for');
+            $(this).parent().removeAttr('for'); // ugly!
         });
 
-        // fix radio bug
-        iClone.find('input:radio, input:checkbox').each(function(){
-            // fix lost checked from parent item
-            $(this).attr('name', 'mblock_new_' + $(this).attr('name'));
-            // fix lost value
-            $(this).attr('data-value', $(this).val());
-        });
+        // fix lost checked from parent item
+        // $(this).attr('name', 'mblock_new_' + $(this).attr('name')); // wtf!?
+        // fix lost value
+        checkedFind(iClone);
 
         // add clone
         item.after(iClone);
@@ -500,10 +502,17 @@ function mblock_moveup(element, item) {
     if (prev.length == 0) return;
 
     setTimeout(function () {
+        // fix checked bug
+        checkedFind(prev);
+
         item.insertBefore(prev);
         // set last user action
         mblock_reindex(element);
         mblock_set_addAndRemoveBtn_visibility(element);
+
+        // set checked
+        resetChecked(prev);
+
         // trigger event
         let iClone = prev;
         iClone.trigger('rex:change', [iClone]);
@@ -515,14 +524,42 @@ function mblock_movedown(element, item) {
     if (next.length == 0) return;
 
     setTimeout(function () {
+        // fix checked bug
+        checkedFind(next);
+
         item.insertAfter(next);
+
         // set last user action
         mblock_reindex(element);
         mblock_set_addAndRemoveBtn_visibility(element);
+
+        // set checked
+        resetChecked(next);
+
         // trigger event
         let iClone = next;
         iClone.trigger('rex:change', [iClone]);
     }, 150);
+}
+
+function checkedFind(element) {
+    element.find('input:radio, input:checkbox').each(function(){
+        // fix lost checked from parent item
+        // fix lost value
+        $(this).attr('data-value', $(this).val());
+        if($(this).is(':checked')) {
+            $(this).attr('data-checked', 1);
+        }
+    });
+}
+
+function resetChecked(element) {
+    element.find('input:radio, input:checkbox').each(function(){
+        if($(this).attr('data-checked') == 1) {
+            $(this).prop('checked', true);
+            $(this).attr('checked', 'checked');
+        }
+    });
 }
 
 function mblock_scroll(element, item) {
