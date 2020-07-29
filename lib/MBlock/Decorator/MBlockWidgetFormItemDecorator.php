@@ -55,7 +55,7 @@ class MBlockWidgetFormItemDecorator extends MBlockWidgetReplacer
                 foreach ($matches as $key => $match) {
                     if ($match->hasChildNodes() && !$match->hasAttribute('data-mblock')) {
                         self::processImageList($match, $item, $nestedCount);
-//                        $match->setAttribute('data-mblock', true);
+                        $match->setAttribute('data-mblock', true);
                     }
                 }
             }
