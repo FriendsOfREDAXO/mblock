@@ -68,7 +68,45 @@ class MBlockValueReplacer
             }
         }
 
-        // find selects
+        // rex-js-widget custom-imglist  rex-js-widget-imglist
+        if ($matches = self::getElementsByClass($dom, 'div.rex-js-widget-imglist')) {
+            $domElementsToRemove = [];
+            /** @var DOMElement $match */
+            foreach ($matches as $match) {
+                // replace value by json key
+                $selects = $match->getElementsByTagName('select');
+                if ($selects->length > 0) {
+                    /** @var DOMElement $select */
+                    foreach ($selects as $select) {
+                        if ($select->hasChildNodes()) {
+                            for ($i = 0; $i < $select->childNodes->length; $i++) {
+                                $domElementsToRemove[] = $select->childNodes->item($i);
+                            }
+                        }
+                    }
+                }
+                $ul = $match->getElementsByTagName('ul');
+                if ($ul->length > 0) {
+                    /** @var DOMElement $list */
+                    foreach ($ul as $list) {
+                        $classes = explode(' ', $list->getAttribute('class'));
+                        if ($list->hasChildNodes() && in_array('thumbnail-list', $classes)) {
+                            for ($i = 0; $i < $list->childNodes->length; $i++) {
+                                $domElementsToRemove[] = $list->childNodes->item($i);
+                            }
+                        }
+                    }
+                }
+            }
+            if (sizeof($domElementsToRemove) > 0) {
+                /** @var DOMElement $domElement */
+                foreach ($domElementsToRemove as $key => $domElement) {
+                    $domElement->parentNode->removeChild($domElement);
+                }
+            }
+        }
+
+            // find selects
         if ($matches = $dom->getElementsByTagName('select')) {
             /** @var DOMElement $match */
             foreach ($matches as $match) {
