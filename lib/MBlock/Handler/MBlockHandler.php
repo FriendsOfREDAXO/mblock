@@ -333,7 +333,7 @@ class MBlockHandler
                         foreach ($match->childNodes as $key => $child) {
                             if ($child->hasAttribute('class') && $child->getAttribute('class') == 'sortitem') {
                                 if (($initialHidden === false && $key > 0) || $initialHidden === true)
-                                    $match->removeChild($child);
+                                    $child->parentNode->removeChild($child);
                             }
                             // normalize input do that for link and media widgets
                             $inputs = $match->getElementsByTagName('input');
@@ -351,7 +351,7 @@ class MBlockHandler
                                     if (strpos($item->getAttribute('id'), 'REX_IMGLIST_') !== false) {
                                         if ($item->hasChildNodes()) {
                                             foreach ($item->childNodes as $childNode) {
-                                                $item->removeChild($childNode);
+                                                $childNode->parentNode->removeChild($childNode);
                                             }
                                         }
                                     }
