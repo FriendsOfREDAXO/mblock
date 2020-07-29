@@ -197,9 +197,9 @@ class MBlockWidgetReplacer extends MBlockElementReplacer
                     }
                 }
                 foreach ($dom->getElementsByTagName('ul') as $child) {
-                    foreach ($child->childNodes as $childNode) {
-                        $child->removeChild($childNode);
-                    }
+//                    foreach ($child->childNodes as $childNode) {
+//                        $child->removeChild($childNode);
+//                    }
                     $child->setAttribute('id', 'REX_IMGLIST_' . $id);
                     foreach ($val as $key => $file) {
                         if (!empty($file)) {
