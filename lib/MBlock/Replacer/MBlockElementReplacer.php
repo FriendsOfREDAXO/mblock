@@ -95,7 +95,7 @@ class MBlockElementReplacer
                     break;
                 case 'textarea':
                     if ($matches && is_array($item->getVal()) && array_key_exists($matches[1], $item->getVal())) {
-                        $result = $item->getVal();
+                        $result = $item->getResult() ?: $item->getVal();
                         $id = uniqid(md5(rand(1000, 9999)), true);
                         // node value cannot contains &
                         // so set a unique id there we replace later with the right value
