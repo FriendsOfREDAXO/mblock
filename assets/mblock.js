@@ -409,6 +409,11 @@ function mblock_copy_item(element, item) {
 
         let iClone = item.clone();
 
+        // set select values for clone
+        item.find('select').each(function(i) {
+            iClone.find('select').eq(i).val($(this).val())
+        });
+        
         // fix for checkbox and radio bug
         iClone.find('input:radio, input:checkbox').each(function(){
             $(this).parent().removeAttr('for'); // ugly!
