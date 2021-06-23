@@ -169,7 +169,7 @@ function mblock_reindex(element) {
 
                 // button
                 $(this).parent().find('a.btn-popup').each(function () {
-                    $(this).attr('onclick', $(this).attr('onclick').replace(/\(\d+/, '(' + sindex + '' + mblock_count + '00' + eindex));
+                    $(this).attr('onclick', $(this).attr('onclick').replace(/\('\d+/, '(\'' + sindex + '' + mblock_count + '00' + eindex));
                     $(this).attr('onclick', $(this).attr('onclick').replace(/_\d+/, '_' + sindex + '' + mblock_count + '00' + eindex));
                 });
             }
@@ -192,7 +192,7 @@ function mblock_reindex(element) {
                     // button
                     $(this).parent().find('a.btn-popup').each(function () {
                         if ($(this).attr('onclick')) {
-                            $(this).attr('onclick', $(this).attr('onclick').replace(/\(\d+/, '(' + sindex + '' + mblock_count + '00' + eindex));
+                            $(this).attr('onclick', $(this).attr('onclick').replace(/\('\d+/, '(\'' + sindex + '' + mblock_count + '00' + eindex));
                             $(this).attr('onclick', $(this).attr('onclick').replace(/_\d+/, '_' + sindex + '' + mblock_count + '00' + eindex));
                         }
                     });
