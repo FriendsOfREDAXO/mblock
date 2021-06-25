@@ -8,6 +8,7 @@
 class MBlockSystemButtonReplacer
 {
     use \MBlock\Decorator\MBlockDOMTrait;
+    const REX_VERSION = '5.12.1';
 
     /**
      * @param MBlockItem $item
@@ -125,8 +126,13 @@ class MBlockSystemButtonReplacer
             // change for id
             self::replaceId($dom->firstChild, $item);
             // change onclick id
-            self::replaceOnClick($dom, $item, 'REXMedia(', '(', ',');
-            self::replaceOnClick($dom, $item, 'REXMedia(', '(', ')');
+            if (rex_version::compare(self::REX_VERSION, rex::getVersion(), '>=')) {
+                self::replaceOnClick($dom, $item, 'REXMedia(', '(\'?', '\'?,', '(', ',');
+                self::replaceOnClick($dom, $item, 'REXMedia(', '(\'?', '\'?\)', '(', ')');
+            } else {
+                self::replaceOnClick($dom, $item, 'REXMedia(', '(', ',', '(', ',');
+                self::replaceOnClick($dom, $item, 'REXMedia(', '(', ')', '(', ')');
+            }
         }
     }
 
@@ -169,8 +175,13 @@ class MBlockSystemButtonReplacer
                     }
                 }
                 // change click id
-                self::replaceOnClick($dom, $item, 'REXMedialist(', '(', ',');
-                self::replaceOnClick($dom, $item, 'REXMedialist(', '(', ')');
+                if (rex_version::compare(self::REX_VERSION, rex::getVersion(), '>=')) {
+                    self::replaceOnClick($dom, $item, 'REXMedialist(', '(\'?', '\'?,', '(\'', '\',');
+                    self::replaceOnClick($dom, $item, 'REXMedialist(', '(\'?', '\'?\)', '(\'', '\')');
+                } else {
+                    self::replaceOnClick($dom, $item, 'REXMedialist(', '(', ',', '(', ',');
+                    self::replaceOnClick($dom, $item, 'REXMedialist(', '(', ')', '(', ')');
+                }
             }
         }
     }
@@ -205,9 +216,16 @@ class MBlockSystemButtonReplacer
             // add link art name
             self::addArtName($dom->firstChild, $item, $name);
             // change click id
-            self::replaceOnClick($dom, $item, 'REXLink(', '(', ')');
-            // change click id
-            self::replaceOnClick($dom, $item, 'openLinkMap(', '_', '\'');
+            if (rex_version::compare(self::REX_VERSION, rex::getVersion(), '>=')) {
+                // openLinkMap('REX_LINK_1', '&clang=1&category_id=0');return false;"
+                // deleteREXLink('1');return false;
+                // deleteREXLinklist('1');return false;
+                self::replaceOnClick($dom, $item, 'REXLink(', '(\'?', '\'?\)','(\'', '\')');
+                self::replaceOnClick($dom, $item, 'openLinkMap(', '_', '\'', '_', '\'');
+            } else {
+                self::replaceOnClick($dom, $item, 'REXLink(', '(', ')', '(', ')');
+                self::replaceOnClick($dom, $item, 'openLinkMap(', '_', '\'', '_', '\'');
+            }
         }
     }
 
@@ -288,10 +306,16 @@ class MBlockSystemButtonReplacer
                     self::addLinkSelectOptions($child, $item, $name);
                 }
             }
-            // change click id
-            self::replaceOnClick($dom, $item, 'REXLinklist(', '(', ',');
-            // change click id
-            self::replaceOnClick($dom, $item, 'deleteREXLinklist(', '(', ')');
+            if (rex_version::compare(self::REX_VERSION, rex::getVersion(), '>=')) {
+                // moveREXLinklist('1','top');return false;"
+                // openREXLinklist('1', '&clang=1&category_id=0');return false
+                self::replaceOnClick($dom, $item, 'REXLinklist(', '(\'?', '\'?,','(\'', '\',');
+                self::replaceOnClick($dom, $item, 'deleteREXLinklist(', '(\'?', '\'?', '(\'', '\'');
+            } else {
+                self::replaceOnClick($dom, $item, 'REXLinklist(', '(', ',', '(', ',');
+                self::replaceOnClick($dom, $item, 'deleteREXLinklist(', '(', ')', '(', ')');
+            }
+
         }
     }
 
@@ -303,7 +327,7 @@ class MBlockSystemButtonReplacer
      * @param string $suffix
      * @author Joachim Doerr
      */
-    protected static function replaceOnClick(DOMElement $dom, MBlockItem $item, $btnFindKey, $prefix = '', $suffix = '')
+    protected static function replaceOnClick(DOMElement $dom, MBlockItem $item, $btnFindKey, $searchPrefix = '', $searchSuffix = '', $prefix = '', $suffix = '')
     {
         // find a buttons and replace id
         if ($dom->hasChildNodes()) {
@@ -311,7 +335,7 @@ class MBlockSystemButtonReplacer
             foreach($dom->getElementsByTagName('a') as $child) {
                 if ($child->hasAttribute('onclick')) {
                     if (strpos($child->getAttribute('onclick'), $btnFindKey) !== false) {
-                        $child->setAttribute('onclick', preg_replace('/\\'.$prefix.'\d\\'.$suffix.'/', $prefix . $item->getPayload('count-id') . $_SESSION['mblock_count'] . '00' . $item->getPayload('replace-id') . $suffix, $child->getAttribute('onclick')));
+                        $child->setAttribute('onclick', preg_replace('/\\'.$searchPrefix.'\d\\'.$searchSuffix.'/', $prefix . $item->getPayload('count-id') . $_SESSION['mblock_count'] . '00' . $item->getPayload('replace-id') . $suffix, $child->getAttribute('onclick')));
                     }
                 }
             }
