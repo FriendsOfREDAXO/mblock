@@ -188,11 +188,33 @@ function mblock_reindex(element) {
                     if ($(this).next().attr('type') == 'hidden') {
                         $(this).next().attr('id', $(this).next().attr('id').replace(/\d+/, sindex + '' + mblock_count + '00' + eindex));
                     }
+                }
+            }
 
+            // input rex link button
+            if ($(this).prop("nodeName") == 'INPUT' && $(this).attr('id') && (
+                $(this).attr('id').indexOf("REX_LINK_") >= 0
+            )) {
+                if ($(this).attr('type') != 'hidden') {
                     // button
                     $(this).parent().find('a.btn-popup').each(function () {
                         if ($(this).attr('onclick')) {
                             $(this).attr('onclick', $(this).attr('onclick').replace(/\('?\d+/, '(\'' + sindex + '' + mblock_count + '00' + eindex));
+                            $(this).attr('onclick', $(this).attr('onclick').replace(/_\d+/, '_' + sindex + '' + mblock_count + '00' + eindex));
+                        }
+                    });
+                }
+            }
+
+            // input rex media button
+            if ($(this).prop("nodeName") == 'INPUT' && $(this).attr('id') && (
+                $(this).attr('id').indexOf("REX_MEDIA_") >= 0
+            )) {
+                if ($(this).attr('type') != 'hidden') {
+                    // button
+                    $(this).parent().find('a.btn-popup').each(function () {
+                        if ($(this).attr('onclick')) {
+                            $(this).attr('onclick', $(this).attr('onclick').replace(/\(\d+/, '(' + sindex + '' + mblock_count + '00' + eindex));
                             $(this).attr('onclick', $(this).attr('onclick').replace(/_\d+/, '_' + sindex + '' + mblock_count + '00' + eindex));
                         }
                     });
