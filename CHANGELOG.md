@@ -1,5 +1,10 @@
 # MBlock - REDAXO Addon für Modul-Input-Blöcke
 
+### Version 3.2.0
+
+* fixes: https://github.com/FriendsOfREDAXO/mblock/issues/138
+* Widget fixes for REDAXO 5.12.1
+
 ### Version 3.1.0
 
 * added rex:change event after item movements
