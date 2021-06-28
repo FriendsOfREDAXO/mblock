@@ -2,7 +2,7 @@
 
 ### Version 3.2.0
 
-* fixes: https://github.com/FriendsOfREDAXO/mblock/issues/138
+* fixes: https://github.com/FriendsOfREDAXO/mblock/issues/137
 * Widget fixes for REDAXO 5.12.1
 
 ### Version 3.1.0
