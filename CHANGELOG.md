@@ -1,5 +1,9 @@
 # MBlock - REDAXO Addon für Modul-Input-Blöcke
 
+### Version 3.3.0
+
+* dark mode support thx to: @eaCe
+
 ### Version 3.2.0
 
 * fixes: https://github.com/FriendsOfREDAXO/mblock/issues/137
