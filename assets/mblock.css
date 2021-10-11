@@ -82,6 +82,27 @@ div.sortable-ghost {
 .mblock_wrapper.hide_sorthandle > div {
     padding-left: 15px;
 }
+
 .mblock_wrapper.hide_removeadded > div {
     padding-top: 15px;
+}
+
+body.rex-theme-dark .mblock_wrapper > div {
+    border: 1px solid #1a3332;
+    background: #1a3332;
+}
+
+body.rex-theme-dark div.sortable-ghost {
+    border: 1px dashed #151e24;
+}
+
+@media (prefers-color-scheme: dark) {
+    body:not(.rex-theme-light) .mblock_wrapper > div {
+        border: 1px solid #1a3332;
+        background: #1a3332;
+    }
+
+    body:not(.rex-theme-light) div.sortable-ghost {
+        border: 1px dashed #151e24;
+    }
 }
