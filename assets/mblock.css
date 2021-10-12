@@ -97,12 +97,12 @@ body.rex-theme-dark div.sortable-ghost {
 }
 
 @media (prefers-color-scheme: dark) {
-    body:not(.rex-theme-light) .mblock_wrapper > div {
+    body[class^="rex-theme"]:not(.rex-theme-light) .mblock_wrapper > div {
         border: 1px solid #1a3332;
         background: #1a3332;
     }
 
-    body:not(.rex-theme-light) div.sortable-ghost {
+    bodyclass^="rex-theme":not(.rex-theme-light) div.sortable-ghost {
         border: 1px dashed #151e24;
     }
 }
