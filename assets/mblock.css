@@ -102,7 +102,7 @@ body.rex-theme-dark div.sortable-ghost {
         background: #1a3332;
     }
 
-    bodyclass^="rex-theme":not(.rex-theme-light) div.sortable-ghost {
+    body[class^="rex-theme"]:not(.rex-theme-light) div.sortable-ghost {
         border: 1px dashed #151e24;
     }
 }
