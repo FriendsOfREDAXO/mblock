@@ -4,12 +4,12 @@
 }
 
 .mblock_wrapper > div {
-    border: 1px solid rgba(100, 100, 100, 0.20);
-    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid #bfe0d8;
+    background: #f1fcfa;
+    /*color: #1C94C4;*/
     margin: 0 0 10px 0;
-    padding: 20px 15px 20px 25px;
-    position: relative;
-    box-shadow: 0 5px 15px rgba(0,0,0,.08);
+    padding: 20px 15px 15px 25px;
+    position: relative
 }
 
 .mblock_wrapper span.sorthandle {
@@ -20,7 +20,7 @@
     bottom: 5px;
     left: 4px;
     width: 8px;
-    border-left: dotted 2px #ccc; 
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAB3RJTUUH3wIDBycZ/Cj09AAAAAlwSFlzAAALEgAACxIB0t1+/AAAAARnQU1BAACxjwv8YQUAAAAWSURBVHjaY2DABhoaGupBGMRmYiAEAKo2BAFbROu9AAAAAElFTkSuQmCC)
 }
 
 .mblock_wrapper span.sorthandle:hover {
@@ -85,4 +85,24 @@ div.sortable-ghost {
 
 .mblock_wrapper.hide_removeadded > div {
     padding-top: 15px;
+}
+
+body.rex-theme-dark .mblock_wrapper > div {
+    border: 1px solid #1a3332;
+    background: #1a3332;
+}
+
+body.rex-theme-dark div.sortable-ghost {
+    border: 1px dashed #151e24;
+}
+
+@media (prefers-color-scheme: dark) {
+    body[class^="rex-theme"]:not(.rex-theme-light) .mblock_wrapper > div {
+        border: 1px solid #1a3332;
+        background: #1a3332;
+    }
+
+    body[class^="rex-theme"]:not(.rex-theme-light) div.sortable-ghost {
+        border: 1px dashed #151e24;
+    }
 }
