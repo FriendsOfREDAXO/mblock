@@ -1,0 +1,49 @@
+mblock_title = MBlock
+
+mblock_overview = Overzicht
+mblock_config_save = Instellingen opslaan
+
+mblock_config_label_template = Thema voor MBlock Sort-Fields
+mblock_config_saved = Instellingen zijn opgeslagen
+mblock_config = configuratie
+
+mblock_demo = voorbeeldverzameling
+mblock_demo_base = Modulevoorbeelden
+mblock_demo_mform = MForm module voorbeelden
+mblock_demo_html = HTML-module voorbeelden
+
+mblock_example_base_teammember_example = Teamleden
+mblock_example_base_link_example = Link en Linklijst
+mblock_example_base_media_example = Media en medialijst
+mblock_example_base_defaults_example = Verschillende formulierelementen
+
+mblock_example_html_teammember_example = Teamleden
+mblock_example_html_link_example = Link en Linklijst
+mblock_example_html_media_example = Media en medialijst
+mblock_example_html_defaults_example = Verschillende formulierelementen
+
+mblock_modul_input = module-ingang
+mblock_modul_output = module-uitgang
+
+mblock_help_subheadline_1 = MBlock - maak en sorteer meerdere datablokken binnen een module
+mblock_help_infotext_1 = Met MBlock is het mogelijk om een ​​willekeurig aantal datablokken aan te maken binnen een module. Deze kunnen vervolgens eenvoudig worden gesorteerd met een knop of drag & drop.
+mblock_github = MBlock bij Friends Of REDAXO
+
+mblock_info = Info
+mblock_example_description_base = Voorbeelden die laten zien hoe meerdere blokken kunnen worden gemaakt binnen een module. <br> <b> Belangrijk: </b> De MForm-add-on is vereist voor alle voorbeelden!
+mblock_example_description_html = De volgende voorbeelden laten zien hoe meerdere blokken kunnen worden gemaakt binnen een module zonder MForm.
+
+mblock_defaults = Instellingen
+mblock_theme_options = Thema-opties
+mblock_scroll = SmoothScroll geactiveerd
+mblock_not_scroll = SmoothScroll uitgeschakeld
+mblock_scroll_label = SmoothScroll
+mblock_not_delete_confirm = Bevestiging voor het verwijderen van blokken uitgeschakeld
+mblock_ok_delete_confirm = Bevestiging geactiveerd voordat blokken worden verwijderd
+mblock_delete_confirm_label = Bevestiging voor verwijdering
+mblock_delete_confirm = Blok verwijderen?
+
+mblock_rexform_demo = RexForm MBlock-demo
+rex_form_mblock_demo_entries = Demo-items
+rex_form_mblock_demo_entries_add = Demo-item toevoegen
+rex_form_mblock_demo_entries_edit = Demo-invoer bewerken
