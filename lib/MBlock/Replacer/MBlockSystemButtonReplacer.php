@@ -436,6 +436,9 @@ class MBlockSystemButtonReplacer
                 }
                 /** @var DOMElement $child */
                 foreach ($dom->childNodes as $child) {
+                    if ($child->nodeName != 'option') { // Patch xampp gegen ooops
+                       continue;
+                    }                    
                     $child->setAttribute('value', $child->nodeValue);
                     $child->nodeValue = htmlentities(self::getLinkInfo($child->getAttribute('value'))['art_name']);
                     $child->removeAttribute('selected');
