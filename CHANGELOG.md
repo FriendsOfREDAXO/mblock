@@ -7,7 +7,7 @@
 * add mblock:change and set rex:change to deprecated. rex:change will remove in next minor version
 * refresh disabled button status by drag and drop movements
 * don't add empty link and media list option
-* dark mode support thx to: @eaCe
+* dark mode support thx to: @eaCe, @skerbis
 
 ### Version 3.2.0
 
