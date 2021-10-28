@@ -402,13 +402,20 @@ class MBlockSystemButtonReplacer
         ) {
             $key = (isset($item->getResult()[$item->getSystemName() . '_' . $item->getSystemId()])) ? $item->getSystemName() . '_' . $item->getSystemId() : strtolower($item->getSystemName()) . '_' . $item->getSystemId();
             $resultItems = explode(',', $item->getResult()[$key]);
-            foreach ($resultItems as $resultItem) {
-                $dom->appendChild(new DOMElement('option', $resultItem));
-            }
-            /** @var DOMElement $child */
-            foreach ($dom->childNodes as $child) {
-                $child->setAttribute('value', $child->nodeValue);
-                $child->removeAttribute('selected');
+            if (sizeof($resultItems) > 0) {
+                foreach ($resultItems as $resultItem) {
+                    if (!empty($resultItem)) {
+                        $dom->appendChild(new DOMElement('option', $resultItem));
+                    }
+                }
+                /** @var DOMElement $child */
+                foreach ($dom->childNodes as $child) {
+                    if ($child->nodeName != 'option') { // Patch xampp gegen ooops
+                        continue;
+                    }
+                    $child->setAttribute('value', $child->nodeValue);
+                    $child->removeAttribute('selected');
+                }
             }
         }
     }
@@ -430,9 +437,11 @@ class MBlockSystemButtonReplacer
         ) {
             $key = (isset($item->getResult()[$item->getSystemName() . '_' . $item->getSystemId()])) ? $item->getSystemName() . '_' . $item->getSystemId() : strtolower($item->getSystemName()) . '_' . $item->getSystemId();
             $resultItems = explode(',', $item->getResult()[$key]);
-            if ($resultItems[0] != '') {
+            if (sizeof($resultItems) > 0) {
                 foreach ($resultItems as $resultItem) {
-                    $dom->appendChild(new DOMElement('option', $resultItem));
+                    if (!empty($resultItem)) {
+                        $dom->appendChild(new DOMElement('option', $resultItem));
+                    }
                 }
                 /** @var DOMElement $child */
                 foreach ($dom->childNodes as $child) {
