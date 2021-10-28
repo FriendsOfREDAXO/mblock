@@ -5,7 +5,7 @@
 * don't remove \' in media widget onclick id
 * add mblock:change and set rex:change to deprecated. rex:change will remove in next minor version
 * refresh disabled button status by drag and drop movements
-* 
+* don't add empty link and media list option
 
 ### Version 3.3.0
 
