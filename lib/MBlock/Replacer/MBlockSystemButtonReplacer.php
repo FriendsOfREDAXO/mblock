@@ -127,8 +127,8 @@ class MBlockSystemButtonReplacer
             self::replaceId($dom->firstChild, $item);
             // change onclick id
             if (rex_version::compare(self::REX_VERSION, rex::getVersion(), '>=')) {
-                self::replaceOnClick($dom, $item, 'REXMedia(', '(\'?', '\'?,', '(', ',');
-                self::replaceOnClick($dom, $item, 'REXMedia(', '(\'?', '\'?\)', '(', ')');
+                self::replaceOnClick($dom, $item, 'REXMedia(', '(\'?', '\'?,', '(\'', '\',');
+                self::replaceOnClick($dom, $item, 'REXMedia(', '(\'?', '\'?\)', '(\'', '\')');
             } else {
                 self::replaceOnClick($dom, $item, 'REXMedia(', '(', ',', '(', ',');
                 self::replaceOnClick($dom, $item, 'REXMedia(', '(', ')', '(', ')');
