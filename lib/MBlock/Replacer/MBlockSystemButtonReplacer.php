@@ -126,7 +126,7 @@ class MBlockSystemButtonReplacer
             // change for id
             self::replaceId($dom->firstChild, $item);
             // change onclick id
-            if (rex_version::compare(self::REX_VERSION, rex::getVersion(), '>=')) {
+            if (rex_version::compare(rex::getVersion(),self::REX_VERSION, '>=')) {
                 self::replaceOnClick($dom, $item, 'REXMedia(', '(\'?', '\'?,', '(\'', '\',');
                 self::replaceOnClick($dom, $item, 'REXMedia(', '(\'?', '\'?\)', '(\'', '\')');
             } else {
