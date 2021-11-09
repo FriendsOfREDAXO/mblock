@@ -1,7 +1,7 @@
 # MBlock - REDAXO Addon für Modul-Input-Blöcke
 
-### Version 3.4.0
-
+### Version 3.4.0 - 3.4.1
+* rex_version::compare fixed for REDAXO >= 5.12
 * dark-mode support for REDAXO >= 5.13
 * don't remove \' in media widget onclick id
 * add mblock:change and set rex:change to deprecated. rex:change will remove in next minor version
