@@ -175,7 +175,7 @@ class MBlockSystemButtonReplacer
                     }
                 }
                 // change click id
-                if (rex_version::compare(self::REX_VERSION, rex::getVersion(), '>=')) {
+                if (rex_version::compare(rex::getVersion(),self::REX_VERSION, '>=')) {
                     self::replaceOnClick($dom, $item, 'REXMedialist(', '(\'?', '\'?,', '(\'', '\',');
                     self::replaceOnClick($dom, $item, 'REXMedialist(', '(\'?', '\'?\)', '(\'', '\')');
                 } else {
