@@ -216,10 +216,7 @@ class MBlockSystemButtonReplacer
             // add link art name
             self::addArtName($dom->firstChild, $item, $name);
             // change click id
-            if (rex_version::compare(self::REX_VERSION, rex::getVersion(), '>=')) {
-                // openLinkMap('REX_LINK_1', '&clang=1&category_id=0');return false;"
-                // deleteREXLink('1');return false;
-                // deleteREXLinklist('1');return false;
+            if (rex_version::compare(rex::getVersion(),self::REX_VERSION, '>=')) {
                 self::replaceOnClick($dom, $item, 'REXLink(', '(\'?', '\'?\)','(\'', '\')');
                 self::replaceOnClick($dom, $item, 'openLinkMap(', '_', '\'', '_', '\'');
             } else {
@@ -306,7 +303,7 @@ class MBlockSystemButtonReplacer
                     self::addLinkSelectOptions($child, $item, $name);
                 }
             }
-            if (rex_version::compare(self::REX_VERSION, rex::getVersion(), '>=')) {
+            if (rex_version::compare(rex::getVersion(),self::REX_VERSION, '>=')) {
                 // moveREXLinklist('1','top');return false;"
                 // openREXLinklist('1', '&clang=1&category_id=0');return false
                 self::replaceOnClick($dom, $item, 'REXLinklist(', '(\'?', '\'?,','(\'', '\',');
