@@ -304,8 +304,6 @@ class MBlockSystemButtonReplacer
                 }
             }
             if (rex_version::compare(rex::getVersion(),self::REX_VERSION, '>=')) {
-                // moveREXLinklist('1','top');return false;"
-                // openREXLinklist('1', '&clang=1&category_id=0');return false
                 self::replaceOnClick($dom, $item, 'REXLinklist(', '(\'?', '\'?,','(\'', '\',');
                 self::replaceOnClick($dom, $item, 'deleteREXLinklist(', '(\'?', '\'?', '(\'', '\'');
             } else {
