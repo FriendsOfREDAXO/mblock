@@ -32,7 +32,7 @@ class rex_yform_action_mblock_db_query extends rex_yform_action_abstract
         $sql->setQuery($query, $params);
     }
 
-    public function getDescription()
+    public function getDescription(): string
     {
         return 'action|mblock_db_query|query|labels[name,email,id]';
     }
