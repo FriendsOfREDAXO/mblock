@@ -2,7 +2,7 @@
 
 class rex_yform_action_mblock_db_query extends rex_yform_action_abstract
 {
-    public function executeAction()
+    public function executeAction(): void
     {
         $query = trim($this->getElement(2));
         $labels = explode(',', $this->getElement(3));
