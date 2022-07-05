@@ -45,7 +45,7 @@ __Output:__
 <?php
 
 echo '<pre>';
-print_r(rex_var::toArray("REX_VALUE[1]"));
+dump(rex_var::toArray("REX_VALUE[1]"));
 echo '</pre>';
 ```
 
@@ -86,7 +86,7 @@ __Output:__
 <?php
 
 echo '<pre>';
-print_r(rex_var::toArray("REX_VALUE[1]"));
+dump(rex_var::toArray("REX_VALUE[1]"));
 echo '</pre>';
 ```
 
