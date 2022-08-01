@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author mail[at]joachim-doerr[dot]com Joachim Doerr
  * @package redaxo5
@@ -19,6 +20,16 @@ class MBlockValueHandler
 
         if (rex_get('function') == 'add') {
             return $result;
+        }
+        if (rex_request('save', 'int') == 1) {
+            $result = [];
+
+            if (rex_request('REX_INPUT_VALUE', 'array')) {
+                foreach (rex_request('REX_INPUT_VALUE') as $key => $value) {
+                    $result['value'][$key] = $value;
+                }
+                return $result;
+            }
         }
 
         if ($sliceId != false) {
