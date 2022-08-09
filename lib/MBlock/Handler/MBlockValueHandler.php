@@ -23,14 +23,15 @@ class MBlockValueHandler
         }
        
         $prevent_action = false; 
-        if (rex_addon::get('gridblock')->isAvailable() && )
+        if (rex_addon::get('gridblock')->isAvailable())
         {
             if (rex_gridblock::isBackend())
             {
                 $prevent_action = true; 
             }
         }
-         // Get data from $_POST and ignore gridblock addon
+         // Get data from $_POST and ignore gridblock addon 
+         // Should be chenged when https://github.com/redaxo/redaxo/issues/5298 is fixed. 
         if (rex_request('save', 'int') == 1 && $prevent_action == false) {
             $result = [];
 
