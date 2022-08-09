@@ -21,14 +21,27 @@ class MBlockValueHandler
         if (rex_get('function') == 'add') {
             return $result;
         }
-        if (rex_request('save', 'int') == 1) {
-            $result = [];
 
-            if (rex_request('REX_INPUT_VALUE', 'array')) {
-                foreach (rex_request('REX_INPUT_VALUE') as $key => $value) {
-                    $result['value'][$key] = $value;
+        $bGridblockActive = false;
+
+        // prüfe ob GB installiert ist
+        if (rex_addon::get('gridblock')->isAvailable()) {
+            // prüfe, ob du dich im Edit-Modus eines Block befindest
+            if (rex_gridblock::isBackend()) {
+                $bGridblockActive = true;
+            }
+        }
+
+        if ($bGridblockActive == false) {
+            if (rex_request('save', 'int') == 1) {
+                $result = [];
+
+                if (rex_request('REX_INPUT_VALUE', 'array')) {
+                    foreach (rex_request('REX_INPUT_VALUE') as $key => $value) {
+                        $result['value'][$key] = $value;
+                    }
+                    return $result;
                 }
-                return $result;
             }
         }
 
