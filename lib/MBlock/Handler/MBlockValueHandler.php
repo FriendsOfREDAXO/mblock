@@ -21,7 +21,8 @@ class MBlockValueHandler
         if (rex_get('function') == 'add') {
             return $result;
         }
-        if (rex_request('save', 'int') == 1) {
+        // Get data from $_POST and ignore gridblock addon
+        if (rex_request('save', 'int') == 1 && !rex_addon::get('gridblock')->isAvailable() && !rex_gridblock::isBackend()) {
             $result = [];
 
             if (rex_request('REX_INPUT_VALUE', 'array')) {
