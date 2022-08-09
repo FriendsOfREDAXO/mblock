@@ -22,7 +22,7 @@ class MBlockValueHandler
             return $result;
         }
        
-        $prevent_achtion = false; 
+        $prevent_action = false; 
         if (rex_addon::get('gridblock')->isAvailable() && )
         {
             if (rex_gridblock::isBackend())
