@@ -31,7 +31,7 @@ class MBlockValueHandler
             }
         }
          // Get data from $_POST and ignore gridblock addon
-        if (rex_request('save', 'int') == 1 && $prevent_action) {
+        if (rex_request('save', 'int') == 1 && $prevent_action == false) {
             $result = [];
 
             if (rex_request('REX_INPUT_VALUE', 'array')) {
