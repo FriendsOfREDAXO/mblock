@@ -68,7 +68,7 @@ class MBlockValueHandler
                         $result['link'][$i] = $sql->getValue('link' . $i);
                     }
 
-                    $jsonResult = json_decode(htmlspecialchars_decode($result['value'][$i]), true);
+                    $jsonResult = json_decode(htmlspecialchars_decode((string) $result['value'][$i]), true);
 
                     if (is_array($jsonResult))
                         $result['value'][$i] = $jsonResult;
@@ -122,3 +122,4 @@ class MBlockValueHandler
         return $result;
     }
 }
+
