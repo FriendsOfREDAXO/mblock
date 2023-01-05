@@ -31,15 +31,15 @@ mblock_github = MBlock bei Friends Of REDAXO
 
 mblock_info = Info
 mblock_example_description_base = Beispiele, die zeigen, wie mehrfache Blöcke innerhalb eines Moduls erzeugt werden können.<br><b>Wichtig:</b> Für alle Beispiele wird zusätzlich das Addon MForm benötigt!
-mblock_example_description_html = Die folgende Beispiele zeigen, wie ohne MForm, mehrfache Blöcke innerhalb eines Moduls erzeugt werden können.
+mblock_example_description_html = Die folgenden Beispiele zeigen, wie ohne MForm, mehrfache Blöcke innerhalb eines Moduls erzeugt werden können.
 
 mblock_defaults = Einstellungen
 mblock_theme_options = Theme-Optionen
 mblock_scroll = SmoothScroll aktiviert
 mblock_not_scroll = SmoothScroll deaktiviert
 mblock_scroll_label = SmoothScroll
-mblock_not_delete_confirm = Bestätigung vor dem Löschen von Blocken deaktiviert
-mblock_ok_delete_confirm = Bestätigung vor dem Löschen von Blocken aktiviert
+mblock_not_delete_confirm = Bestätigung vor dem Löschen von Blöcken deaktiviert
+mblock_ok_delete_confirm = Bestätigung vor dem Löschen von Blöcken aktiviert
 mblock_delete_confirm_label = Bestätigung vor dem Löschen
 mblock_delete_confirm = Block löschen?
 
