@@ -21,7 +21,7 @@ trait MBlockDOMTrait
     private static function createDom($html)
     {
         $dom = new DOMDocument();
-        $html = htmlspecialchars_decode(iconv('UTF-8', 'ISO-8859-1', htmlentities($html, ENT_COMPAT, 'UTF-8')), ENT_QUOTES);
+        $html = htmlspecialchars_decode(iconv('UTF-8', 'ISO-8859-1//IGNORE', htmlentities($html, ENT_COMPAT, 'UTF-8')), ENT_QUOTES);
         @$dom->loadHTML("<html xmlns=\"http://www.w3.org/1999/xhtml\"><body>$html</body></html>");
         $dom->preserveWhiteSpace = false;
         return $dom;
