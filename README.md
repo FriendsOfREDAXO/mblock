@@ -5,6 +5,9 @@ Mit MBlock ist es möglich, innerhalb eines Moduls beliebig viele Datenblöcke z
 
 _English:_ MBlock lets you create an unlimited number of data blocks within a single module. These data blocks can be sorted per click or drag & drop.
 
+> Please note: The examples are valid for MForm version 7 and higher. When using older MForm versions, please refer to the documentation of the respective version. 
+
+
 ![Screenshot](https://raw.githubusercontent.com/FriendsOfREDAXO/mblock/assets/mblock.png)
 
 ## Modulbeispiele / Module examples
