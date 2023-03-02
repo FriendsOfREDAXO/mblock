@@ -7,7 +7,7 @@
     border: 1px solid rgba(100, 100, 100, 0.20);
     background: rgba(255, 255, 255, 0.09);
     margin: 0 0 10px 0;
-    padding: 20px 15px 20px 25px;
+    padding: 40px 15px 20px 25px;
     position: relative;
     box-shadow: 0 5px 15px rgba(0,0,0,.08);
 }
@@ -34,9 +34,10 @@ div.sortable-ghost {
 
 .mblock_wrapper span.removeadded {
     position: absolute;
-    right: 15px;
-    top: 9px;
+    right: 0px;
+    top: 0px;
     z-index: 1;
+    padding: 5px;
 }
 
 .mblock_wrapper span.removeadded .btn {
