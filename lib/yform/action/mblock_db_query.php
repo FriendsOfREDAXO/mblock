@@ -7,7 +7,7 @@ class rex_yform_action_mblock_db_query extends rex_yform_action_abstract
         $query = trim($this->getElement(2));
         $labels = explode(',', $this->getElement(3));
 
-        if ($query == '') {
+        if ('' == $query) {
             if ($this->params['debug']) {
                 echo 'ActionQuery Error: no query';
             }

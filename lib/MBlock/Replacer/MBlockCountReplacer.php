@@ -8,13 +8,11 @@
 class MBlockCountReplacer
 {
     /**
-     * @param MBlockItem $item
-     * @param $count
      * @return mixed
      * @author Joachim Doerr
      */
     public static function replaceCountKeys(MBlockItem $item, $count)
     {
-        return str_replace(array('%%MB_COUNT%%', '%MB_COUNT%'), array('<span class="mb_count">'.$count.'</span>', $count), $item->getForm());
+        return str_replace(['%%MB_COUNT%%', '%MB_COUNT%'], ['<span class="mb_count">' . $count . '</span>', $count], $item->getForm());
     }
 }

@@ -8,12 +8,9 @@
 class MBlockRexFormProcessor
 {
     /**
-     * @param $status
-     * @param mblock_rex_form $form
-     * @param array $post
+     * @throws rex_sql_exception
      * @return mixed
      * @author Joachim Doerr
-     * @throws rex_sql_exception
      */
     public static function postPostSaveAction($status, mblock_rex_form $form, array $post)
     {
@@ -21,15 +18,18 @@ class MBlockRexFormProcessor
         $processIt = false;
 
         foreach ($post as $fieldRow => $fields) {
-            if (strpos($fieldRow, '_save') !== false OR strpos($fieldRow, '_apply') !== false)
+            if (str_contains($fieldRow, '_save') || str_contains($fieldRow, '_apply')) {
                 $processIt = true;
+            }
 
-            if (strpos($fieldRow, '_apply') !== false)
+            if (str_contains($fieldRow, '_apply')) {
                 $redirect = true;
+            }
         }
 
-        if ($processIt)
+        if ($processIt) {
             self::update($form, $post, $form->getSql()->getLastId());
+        }
 
         if ($redirect) {
             if (($result = $form->validate()) === true) {
@@ -45,8 +45,6 @@ class MBlockRexFormProcessor
     }
 
     /**
-     * @param mblock_rex_form $form
-     * @param array $post
      * @param null $id
      * @author Joachim Doerr
      * @throws rex_sql_exception
@@ -57,35 +55,45 @@ class MBlockRexFormProcessor
         $sql->setDebug(0);
         $sql->setTable($form->getTableName());
 
-        if (!is_null($id) && $id != 0)
+        if (null !== $id && 0 != $id) {
             $sql->setWhere('id = ' . $id);
-        else
+        } else {
             $sql->setWhere($form->getWhereCondition());
+        }
 
-        $updateValues = array();
-        $rows = array();
+        $updateValues = [];
+        $rows = [];
 
         $result = $form->getSql()->getRow();
 
-        if (is_array($result) && sizeof($result) > 0)
-            foreach ($result as $row => $value)
-                if(is_array(json_decode($value, true))) {
+        if (is_array($result) && count($result) > 0) {
+            foreach ($result as $row => $value) {
+                if (is_array(json_decode($value, true))) {
                     $newRow = explode('.', $row);
                     $rows[] = array_pop($newRow);
                 }
+            }
+        }
 
-        if (isset($post[$form->getName()]))
-            foreach ($post[$form->getName()] as $row => $field)
-                if (is_array($field))
+        if (isset($post[$form->getName()])) {
+            foreach ($post[$form->getName()] as $row => $field) {
+                if (is_array($field)) {
                     $updateValues[$row] = json_encode($field);
+                }
+            }
+        }
 
         // is row not in update list?
-        if (sizeof($rows) > 0)
-            foreach ($rows as $row)
-                if (!array_key_exists($row, $updateValues))
-                    $updateValues[$row] = NULL;
+        if (count($rows) > 0) {
+            foreach ($rows as $row) {
+                if (!array_key_exists($row, $updateValues)) {
+                    $updateValues[$row] = null;
+                }
+            }
+        }
 
-        if (sizeof($updateValues) > 0)
+        if (count($updateValues) > 0) {
             $sql->setValues($updateValues)->update();
+        }
     }
 }

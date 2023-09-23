@@ -10,9 +10,7 @@ class MBlockCheckboxReplacer
     use \MBlock\Decorator\MBlockDOMTrait;
 
     /**
-     * @param MBlockItem $item
-     * @param $count
-     * @return String
+     * @return string
      * @author Joachim Doerr
      */
     public static function replaceCheckboxesBlockHolder(MBlockItem $item, $count)

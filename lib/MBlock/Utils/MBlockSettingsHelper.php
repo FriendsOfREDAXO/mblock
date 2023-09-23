@@ -8,7 +8,6 @@
 class MBlockSettingsHelper
 {
     /**
-     * @param array $settings
      * @return string
      * @author Joachim Doerr
      */
@@ -30,11 +29,13 @@ class MBlockSettingsHelper
                 $settings['delete_confirm'] = rex_i18n::msg('mblock_delete_confirm');
             }
         } else {
-            if ($settings['delete_confirm'] === 1)
+            if (1 === $settings['delete_confirm']) {
                 $settings['delete_confirm'] = rex_i18n::msg('mblock_delete_confirm');
+            }
 
-            if ($settings['delete_confirm'] === 0)
+            if (0 === $settings['delete_confirm']) {
                 unset($settings['delete_confirm']);
+            }
         }
         if (isset($_SESSION['mblock_count'])) {
             $settings['mblock_count'] = $_SESSION['mblock_count'];

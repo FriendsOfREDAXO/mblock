@@ -7,40 +7,26 @@
 
 class MBlockItem
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     public $result;
 
-    /**
-     * @var integer
-     */
+    /** @var int */
     public $id;
 
-    /**
-     * @var integer
-     */
+    /** @var int */
     public $valueId;
 
-    /**
-     * @var integer
-     */
+    /** @var int */
     public $systemId;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $systemName;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $form;
 
-    /**
-     * @var array
-     */
-    public $payload = array();
+    /** @var array */
+    public $payload = [];
 
     /**
      * @return array
@@ -169,7 +155,7 @@ class MBlockItem
      */
     public function getPayload($key = null)
     {
-        if (!is_null($key) && array_key_exists($key, $this->payload)) {
+        if (null !== $key && array_key_exists($key, $this->payload)) {
             return $this->payload[$key];
         }
         return $this->payload;
@@ -187,8 +173,6 @@ class MBlockItem
     }
 
     /**
-     * @param $key
-     * @param $value
      * @return $this
      * @author Joachim Doerr
      */

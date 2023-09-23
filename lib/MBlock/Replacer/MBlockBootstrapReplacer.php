@@ -10,9 +10,7 @@ class MBlockBootstrapReplacer
     use \MBlock\Decorator\MBlockDOMTrait;
 
     /**
-     * @param MBlockItem $item
-     * @param $count
-     * @return String
+     * @return string
      * @author Joachim Doerr
      */
     public static function replaceTabIds(MBlockItem $item, $count)
@@ -26,7 +24,7 @@ class MBlockBootstrapReplacer
             foreach ($matches as $key => $match) {
                 $item->addPayload('replace-id', $key);
 
-                $href = str_replace('#','',$match->getAttribute('href'));
+                $href = str_replace('#', '', $match->getAttribute('href'));
                 $newHref = $href . '_' . $count . $_SESSION['mblock_count'] . '00' . $key;
                 $match->setAttribute('href', '#' . $newHref);
 
@@ -52,9 +50,7 @@ class MBlockBootstrapReplacer
     }
 
     /**
-     * @param MBlockItem $item
-     * @param $count
-     * @return String
+     * @return string
      * @author Joachim Doerr
      */
     public static function replaceCollapseIds(MBlockItem $item, $count)
@@ -68,11 +64,11 @@ class MBlockBootstrapReplacer
             foreach ($matches as $key => $match) {
                 $item->addPayload('replace-id', $key);
 
-                $href = str_replace('#','',$match->getAttribute('data-target'));
+                $href = str_replace('#', '', $match->getAttribute('data-target'));
                 $newHref = $href . '_' . $count . $_SESSION['mblock_count'] . '00' . $key;
                 $match->setAttribute('data-target', '#' . $newHref);
                 if ($match->hasAttribute('data-parent')) {
-                    $match->setAttribute('data-parent', '#accgr' . '_' . $count . $_SESSION['mblock_count'] . '00');
+                    $match->setAttribute('data-parent', '#accgr_' . $count . $_SESSION['mblock_count'] . '00');
                 }
 
                 $next = $match->nextSibling;
@@ -83,8 +79,8 @@ class MBlockBootstrapReplacer
 
                 $parent = $match->parentNode->parentNode;
 
-                if ($parent->hasAttribute('data-group-accordion') && $parent->getAttribute('data-group-accordion') == 1) {
-                    $parent->setAttribute('id', 'accgr' . '_' . $count . $_SESSION['mblock_count'] . '00');
+                if ($parent->hasAttribute('data-group-accordion') && 1 == $parent->getAttribute('data-group-accordion')) {
+                    $parent->setAttribute('id', 'accgr_' . $count . $_SESSION['mblock_count'] . '00');
                 }
             }
         }

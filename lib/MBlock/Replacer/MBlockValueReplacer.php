@@ -10,9 +10,7 @@ class MBlockValueReplacer
     use \MBlock\Decorator\MBlockDOMTrait;
 
     /**
-     * @param MBlockItem $item
-     * @param $count
-     * @return String
+     * @return string
      * @author Joachim Doerr
      */
     public static function replaceValueSetEmpty(MBlockItem $item, $setDefaultValue = false)
@@ -57,8 +55,9 @@ class MBlockValueReplacer
                     foreach ($match->childNodes as $child) {
                         switch ($child->nodeName) {
                             case 'optgroup':
-                                foreach ($child->childNodes as $nodeChild)
+                                foreach ($child->childNodes as $nodeChild) {
                                     self::replaceOptionSelect($match, $nodeChild, $item);
+                                }
                                 break;
                             case 'option':
                                 if (isset($child->tagName)) {
@@ -71,14 +70,10 @@ class MBlockValueReplacer
             }
         }
 
-
         return self::saveHtml($dom);
     }
 
     /**
-     * @param DOMElement $element
-     * @param MBlockItem $item
-     * @param bool $valueEmpty
      * @author Joachim Doerr
      */
     protected static function replaceValue(DOMElement $element, MBlockItem $item)
@@ -102,8 +97,6 @@ class MBlockValueReplacer
     }
 
     /**
-     * @param DOMElement $element
-     * @param MBlockItem $item
      * @author Joachim Doerr
      */
     protected static function replaceChecked(DOMElement $element, MBlockItem $item)
@@ -121,9 +114,6 @@ class MBlockValueReplacer
     }
 
     /**
-     * @param DOMElement $select
-     * @param DOMElement $option
-     * @param MBlockItem $item
      * @author Joachim Doerr
      */
     protected static function replaceOptionSelect(DOMElement $select, DOMElement $option, MBlockItem $item)

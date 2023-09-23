@@ -28,13 +28,13 @@ class mblock_rex_form extends rex_form
             /** @var rex_form_element $element */
             foreach ($fieldsetElements as $element) {
                 // read-only-fields nicht speichern
-                if (strpos($element->getAttribute('class'), 'form-control-static') !== false) {
+                if (str_contains($element->getAttribute('class'), 'form-control-static')) {
                     continue;
                 }
 
                 // add by JD
                 // must have for json array
-                if (strpos($element->getFieldName(), '][') !== false) {
+                if (str_contains($element->getFieldName(), '][')) {
                     continue;
                 }
 
@@ -94,15 +94,17 @@ class mblock_rex_form extends rex_form
      */
     public function get()
     {
-        if (rex_request::get('redirected', 'int', 0) == 1) {
+        if (1 == rex_request::get('redirected', 'int', 0)) {
             $list_name = rex_request::get('list', 'string');
             $message = rex_request::get($list_name . '_msg', 'string');
 
-            if ($message)
-                if (rex_request::get('msg_is_warning', 'int', 0) == 1)
+            if ($message) {
+                if (1 == rex_request::get('msg_is_warning', 'int', 0)) {
                     $this->setWarning($message);
-                else
+                } else {
                     $this->setMessage($message);
+                }
+            }
         }
         return parent::get();
     }
@@ -119,7 +121,6 @@ class mblock_rex_form extends rex_form
     /**
      * @param string $listMessage
      * @param string $listWarning
-     * @param array $params
      * @author Joachim Doerr
      */
     public function redirect($listMessage = '', $listWarning = '', array $params = [])
@@ -170,11 +171,11 @@ class mblock_rex_form extends rex_form
         foreach ($fieldsets as $fieldsetName => $fieldsetElements) {
             $s .= '<fieldset>' . "\n";
 
-            if ($legend != '' && $legend != $this->name) {
+            if ('' != $legend && $legend != $this->name) {
                 $s .= '<legend>' . htmlspecialchars($legend) . '</legend>' . "\n";
             }
 
-            if ($i == 0 && $addHeaders) {
+            if (0 == $i && $addHeaders) {
                 foreach ($this->getHeaderElements() as $element) {
                     // Callback
                     $element->setValue($this->preView($fieldsetName, $element->getFieldName(), $element->getValue()));
@@ -189,7 +190,6 @@ class mblock_rex_form extends rex_form
                 $element->setValue($this->preView($fieldsetName, $element->getFieldName(), $element->getValue()));
                 $s .= $element->get();
             }
-
 
             $s .= '</fieldset>' . "\n";
 

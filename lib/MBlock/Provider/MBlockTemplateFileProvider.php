@@ -7,21 +7,20 @@
 
 class MBlockTemplateFileProvider
 {
-    const DEFAULT_THEME = 'default_theme';
-    const THEME_PATH = 'mblock/templates/%s/';
-    const ELEMENTS_PATH = 'elements/';
+    public const DEFAULT_THEME = 'default_theme';
+    public const THEME_PATH = 'mblock/templates/%s/';
+    public const ELEMENTS_PATH = 'elements/';
 
     /**
-     * @param $templateType
      * @param string $subPath
      * @param null $theme
      * @param bool $stop
      * @return string
      * @author Joachim Doerr
      */
-    public static function loadTemplate($templateType, $subPath = '', $theme = NULL, $stop = false)
+    public static function loadTemplate($templateType, $subPath = '', $theme = null, $stop = false)
     {
-        if (is_null($theme)) {
+        if (null === $theme) {
             $theme = rex_addon::get('mblock')->getConfig('mblock_theme');
         }
 
@@ -35,10 +34,12 @@ class MBlockTemplateFileProvider
         // is template file exist? and template type not html
         if (file_exists($path . $file)) {
             // load theme file
-            $templateString = implode(file($path . $file, FILE_USE_INCLUDE_PATH));
+            $templateString = implode('', file($path . $file, FILE_USE_INCLUDE_PATH));
         } else {
             // stop recursion is default theme not founding
-            if (!$stop) return self::loadTemplate($templateType, $subPath, self::DEFAULT_THEME, true);
+            if (!$stop) {
+                return self::loadTemplate($templateType, $subPath, self::DEFAULT_THEME, true);
+            }
         }
 
         // exchange template string
