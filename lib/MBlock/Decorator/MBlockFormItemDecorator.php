@@ -10,11 +10,10 @@ class MBlockFormItemDecorator
     use \MBlock\Decorator\MBlockDOMTrait;
 
     /**
-     * @param MBlockItem $item
-     * @return String
+     * @return string
      * @author Joachim Doerr
      */
-    static public function decorateFormItem(MBlockItem $item)
+    public static function decorateFormItem(MBlockItem $item)
     {
         $dom = self::createDom($item->getForm());
 
@@ -58,8 +57,8 @@ class MBlockFormItemDecorator
             /** @var DOMElement $match */
             foreach ($matches as $match) {
                 // continue by media elements
-                if (strpos($match->getAttribute('id'), 'REX_MEDIA') !== false
-                    or strpos($match->getAttribute('id'), 'REX_LINK') !== false) {
+                if (str_contains($match->getAttribute('id'), 'REX_MEDIA')
+                    || str_contains($match->getAttribute('id'), 'REX_LINK')) {
                     continue;
                 }
                 // label for and id change
@@ -74,8 +73,9 @@ class MBlockFormItemDecorator
                     foreach ($match->childNodes as $child) {
                         switch ($child->nodeName) {
                             case 'optgroup':
-                                foreach ($child->childNodes as $nodeChild)
+                                foreach ($child->childNodes as $nodeChild) {
                                     self::replaceOptionSelect($match, $nodeChild, $item);
+                                }
                                 break;
                             case 'option':
                                 if (isset($child->tagName)) {
@@ -93,20 +93,18 @@ class MBlockFormItemDecorator
     }
 
     /**
-     * @param DOMElement $element
-     * @param MBlockItem $item
      * @author Joachim Doerr
      */
     protected static function replaceName(DOMElement $element, MBlockItem $item)
     {
         // replace attribute id
         preg_match('/\]\[\d+\]\[/', $element->getAttribute('name'), $matches);
-        if ($matches) $element->setAttribute('name', str_replace($matches[0], '][' . $item->getId() . '][', $element->getAttribute('name')));
+        if ($matches) {
+            $element->setAttribute('name', str_replace($matches[0], '][' . $item->getId() . '][', $element->getAttribute('name')));
+        }
     }
 
     /**
-     * @param DOMElement $element
-     * @param MBlockItem $item
      * @param bool $valueEmpty
      * @author Joachim Doerr
      */
@@ -132,7 +130,7 @@ class MBlockFormItemDecorator
                 case 'textarea':
                     if ($matches && array_key_exists($matches[1], $item->getResult())) {
                         $result = $item->getResult();
-                        $id = uniqid(md5(rand(1000, 9999)), true);
+                        $id = uniqid(md5(random_int(1000, 9999)), true);
                         // node value cannot contains &
                         // so set a unique id there we replace later with the right value
                         $element->nodeValue = $id;
@@ -140,7 +138,7 @@ class MBlockFormItemDecorator
                         $valueResult = $result[$matches[1]];
 
                         // add the id to the result value
-                        $result[$matches[1]] = array('id' => $id, 'value' => $valueResult);
+                        $result[$matches[1]] = ['id' => $id, 'value' => $valueResult];
 
                         // reset result
                         $item->setResult($result);
@@ -154,8 +152,6 @@ class MBlockFormItemDecorator
     }
 
     /**
-     * @param DOMElement $element
-     * @param MBlockItem $item
      * @author Joachim Doerr
      */
     protected static function replaceSelectedData(DOMElement $element, MBlockItem $item)
@@ -178,8 +174,6 @@ class MBlockFormItemDecorator
     }
 
     /**
-     * @param DOMElement $element
-     * @param MBlockItem $item
      * @author Joachim Doerr
      */
     protected static function replaceChecked(DOMElement $element, MBlockItem $item)
@@ -201,9 +195,6 @@ class MBlockFormItemDecorator
     }
 
     /**
-     * @param DOMElement $select
-     * @param DOMElement $option
-     * @param MBlockItem $item
      * @author Joachim Doerr
      */
     protected static function replaceOptionSelect(DOMElement $select, DOMElement $option, MBlockItem $item)
@@ -236,20 +227,19 @@ class MBlockFormItemDecorator
     }
 
     /**
-     * @param DOMDocument $dom
-     * @param DOMElement $element
-     * @param MBlockItem $item
      * @return bool
      * @author Joachim Doerr
      */
     protected static function replaceForId(DOMDocument $dom, DOMElement $element, MBlockItem $item)
     {
         // get input id
-        if (!$elementId = $element->getAttribute('id')) return true;
+        if (!$elementId = $element->getAttribute('id')) {
+            return true;
+        }
 
         // ignore system elements
-        if (strpos($elementId, 'REX_MEDIA') !== false
-            or strpos($elementId, 'REX_LINK') !== false) {
+        if (str_contains($elementId, 'REX_MEDIA')
+            || str_contains($elementId, 'REX_LINK')) {
             return false;
         }
 
@@ -271,7 +261,6 @@ class MBlockFormItemDecorator
     }
 
     /**
-     * @param DOMElement $element
      * @return mixed
      * @author Joachim Doerr
      */

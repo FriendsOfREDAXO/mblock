@@ -6,26 +6,25 @@
  */
 
 // rex request
-$config = rex_post('config', array(
-    array('mblock_theme', 'string'),
-    array('mblock_scroll', 'boolean'),
-    array('mblock_delete', 'boolean'),
-    array('mblock_delete_confirm', 'boolean'),
-    array('submit', 'boolean')
-));
+$config = rex_post('config', [
+    ['mblock_theme', 'string'],
+    ['mblock_scroll', 'boolean'],
+    ['mblock_delete', 'boolean'],
+    ['mblock_delete_confirm', 'boolean'],
+    ['submit', 'boolean'],
+]);
 
 // include info page
 include rex_path::addon('mblock', 'pages/info.php');
 
-//////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////
 // parse info fragment
 $fragment = new rex_fragment();
 $fragment->setVar('title', rex_i18n::msg('mblock_help_subheadline_1'), false);
 $fragment->setVar('body', $content, false);
 echo $fragment->parse('core/page/section.php');
 
-
-//////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////
 // init form
 $form = '';
 
@@ -49,13 +48,13 @@ $form .= '
 ';
 
 // set arrays
-$formElements = array();
-$elements = array();
+$formElements = [];
+$elements = [];
 $elements['label'] = '
   <label for="rex-mblock-config-template">' . rex_i18n::msg('mblock_config_label_template') . '</label>
 ';
 // create select
-$select = new rex_select;
+$select = new rex_select();
 $select->setId('rex-mblock-config-template');
 $select->setSize(1);
 $select->setAttribute('class', 'form-control');
@@ -73,13 +72,13 @@ $fragment->setVar('elements', $formElements, false);
 $form .= $fragment->parse('core/form/form.php');
 
 // label
-$formElements = array();
-$elements = array();
+$formElements = [];
+$elements = [];
 $elements['label'] = '
   <label for="rex-mblock-config-scroll-label">' . rex_i18n::msg('mblock_scroll_label') . '</label>
 ';
 // create select
-$select = new rex_select;
+$select = new rex_select();
 $select->setId('rex-mblock-config-scroll-label');
 $select->setSize(1);
 $select->setAttribute('class', 'form-control');
@@ -96,13 +95,13 @@ $fragment->setVar('elements', $formElements, false);
 $form .= $fragment->parse('core/form/form.php');
 
 // label
-$formElements = array();
-$elements = array();
+$formElements = [];
+$elements = [];
 $elements['label'] = '
   <label for="rex-mblock-config-delete-confirm">' . rex_i18n::msg('mblock_delete_confirm_label') . '</label>
 ';
 // create select
-$select = new rex_select;
+$select = new rex_select();
 $select->setId('rex-mblock-config-delete-confirm');
 $select->setSize(1);
 $select->setAttribute('class', 'form-control');
@@ -118,10 +117,9 @@ $fragment = new rex_fragment();
 $fragment->setVar('elements', $formElements, false);
 $form .= $fragment->parse('core/form/form.php');
 
-
 // create submit button
-$formElements = array();
-$elements = array();
+$formElements = [];
+$elements = [];
 $elements['field'] = '
   <input type="submit" class="btn btn-save rex-form-aligned" name="config[submit]" value="' . rex_i18n::msg('mblock_config_save') . '" ' . rex::getAccesskey(rex_i18n::msg('mblock_config_save'), 'save') . ' />
 ';
@@ -138,7 +136,7 @@ $form .= '
   </form>
 ';
 
-//////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////
 // parse form fragment
 $fragment = new rex_fragment();
 $fragment->setVar('class', 'edit', false);

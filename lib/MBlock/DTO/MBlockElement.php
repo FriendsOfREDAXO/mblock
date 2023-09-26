@@ -7,26 +7,17 @@
 
 class MBlockElement
 {
-    const KEY = "<mblock:%s/>";
+    public const KEY = '<mblock:%s/>';
 
-    /**
-     * @var
-     */
     public $settings;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $output;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $form;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     public $index;
 
     /**
@@ -95,7 +86,7 @@ class MBlockElement
      */
     public function getKeys()
     {
-        $keys = array();
+        $keys = [];
         foreach (get_object_vars($this) as $f => $v) {
             $keys[] = sprintf(self::KEY, $f);
         }
@@ -108,7 +99,7 @@ class MBlockElement
      */
     public function getValues()
     {
-        $values = array();
+        $values = [];
         foreach (get_object_vars($this) as $f => $v) {
             $values[] = $v;
         }

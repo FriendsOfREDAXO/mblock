@@ -7,21 +7,14 @@
 
 class MBlock
 {
+    /** @var array */
+    private static $items = [];
 
-    /**
-     * @var array
-     */
-    private static $items = array();
+    /** @var array */
+    private static $result = [];
 
-    /**
-     * @var array
-     */
-    private static $result = array();
-
-    /**
-     * @var array
-     */
-    private static $output = array();
+    /** @var array */
+    private static $output = [];
 
     /**
      * MBlock constructor.
@@ -36,23 +29,22 @@ class MBlock
     }
 
     /**
-     * @param $id
      * @param string|MForm|mblock_rex_form|rex_yform $form
      * @param array $settings
      * @param null $theme
-     * @return mixed
      * @throws rex_sql_exception
+     * @return mixed
      */
-    public static function show($id, $form, $settings = array(), $theme = null)
+    public static function show($id, $form, $settings = [], $theme = null)
     {
         $plain = false;
         if (!isset($_SESSION['mblock_count'])) {
             // set mblock count is not exist
             $_SESSION['mblock_count'] = 0;
         }
-        $_SESSION['mblock_count']++;
+        ++$_SESSION['mblock_count'];
 
-        if (is_integer($id) or is_numeric($id)) {
+        if (is_int($id) || is_numeric($id)) {
             // load rex value by id
             self::$result = MBlockValueHandler::loadRexVars();
 
@@ -60,17 +52,17 @@ class MBlock
                 $form = $form->show();
             }
         } else {
-            if (strpos($id, 'yform') !== false) {
+            if (str_contains($id, 'yform')) {
                 $table = explode('::', $id);
 
-                if (sizeof($table) > 2) {
+                if (count($table) > 2) {
                     $id = $table[0] . '::' . $table[1];
                     $settings['type_key'] = $table[2];
                     $post = rex_request::post($table[1]);
-                    if (!is_null($post) && isset($post[$settings['type_key']])) {
+                    if (null !== $post && isset($post[$settings['type_key']])) {
                         self::$result['value'][$id] = $post[$settings['type_key']];
                     }
-                    if (sizeof($table) > 3) {
+                    if (count($table) > 3) {
                         self::$result = MBlockValueHandler::loadFromTable($table);
                     }
                 } else {
@@ -110,7 +102,7 @@ class MBlock
                 $table = explode('::', $id);
                 self::$result = MBlockValueHandler::loadFromTable($table, rex_request::get('id', 'int', 0));
 
-                if (sizeof($table) > 2) {
+                if (count($table) > 2) {
                     $id = $table[0] . '::' . $table[1];
                     $settings['type_key'] = array_pop($table);
                 }
@@ -126,7 +118,7 @@ class MBlock
         $plainItem = new MBlockItem();
         $plainItem->setId(0)
             ->setValueId($id)
-            ->setResult(array())
+            ->setResult([])
             ->setForm($form)
             ->addPayload('plain_item', true);
 
@@ -135,7 +127,7 @@ class MBlock
             // item result to item
             foreach (self::$result['value'][$id] as $jId => $values) {
                 // init item
-                self::$items[$jId] = new MBlockItem;
+                self::$items[$jId] = new MBlockItem();
                 self::$items[$jId]->setId($jId)
                     ->setValueId($id)
                     ->setResult($values)
@@ -152,21 +144,20 @@ class MBlock
 
         // create first element
         // don't loaded?
-        if (!self::$items && (!isset($settings['initial_hidden']) or $settings['initial_hidden'] != 1)) {
+        if (!self::$items && (!isset($settings['initial_hidden']) || 1 != $settings['initial_hidden'])) {
             // set plain item for add
             $plain = true;
             self::$items[0] = new MBlockItem();
             self::$items[0]->setId(0)
                 ->setValueId($id)
-                ->setResult(array())
+                ->setResult([])
                 ->setForm($form);
         }
-
 
         // foreach rex value json items
         /** @var MBlockItem $item */
         foreach (static::$items as $count => $item) {
-            static::$output[] = self::createOutput($item, ($count + 1), $theme);
+            static::$output[] = self::createOutput($item, $count + 1, $theme);
         }
 
         $addText = (isset($settings['initial_button_text'])) ? ' ' . $settings['initial_button_text'] : '';
@@ -181,8 +172,7 @@ class MBlock
         // return wrapped from elements
         $output = MBlockParser::parseElement($wrapper, 'wrapper', $theme);
 
-
-        if (($plain && array_key_exists('disable_null_view', $settings) && $settings['disable_null_view'] == true) and rex_request::get('function', 'string') != 'add') {
+        if (($plain && array_key_exists('disable_null_view', $settings) && true == $settings['disable_null_view']) && 'add' != rex_request::get('function', 'string')) {
 
             $buttonText = 'Show MBlock';
             if (array_key_exists('null_view_button_text', $settings) && !empty($settings['null_view_button_text'])) {
@@ -210,8 +200,6 @@ class MBlock
     }
 
     /**
-     * @param MBlockItem $item
-     * @param $count
      * @param null $theme
      * @return mixed
      * @author Joachim Doerr

@@ -26,7 +26,6 @@ rex_dir::deleteFiles($this->getAssetsPath(), true);
 // copy assets
 rex_dir::copy($this->getPath('assets'), $this->getAssetsPath());
 
-
 // ensure demo table
 rex_sql_table::get(rex::getTable('mblock_rexform_demo'))
     ->ensureColumn(new rex_sql_column('id', 'int(11)', false, null, 'auto_increment'))
@@ -40,18 +39,17 @@ rex_sql_table::get(rex::getTable('mblock_rexform_demo'))
     ->setPrimaryKey('id')
     ->ensure();
 
-
 // rex media and link updater
-$values = array();
+$values = [];
 
-for ($i = 1; $i < 21; $i++) {
+for ($i = 1; $i < 21; ++$i) {
     $values[] = " value{$i} = REPLACE(value{$i}, 'REX_INPUT_L', 'REX_L')";
     $values[] = " value{$i} = REPLACE(value{$i}, 'REX_INPUT_M', 'REX_M')";
 }
 
 $values = implode(",\n\t", $values);
 $prefix = rex::getTablePrefix();
-$query= "UPDATE\n\t {$prefix}article_slice \nSET\n\t{$values};\n";
+$query = "UPDATE\n\t {$prefix}article_slice \nSET\n\t{$values};\n";
 
 $sql = rex_sql::factory();
 $sql->setDebug(false);

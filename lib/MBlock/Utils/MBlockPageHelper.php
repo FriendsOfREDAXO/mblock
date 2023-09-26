@@ -8,7 +8,6 @@
 class MBlockPageHelper
 {
     /**
-     * @param $type
      * @return string
      * @author Joachim Doerr
      */
@@ -19,14 +18,14 @@ class MBlockPageHelper
             if (is_dir($file)) {
                 continue;
             }
-            if (strpos($file, $type) !== false && strpos($file, 'output') === false) {
+            if (str_contains($file, $type) && !str_contains($file, 'output')) {
 
                 // add input
-                $content = '<h3>'.rex_i18n::msg('mblock_modul_input').'</h3>' . rex_string::highlight(file_get_contents(rex_path::addon('mblock', 'pages/examples/' . $file)));
+                $content = '<h3>' . rex_i18n::msg('mblock_modul_input') . '</h3>' . rex_string::highlight(file_get_contents(rex_path::addon('mblock', 'pages/examples/' . $file)));
 
                 if (file_exists(rex_path::addon('mblock', 'pages/examples/' . pathinfo($file, PATHINFO_FILENAME) . '_output.ini'))) {
                     // add output
-                    $content .= '<h3>'.rex_i18n::msg('mblock_modul_output').'</h3>' . rex_string::highlight(file_get_contents(rex_path::addon('mblock', 'pages/examples/' . pathinfo($file, PATHINFO_FILENAME) . '_output.ini')));
+                    $content .= '<h3>' . rex_i18n::msg('mblock_modul_output') . '</h3>' . rex_string::highlight(file_get_contents(rex_path::addon('mblock', 'pages/examples/' . pathinfo($file, PATHINFO_FILENAME) . '_output.ini')));
                 }
 
                 // parse info fragment

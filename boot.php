@@ -21,13 +21,14 @@ if (rex::isBackend() && is_object(rex::getUser())) {
 
     // register extensions
     // alfred post post
-    rex_extension::register('REX_FORM_SAVED', function (rex_extension_point $params) {
+    rex_extension::register('REX_FORM_SAVED', static function (rex_extension_point $params) {
         /** @var rex_form|null $form */
         $form = ($params->hasParam('form')) ? $params->getParam('form') : null;
-        if ($form instanceof mblock_rex_form)
-            return MBlockRexFormProcessor::postPostSaveAction($params->getSubject(), $form, $_POST); // execute post post
-        else
-            return $params->getSubject();
+        if ($form instanceof mblock_rex_form) {
+            return MBlockRexFormProcessor::postPostSaveAction($params->getSubject(), $form, $_POST);
+        } // execute post post
+
+        return $params->getSubject();
     });
 
     // assets

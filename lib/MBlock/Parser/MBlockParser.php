@@ -8,7 +8,6 @@
 class MBlockParser
 {
     /**
-     * @param MBlockElement $element
      * @param string $templateType
      * @param null $theme
      * @return mixed
@@ -17,8 +16,8 @@ class MBlockParser
     public static function parseElement(MBlockElement $element, $templateType, $theme = null)
     {
         return str_replace(
-            array_merge(array(' />'), $element->getKeys()),
-            array_merge(array('/>'), $element->getValues()),
+            array_merge([' />'], $element->getKeys()),
+            array_merge(['/>'], $element->getValues()),
             MBlockTemplateFileProvider::loadTemplate($templateType, '', $theme));
     }
 }
