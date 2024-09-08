@@ -107,7 +107,6 @@ function mblock_sort_it(element) {
             mblock_remove(element);
             // trigger event
             let iClone = $(event.item);
-            iClone.trigger('rex:change', [iClone]);
             iClone.trigger('mblock:change', [iClone]);
         }
     });
@@ -426,7 +425,6 @@ function mblock_moveup(element, item) {
         mblock_remove(element);
         // trigger event
         let iClone = prev;
-        iClone.trigger('rex:change', [iClone]);
         iClone.trigger('mblock:change', [iClone]);
     }, 150);
 }
@@ -442,7 +440,6 @@ function mblock_movedown(element, item) {
         mblock_remove(element);
         // trigger event
         let iClone = next;
-        iClone.trigger('rex:change', [iClone]);
         iClone.trigger('mblock:change', [iClone]);
     }, 150);
 }
