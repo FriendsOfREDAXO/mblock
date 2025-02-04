@@ -22,6 +22,7 @@ __Input:__
 
 ```php
 <?php
+use FriendsOfRedaxo\MForm;
 
 // base ID
 $id = 1;
