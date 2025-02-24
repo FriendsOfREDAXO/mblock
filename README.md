@@ -48,7 +48,7 @@ __Output:__
 <?php
 
 echo '<pre>';
-dump(rex_var::toArray("REX_VALUE[1]"));
+dump(rex_var::toArray("REX_VALUE[1]")); // the Mediafield Values are in the "REX_MEDIA_n" Keys in the Array, REX_MEDIA[n] is not used
 echo '</pre>';
 ```
 
