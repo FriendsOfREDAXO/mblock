@@ -357,7 +357,7 @@ class MBlock
         // Only add toggle field if block is explicitly set to inactive
         if (is_array($result) && isset($result['mblock_active']) && $result['mblock_active'] == '0') {
             // Block is inactive - add hidden field with value 0
-            $hiddenField = '<input type="hidden" name="REX_INPUT_VALUE[' . $item->getValueId() . '][' . ($count - 1) . '][mblock_active]" value="0" class="mblock-toggle-field" />';
+            $hiddenField = '<input type="hidden" name="REX_INPUT_VALUE[' . $item->getValueId() . '][' . $count . '][mblock_active]" value="0" class="mblock-toggle-field" />';
             $form .= $hiddenField;
             
             if (rex::isDebugMode()) {
