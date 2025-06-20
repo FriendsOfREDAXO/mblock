@@ -249,6 +249,13 @@ function mblock_bind_add_delete_events(element) {
         const $block = $btn.closest('.sortitem');
         
         if (!$btn.prop('disabled')) {
+            // MBlock v3.5 - Löschbestätigung prüfen
+            if (element.data().hasOwnProperty('delete_confirm')) {
+                if (!confirm(element.data('delete_confirm'))) {
+                    return false;
+                }
+            }
+            
             $block.remove();
             mblock_reindex(element);
             mblock_update_button_states(element);
@@ -694,8 +701,13 @@ function mblock_add_item(element, item) {
     
     // scroll to item
     mblock_scroll(element, iClone);
-    // trigger rex ready
+    
+    // MBlock v4.0 - Enhanced Widget Support for new items
+    mblock_reinit_widgets(iClone);
+    
+    // trigger rex ready on the new block and document
     iClone.trigger('rex:ready', [iClone]);
+    $(document).trigger('rex:ready', [iClone]);
 }
 
 // MBlock v3.5 - Add buttons to newly created blocks
@@ -907,9 +919,163 @@ function mblock_debug_move_buttons(element) {
     });
 }
 
-// MBlock v3.5 - Ensure functions are available globally for debugging
+// MBlock v4.0 - Enhanced Widget Support for dynamically added items
+function mblock_reinit_widgets(newBlock) {
+    console.log('MBlock v4.0 - Reinitializing widgets for new block');
+    
+    // Re-initialize Media-Pool widgets
+    newBlock.find('.rex-js-widget-media').each(function() {
+        const $widget = $(this);
+        const $input = $widget.find('input[type="text"]');
+        const $button = $widget.find('.btn-popup');
+        
+        if ($button.length && $input.length) {
+            // Extract the numeric ID from the input name/id
+            const inputId = $input.attr('id') || $input.attr('name');
+            let mediaId = null;
+            
+            // Try to extract numeric ID from REX_MEDIA_X pattern
+            const match = inputId.match(/REX_MEDIA_(\d+)/);
+            if (match) {
+                mediaId = match[1];
+            }
+            
+            if (mediaId) {
+                // Use REDAXO's standard function
+                $button.attr('onclick', `openREXMedia('${mediaId}'); return false;`);
+                console.log('Media widget reinitialized for REX_MEDIA_' + mediaId);
+            } else {
+                // Fallback: Set up data attributes for manual handling
+                $button.attr('data-opener', inputId);
+                $button.off('click.mblock-media').on('click.mblock-media', function(e) {
+                    e.preventDefault();
+                    const opener = $(this).data('opener');
+                    if (opener) {
+                        newPoolWindow('index.php?page=mediapool/media&opener_input_field=' + opener);
+                    }
+                    return false;
+                });
+                console.log('Media widget fallback initialized for:', inputId);
+            }
+        }
+    });
+    
+    // Re-initialize Media-List widgets
+    newBlock.find('.rex-js-widget-medialist').each(function() {
+        const $widget = $(this);
+        const $select = $widget.find('select');
+        const $button = $widget.find('.btn-popup');
+        
+        if ($button.length && $select.length) {
+            // Extract the numeric ID from the select name/id
+            const selectId = $select.attr('id') || $select.attr('name');
+            let medialistId = null;
+            
+            // Try to extract numeric ID from REX_MEDIALIST_SELECT_X pattern
+            const match = selectId.match(/REX_MEDIALIST_SELECT_(\d+)/);
+            if (match) {
+                medialistId = match[1];
+            }
+            
+            if (medialistId) {
+                // Use REDAXO's standard function
+                $button.attr('onclick', `openREXMedialist('${medialistId}'); return false;`);
+                console.log('Medialist widget reinitialized for REX_MEDIALIST_' + medialistId);
+            } else {
+                // Fallback: Set up data attributes for manual handling
+                $button.attr('data-opener', selectId);
+                console.log('Medialist widget fallback initialized for:', selectId);
+            }
+        }
+    });
+    
+    // Re-initialize Link widgets
+    newBlock.find('.rex-js-widget-link').each(function() {
+        const $widget = $(this);
+        const $input = $widget.find('input[type="text"]');
+        const $button = $widget.find('.btn-popup');
+        
+        if ($button.length && $input.length) {
+            const inputId = $input.attr('id');
+            if (inputId) {
+                $button.attr('data-opener', inputId);
+                $button.attr('onclick', `rex_link_openPopup('${inputId}');`);
+                
+                console.log('Link widget reinitialized for input:', inputId);
+            }
+        }
+    });
+    
+    // Re-initialize CKE5 editors if present
+    newBlock.find('.cke5-editor').each(function() {
+        const $editor = $(this);
+        const editorId = $editor.attr('id');
+        
+        if (editorId && window.CKEDITOR) {
+            // Destroy existing instance if any
+            if (window.CKEDITOR.instances[editorId]) {
+                window.CKEDITOR.instances[editorId].destroy();
+            }
+            
+            // Re-initialize CKE5 editor
+            try {
+                // This will depend on the specific CKE5 configuration
+                // You may need to adjust this based on your CKE5 setup
+                $(document).trigger('cke5:reinit', [editorId]);
+                console.log('CKE5 editor reinitialized for:', editorId);
+            } catch (e) {
+                console.log('CKE5 reinit failed:', e);
+            }
+        }
+    });
+    
+    // Re-initialize other common widgets
+    newBlock.find('.rex-js-widget').each(function() {
+        const $widget = $(this);
+        // Trigger a general widget initialization event
+        $widget.trigger('widget:reinit');
+    });
+    
+    // Force re-initialization of any Select2 dropdowns
+    newBlock.find('select.select2').each(function() {
+        const $select = $(this);
+        if ($select.hasClass('select2-hidden-accessible')) {
+            $select.select2('destroy');
+        }
+        $select.select2();
+    });
+    
+    // Re-bind media preview events for new widgets
+    newBlock.find('.rex-js-widget-media.rex-js-widget-preview, .rex-js-widget-medialist.rex-js-widget-preview')
+        .off('mouseenter.mblock-media-preview')
+        .on('mouseenter.mblock-media-preview', function() {
+            const $this = $(this);
+            let value;
+            if ($this.hasClass('rex-js-widget-media')) {
+                value = $this.find('input[type=text]').val();
+            } else {
+                value = $this.find('select :selected').text();
+            }
+            // Trigger media preview if function exists
+            if (typeof rexShowMediaPreview === 'function') {
+                rexShowMediaPreview.call(this);
+            }
+        })
+        .off('mouseleave.mblock-media-preview')
+        .on('mouseleave.mblock-media-preview', function() {
+            const div = $('.rex-js-media-preview', this);
+            if (div.css('height') != 'auto') {
+                div.slideUp('normal');
+            }
+        });
+    
+    console.log('Widget reinitialization completed for new MBlock item');
+}
+
+// MBlock v4.0 - Ensure functions are available globally for debugging
 window.mblock_add_item = mblock_add_item;
 window.mblock_moveup = mblock_moveup;
 window.mblock_movedown = mblock_movedown;
 window.mblock_init = mblock_init;
 window.mblock_debug_move_buttons = mblock_debug_move_buttons;
+window.mblock_reinit_widgets = mblock_reinit_widgets;
