@@ -3,7 +3,7 @@
 ### Version 4.0.0 - Complete Modernization & Backend Integration 🚀
 
 **Release Date:** 20. Juni 2025  
-**Major Release:** Vollständige Modernisierung mit Backend-Integration und verbesserter Entwicklererfahrung
+**Major Release:** Vollständige Modernisierung mit Backend-Integration, robustem Toggle-System und verbesserter Entwicklererfahrung
 
 ---
 

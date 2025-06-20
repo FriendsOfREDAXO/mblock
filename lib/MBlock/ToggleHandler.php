@@ -20,6 +20,11 @@ class MBlockToggleHandler
             return true; // Default to active
         }
         
+        // Check if block is empty array (deactivated blocks are stored as empty arrays)
+        if (empty($block)) {
+            return false;
+        }
+        
         // Check if block has mblock_active field and if it's active
         // Default to active if field doesn't exist (backwards compatibility)
         return !isset($block['mblock_active']) || $block['mblock_active'] == '1' || $block['mblock_active'] === true;

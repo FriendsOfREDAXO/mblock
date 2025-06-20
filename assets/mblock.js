@@ -110,17 +110,34 @@ function mblock_bind_toggle_events(element) {
         if (isActive) {
             // User wants to DEACTIVATE block - create field with value 0
             if ($hiddenField.length === 0) {
-                const $firstInput = $block.find('input[type="hidden"]').first();
-                if ($firstInput.length > 0) {
-                    const fieldName = $firstInput.attr('name');
+                // Try to find any input field to extract the pattern
+                const $anyInput = $block.find('input, select, textarea').first();
+                if ($anyInput.length > 0) {
+                    const fieldName = $anyInput.attr('name');
                     if (fieldName) {
-                        const baseName = fieldName.replace(/\[.*?\]/g, '');
-                        const newFieldName = baseName + '[' + arrayIndex + '][mblock_active]';
-                        $hiddenField = $('<input type="hidden" name="' + newFieldName + '" value="0">');
-                        $block.append($hiddenField);
-                        
-                        if (window.console && window.rex_debug) {
-                            console.log('MBlock v3.5 - Created INACTIVE toggle field:', newFieldName);
+                        // Extract pattern like "REX_INPUT_VALUE[2][0]" from field name
+                        const matches = fieldName.match(/^(REX_INPUT_VALUE\[\d+\]\[\d+\])/);
+                        if (matches) {
+                            const baseName = matches[1];
+                            const newFieldName = baseName + '[mblock_active]';
+                            $hiddenField = $('<input type="hidden" name="' + newFieldName + '" value="0" class="mblock-toggle-field">');
+                            $block.append($hiddenField);
+                            
+                            if (window.console && window.rex_debug) {
+                                console.log('MBlock v4.0 - Created INACTIVE toggle field:', newFieldName);
+                            }
+                        } else {
+                            // Fallback: try to construct from block structure
+                            const wrapper = $block.closest('.mblock_wrapper');
+                            const wrapperIndex = wrapper.find('> div.sortitem').index($block);
+                            const valueId = wrapper.attr('data-value-id') || '1';
+                            const fallbackName = 'REX_INPUT_VALUE[' + valueId + '][' + wrapperIndex + '][mblock_active]';
+                            $hiddenField = $('<input type="hidden" name="' + fallbackName + '" value="0" class="mblock-toggle-field">');
+                            $block.append($hiddenField);
+                            
+                            if (window.console && window.rex_debug) {
+                                console.log('MBlock v4.0 - Created INACTIVE toggle field (fallback):', fallbackName);
+                            }
                         }
                     }
                 }
