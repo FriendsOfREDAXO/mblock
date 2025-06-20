@@ -1,96 +1,297 @@
-MBlock
-======
+# MBlock v4.0 - Mehrfachblöcke für REDAXO Module
 
-Mit MBlock ist es möglich, innerhalb eines Moduls beliebig viele Datenblöcke zu erzeugen. Diese können dann einfach per Button oder Drag & Drop sortiert werden.
+Mit **MBlock** können Sie innerhalb eines REDAXO-Moduls beliebig viele gleichartige Datenblöcke erstellen, die der Redakteur einfach hinzufügen, löschen, sortieren und ein-/ausklappen kann.
 
-_English:_ MBlock lets you create an unlimited number of data blocks within a single module. These data blocks can be sorted per click or drag & drop.
+![MBlock Demo](https://raw.githubusercontent.com/FriendsOfREDAXO/mblock/assets/mblock.png)
 
-> Please note: The examples are valid for MForm version 7 and higher. When using older MForm versions, please refer to the documentation of the respective version. 
+## 🚀 Was kann MBlock?
 
+- **Mehrfachblöcke erstellen**: Beliebig viele Wiederholungen eines Formularbereichs
+- **Drag & Drop Sortierung**: Blöcke einfach per Maus neu anordnen
+- **Toggle-Funktionalität**: Blöcke ein- und ausklappen (NEU in v3.5)
+- **Min/Max Limits**: Mindest- und Höchstanzahl von Blöcken definieren
+- **Flexible Integration**: Funktioniert mit MForm und reinem HTML
+- **Moderne API**: Vereinfachte Datenausgabe mit `getBlocks()` und `getAllBlocks()`
 
-![Screenshot](https://raw.githubusercontent.com/FriendsOfREDAXO/mblock/assets/mblock.png)
+## 📋 Voraussetzungen
 
-## Modulbeispiele / Module examples
+- REDAXO 5.12+
+- PHP 8.1+
+- **Empfohlen**: [MForm Addon](https://github.com/FriendsOfREDAXO/mform) für komfortable Formularerstellung
 
-MBlock enthält einige Modulbeispiele. Diese findest du auf der MBlock-Seite im REDAXO-Backend. An dieser Stelle möchten wir nur zwei Beispiele auflisten — mit Unterstützung durch [MForm](https://github.com/FriendsOfREDAXO/mform) und ohne —, um zu zeigen, wie MBlock funktioniert.
+## 🎯 MForm vs. HTML - Unsere Empfehlung
 
-_English:_ MBlock contains several module examples. You’ll find them on the MBlock page within the REDAXO backend. At this point, we want to show two examples only — one with [MForm](https://github.com/FriendsOfREDAXO/mform) support and another one without — to demonstrate how MBlock works.
+**MForm wird empfohlen** für die Verwendung mit MBlock:
 
-### Example 1: team members (requires [MForm](https://github.com/FriendsOfREDAXO/mform) addon)
+### ✅ Vorteile MForm
+- Automatische Widget-Integration (Media, Link, etc.)
+- Saubere Datenstruktur
+- Weniger Code erforderlich
+- Bessere Wartbarkeit
+- Integrierte Validierung
 
-__Input:__
+### ⚠️ Reines HTML
+- Mehr Code erforderlich
+- Manuelle Widget-Integration nötig
+- Nur für spezielle Anwendungsfälle empfohlen
+
+## 🔧 Grundlegende Verwendung
+
+### Mit MForm (empfohlen)
 
 ```php
 <?php
+// Modul-Eingabe
+use FriendsOfRedaxo\MForm;
 
-// base ID
 $id = 1;
-
-// init mform
 $mform = new MForm();
 
-// fieldset
-$mform->addFieldsetArea('Team member');
+$mform->addFieldset('Teammitglied');
+$mform->addTextField("$id.0.name", ['label' => 'Name']);
+$mform->addMediaField(1, ['label' => 'Avatar']);  // Richtige Widget-Methode!
 
-// textinput
-$mform->addTextField("$id.0.name", array('label'=>'Name')); // use string for x.0 json values
-
-// media button
-$mform->addMediaField(1, array('label'=>'Avatar')); // mblock will auto set the media file as json value
-
-// parse form
-echo MBlock::show($id, $mform->show(), array('min'=>2,'max'=>4)); // add settings min and max
+echo MBlock::show($id, $mform->show(), [
+    'min' => 1,
+    'max' => 5,
+    'collapsed' => true  // NEU: Blöcke eingeklappt starten
+]);
 ```
-
-__Output:__
 
 ```php
 <?php
+// Modul-Ausgabe
+$blocks = MBlock::getBlocks(1);  // NEU: Vereinfachte API
 
-echo '<pre>';
-dump(rex_var::toArray("REX_VALUE[1]")); // the Mediafield Values are in the "REX_MEDIA_n" Keys in the Array, REX_MEDIA[n] is not used
-echo '</pre>';
+foreach ($blocks as $block) {
+    echo '<div class="team-member">';
+    echo '<h3>' . rex_escape($block['name']) . '</h3>';
+    
+    if ($block['REX_MEDIA_1']) {
+        echo '<img src="' . rex_url::media($block['REX_MEDIA_1']) . '">';
+    }
+    
+    echo '</div>';
+}
 ```
 
-### Example 2: team members (without [MForm](https://github.com/FriendsOfREDAXO/mform))
-
-__Input:__
+### Mit HTML
 
 ```php
 <?php
-
-// base ID
+// Modul-Eingabe
 $id = 1;
+$form = '
+<fieldset>
+    <legend>Teammitglied</legend>
+    <input type="text" name="REX_INPUT_VALUE[' . $id . '][0][name]" placeholder="Name">
+    REX_MEDIA[id="1" widget="1"]
+</fieldset>';
 
-// html form
-$form = <<<EOT
-    <fieldset class="form-horizontal ">
-        <legend>Team member</legend>
-        <div class="form-group">
-            <div class="col-sm-2 control-label"><label for="rv2_1_0_name">Name</label></div>
-            <div class="col-sm-10"><input id="rv2_1_0_name" type="text" name="REX_INPUT_VALUE[$id][0][name]" value="" class="form-control "></div>
-        </div>
-        <div class="form-group">
-            <div class="col-sm-2 control-label"><label>Avatar</label></div>
-            <div class="col-sm-10">
-                REX_MEDIA[id="1" widget="1"]
-            </div>
-        </div>
-    </fieldset>
-EOT;
-
-// parse form
 echo MBlock::show($id, $form);
 ```
 
-__Output:__
+## 🆕 Migration von älteren Versionen (< 4.0)
 
+### API-Änderungen
+
+**ALT** (deprecated):
 ```php
-<?php
-
-echo '<pre>';
-dump(rex_var::toArray("REX_VALUE[1]"));
-echo '</pre>';
+$data = rex_var::toArray("REX_VALUE[1]");
 ```
 
+**NEU** (empfohlen):
+```php
+$blocks = MBlock::getBlocks(1);        // Für einen spezifischen Block-Typ
+$allBlocks = MBlock::getAllBlocks();   // Für alle Block-Typen des Artikels
+```
 
+### Toggle-Funktionalität aktivieren
+
+Für die neue Toggle-Funktionalität (Ein-/Ausklappen) müssen Sie:
+
+1. **CSS aktualisieren**: Neue MBlock-Styles einbinden
+2. **JavaScript aktualisieren**: Neue Event-Handler verwenden  
+3. **Optional**: `collapsed: true` Parameter bei `MBlock::show()` verwenden
+
+## 🎨 REDAXO Widgets richtig verwenden
+
+### ⚠️ Wichtig für MForm: Richtige Widget-Methoden verwenden!
+
+```php
+// ✅ RICHTIG - Spezifische Widget-Methoden verwenden
+$mform->addMediaField(1, ['label' => 'Bild']);          // REX_MEDIA[1]
+$mform->addLinkField(2, ['label' => 'Link']);           // REX_LINK[2]
+$mform->addLinklistField(3, ['label' => 'Linkleiste']); // REX_LINKLIST[3]
+$mform->addMedialistField(4, ['label' => 'Medialeiste']); // REX_MEDIALIST[4]
+
+// ❌ FALSCH - String-Felder funktionieren nicht mit Widgets
+$mform->addMediaField("1.0.media", ['label' => 'Bild']);
+$mform->addMediaField("1", ['label' => 'Bild']);  // Auch falsch - String statt INT!
+```
+
+### Widget-Ausgabe
+
+```php
+$blocks = MBlock::getBlocks(1);
+
+foreach ($blocks as $block) {
+    // Media Widget
+    if (!empty($block['REX_MEDIA_1'])) {
+        echo '<img src="' . rex_url::media($block['REX_MEDIA_1']) . '">';
+    }
+    
+    // Link Widget  
+    if (!empty($block['REX_LINK_2'])) {
+        echo '<a href="' . rex_getUrl($block['REX_LINK_2']) . '">Link</a>';
+    }
+    
+    // Medialist Widget
+    if (!empty($block['REX_MEDIALIST_4'])) {
+        $mediaIds = explode(',', $block['REX_MEDIALIST_4']);
+        foreach ($mediaIds as $mediaId) {
+            echo '<img src="' . rex_url::media($mediaId) . '">';
+        }
+    }
+}
+```
+
+## 📚 MBlock Klassen-Referenz
+
+### MBlock Hauptklasse
+
+```php
+MBlock::show($id, $form, $options = [])
+```
+
+**Parameter:**
+- `$id` (int): Eindeutige Block-ID
+- `$form` (string): HTML-Formular oder MForm-Output
+- `$options` (array): Konfigurationsoptionen
+
+**Optionen:**
+```php
+[
+    'min' => 1,              // Mindestanzahl Blöcke
+    'max' => 10,             // Maximalanzahl Blöcke
+    'collapsed' => false,    // Blöcke eingeklappt starten
+    'template' => 'default', // CSS-Theme
+    'sortable' => true       // Drag & Drop aktiviert
+]
+```
+
+### Neue API-Methoden (v3.5)
+
+```php
+// Blöcke eines bestimmten Typs abrufen
+MBlock::getBlocks($id)
+
+// Alle Blöcke des aktuellen Artikels abrufen
+MBlock::getAllBlocks()
+
+// Block-Daten prüfen
+MBlock::hasBlocks($id)
+
+// Anzahl Blöcke ermitteln
+MBlock::getBlockCount($id)
+```
+
+### MBlock_I18n Klasse
+
+```php
+// Übersetzungen für MBlock-Interface
+MBlock_I18n::msg($key, $fallback = '')
+```
+
+## 🎪 JavaScript Events
+
+### Event-Listener registrieren
+
+```javascript
+// Nach Block hinzufügen
+$(document).on('mblock:add', function(event, blockId, element) {
+    console.log('Block hinzugefügt:', blockId);
+});
+
+// Nach Block löschen  
+$(document).on('mblock:delete', function(event, blockId, element) {
+    console.log('Block gelöscht:', blockId);
+});
+
+// Nach Block sortieren
+$(document).on('mblock:sort', function(event, blockId, element) {
+    console.log('Block sortiert:', blockId);
+});
+
+// Nach Block toggle (ein-/ausklappen)
+$(document).on('mblock:toggle', function(event, blockId, element, isCollapsed) {
+    console.log('Block toggle:', blockId, 'eingeklappt:', isCollapsed);
+});
+
+// Nach MBlock initialisierung
+$(document).on('mblock:ready', function(event, blockId) {
+    console.log('MBlock bereit:', blockId);
+});
+```
+
+### Custom JavaScript ausführen
+
+```javascript
+// Warten bis MBlock vollständig geladen
+$(document).on('rex:ready', function() {
+    // Ihre MBlock-Initialisierung hier
+    $('.my-mblock-field').each(function() {
+        // Custom Logic
+    });
+});
+```
+
+## 🔍 Debugging & Troubleshooting
+
+### Debug-Ausgaben
+
+```php
+// Alle Block-Daten ausgeben
+$blocks = MBlock::getBlocks(1);
+dump($blocks);
+
+// Einzelnen Block analysieren
+$blocks = MBlock::getAllBlocks();
+foreach ($blocks as $blockType => $blockData) {
+    echo "Block-Typ: $blockType<br>";
+    dump($blockData);
+}
+```
+
+### Häufige Probleme
+
+1. **Widgets funktionieren nicht**
+   - Lösung: Integer-Felder in MForm verwenden
+
+2. **JavaScript-Fehler**
+   - Lösung: `rex:ready` Event abwarten
+
+3. **Daten werden nicht gespeichert**
+   - Lösung: Korrekte `name`-Attribute prüfen
+
+4. **Toggle funktioniert nicht**
+   - Lösung: Auf v4.0 migrieren und neue Assets einbinden
+
+## 🎯 Best Practices
+
+1. **Verwenden Sie MForm** für bessere Wartbarkeit
+2. **Begrenzen Sie die Anzahl** der Blöcke mit `min`/`max`
+3. **Verwenden Sie aussagekräftige Block-IDs** (1, 2, 3...)
+4. **Testen Sie mit ein-/ausgeklappten Blöcken**
+5. **Validieren Sie Eingaben** in der Ausgabe
+6. **Nutzen Sie die neuen API-Methoden** für sauberen Code
+
+## 📞 Support & Community
+
+- **GitHub**: [FriendsOfREDAXO/mblock](https://github.com/FriendsOfREDAXO/mblock)
+- **REDAXO Slack**: #addons Channel
+- **Dokumentation**: REDAXO Backend → MBlock → Hilfe
+
+---
+
+**MBlock v4.0** - Entwickelt von [Friends Of REDAXO](https://friendsofredaxo.github.io/)

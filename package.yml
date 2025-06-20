@@ -1,5 +1,5 @@
 package: mblock
-version: 3.4.13
+version: 4.0.0-dev
 name: MBlock
 author: Friends Of REDAXO
 supportpage: https://github.com/FriendsOfREDAXO/mblock
@@ -17,8 +17,12 @@ page:
                 demo_mform: { title: translate:demo_mform }
                 demo_html: { title: translate:demo_html }
         rexform_demo: { title: translate:rexform_demo }
+        debug_fixed: { title: "Debug & Test", perm: admin }
+        help: { title: translate:help, subPath: README.md }
+        ajax: { title: "AJAX Handler", hidden: true }
 
 requires:
-    redaxo: ^5.6.0
+    redaxo: ^5.12.0
     php:
+        version: ^8.1
         extensions: [xml]

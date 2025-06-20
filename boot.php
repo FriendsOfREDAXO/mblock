@@ -35,7 +35,24 @@ if (rex::isBackend() && is_object(rex::getUser())) {
     rex_view::addJsFile($this->getAssetsUrl('mblock_smooth_scroll.min.js'));
     rex_view::addJsFile($this->getAssetsUrl('mblock.js'));
     rex_view::addCssFile($this->getAssetsUrl('mblock.css'));
-
+    
+    // MBlock v3.5 - Add internationalization support for JavaScript
+    rex_extension::register('OUTPUT_FILTER', function(rex_extension_point $ep) {
+        if (rex::isBackend()) {
+            $content = $ep->getSubject();
+            
+            // Only add translations if MBlock is being used (contains mblock_wrapper)
+            if (strpos($content, 'mblock_wrapper') !== false) {
+                $i18nScript = MBlockI18n::generateScriptTag();
+                
+                // Insert before closing </head> tag
+                $content = str_replace('</head>', $i18nScript . "\n</head>", $content);
+            }
+            
+            return $content;
+        }
+        return $ep->getSubject();
+    });
 }
 
 if (isset($_SESSION['mblock_count'])) {

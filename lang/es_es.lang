@@ -11,6 +11,7 @@ mblock_demo = Ejemplos
 mblock_demo_base = Ejemplos de módulos
 mblock_demo_mform = Ejemplos de módulos MForm
 mblock_demo_html = Ejemplos de módulos HTML
+mblock_help = Ayuda
 
 mblock_example_base_teammember_example = Miembros del equipo
 mblock_example_base_link_example = Enlace y lista de enlaces
@@ -45,5 +46,16 @@ mblock_delete_confirm = Eliminar bloque?
 
 mblock_rexform_demo = Demostración de RexForm MBlock
 rex_form_mblock_demo_entries = Entradas de demostración
-rex_form_mblock_demo_entries_add = Agregue una entrada de demostración
-rex_form_mblock_demo_entries_edit = Editar una entrada de demostración
+rex_form_mblock_demo_entries_add = Agregar entrada de demostración
+rex_form_mblock_demo_entries_edit = Editar entrada de demostración
+
+# MBlock v3.5 - Tooltip translations
+mblock_v35_tooltip_toggle_active = Desactivar bloque
+mblock_v35_tooltip_toggle_inactive = Activar bloque
+mblock_v35_tooltip_move_up = Mover bloque hacia arriba
+mblock_v35_tooltip_move_down = Mover bloque hacia abajo
+mblock_v35_tooltip_drag_handle = Mover bloque arrastrando y soltando
+mblock_v35_tooltip_add = Agregar bloque
+mblock_v35_tooltip_delete = Eliminar bloque
+mblock_v35_block_active = Activo
+mblock_v35_block_inactive = Inactivo

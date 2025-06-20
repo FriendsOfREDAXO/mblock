@@ -1,5 +1,246 @@
 # MBlock - REDAXO Addon für Modul-Input-Blöcke
 
+### Version 4.0.0 - Complete Modernization & Backend Integration 🚀
+
+**Release Date:** 20. Juni 2025  
+**Major Release:** Vollständige Modernisierung mit Backend-Integration und verbesserter Entwicklererfahrung
+
+---
+
+## 🎯 **Hauptfeatures**
+
+### ✨ **Neue Backend-Integration**
+* **NEW:** Hilfe-Seite im Backend mit integrierter README-Dokumentation
+* **NEW:** Moderne Demo-Seiten mit Tab-Navigation (MForm & HTML)
+* **NEW:** Scrollbare Code-Beispiele mit verbesserter Lesbarkeit
+* **NEW:** Admin-Debug-Seite mit erweiterten Debugging-Optionen
+* **NEW:** Vollständige Backend-Navigation mit übersichtlicher Struktur
+
+### 🔧 **Block Toggle System**
+* **NEW:** Block Toggle-Funktionalität - Blöcke ein-/ausschalten ohne Löschung
+* **NEW:** Vereinfachte API mit `getBlocks()` (nur aktive) und `getAllBlocks()` (alle Blöcke)
+* **NEW:** Optionale `collapsed: true` Konfiguration für eingeklappte Blöcke
+* **NEW:** Visuelle Darstellung aktiver/inaktiver Blöcke
+
+### 🎨 **Moderne Benutzeroberfläche**
+* **NEW:** Einheitliche Button-Gruppe mit 6 Steuerelementen: Toggle, Hoch/Runter, Drag Handle, Hinzufügen, Löschen
+* **NEW:** Internationalisierte Tooltips (de, en, es, nl, pt, sv)
+* **NEW:** Dark Mode Unterstützung für alle Komponenten
+* **NEW:** Responsive Design mit verbesserter Zugänglichkeit
+* **NEW:** Moderne CSS mit CSS-Variablen für einfache Anpassung
+
+---
+
+## 🔧 **Technische Verbesserungen**
+
+### 📚 **API & Entwicklererfahrung**
+* **NEW:** `MBlock::getBlocks($id)` - Nur aktive Blöcke abrufen
+* **NEW:** `MBlock::getAllBlocks()` - Alle Blöcke des Artikels abrufen
+* **NEW:** `MBlock::hasBlocks($id)` - Prüfen ob Blöcke vorhanden
+* **NEW:** `MBlock::getBlockCount($id)` - Anzahl Blöcke ermitteln
+* **NEW:** `MBlock_I18n::msg($key, $fallback)` - Übersetzungen abrufen
+
+### 🎪 **JavaScript Event System**
+* **IMPROVED:** Vollständige Event-System-Überarbeitung
+* **NEW:** `mblock:toggle` Event für Block-Toggle-Aktionen
+* **NEW:** `mblock:ready` Event für Initialisierung
+* **IMPROVED:** Bestehende Events: `mblock:add`, `mblock:delete`, `mblock:sort`
+* **IMPROVED:** Reindex-sichere Event-Handler ohne doppelte Bindungen
+
+### 🛠️ **Backend & Dokumentation**
+* **NEW:** Vollständig neue deutsche README mit umfassender Dokumentation
+* **NEW:** Widget-Integration-Anleitung (MForm-spezifisch)
+* **NEW:** Migration Guide für < 3.5 Versionen
+* **NEW:** JavaScript Event-Referenz für Entwickler
+* **NEW:** Troubleshooting-Sektion mit häufigen Problemen
+* **NEW:** Best Practices Richtlinien
+
+---
+
+## 🐛 **Fehlerbehebungen**
+
+### 🔄 **Stabilität & Performance**
+* **FIXED:** Mehrfache Event-Handler-Bindung behoben
+* **FIXED:** Fehlerhafte Block-Indizierung (Array-Index -1 Fehler)
+* **FIXED:** Toggle-Felder nur bei Bedarf erstellen
+* **FIXED:** Button-Status-Inkonsistenzen nach Drag & Drop
+* **FIXED:** Legacy CSS-Klassenkonlikte zwischen alten und neuen Buttons
+* **FIXED:** Server-Template mit Legacy-Buttons beim Hinzufügen neuer Blöcke
+
+### 📝 **Datenintegration**
+* **FIXED:** REX_MBLOCK_VALUE/REX_MBLOCK_ID Fehler behoben (existieren nicht)
+* **FIXED:** Korrekte Verwendung von REX_INPUT_VALUE, REX_VALUE etc.
+* **FIXED:** Widget-Integration mit korrekten MForm-Methoden
+* **FIXED:** String- vs. Integer-ID Probleme bei Widgets
+
+---
+
+## 📋 **Demo & Beispiele**
+
+### 🎭 **Neue Demo-Seiten**
+* **NEW:** MForm-Demo mit 4 praktischen Beispielen
+* **NEW:** HTML-Demo mit 4 praktischen Beispielen
+* **NEW:** Tabbed Code-Darstellung (Input/Output)
+* **NEW:** Echte MBlock-Buttons und -Features in allen Demos
+* **NEW:** Scrollbare Code-Blöcke mit verbesserter Schriftgröße
+* **NEW:** Responsive Design für alle Bildschirmgrößen
+
+### 📖 **Dokumentation**
+* **NEW:** Umfassende deutsche README (298 Zeilen)
+* **NEW:** MForm vs. HTML Empfehlungen mit Vor-/Nachteilen
+* **NEW:** Vollständige Klassen-Referenz
+* **NEW:** Widget-Integrations-Anleitung mit korrekten Beispielen
+* **NEW:** Debugging-Sektion mit praktischen Tipps
+
+---
+
+## 🌍 **Internationalisierung**
+
+### 🗣️ **Mehrsprachigkeit**
+* **NEW:** Vollständige Übersetzungen für 6 Sprachen
+* **NEW:** Tooltips passen sich automatisch an Backend-Sprache an
+* **IMPROVED:** Konsistente Übersetzungsschlüssel
+* **NEW:** Einfache Erweiterung um weitere Sprachen
+
+### 🔤 **Unterstützte Sprachen**
+* Deutsch (de_de) - Vollständig
+* English (en_gb) - Vollständig
+* Español (es_es) - Vollständig
+* Nederlands (nl_nl) - Vollständig
+* Português (pt_br) - Vollständig
+* Svenska (sv_se) - Vollständig
+
+---
+
+## 🧹 **Projekt-Bereinigung**
+
+### 🗑️ **Entfernte Dateien**
+* **REMOVED:** Alte Example-Dateien (16 .ini-Dateien)
+* **REMOVED:** Temporäre Test- und Demo-Dateien
+* **REMOVED:** Veraltete Dokumentation und Konzept-Dateien
+* **REMOVED:** Backup-Dateien und Legacy-Templates
+* **REMOVED:** Überflüssige Info-Seiten (durch README ersetzt)
+
+### � **Optimierte Struktur**
+* **IMPROVED:** Klare Trennung zwischen Kern-Funktionalität und Demos
+* **IMPROVED:** Reduzierte Dateienanzahl für bessere Performance
+* **IMPROVED:** Fokus auf moderne Demo-Seiten statt alter Beispiele
+* **IMPROVED:** Aufgeräumte Backend-Navigation
+
+---
+
+## ⚡ **Performance & Stabilität**
+
+### 🚀 **Optimierungen**
+* **IMPROVED:** Event-Delegation für bessere Performance
+* **IMPROVED:** Reduzierte DOM-Manipulationen
+* **IMPROVED:** Effizientere CSS-Selektoren
+* **IMPROVED:** Optimierte JavaScript-Ausführung
+* **IMPROVED:** Weniger Dateien, schnelleres Laden
+
+### 🔒 **Stabilität**
+* **IMPROVED:** Robuste Button-Status-Verwaltung
+* **IMPROVED:** Sichere Block-Indizierung
+* **IMPROVED:** Fehlerbehandlung bei Widget-Integration
+* **IMPROVED:** Konsistente Datenstruktur
+
+---
+
+## 🔄 **Migration & Kompatibilität**
+
+### ✅ **Vollständige Rückwärtskompatibilität**
+* **MAINTAINED:** Alle bestehenden MBlock-Module funktionieren unverändert
+* **MAINTAINED:** Bestehende API-Methoden bleiben verfügbar
+* **ENHANCED:** Bestehende Blöcke erhalten automatisch neue v3.5-Funktionen
+* **OPTIONAL:** Toggle-Funktionalität ist opt-in (Blöcke standardmäßig aktiv)
+
+### 🔄 **Migration von < 3.5**
+* **GUIDE:** Detaillierte Anleitung für API-Änderungen
+* **GUIDE:** Toggle-Funktionalität aktivieren
+* **GUIDE:** Neue Event-Handler implementieren
+* **GUIDE:** CSS-Anpassungen für moderne UI
+
+---
+
+## 📊 **Verbesserungen im Detail**
+
+### 📈 **Metriken**
+* **Code-Qualität:** Vollständige Überarbeitung der Kern-Klassen
+* **Dokumentation:** 298 Zeilen umfassende README
+* **Tests:** Erweiterte Debug-Funktionen
+* **Benutzerfreundlichkeit:** Moderne UI mit verbesserter Zugänglichkeit
+* **Performance:** Optimierte Event-Handler und CSS
+
+### 🎯 **Entwicklererfahrung**
+* **NEW:** Vollständige API-Dokumentation
+* **NEW:** Praktische Code-Beispiele
+* **NEW:** Debugging-Tools und -Anleitungen
+* **NEW:** Best Practices Richtlinien
+* **NEW:** Troubleshooting-Sektion
+
+---
+
+## 🏆 **Besondere Erwähnungen**
+
+### 👥 **Community**
+* **IMPROVED:** Fokus auf deutsche REDAXO-Community
+* **NEW:** Umfassende deutsche Dokumentation
+* **NEW:** Praxisnahe Beispiele und Demos
+* **NEW:** Einfache Erweiterbarkeit für Entwickler
+
+### 🔧 **Technologie**
+* **MODERN:** CSS-Variablen für einfache Anpassung
+* **MODERN:** Event-Delegation für bessere Performance
+* **MODERN:** Responsive Design für alle Geräte
+* **MODERN:** Zugänglichkeit nach aktuellen Standards
+
+---
+
+## ⚠️ **Breaking Changes**
+* **NONE** - Vollständige Rückwärtskompatibilität gewährleistet
+
+---
+
+## 🙏 **Credits**
+* Modernisierung basierend auf REDAXO-Design-Philosophie
+* Event-System-Optimierung durch Community-Feedback
+* Internationalisierung für globale REDAXO-Community
+* Deutsche Dokumentation für lokale Entwickler-Community
+
+---
+
+#### 📝 **API Examples**
+```php
+// New simplified API - get only active blocks
+$activeBlocks = MBlock::getBlocks('REX_VALUE[1]');
+
+// Get all blocks (including inactive ones)
+$allBlocks = MBlock::getAllBlocks('REX_VALUE[1]');
+
+// Check if specific block is active
+foreach ($allBlocks as $block) {
+    $isActive = !isset($block['mblock_active']) || $block['mblock_active'] !== '0';
+    if ($isActive) {
+        // Process active block
+    }
+}
+```
+
+#### 🌍 **Internationalization**
+* Tooltips automatically adapt to REDAXO backend language
+* Supported languages: German, English, Spanish, Dutch, Portuguese, Swedish
+* Easy to extend with additional languages
+
+#### ⚠️ **Breaking Changes**
+* None - Full backwards compatibility maintained
+
+#### 🙏 **Credits**
+* Modern UI design inspired by REDAXO's design philosophy
+* Event system optimization based on community feedback
+* Internationalization support for global REDAXO community
+
+---
+
 ### Version 3.4.0 - 3.4.3
 * rex_version::compare fixed for REDAXO >= 5.12
 * dark-mode support for REDAXO >= 5.13
