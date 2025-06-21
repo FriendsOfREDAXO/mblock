@@ -34,7 +34,10 @@ if (rex::isBackend() && is_object(rex::getUser())) {
     // Debug mode: Load separate files for easier debugging and development
     // Production mode: Load minified bundle for optimal performance
     $isDebugMode = rex::isDebugMode();
-    $hasBundleDist = file_exists($this->getPath('assets/dist/mblock.min.js'));
+    static $hasBundleDist = null;
+    if ($hasBundleDist === null) {
+        $hasBundleDist = file_exists($this->getPath('assets/dist/mblock.min.js'));
+    }
     
     if (!$isDebugMode && $hasBundleDist) {
         // Production mode - use minified bundle (16.8KB, no console logs)
