@@ -11,6 +11,7 @@ mblock_demo = Exempelsamling
 mblock_demo_base = Modul-exemplar
 mblock_demo_mform = MForm Modul exemplar
 mblock_demo_html = HTML modul exemplar
+mblock_help = Hjälp
 
 mblock_example_base_teammember_example = Teammedlemmar
 mblock_example_base_link_example = Länk och länklista
@@ -44,6 +45,27 @@ mblock_delete_confirm_label = Bekräfta före radering
 mblock_delete_confirm = Radera avsnittet?
 
 mblock_rexform_demo = RexForm MBlock demo
-rex_form_mblock_demo_entries = Demo inlägg
-rex_form_mblock_demo_entries_add = Tillfoga demo inlägg
-rex_form_mblock_demo_entries_edit = Redigera demo inlägg
+rex_form_mblock_demo_entries = Demoposter
+rex_form_mblock_demo_entries_add = Lägg till demopost
+rex_form_mblock_demo_entries_edit = Redigera demopost
+
+# MBlock v3.5 - Tooltip translations
+mblock_v35_tooltip_toggle_active = Inaktivera block
+mblock_v35_tooltip_toggle_inactive = Aktivera block
+mblock_v35_tooltip_move_up = Flytta block uppåt
+mblock_v35_tooltip_move_down = Flytta block nedåt
+mblock_v35_tooltip_drag_handle = Flytta block genom att dra och släppa
+mblock_v35_tooltip_add = Lägg till block
+mblock_v35_tooltip_delete = Ta bort block
+mblock_v35_block_active = Aktiv
+mblock_v35_block_inactive = Inaktiv
+
+# MForm Demo Error Messages
+mform_demo_error_title = MForm AddOn Krävs
+mform_demo_error_message = Denna demo kräver MForm AddOn, som för närvarande inte är tillgängligt.
+mform_demo_error_instructions = För att använda denna demo, installera MForm AddOn:
+mform_demo_error_step1 = Gå till <strong>AddOns > Installer</strong>
+mform_demo_error_step2 = Sök efter <strong>"mform"</strong>
+mform_demo_error_step3 = Installera och aktivera AddOn
+mform_demo_error_step4 = Återvänd till denna sida
+mform_demo_error_alternative = Alternativt kan du använda <a href="{0}">HTML Demo</a> som fungerar utan ytterligare AddOns.

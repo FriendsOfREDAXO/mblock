@@ -88,4 +88,361 @@ div.sortable-ghost {
     padding-top: 15px;
 }
 
+/* MBlock v3.5 - Toggle functionality and modern UI */
+.mblock_wrapper {
+    --mblock-primary-color: #3c8dbc;
+    --mblock-success-color: #00a65a;
+    --mblock-danger-color: #dd4b39;
+    --mblock-inactive-color: #6c757d;
+    --mblock-border-radius: 4px;
+    --mblock-transition: all 0.3s ease;
+}
+
+/* Block toggle controls */
+.mblock_wrapper .mblock-controls {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    display: flex;
+    gap: 2px;
+    z-index: 10;
+    flex-wrap: wrap;
+    /* v3.5 - Dünner abgerundeter Rahmen */
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    padding: 3px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.mblock_wrapper .mblock-controls .btn {
+    padding: 4px 8px;
+    font-size: 12px;
+    line-height: 1.2;
+    border-radius: var(--mblock-border-radius);
+    border: 1px solid;
+    transition: var(--mblock-transition);
+    min-width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Spacing adjustments - v3.5 */
+.mblock_wrapper .mblock-controls .mblock-toggle-btn {
+    margin-right: 8px;
+}
+
+.mblock_wrapper .mblock-controls .mblock-add-btn {
+    margin-left: 4px;
+}
+
+/* Toggle button styles */
+.mblock_wrapper .mblock-toggle-btn.active {
+    background-color: var(--mblock-success-color) !important;
+    border-color: var(--mblock-success-color) !important;
+    color: white !important;
+}
+
+.mblock_wrapper .mblock-toggle-btn.inactive {
+    background-color: var(--mblock-inactive-color) !important;
+    border-color: var(--mblock-inactive-color) !important;
+    color: white !important;
+    opacity: 0.8;
+}
+
+/* Move handle modernized */
+.mblock_wrapper .mblock-move-btn {
+    background-color: #f8f9fa !important;
+    border-color: #dee2e6 !important;
+    color: var(--mblock-inactive-color) !important;
+    cursor: grab;
+}
+
+.mblock_wrapper .mblock-move-btn:hover {
+    background-color: #e9ecef !important;
+    color: #495057 !important;
+}
+
+.mblock_wrapper .mblock-move-btn:active {
+    cursor: grabbing;
+}
+
+/* Move buttons (up/down arrows) */
+.mblock_wrapper .mblock-move-up,
+.mblock_wrapper .mblock-move-down {
+    background-color: #6c757d !important;
+    border-color: #6c757d !important;
+    color: white !important;
+}
+
+.mblock_wrapper .mblock-move-up:hover,
+.mblock_wrapper .mblock-move-down:hover {
+    background-color: #5a6268 !important;
+    border-color: #545b62 !important;
+}
+
+.mblock_wrapper .mblock-move-up:disabled,
+.mblock_wrapper .mblock-move-down:disabled,
+.mblock_wrapper .mblock-move-up.disabled,
+.mblock_wrapper .mblock-move-down.disabled {
+    background-color: #e9ecef !important;
+    border-color: #dee2e6 !important;
+    color: #6c757d !important;
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+}
+
+/* Drag handle specific styling */
+.mblock_wrapper .sorthandle {
+    cursor: grab;
+}
+
+.mblock_wrapper .sorthandle:hover {
+    background-color: #e9ecef !important;
+}
+
+.mblock_wrapper .sorthandle:active {
+    cursor: grabbing;
+}
+
+/* Delete button */
+.mblock_wrapper .mblock-delete-btn {
+    background-color: var(--mblock-danger-color) !important;
+    border-color: var(--mblock-danger-color) !important;
+    color: white !important;
+}
+
+.mblock_wrapper .mblock-delete-btn:hover {
+    background-color: #c23321 !important;
+    border-color: #c23321 !important;
+}
+
+/* Add button */
+.mblock_wrapper .mblock-add-btn {
+    background-color: var(--mblock-primary-color) !important;
+    border-color: var(--mblock-primary-color) !important;
+    color: white !important;
+}
+
+.mblock_wrapper .mblock-add-btn:hover {
+    background-color: #367fa9 !important;
+    border-color: #367fa9 !important;
+}
+
+/* Inactive block styling */
+.mblock_wrapper > div.mblock-inactive {
+    opacity: 0.6;
+    background: rgba(108, 117, 125, 0.1) !important;
+    border-color: rgba(108, 117, 125, 0.3) !important;
+    transition: var(--mblock-transition);
+}
+
+.mblock_wrapper > div.mblock-inactive:hover {
+    opacity: 0.8;
+}
+
+/* Animation for toggle state changes */
+.mblock_wrapper > div {
+    transition: var(--mblock-transition);
+}
+
+/* Hide old controls */
+.mblock_wrapper span.removeadded {
+    display: none !important;
+}
+
+.mblock_wrapper span.sorthandle {
+    display: none !important;
+}
+
+/* Modern block styling */
+.mblock_wrapper > div {
+    border-radius: var(--mblock-border-radius);
+    transition: var(--mblock-transition);
+    position: relative;
+    padding-top: 45px;
+    padding-left: 15px;
+}
+
+.mblock_wrapper > div:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,.15);
+}
+
+/* Toggle switch component */
+.mblock-toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.mblock-toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.mblock-toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: var(--mblock-transition);
+    border-radius: 12px;
+}
+
+.mblock-toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: var(--mblock-transition);
+    border-radius: 50%;
+}
+
+.mblock-toggle-switch input:checked + .mblock-toggle-slider {
+    background-color: var(--mblock-success-color);
+}
+
+.mblock-toggle-switch input:checked + .mblock-toggle-slider:before {
+    transform: translateX(20px);
+}
+
+/* Dark mode support */
+.rex-theme-dark .mblock_wrapper > div {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.rex-theme-dark .mblock_wrapper > div.mblock-inactive {
+    background: rgba(108, 117, 125, 0.15) !important;
+}
+
+.rex-theme-dark .mblock-toggle-slider {
+    background-color: #555;
+}
+
+/* Dark mode support for button container */
+.rex-theme-dark .mblock_wrapper .mblock-controls {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.8);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .mblock_wrapper .mblock-controls {
+        flex-wrap: wrap;
+        gap: 1px;
+    }
+    
+    .mblock_wrapper .mblock-controls .btn {
+        min-width: 24px;
+        height: 24px;
+        padding: 2px 4px;
+        font-size: 10px;
+    }
+}
+
+/* MBlock v4.0 - Highlight animation for new blocks */
+.mblock-new-highlight {
+    animation: mblock-highlight 1.2s ease-in-out;
+    border-color: #28a745 !important;
+    box-shadow: 0 0 20px rgba(40, 167, 69, 0.3) !important;
+}
+
+@keyframes mblock-highlight {
+    0% { 
+        background-color: rgba(40, 167, 69, 0.2);
+        transform: scale(1.02);
+    }
+    50% { 
+        background-color: rgba(40, 167, 69, 0.1);
+        transform: scale(1.01);
+    }
+    100% { 
+        background-color: rgba(255, 255, 255, 0.09);
+        transform: scale(1);
+    }
+}
+
+/* MBlock v4.0 - Move feedback animations */
+.mblock-move-feedback {
+    animation: mblock-move-pulse 0.4s ease-in-out;
+    border-color: #007bff !important;
+    box-shadow: 0 0 15px rgba(0, 123, 255, 0.4) !important;
+}
+
+.mblock-move-up-feedback {
+    animation: mblock-move-up 0.2s ease-out;
+}
+
+.mblock-move-down-feedback {
+    animation: mblock-move-down 0.2s ease-out;
+}
+
+@keyframes mblock-move-pulse {
+    0% { 
+        background-color: rgba(0, 123, 255, 0.15);
+        transform: scale(1.01);
+    }
+    50% { 
+        background-color: rgba(0, 123, 255, 0.08);
+        transform: scale(1.005);
+    }
+    100% { 
+        background-color: rgba(255, 255, 255, 0.09);
+        transform: scale(1);
+    }
+}
+
+@keyframes mblock-move-up {
+    0% { 
+        transform: translateY(10px);
+        opacity: 0.8;
+    }
+    100% { 
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes mblock-move-down {
+    0% { 
+        transform: translateY(-10px);
+        opacity: 0.8;
+    }
+    100% { 
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Button feedback animations */
+.mblock-btn-clicked {
+    animation: mblock-btn-click 0.2s ease-out;
+}
+
+@keyframes mblock-btn-click {
+    0% { 
+        transform: scale(1);
+    }
+    50% { 
+        transform: scale(0.95);
+        background-color: rgba(0, 123, 255, 0.2) !important;
+    }
+    100% { 
+        transform: scale(1);
+    }
+}
+
 

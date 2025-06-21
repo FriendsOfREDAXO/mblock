@@ -11,6 +11,7 @@ mblock_demo = Beispielsammlung
 mblock_demo_base = Modul-Beispiele
 mblock_demo_mform = MForm Modul-Beispiele
 mblock_demo_html = HTML Modul-Beispiele
+mblock_help = Hilfe
 
 mblock_example_base_teammember_example = Teammitglieder
 mblock_example_base_link_example = Link und Linklist
@@ -47,3 +48,24 @@ mblock_rexform_demo = RexForm MBlock Demo
 rex_form_mblock_demo_entries = Demo Einträge
 rex_form_mblock_demo_entries_add = Demo Eintrag hinzufügen
 rex_form_mblock_demo_entries_edit = Demo Eintrag editieren
+
+# MBlock v3.5 - Tooltip translations
+mblock_v35_tooltip_toggle_active = Block deaktivieren
+mblock_v35_tooltip_toggle_inactive = Block aktivieren
+mblock_v35_tooltip_move_up = Block nach oben verschieben
+mblock_v35_tooltip_move_down = Block nach unten verschieben
+mblock_v35_tooltip_drag_handle = Block per Drag & Drop verschieben
+mblock_v35_tooltip_add = Block hinzufügen
+mblock_v35_tooltip_delete = Block löschen
+mblock_v35_block_active = Aktiv
+mblock_v35_block_inactive = Inaktiv
+
+# MForm Demo Error Messages
+mform_demo_error_title = MForm AddOn erforderlich
+mform_demo_error_message = Diese Demo benötigt das MForm AddOn, welches derzeit nicht verfügbar ist.
+mform_demo_error_instructions = Um diese Demo zu verwenden, installieren Sie bitte das MForm AddOn:
+mform_demo_error_step1 = Gehen Sie zu <strong>AddOns > Installer</strong>
+mform_demo_error_step2 = Suchen Sie nach <strong>"mform"</strong>
+mform_demo_error_step3 = Installieren und aktivieren Sie das AddOn
+mform_demo_error_step4 = Kehren Sie zu dieser Seite zurück
+mform_demo_error_alternative = Alternativ können Sie die <a href="{0}">HTML-Demo</a> verwenden, die ohne zusätzliche AddOns funktioniert.

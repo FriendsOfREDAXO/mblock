@@ -11,6 +11,7 @@ mblock_demo = Exemplos
 mblock_demo_base = Exemplos de módulos
 mblock_demo_mform = Exemplos de módulos MForm
 mblock_demo_html = Exemplos de módulos HTML
+mblock_help = Ajuda
 
 mblock_example_base_teammember_example = Membros do time
 mblock_example_base_link_example = Link e lista de links
@@ -42,3 +43,28 @@ mblock_not_delete_confirm = Desativada a confirmação antes da exclusão de Blo
 mblock_ok_delete_confirm = Ativada a confirmação antes da exclusão de Blocos
 mblock_delete_confirm_label = Confirmação antes da exclusão
 mblock_delete_confirm = Deletar o bloco?
+
+rex_form_mblock_demo_entries = Entradas de demonstração
+rex_form_mblock_demo_entries_add = Adicionar entrada de demonstração
+rex_form_mblock_demo_entries_edit = Editar entrada de demonstração
+
+# MBlock v3.5 - Tooltip translations
+mblock_v35_tooltip_toggle_active = Desativar bloco
+mblock_v35_tooltip_toggle_inactive = Ativar bloco
+mblock_v35_tooltip_move_up = Mover bloco para cima
+mblock_v35_tooltip_move_down = Mover bloco para baixo
+mblock_v35_tooltip_drag_handle = Mover bloco arrastando e soltando
+mblock_v35_tooltip_add = Adicionar bloco
+mblock_v35_tooltip_delete = Excluir bloco
+mblock_v35_block_active = Ativo
+mblock_v35_block_inactive = Inativo
+
+# MForm Demo Error Messages
+mform_demo_error_title = AddOn MForm Obrigatório
+mform_demo_error_message = Esta demonstração requer o AddOn MForm, que não está disponível no momento.
+mform_demo_error_instructions = Para usar esta demonstração, instale o AddOn MForm:
+mform_demo_error_step1 = Vá para <strong>AddOns > Instalador</strong>
+mform_demo_error_step2 = Procure por <strong>"mform"</strong>
+mform_demo_error_step3 = Instale e ative o AddOn
+mform_demo_error_step4 = Retorne a esta página
+mform_demo_error_alternative = Alternativamente, você pode usar a <a href="{0}">Demonstração HTML</a> que funciona sem AddOns adicionais.

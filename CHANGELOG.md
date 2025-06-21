@@ -1,5 +1,33 @@
 # MBlock - REDAXO Addon für Modul-Input-Blöcke
 
+### Version 5.0.0 - Modernes Build-System & Performance 🚀
+
+1.  **Modernes Build-System:** Rollup-basiertes Bundling mit NPM Scripts (`build`, `prod`, `dev`, `clean`) und Shell-Scripts für erweiterte Optionen.
+2.  **Performance-Optimierung:** Minifiziertes Bundle (16.8KB, 62% kleiner), alle Console-Logs in Production entfernt, Dead Code Elimination.
+3.  **Robustes Smooth Scrolling:** Verbesserte Scroll-Logik mit Fallback für versteckte/getabbte Blöcke, 2s visuelle Highlights für neue Blöcke.
+4.  **Zentralisierte Button-Bar:** Einheitliche Controls für alle Blöcke, neue Reihenfolge (Delete, Toggle, Move, Add), streamlined Code.
+5.  **Visuelles Feedback:** Animationen für alle Control-Buttons (Move-Pulse, Button-Clicks, Block-Highlights), moderne UI-Animationen.
+6.  **Build-System-Integration:** Git-freundliche Konfiguration, `node_modules` ausgeschlossen, automatische Build-Info-Generierung.
+7.  **Code-Refactoring:** Generalisierte Funktionsnamen, entfernte Legacy-Code, saubere moderne Codebase.
+8.  **Production-Ready:** ES5-Kompatibilität, optimierte Ladezeiten, professionelle Deployment-Scripts.
+9.  **Dokumentations-Konsolidierung:** Komplette Build-Dokumentation in README integriert, überflüssige .md-Dateien entfernt.
+
+---
+
+### Version 4.0.0 - Complete Modernization & Backend Integration 🚀
+
+1.  **Complete Backend Integration:** Dedicated backend pages for Help/Docs (integrated README), Demos, Debugging, and navigation.
+2.  **New Block Toggle System:** Blocks can be toggled on/off (not deleted). New API methods: `getBlocks()` (active only) and `getAllBlocks()` (all).
+3.  **Full UI Overhaul:** Modern buttons, drag handle, Dark Mode, responsive design, CSS variables for easy customization.
+4.  **Revised JavaScript Event System:** More robust with new events (`mblock:toggle`, `mblock:ready`) and improved existing ones.
+5.  **Extended API:** Simplified methods for developers.
+6.  **Greatly Improved Documentation:** New, detailed README and guides (migration, widgets, etc.).
+7.  **Numerous Bug Fixes:** Improved stability, data handling, and UI consistency.
+8.  **Performance Optimizations & Code Cleanup:** More efficient and streamlined codebase.
+9.  **Full Backwards Compatibility:** No Breaking Changes. Existing modules work unchanged.
+
+---
+
 ### Version 3.4.0 - 3.4.3
 * rex_version::compare fixed for REDAXO >= 5.12
 * dark-mode support for REDAXO >= 5.13

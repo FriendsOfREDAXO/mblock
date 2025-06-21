@@ -24,6 +24,11 @@ class MBlock
     private static $output = array();
 
     /**
+     * @var array - Stores toggle states for blocks
+     */
+    private static $toggleStates = array();
+
+    /**
      * MBlock constructor.
      * @author Joachim Doerr
      */
@@ -32,6 +37,83 @@ class MBlock
         // create mblock page count is not exist
         if (!isset($_SESSION['mblock_count'])) {
             $_SESSION['mblock_count'] = 0;
+        }
+    }
+
+    /**
+     * Get only active blocks - new simplified API for v3.5
+     * @param string $rexValue - The REX_VALUE reference like "REX_VALUE[1]"
+     * @return array
+     * @author MBlock v3.5
+     */
+    public static function getBlocks($rexValue)
+    {
+        // Load data using rex_var
+        $blocks = rex_var::toArray($rexValue);
+        
+        if (!is_array($blocks)) {
+            return array();
+        }
+        
+        // Use the simplified ToggleHandler to filter active blocks
+        $activeBlocks = MBlockToggleHandler::filterActiveBlocks($blocks);
+        
+        if (rex::isDebugMode()) {
+            MBlockToggleHandler::debugToggleStates($blocks, 'MBlock::getBlocks()');
+            dump('MBlock v3.5 getBlocks() - Active blocks:', $activeBlocks);
+        }
+        
+        return $activeBlocks;
+    }
+
+    /**
+     * Get all blocks including inactive ones
+     * @param string $rexValue - The REX_VALUE reference like "REX_VALUE[1]"
+     * @return array
+     * @author MBlock v3.5
+     */
+    public static function getAllBlocks($rexValue)
+    {
+        $blocks = rex_var::toArray($rexValue);
+        
+        if (!is_array($blocks)) {
+            return array();
+        }
+        
+        if (rex::isDebugMode()) {
+            dump('MBlock v3.5 getAllBlocks() - All blocks:', $blocks);
+        }
+        
+        return $blocks;
+    }
+
+    /**
+     * Check if a specific block is active - removed complex session logic
+     * Now we check directly in the block data
+     * @param string $valueId
+     * @param int $blockIndex
+     * @return bool
+     * @author MBlock v3.5
+     */
+    private static function isBlockActive($valueId, $blockIndex)
+    {
+        trigger_error('MBlock::isBlockActive() is deprecated and will be removed in future versions. Use MBlock::getBlocks() instead.', E_USER_DEPRECATED);
+        return true;
+    }
+
+    /**
+     * Set toggle state for a block - simplified version
+     * @param string $valueId
+     * @param int $blockIndex
+     * @param bool $active
+     * @author MBlock v3.5
+     */
+    public static function setBlockToggle($valueId, $blockIndex, $active = true)
+    {
+        // This is now handled by the form data itself
+        // The mblock_active field is automatically included in the form data
+        if (rex::isDebugMode()) {
+            dump('MBlock v3.5 setBlockToggle() - Toggle state will be saved with form data');
         }
     }
 
@@ -170,7 +252,7 @@ class MBlock
         }
 
         $addText = (isset($settings['initial_button_text'])) ? ' ' . $settings['initial_button_text'] : '';
-        $addItem = rex_escape('<div class="mblock-single-add"><span class="singleadded"><button type="button" class="btn btn-default addme" title="duplicate"><i class="rex-icon rex-icon-add-module"></i>' . $addText . '</button></span></div>');
+        $addItem = rex_escape('<div class="mblock-single-add"><span class="singleadded"><button type="button" class="btn btn-success mblock-add-btn" title="duplicate"><i class="rex-icon rex-icon-add-module"></i>' . $addText . '</button></span></div>');
         $plainItem = rex_escape(self::createOutput($plainItem, 0, $theme));
 
         // wrap parsed form items
@@ -235,6 +317,9 @@ class MBlock
 
         // set only checkbox block holder
         $item->setForm(MBlockCheckboxReplacer::replaceCheckboxesBlockHolder($item, $count));
+        
+        // MBlock v3.5 - Add hidden toggle field automatically
+        $item->setForm(self::addToggleField($item, $count));
 
         // parse form item
         $element = new MBlockElement();
@@ -252,6 +337,35 @@ class MBlock
         }
 
         return $output;
+    }
+
+    /**
+     * Add hidden toggle field to form - MBlock v3.5
+     * @param MBlockItem $item
+     * @param int $count
+     * @return string
+     * @author MBlock v3.5
+     */
+    private static function addToggleField(MBlockItem $item, $count)
+    {
+        $form = $item->getForm();
+        
+        // Get current toggle state from item result
+        $result = $item->getResult();
+        
+        // Only add toggle field if block is explicitly set to inactive
+        if (is_array($result) && isset($result['mblock_active']) && $result['mblock_active'] == '0') {
+            // Block is inactive - add hidden field with value 0
+            $hiddenField = '<input type="hidden" name="REX_INPUT_VALUE[' . $item->getValueId() . '][' . $count . '][mblock_active]" value="0" class="mblock-toggle-field" />';
+            $form .= $hiddenField;
+            
+            if (rex::isDebugMode()) {
+                dump('MBlock v3.5 addToggleField() - Added INACTIVE toggle field:', $hiddenField);
+            }
+        }
+        // If no mblock_active field or it's set to 1, don't add anything (active is default)
+        
+        return $form;
     }
 
     /**
