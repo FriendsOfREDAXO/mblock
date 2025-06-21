@@ -59,3 +59,13 @@ mblock_v35_tooltip_add = Add block
 mblock_v35_tooltip_delete = Delete block
 mblock_v35_block_active = Active
 mblock_v35_block_inactive = Inactive
+
+# MForm Demo Error Messages
+mform_demo_error_title = MForm AddOn Required
+mform_demo_error_message = This demo requires the MForm AddOn, which is currently not available.
+mform_demo_error_instructions = To use this demo, please install the MForm AddOn:
+mform_demo_error_step1 = Go to <strong>AddOns > Installer</strong>
+mform_demo_error_step2 = Search for <strong>"mform"</strong>
+mform_demo_error_step3 = Install and activate the AddOn
+mform_demo_error_step4 = Return to this page
+mform_demo_error_alternative = Alternatively, you can use the <a href="{0}">HTML Demo</a> which works without additional AddOns.

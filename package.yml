@@ -21,8 +21,6 @@ page:
 
 requires:
     redaxo: ^5.12.0
-    packages:
-        mform: ^8.1.0
     php:
         version: ^8.1
         extensions: [xml]

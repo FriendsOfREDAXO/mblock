@@ -59,3 +59,13 @@ mblock_v35_tooltip_add = Lägg till block
 mblock_v35_tooltip_delete = Ta bort block
 mblock_v35_block_active = Aktiv
 mblock_v35_block_inactive = Inaktiv
+
+# MForm Demo Error Messages
+mform_demo_error_title = MForm AddOn Krävs
+mform_demo_error_message = Denna demo kräver MForm AddOn, som för närvarande inte är tillgängligt.
+mform_demo_error_instructions = För att använda denna demo, installera MForm AddOn:
+mform_demo_error_step1 = Gå till <strong>AddOns > Installer</strong>
+mform_demo_error_step2 = Sök efter <strong>"mform"</strong>
+mform_demo_error_step3 = Installera och aktivera AddOn
+mform_demo_error_step4 = Återvänd till denna sida
+mform_demo_error_alternative = Alternativt kan du använda <a href="{0}">HTML Demo</a> som fungerar utan ytterligare AddOns.

@@ -1,8 +1,35 @@
 <?php
 /**
- * MBlock v4.0 - MForm Demo mit Input/Output Tabs
+ * MBlock v5.0 - MForm Demo mit Input/Output Tabs
  * Demonstration von MBlock mit MForm und Tab-Darstellung für Code-Beispiele
  */
+
+// Check if MForm addon is installed and available
+$mform_addon = rex_addon::get('mform');
+if (!$mform_addon->isInstalled() || !$mform_addon->isAvailable()) {
+    $content = '<div class="rex-page-header">
+        <h1 class="rex-page-title">MBlock v5.0 - MForm Demo</h1>
+    </div>';
+    
+    $htmlDemoUrl = rex_url::currentBackendPage(['page' => 'mblock/demo/demo_html']);
+    $alternativeText = rex_i18n::msg('mform_demo_error_alternative', $htmlDemoUrl);
+    
+    $content .= rex_view::error('
+        <h4><i class="rex-icon fa-exclamation-triangle"></i> ' . rex_i18n::msg('mform_demo_error_title') . '</h4>
+        <p><strong>' . rex_i18n::msg('mform_demo_error_message') . '</strong></p>
+        <p>' . rex_i18n::msg('mform_demo_error_instructions') . '</p>
+        <ol>
+            <li>' . rex_i18n::msg('mform_demo_error_step1') . '</li>
+            <li>' . rex_i18n::msg('mform_demo_error_step2') . '</li>
+            <li>' . rex_i18n::msg('mform_demo_error_step3') . '</li>
+            <li>' . rex_i18n::msg('mform_demo_error_step4') . '</li>
+        </ol>
+        <p><small><i class="rex-icon fa-info-circle"></i> ' . $alternativeText . '</small></p>
+    ');
+    
+    echo $content;
+    return;
+}
 
 use FriendsOfRedaxo\MForm;
 
@@ -14,7 +41,7 @@ if (rex_post('submit', 'bool')) {
 $content = '';
 
 $content .= '<div class="rex-page-header">
-    <h1 class="rex-page-title">MBlock v4.0 - MForm Demo</h1>
+    <h1 class="rex-page-title">MBlock v5.0 - MForm Demo</h1>
 </div>';
 
 $content .= '<div class="alert alert-info">
@@ -24,7 +51,7 @@ $content .= '<div class="alert alert-info">
 
 $content .= '<div class="panel panel-primary">
     <div class="panel-heading">
-        <h3 class="panel-title"><i class="rex-icon fa-cubes"></i> MBlock v4.0 - MForm Beispiele</h3>
+        <h3 class="panel-title"><i class="rex-icon fa-cubes"></i> MBlock v5.0 - MForm Beispiele</h3>
     </div>
     <div class="panel-body">
         <p>Diese Demo zeigt die wichtigsten MBlock-Features mit 4 praktischen MForm-Beispielen:</p>
