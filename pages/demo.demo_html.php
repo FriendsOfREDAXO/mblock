@@ -1,548 +1,447 @@
 <?php
 /**
- * MBlock v4.0 - HTML Demo mit Input/Output Tabs
- * Demonstration der reinen HTML-Verwendung von MBlock basiert auf den Original-Examples
+ * MBlock HTML Demo - Vereinfachte Demo mit verschiedenen Feldtypen
+ * Zeigt eine einzige, klare Demo mit verschiedenen HTML-Elementen und Widget-Erklärungen
  */
 
-$content = '<div class="rex-page-header">
-    <h1 class="rex-page-title">MBlock v4.0 - HTML Demo</h1>
-</div>';
+$content = '';
 
-$content .= '<div class="alert alert-info">
-    <strong>HTML Demo:</strong> Diese Seite zeigt die korrekte HTML-Verwendung von MBlock basierend auf den Original-Examples. 
-    Input- und Output-Code werden in separaten Tabs dargestellt.
-</div>';
+echo rex_view::title('MBlock HTML Demo - Verschiedene Feldtypen');
 
-// ======================
-// 1. EINFACHES BEISPIEL - Teammitglieder
-// ======================
-$content .= '<div class="panel panel-primary">
-    <div class="panel-heading">
-        <h4>1. Einfach - Teammitglieder (wie html1_teammember_example)</h4>
-    </div>
-    <div class="panel-body">
-        <div class="row">
-            <div class="col-md-6">';
-
-// Echtes MBlock Beispiel basierend auf html1_teammember_example.ini
-$id1 = 1;
-$teamForm = '
-<fieldset class="form-horizontal">
-    <legend>Team member</legend>
-    <div class="form-group">
-        <div class="col-sm-2 control-label"><label for="rv2_1_0_name">Name</label></div>
-        <div class="col-sm-10">
-            <input id="rv2_1_0_name" type="text" name="REX_INPUT_VALUE[' . $id1 . '][0][name]" value="" class="form-control">
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="col-sm-2 control-label"><label>Avatar</label></div>
-        <div class="col-sm-10">
-            REX_MEDIA[id="1" widget="1"]
-        </div>
-    </div>
-</fieldset>';
-
-$content .= MBlock::show($id1, $teamForm);
-
-$content .= '</div>
-            <div class="col-md-6">
-                <!-- Tab Navigation -->
-                <ul class="nav nav-tabs" role="tablist">
-                    <li role="presentation" class="active">
-                        <a href="#code-input-1" aria-controls="code-input-1" role="tab" data-toggle="tab">
-                            <i class="rex-icon fa-pencil"></i> Modul-Input
-                        </a>
-                    </li>
-                    <li role="presentation">
-                        <a href="#code-output-1" aria-controls="code-output-1" role="tab" data-toggle="tab">
-                            <i class="rex-icon fa-eye"></i> Modul-Output
-                        </a>
-                    </li>
-                </ul>
-                
-                <!-- Tab Content -->
-                <div class="tab-content" style="border: 1px solid #ddd; border-top: none;">
-                    <div role="tabpanel" class="tab-pane active" id="code-input-1">
-                        <pre class="code-example">' . htmlentities('<?php
-// Modul-Input (html1_teammember_example.ini)
-$id = 1;
-
-$form = <<<EOT
-<fieldset class="form-horizontal">
-    <legend>Team member</legend>
-    <div class="form-group">
-        <div class="col-sm-2 control-label">
-            <label for="rv2_1_0_name">Name</label>
-        </div>
-        <div class="col-sm-10">
-            <input id="rv2_1_0_name" type="text" 
-                   name="REX_INPUT_VALUE[$id][0][name]" 
-                   value="" class="form-control">
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="col-sm-2 control-label"><label>Avatar</label></div>
-        <div class="col-sm-10">
-            REX_MEDIA[id="1" widget="1"]
-        </div>
-    </div>
-</fieldset>
-EOT;
-
-echo MBlock::show($id, $form);
-?>') . '</pre>
-                    </div>
-                    <div role="tabpanel" class="tab-pane" id="code-output-1">
-                        <pre class="code-example">' . htmlentities('<?php
-// Modul-Output (html1_teammember_example_output.ini)
-echo \'<pre>\';
-print_r(rex_var::toArray("REX_VALUE[1]"));
-echo \'</pre>\';
-
-// Oder formatierte Ausgabe:
-$blocks = rex_var::toArray("REX_VALUE[1]");
-foreach($blocks as $block) {
-    echo \'<div class="team-member">\';
-    echo \'<h3>\' . $block[\'name\'] . \'</h3>\';
-    
-    // Avatar anzeigen
-    if(!empty($block[\'REX_MEDIA_1\'])) {
-        $media = rex_media::get($block[\'REX_MEDIA_1\']);
-        if($media) {
-            echo \'<img src="\' . $media->getUrl() . \'" alt="">\';
-        }
-    }
-    echo \'</div>\';
-}
-?>') . '</pre>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>';
-
-// ======================
-// 2. LINK BEISPIEL
-// ======================
-$content .= '<div class="panel panel-info">
-    <div class="panel-heading">
-        <h4>2. Links - Einzellinks und Listen (wie html2_link_example)</h4>
-    </div>
-    <div class="panel-body">
-        <div class="row">
-            <div class="col-md-6">';
-
-// Link MBlock Beispiel basierend auf html2_link_example.ini
-$id2 = 2;
-$linkForm = '
-<fieldset class="form-horizontal">
-    <legend>Links</legend> 
-    <div class="form-group">
-        <div class="col-sm-2 control-label"><label>Link</label></div>
-        <div class="col-sm-10">
-            REX_LINK[id="1" widget="1"]
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="col-sm-2 control-label"><label>Link list</label></div>
-        <div class="col-sm-10">
-            REX_LINKLIST[id="1" widget="1"]
-        </div>
-    </div>
-</fieldset>';
-
-$content .= MBlock::show($id2, $linkForm);
-
-$content .= '</div>
-            <div class="col-md-6">
-                <!-- Tab Navigation -->
-                <ul class="nav nav-tabs" role="tablist">
-                    <li role="presentation" class="active">
-                        <a href="#code-input-2" aria-controls="code-input-2" role="tab" data-toggle="tab">
-                            <i class="rex-icon fa-pencil"></i> Modul-Input
-                        </a>
-                    </li>
-                    <li role="presentation">
-                        <a href="#code-output-2" aria-controls="code-output-2" role="tab" data-toggle="tab">
-                            <i class="rex-icon fa-eye"></i> Modul-Output
-                        </a>
-                    </li>
-                </ul>
-                
-                <!-- Tab Content -->
-                <div class="tab-content" style="border: 1px solid #ddd; border-top: none;">
-                    <div role="tabpanel" class="tab-pane active" id="code-input-2">
-                        <pre class="code-example">' . htmlentities('<?php
-// Modul-Input (html2_link_example.ini)
-$id = 2;
-
-$form = <<<EOT
-<fieldset class="form-horizontal">
-    <legend>Links</legend> 
-    <div class="form-group">
-        <div class="col-sm-2 control-label"><label>Link</label></div>
-        <div class="col-sm-10">
-            REX_LINK[id="1" widget="1"]
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="col-sm-2 control-label"><label>Link list</label></div>
-        <div class="col-sm-10">
-            REX_LINKLIST[id="1" widget="1"]
-        </div>
-    </div>
-</fieldset>
-EOT;
-
-echo MBlock::show($id, $form);
-?>') . '</pre>
-                    </div>
-                    <div role="tabpanel" class="tab-pane" id="code-output-2">
-                        <pre class="code-example">' . htmlentities('<?php
-// Modul-Output für Link-Widgets
-$blocks = rex_var::toArray("REX_VALUE[2]");
-foreach($blocks as $block) {
-    // Einzellink
-    if(!empty($block[\'REX_LINK_1\'])) {
-        $article = rex_article::get($block[\'REX_LINK_1\']);
-        if($article) {
-            echo \'<a href="\' . $article->getUrl() . \'">\';
-            echo $article->getName();
-            echo \'</a><br>\';
-        }
-    }
-    
-    // Link-Liste
-    if(!empty($block[\'REX_LINKLIST_1\'])) {
-        $linkList = explode(\',\', $block[\'REX_LINKLIST_1\']);
-        echo \'<ul>\';
-        foreach($linkList as $linkId) {
-            $article = rex_article::get($linkId);
-            if($article) {
-                echo \'<li><a href="\' . $article->getUrl() . \'">\';
-                echo $article->getName();
-                echo \'</a></li>\';
-            }
-        }
-        echo \'</ul>\';
-    }
-}
-?>') . '</pre>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>';
-
-// ======================
-// 3. MEDIA BEISPIEL
-// ======================
-$content .= '<div class="panel panel-success">
-    <div class="panel-heading">
-        <h4>3. Media - Einzelbilder und Listen (wie html3_media_example)</h4>
-    </div>
-    <div class="panel-body">
-        <div class="row">
-            <div class="col-md-6">';
-
-// Media MBlock Beispiel basierend auf html3_media_example.ini
-$id3 = 3;
-$mediaForm = '
-<fieldset class="form-horizontal">
-    <legend>Media</legend> 
-    <div class="form-group">
-        <div class="col-sm-2 control-label"><label>Media</label></div>
-        <div class="col-sm-10">
-            REX_MEDIA[id="1" widget="1"]
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="col-sm-2 control-label"><label>Media list</label></div>
-        <div class="col-sm-10">
-            REX_MEDIALIST[id="1" widget="1"]
-        </div>
-    </div>
-</fieldset>';
-
-$content .= MBlock::show($id3, $mediaForm);
-
-$content .= '</div>
-            <div class="col-md-6">
-                <!-- Tab Navigation -->
-                <ul class="nav nav-tabs" role="tablist">
-                    <li role="presentation" class="active">
-                        <a href="#code-input-3" aria-controls="code-input-3" role="tab" data-toggle="tab">
-                            <i class="rex-icon fa-pencil"></i> Modul-Input
-                        </a>
-                    </li>
-                    <li role="presentation">
-                        <a href="#code-output-3" aria-controls="code-output-3" role="tab" data-toggle="tab">
-                            <i class="rex-icon fa-eye"></i> Modul-Output
-                        </a>
-                    </li>
-                </ul>
-                
-                <!-- Tab Content -->
-                <div class="tab-content" style="border: 1px solid #ddd; border-top: none;">
-                    <div role="tabpanel" class="tab-pane active" id="code-input-3">
-                        <pre class="code-example">' . htmlentities('<?php
-// Modul-Input (html3_media_example.ini)
-$id = 3;
-
-$form = <<<EOT
-<fieldset class="form-horizontal">
-    <legend>Media</legend> 
-    <div class="form-group">
-        <div class="col-sm-2 control-label"><label>Media</label></div>
-        <div class="col-sm-10">
-            REX_MEDIA[id="1" widget="1"]
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="col-sm-2 control-label"><label>Media list</label></div>
-        <div class="col-sm-10">
-            REX_MEDIALIST[id="1" widget="1"]
-        </div>
-    </div>
-</fieldset>
-EOT;
-
-echo MBlock::show($id, $form);
-?>') . '</pre>
-                    </div>
-                    <div role="tabpanel" class="tab-pane" id="code-output-3">
-                        <pre class="code-example">' . htmlentities('<?php
-// Modul-Output für Media-Widgets
-$blocks = rex_var::toArray("REX_VALUE[3]");
-foreach($blocks as $block) {
-    // Einzelbild
-    if(!empty($block[\'REX_MEDIA_1\'])) {
-        $media = rex_media::get($block[\'REX_MEDIA_1\']);
-        if($media) {
-            echo \'<img src="\' . $media->getUrl() . \'" alt="">\';
-        }
-    }
-    
-    // Medien-Liste
-    if(!empty($block[\'REX_MEDIALIST_1\'])) {
-        $mediaList = explode(\',\', $block[\'REX_MEDIALIST_1\']);
-        echo \'<div class="media-gallery">\';
-        foreach($mediaList as $mediaFile) {
-            $media = rex_media::get($mediaFile);
-            if($media) {
-                echo \'<img src="\' . $media->getUrl() . \'" alt="">\';
-            }
-        }
-        echo \'</div>\';
-    }
-}
-?>') . '</pre>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>';
-
-// ======================
-// 4. DEFAULTS BEISPIEL
-// ======================
-$content .= '<div class="panel panel-warning">
-    <div class="panel-heading">
-        <h4>4. Erweitert - Mit Standardwerten (wie html4_defaults_example)</h4>
-    </div>
-    <div class="panel-body">
-        <div class="row">
-            <div class="col-md-6">';
-
-// Defaults MBlock Beispiel basierend auf html4_defaults_example.ini
-$id4 = 4;
-$defaultsForm = '
-<fieldset class="form-horizontal">
-    <legend>Name und Link</legend>
-    <div class="form-group">
-        <div class="col-sm-2 control-label"><label for="rv2_4_0_name">Name</label></div>
-        <div class="col-sm-10">
-            <input id="rv2_4_0_name" type="text" name="REX_INPUT_VALUE[' . $id4 . '][0][name]" value="" class="form-control">
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="col-sm-2 control-label"><label>Link</label></div>
-        <div class="col-sm-10">
-            REX_LINK[id="1" widget="1"]
-        </div>
-    </div>
-</fieldset>';
-
-$content .= MBlock::show($id4, $defaultsForm, array(
-    'label' => 'Erweiterte Blöcke',
-    'min' => 1,
-    'max' => 10
-));
-
-$content .= '</div>
-            <div class="col-md-6">
-                <!-- Tab Navigation -->
-                <ul class="nav nav-tabs" role="tablist">
-                    <li role="presentation" class="active">
-                        <a href="#code-input-4" aria-controls="code-input-4" role="tab" data-toggle="tab">
-                            <i class="rex-icon fa-pencil"></i> Modul-Input
-                        </a>
-                    </li>
-                    <li role="presentation">
-                        <a href="#code-output-4" aria-controls="code-output-4" role="tab" data-toggle="tab">
-                            <i class="rex-icon fa-eye"></i> Modul-Output
-                        </a>
-                    </li>
-                </ul>
-                
-                <!-- Tab Content -->
-                <div class="tab-content" style="border: 1px solid #ddd; border-top: none;">
-                    <div role="tabpanel" class="tab-pane active" id="code-input-4">
-                        <pre class="code-example">' . htmlentities('<?php
-// Modul-Input (html4_defaults_example.ini)
-$id = 4;
-
-$form = <<<EOT
-<fieldset class="form-horizontal">
-    <legend>Name und Link</legend>
-    <div class="form-group">
-        <div class="col-sm-2 control-label">
-            <label for="rv2_4_0_name">Name</label>
-        </div>
-        <div class="col-sm-10">
-            <input id="rv2_4_0_name" type="text" 
-                   name="REX_INPUT_VALUE[$id][0][name]" 
-                   value="" class="form-control">
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="col-sm-2 control-label"><label>Link</label></div>
-        <div class="col-sm-10">
-            REX_LINK[id="1" widget="1"]
-        </div>
-    </div>
-</fieldset>
-EOT;
-
-echo MBlock::show($id, $form, array(
-    \'label\' => \'Erweiterte Blöcke\',
-    \'min\' => 1,
-    \'max\' => 10
-));
-?>') . '</pre>
-                    </div>
-                    <div role="tabpanel" class="tab-pane" id="code-output-4">
-                        <pre class="code-example">' . htmlentities('<?php
-// Modul-Output (html4_defaults_example_output.ini)
-echo \'<pre>\';
-print_r(rex_var::toArray("REX_VALUE[4]"));
-echo \'</pre>\';
-
-// Oder formatierte Ausgabe:
-$blocks = rex_var::toArray("REX_VALUE[4]");
-foreach($blocks as $block) {
-    echo \'<div class="name-link-block">\';
-    echo \'<h3>\' . $block[\'name\'] . \'</h3>\';
-    
-    // Link anzeigen
-    if(!empty($block[\'REX_LINK_1\'])) {
-        $article = rex_article::get($block[\'REX_LINK_1\']);
-        if($article) {
-            echo \'<a href="\' . $article->getUrl() . \'">\';
-            echo \'Zum Artikel: \' . $article->getName();
-            echo \'</a>\';
-        }
-    }
-    echo \'</div>\';
-}
-?>') . '</pre>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>';
-
-// Zusätzliche Informationen
-$content .= '<div class="alert alert-success">
-    <h4>Wichtige Syntax-Regeln für MBlock HTML:</h4>
+$fragment = new rex_fragment();
+$fragment->setVar('title', 'HTML Form Felder mit MBlock', false);
+$fragment->setVar('body', '
+<div class="alert alert-info">
+    <strong>Diese Demo zeigt:</strong>
     <ul>
-        <li><strong>Input-Felder:</strong> <code>name="REX_INPUT_VALUE[ID][0][feldname]"</code></li>
-        <li><strong>Output-Daten:</strong> <code>rex_var::toArray("REX_VALUE[ID]")</code></li>
-        <li><strong>REDAXO-Widgets:</strong> <code>REX_MEDIA[id="1" widget="1"]</code>, <code>REX_LINK[id="1" widget="1"]</code>, <code>REX_MEDIALIST[id="1" widget="1"]</code>, <code>REX_LINKLIST[id="1" widget="1"]</code></li>
-        <li><strong>Block-Index:</strong> Die <code>0</code> wird automatisch durch <code>0, 1, 2, ...</code> ersetzt</li>
-        <li><strong>Widget-Ausgabe:</strong> Media-Widgets speichern in <code>REX_MEDIA_1</code>, Link-Widgets in <code>REX_LINK_1</code></li>
-        <li><strong>Einstellungen:</strong> <code>min</code>, <code>max</code>, <code>label</code>, <code>initial_hidden</code></li>
-        <li><strong>FALSCHE Variablen:</strong> <code>REX_MBLOCK_VALUE</code> und <code>REX_MBLOCK_ID</code> existieren NICHT!</li>
+        <li>Verschiedene HTML-Feldtypen (Text, Select, Textarea, Checkbox, Radio)</li>
+        <li>Fake-Widgets als Platzhalter für echte REDAXO-Widgets</li>
+        <li>Wie MBlock mit verschiedenen Input-Elementen funktioniert</li>
+    </ul>
+</div>
+', false);
+echo $fragment->parse('core/page/section.php');
+
+// Demo-Werte für Vorschau
+$demo_data = [
+    [
+        'title' => 'Erster Eintrag',
+        'type' => 'artikel',
+        'description' => 'Dies ist eine Beispiel-Beschreibung für den ersten Eintrag.',
+        'active' => '1',
+        'priority' => 'hoch',
+        'media_id' => '1',
+        'link_id' => '5'
+    ],
+    [
+        'title' => 'Zweiter Eintrag',
+        'type' => 'news',
+        'description' => 'Eine weitere Beschreibung für den zweiten Eintrag mit mehr Text.',
+        'active' => '0',
+        'priority' => 'mittel',
+        'media_id' => '2',
+        'link_id' => '10'
+    ]
+];
+
+$mblock_id = 1;
+$content .= '
+<form>
+    <div class="form-group">
+        <label>Demo MBlock mit verschiedenen Feldtypen:</label>
+        
+        <!-- MBlock Container -->
+        <div class="mblock" data-mblock-id="' . $mblock_id . '">
+            
+            <!-- MBlock Items -->';
+
+foreach ($demo_data as $index => $item) {
+    $content .= '
+            <div class="mblock-item" data-mblock-id="' . $mblock_id . '" data-mblock-count="' . ($index + 1) . '">
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <!-- Text Input -->
+                        <div class="form-group">
+                            <label>Titel:</label>
+                            <input type="text" 
+                                   name="mblock[' . $mblock_id . '][' . ($index + 1) . '][title]" 
+                                   value="' . htmlspecialchars($item['title']) . '"
+                                   class="form-control"
+                                   placeholder="Titel eingeben...">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <!-- Select Dropdown -->
+                        <div class="form-group">
+                            <label>Typ:</label>
+                            <select name="mblock[' . $mblock_id . '][' . ($index + 1) . '][type]" class="form-control">
+                                <option value="">-- Typ wählen --</option>
+                                <option value="artikel"' . ($item['type'] == 'artikel' ? ' selected' : '') . '>Artikel</option>
+                                <option value="news"' . ($item['type'] == 'news' ? ' selected' : '') . '>News</option>
+                                <option value="event"' . ($item['type'] == 'event' ? ' selected' : '') . '>Event</option>
+                                <option value="galerie"' . ($item['type'] == 'galerie' ? ' selected' : '') . '>Galerie</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- Textarea -->
+                        <div class="form-group">
+                            <label>Beschreibung:</label>
+                            <textarea name="mblock[' . $mblock_id . '][' . ($index + 1) . '][description]" 
+                                      class="form-control" 
+                                      rows="3"
+                                      placeholder="Beschreibung eingeben...">' . htmlspecialchars($item['description']) . '</textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-4">
+                        <!-- Checkbox -->
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" 
+                                           name="mblock[' . $mblock_id . '][' . ($index + 1) . '][active]" 
+                                           value="1"' . ($item['active'] ? ' checked' : '') . '>
+                                    Aktiv
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <!-- Radio Buttons -->
+                        <div class="form-group">
+                            <label>Priorität:</label><br>
+                            <div class="radio-inline">
+                                <label>
+                                    <input type="radio" 
+                                           name="mblock[' . $mblock_id . '][' . ($index + 1) . '][priority]" 
+                                           value="hoch"' . ($item['priority'] == 'hoch' ? ' checked' : '') . '>
+                                    Hoch
+                                </label>
+                            </div>
+                            <div class="radio-inline">
+                                <label>
+                                    <input type="radio" 
+                                           name="mblock[' . $mblock_id . '][' . ($index + 1) . '][priority]" 
+                                           value="mittel"' . ($item['priority'] == 'mittel' ? ' checked' : '') . '>
+                                    Mittel
+                                </label>
+                            </div>
+                            <div class="radio-inline">
+                                <label>
+                                    <input type="radio" 
+                                           name="mblock[' . $mblock_id . '][' . ($index + 1) . '][priority]" 
+                                           value="niedrig"' . ($item['priority'] == 'niedrig' ? ' checked' : '') . '>
+                                    Niedrig
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <!-- Hidden Input für Sortierung -->
+                        <input type="hidden" 
+                               name="mblock[' . $mblock_id . '][' . ($index + 1) . '][sort]" 
+                               value="' . ($index + 1) . '">
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <!-- Fake Media Widget -->
+                        <div class="form-group">
+                            <label>Bild (Fake Media Widget):</label>
+                            <div class="input-group">
+                                <input type="text" 
+                                       name="mblock[' . $mblock_id . '][' . ($index + 1) . '][media_id]" 
+                                       value="' . $item['media_id'] . '"
+                                       class="form-control"
+                                       placeholder="Media ID"
+                                       readonly>
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-default" disabled>
+                                        <i class="fa fa-picture-o"></i> Media wählen
+                                    </button>
+                                </span>
+                            </div>
+                            <small class="help-block">
+                                <strong>Hinweis:</strong> In echter Verwendung würde hier ein 
+                                <code>REX_MEDIA_WIDGET</code> stehen.
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <!-- Fake Link Widget -->
+                        <div class="form-group">
+                            <label>Link (Fake Link Widget):</label>
+                            <div class="input-group">
+                                <input type="text" 
+                                       name="mblock[' . $mblock_id . '][' . ($index + 1) . '][link_id]" 
+                                       value="' . $item['link_id'] . '"
+                                       class="form-control"
+                                       placeholder="Artikel ID"
+                                       readonly>
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-default" disabled>
+                                        <i class="fa fa-link"></i> Link wählen
+                                    </button>
+                                </span>
+                            </div>
+                            <small class="help-block">
+                                <strong>Hinweis:</strong> In echter Verwendung würde hier ein 
+                                <code>REX_LINK_WIDGET</code> stehen.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>';
+}
+
+$content .= '
+            
+            <!-- MBlock Template (versteckt) -->
+            <div class="mblock-template" data-mblock-id="' . $mblock_id . '" style="display: none;">
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Titel:</label>
+                            <input type="text" 
+                                   name="mblock[' . $mblock_id . '][%count%][title]" 
+                                   value=""
+                                   class="form-control"
+                                   placeholder="Titel eingeben...">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Typ:</label>
+                            <select name="mblock[' . $mblock_id . '][%count%][type]" class="form-control">
+                                <option value="">-- Typ wählen --</option>
+                                <option value="artikel">Artikel</option>
+                                <option value="news">News</option>
+                                <option value="event">Event</option>
+                                <option value="galerie">Galerie</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Beschreibung:</label>
+                            <textarea name="mblock[' . $mblock_id . '][%count%][description]" 
+                                      class="form-control" 
+                                      rows="3"
+                                      placeholder="Beschreibung eingeben..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" 
+                                           name="mblock[' . $mblock_id . '][%count%][active]" 
+                                           value="1">
+                                    Aktiv
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Priorität:</label><br>
+                            <div class="radio-inline">
+                                <label>
+                                    <input type="radio" 
+                                           name="mblock[' . $mblock_id . '][%count%][priority]" 
+                                           value="hoch">
+                                    Hoch
+                                </label>
+                            </div>
+                            <div class="radio-inline">
+                                <label>
+                                    <input type="radio" 
+                                           name="mblock[' . $mblock_id . '][%count%][priority]" 
+                                           value="mittel">
+                                    Mittel
+                                </label>
+                            </div>
+                            <div class="radio-inline">
+                                <label>
+                                    <input type="radio" 
+                                           name="mblock[' . $mblock_id . '][%count%][priority]" 
+                                           value="niedrig">
+                                    Niedrig
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <input type="hidden" 
+                               name="mblock[' . $mblock_id . '][%count%][sort]" 
+                               value="%count%">
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Bild (Fake Media Widget):</label>
+                            <div class="input-group">
+                                <input type="text" 
+                                       name="mblock[' . $mblock_id . '][%count%][media_id]" 
+                                       value=""
+                                       class="form-control"
+                                       placeholder="Media ID"
+                                       readonly>
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-default" disabled>
+                                        <i class="fa fa-picture-o"></i> Media wählen
+                                    </button>
+                                </span>
+                            </div>
+                            <small class="help-block">
+                                <strong>Hinweis:</strong> In echter Verwendung würde hier ein 
+                                <code>REX_MEDIA_WIDGET</code> stehen.
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Link (Fake Link Widget):</label>
+                            <div class="input-group">
+                                <input type="text" 
+                                       name="mblock[' . $mblock_id . '][%count%][link_id]" 
+                                       value=""
+                                       class="form-control"
+                                       placeholder="Artikel ID"
+                                       readonly>
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-default" disabled>
+                                        <i class="fa fa-link"></i> Link wählen
+                                    </button>
+                                </span>
+                            </div>
+                            <small class="help-block">
+                                <strong>Hinweis:</strong> In echter Verwendung würde hier ein 
+                                <code>REX_LINK_WIDGET</code> stehen.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            
+        </div>
+        
+    </div>
+    
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+        <button type="button" class="btn btn-default">Abbrechen</button>
+    </div>
+</form>';
+
+$fragment = new rex_fragment();
+$fragment->setVar('title', 'Live Demo', false);
+$fragment->setVar('body', $content, false);
+echo $fragment->parse('core/page/section.php');
+
+// Code-Beispiele
+$code_examples = '
+<h4>Verwendung in REDAXO Templates/Modulen:</h4>
+
+<h5>1. Template-Code für echte Widgets:</h5>
+<pre><code>&lt;?php
+// Media Widget
+echo \'&lt;div class="form-group"&gt;\';
+echo \'&lt;label&gt;Bild:&lt;/label&gt;\';
+echo REX_MEDIA_WIDGET::widget("mblock[1][%count%][media_id]", $media_id);
+echo \'&lt;/div&gt;\';
+
+// Link Widget  
+echo \'&lt;div class="form-group"&gt;\';
+echo \'&lt;label&gt;Link:&lt;/label&gt;\';
+echo REX_LINK_WIDGET::widget("mblock[1][%count%][link_id]", $link_id);
+echo \'&lt;/div&gt;\';
+?&gt;</code></pre>
+
+<h5>2. Auslesen der MBlock-Daten:</h5>
+<pre><code>&lt;?php
+// MBlock-Daten aus der Datenbank laden
+$mblock_data = rex_var::toArray("REX_VALUE[1]");
+
+// Durch alle Einträge iterieren
+foreach ($mblock_data as $item) {
+    echo \'&lt;h3&gt;\' . htmlspecialchars($item[\'title\']) . \'&lt;/h3&gt;\';
+    echo \'&lt;p&gt;Typ: \' . htmlspecialchars($item[\'type\']) . \'&lt;/p&gt;\';
+    echo \'&lt;p&gt;\' . nl2br(htmlspecialchars($item[\'description\'])) . \'&lt;/p&gt;\';
+    
+    if ($item[\'active\']) {
+        echo \'&lt;span class="label label-success"&gt;Aktiv&lt;/span&gt;\';
+    }
+    
+    echo \'&lt;p&gt;Priorität: \' . htmlspecialchars($item[\'priority\']) . \'&lt;/p&gt;\';
+    
+    // Media ausgeben
+    if ($item[\'media_id\']) {
+        $media = rex_media::get($item[\'media_id\']);
+        if ($media) {
+            echo \'&lt;img src="\' . $media-&gt;getUrl() . \'" alt=""&gt;\';
+        }
+    }
+    
+    // Link ausgeben
+    if ($item[\'link_id\']) {
+        $article = rex_article::get($item[\'link_id\']);
+        if ($article) {
+            echo \'&lt;a href="\' . $article-&gt;getUrl() . \'"&gt;Weiterlesen&lt;/a&gt;\';
+        }
+    }
+}
+?&gt;</code></pre>
+
+<h5>3. Template-Integration:</h5>
+<pre><code>// In Ihrem Modul-Input:
+&lt;div class="mblock" data-mblock-id="1"&gt;
+    &lt;!-- Ihre MBlock-Items hier --&gt;
+&lt;/div&gt;
+
+// Wichtige Attribute:
+// data-mblock-id="1"     - Eindeutige ID für den MBlock
+// data-mblock-count="%count%" - Platzhalter für die Zählnummer
+// name="mblock[1][%count%][field]" - Namenskonvention für Felder</code></pre>
+
+<div class="alert alert-warning">
+    <strong>Wichtige Hinweise:</strong>
+    <ul>
+        <li>In dieser Demo sind die Widgets deaktiviert - sie dienen nur zur Veranschaulichung</li>
+        <li>Echte REDAXO-Widgets funktionieren nur im Backend-Kontext</li>
+        <li>Die <code>%count%</code> Platzhalter werden automatisch durch MBlock ersetzt</li>
+        <li>MBlock verwaltet die Sortierung und das Hinzufügen/Entfernen automatisch</li>
     </ul>
 </div>';
 
-// CSS für bessere Darstellung
-$content .= '
-<style>
-.code-example {
-    max-height: 350px;
-    overflow-y: auto;
-    margin: 0;
-    padding: 15px;
-    background: #f8f8f8;
-    border: none;
-    font-size: 13px;
-    line-height: 1.5;
-    font-family: "Courier New", Courier, monospace;
-    white-space: pre-wrap;
-}
-
-.tab-content {
-    min-height: 370px;
-}
-
-.nav-tabs {
-    margin-bottom: 0;
-}
-
-.nav-tabs > li > a {
-    padding: 8px 15px;
-    font-size: 14px; /* Normal font size for tabs */
-}
-
-.tab-pane {
-    padding: 0;
-}
-
-.panel {
-    margin-bottom: 25px;
-}
-
-.panel-heading h4 {
-    margin: 0;
-    color: white;
-}
-
-.team-member,
-.name-link-block {
-    border: 1px solid #ddd;
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 5px;
-}
-
-.media-gallery img {
-    max-width: 100px;
-    margin: 5px;
-}
-
-/* Bootstrap 3 Tab-Fix für bessere Darstellung */
-.nav-tabs > li.active > a,
-.nav-tabs > li.active > a:hover,
-.nav-tabs > li.active > a:focus {
-    background-color: #f8f8f8;
-    border-bottom-color: #f8f8f8;
-}
-</style>';
-
-echo $content;
+$fragment = new rex_fragment();
+$fragment->setVar('title', 'Code-Beispiele & Integration', false);
+$fragment->setVar('body', $code_examples, false);
+echo $fragment->parse('core/page/section.php');
