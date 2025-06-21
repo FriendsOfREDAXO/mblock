@@ -184,16 +184,16 @@ MBlock::show($id, $form, $options = [])
 
 ```php
 // Blöcke eines bestimmten Typs abrufen
-MBlock::getBlocks($id)
+MBlock::getBlocks('REX_VALUE[1]')
 
 // Alle Blöcke des aktuellen Artikels abrufen
-MBlock::getAllBlocks()
+MBlock::getAllBlocks('REX_VALUE[1]')
 
 // Block-Daten prüfen
-MBlock::hasBlocks($id)
+MBlock::hasBlocks('REX_VALUE[1]')
 
 // Anzahl Blöcke ermitteln
-MBlock::getBlockCount($id)
+MBlock::getBlockCount('REX_VALUE[1]')
 ```
 
 ### MBlock_I18n Klasse
