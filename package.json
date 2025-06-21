@@ -8,7 +8,7 @@
     "build": "npm run clean && npm run build:js && npm run build:css",
     "build:js": "rollup -c",
     "build:css": "npm run build:css:copy",
-    "build:css:copy": "cp assets/mblock_smooth_scroll.js assets/dist/ && cp assets/mblock_sortable.js assets/dist/ && cp assets/mblock.css assets/dist/",
+    "build:css:copy": "cp assets/mblock_smooth_scroll.min.js assets/dist/ && cp assets/mblock_sortable.min.js assets/dist/ && cp assets/mblock.css assets/dist/",
     "clean": "rm -rf assets/dist && mkdir -p assets/dist",
     "dev": "rollup -c --watch",
     "prod": "NODE_ENV=production npm run build"

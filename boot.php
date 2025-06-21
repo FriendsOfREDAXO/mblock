@@ -38,14 +38,14 @@ if (rex::isBackend() && is_object(rex::getUser())) {
     
     if (!$isDebugMode && $hasBundleDist) {
         // Production mode - use minified bundle (16.8KB, no console logs)
-        rex_view::addJsFile($this->getAssetsUrl('mblock_sortable.min.js'));
-        rex_view::addJsFile($this->getAssetsUrl('mblock_smooth_scroll.js'));
+        rex_view::addJsFile($this->getAssetsUrl('dist/mblock_sortable.min.js'));
+        rex_view::addJsFile($this->getAssetsUrl('dist/mblock_smooth_scroll.min.js'));
         rex_view::addJsFile($this->getAssetsUrl('dist/mblock.min.js'));
         rex_view::addCssFile($this->getAssetsUrl('dist/mblock.css'));
     } else {
         // Debug mode or no bundle available - use separate files for debugging
-        rex_view::addJsFile($this->getAssetsUrl('mblock_sortable.min.js'));
-        rex_view::addJsFile($this->getAssetsUrl('mblock_smooth_scroll.min.js'));
+        rex_view::addJsFile($this->getAssetsUrl('mblock_sortable.js'));
+        rex_view::addJsFile($this->getAssetsUrl('mblock_smooth_scroll.js'));
         rex_view::addJsFile($this->getAssetsUrl('mblock.js')); // Contains console logs for debugging
         rex_view::addCssFile($this->getAssetsUrl('mblock.css'));
     }
