@@ -1,5 +1,19 @@
 # MBlock - REDAXO Addon für Modul-Input-Blöcke
 
+### Version 5.0.0 - Modernes Build-System & Performance 🚀
+
+1.  **Modernes Build-System:** Rollup-basiertes Bundling mit NPM Scripts (`build`, `prod`, `dev`, `clean`) und Shell-Scripts für erweiterte Optionen.
+2.  **Performance-Optimierung:** Minifiziertes Bundle (16.8KB, 62% kleiner), alle Console-Logs in Production entfernt, Dead Code Elimination.
+3.  **Robustes Smooth Scrolling:** Verbesserte Scroll-Logik mit Fallback für versteckte/getabbte Blöcke, 2s visuelle Highlights für neue Blöcke.
+4.  **Zentralisierte Button-Bar:** Einheitliche Controls für alle Blöcke, neue Reihenfolge (Delete, Toggle, Move, Add), streamlined Code.
+5.  **Visuelles Feedback:** Animationen für alle Control-Buttons (Move-Pulse, Button-Clicks, Block-Highlights), moderne UI-Animationen.
+6.  **Build-System-Integration:** Git-freundliche Konfiguration, `node_modules` ausgeschlossen, automatische Build-Info-Generierung.
+7.  **Code-Refactoring:** Generalisierte Funktionsnamen, entfernte Legacy-Code, saubere moderne Codebase.
+8.  **Production-Ready:** ES5-Kompatibilität, optimierte Ladezeiten, professionelle Deployment-Scripts.
+9.  **Dokumentations-Konsolidierung:** Komplette Build-Dokumentation in README integriert, überflüssige .md-Dateien entfernt.
+
+---
+
 ### Version 4.0.0 - Complete Modernization & Backend Integration 🚀
 
 1.  **Complete Backend Integration:** Dedicated backend pages for Help/Docs (integrated README), Demos, Debugging, and navigation.

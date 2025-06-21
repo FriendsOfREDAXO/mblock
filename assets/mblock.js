@@ -10,8 +10,8 @@ $(document).on('rex:ready', function (e, container) {
     });
 });
 
-// MBlock v3.5 - Toggle functionality and modern controls
-function mblock_init_v35_controls(element) {
+// MBlock - Initialize modern control buttons for blocks
+function mblock_init_controls(element) {
     // Get translations (fallback to English if not available)
     const i18n = window.mblock_i18n || {
         toggle_active: 'Deactivate block',
@@ -31,39 +31,11 @@ function mblock_init_v35_controls(element) {
         // Remove old controls first to avoid duplicates
         $block.find('.mblock-controls').remove();
         
-        // MBlock v3.5 - Remove old buttons completely to avoid conflicts  
+        // Remove old buttons completely to avoid conflicts  
         mblock_clean_old_buttons($block);
         
         // Create modern control group with translated tooltips
-        const controls = $(`
-            <div class="mblock-controls">
-                <button type="button" class="btn mblock-toggle-btn active" 
-                        data-toggle="tooltip" title="${i18n.toggle_active}"
-                        data-block-index="${blockIndex}">
-                    <i class="rex-icon fa-eye"></i>
-                </button>
-                <button type="button" class="btn mblock-move-btn mblock-move-up " 
-                        data-toggle="tooltip" title="${i18n.move_up}">
-                    <i class="rex-icon fa-arrow-up"></i>
-                </button>
-                <button type="button" class="btn mblock-move-btn mblock-move-down " 
-                        data-toggle="tooltip" title="${i18n.move_down}">
-                    <i class="rex-icon fa-arrow-down"></i>
-                </button>
-                <button type="button" class="btn mblock-move-btn sorthandle" 
-                        data-toggle="tooltip" title="${i18n.drag_handle}">
-                    <i class="rex-icon fa-arrows"></i>
-                </button>
-                <button type="button" class="btn mblock-add-btn " 
-                        data-toggle="tooltip" title="${i18n.add}">
-                    <i class="rex-icon fa-plus"></i>
-                </button>
-                <button type="button" class="btn mblock-delete-btn " 
-                        data-toggle="tooltip" title="${i18n.delete}">
-                    <i class="rex-icon fa-trash"></i>
-                </button>
-            </div>
-        `);
+        const controls = mblock_create_controls(blockIndex, i18n);
         
         $block.prepend(controls);
         
@@ -83,6 +55,39 @@ function mblock_init_v35_controls(element) {
     mblock_bind_add_delete_events(element);
 }
 
+// MBlock - Central button bar template function
+function mblock_create_controls(blockIndex, i18n) {
+    return $(`
+        <div class="mblock-controls">
+            <button type="button" class="btn mblock-delete-btn " 
+                    data-toggle="tooltip" title="${i18n.delete}">
+                <i class="rex-icon fa-trash"></i>
+            </button>
+            <button type="button" class="btn mblock-toggle-btn active" 
+                    data-toggle="tooltip" title="${i18n.toggle_active}"
+                    data-block-index="${blockIndex}">
+                <i class="rex-icon fa-eye"></i>
+            </button>
+            <button type="button" class="btn mblock-move-btn mblock-move-up " 
+                    data-toggle="tooltip" title="${i18n.move_up}">
+                <i class="rex-icon fa-arrow-up"></i>
+            </button>
+            <button type="button" class="btn mblock-move-btn mblock-move-down " 
+                    data-toggle="tooltip" title="${i18n.move_down}">
+                <i class="rex-icon fa-arrow-down"></i>
+            </button>
+            <button type="button" class="btn mblock-move-btn sorthandle" 
+                    data-toggle="tooltip" title="${i18n.drag_handle}">
+                <i class="rex-icon fa-arrows"></i>
+            </button>
+            <button type="button" class="btn mblock-add-btn " 
+                    data-toggle="tooltip" title="${i18n.add}">
+                <i class="rex-icon fa-plus"></i>
+            </button>
+        </div>
+    `);
+}
+
 function mblock_bind_toggle_events(element) {
     // Get translations (fallback to English if not available)
     const i18n = window.mblock_i18n || {
@@ -90,7 +95,7 @@ function mblock_bind_toggle_events(element) {
         toggle_inactive: 'Activate block'
     };
     
-    // MBlock v3.5 - Use event delegation to avoid multiple handlers
+    // Use event delegation to avoid multiple handlers
     element.off('click.mblock-toggle').on('click.mblock-toggle', '.mblock-toggle-btn', function(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -98,6 +103,9 @@ function mblock_bind_toggle_events(element) {
         const $btn = $(this);
         const $block = $btn.closest('.sortitem');
         const isActive = $btn.hasClass('active');
+        
+        // MBlock v4.0 - Show button click feedback
+        mblock_show_button_feedback($btn);
         
         // Get current block index dynamically (more reliable)
         const blockIndex = $block.index() + 1; // 1-based index for display
@@ -159,7 +167,7 @@ function mblock_bind_toggle_events(element) {
                 $hiddenField.remove();
                 
                 if (window.console && window.rex_debug) {
-                    console.log('MBlock v3.5 - Removed toggle field (block now active)');
+                    console.log('MBlock - Removed toggle field (block now active)');
                 }
             }
             
@@ -180,7 +188,7 @@ function mblock_bind_toggle_events(element) {
         
         // Debug output if REDAXO debug mode is active
         if (window.console && window.rex_debug) {
-            console.log('MBlock v3.5 - Toggle state changed:', {
+            console.log('MBlock - Toggle state changed:', {
                 blockIndex: blockIndex,
                 isActive: !isActive,
                 hiddenFieldValue: $hiddenField.val(),
@@ -193,7 +201,7 @@ function mblock_bind_toggle_events(element) {
 }
 
 function mblock_bind_move_events(element) {
-    // MBlock v3.5 - Use event delegation for move buttons with separate namespaces
+    // Use event delegation for move buttons with separate namespaces
     element.off('click.mblock-move-up').on('click.mblock-move-up', '.mblock-move-up', function(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -201,9 +209,11 @@ function mblock_bind_move_events(element) {
         const $btn = $(this);
         const $block = $btn.closest('.sortitem');
         
-        console.log('MBlock v3.5 - Move Up clicked', { disabled: $btn.prop('disabled') });
+        console.log('MBlock - Move Up clicked', { disabled: $btn.prop('disabled') });
         
         if (!$btn.prop('disabled')) {
+            // MBlock v4.0 - Show button click feedback
+            mblock_show_button_feedback($btn);
             mblock_moveup(element, $block);
         }
         return false;
@@ -216,9 +226,11 @@ function mblock_bind_move_events(element) {
         const $btn = $(this);
         const $block = $btn.closest('.sortitem');
         
-        console.log('MBlock v3.5 - Move Down clicked', { disabled: $btn.prop('disabled') });
+        console.log('MBlock - Move Down clicked', { disabled: $btn.prop('disabled') });
         
         if (!$btn.prop('disabled')) {
+            // MBlock v4.0 - Show button click feedback
+            mblock_show_button_feedback($btn);
             mblock_movedown(element, $block);
         }
         return false;
@@ -226,7 +238,7 @@ function mblock_bind_move_events(element) {
 }
 
 function mblock_bind_add_delete_events(element) {
-    // MBlock v3.5 - Use event delegation for add/delete buttons
+    // Use event delegation for add/delete buttons
     element.off('click.mblock-add').on('click.mblock-add', '.mblock-add-btn', function(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -235,6 +247,9 @@ function mblock_bind_add_delete_events(element) {
         const $block = $btn.closest('.sortitem');
         
         if (!$btn.prop('disabled')) {
+            // MBlock v4.0 - Show button click feedback
+            mblock_show_button_feedback($btn);
+            
             element.attr('data-mblock_clicked_add_item', $block.attr('data-mblock_index'));
             mblock_add_item(element, $block);
         }
@@ -249,30 +264,38 @@ function mblock_bind_add_delete_events(element) {
         const $block = $btn.closest('.sortitem');
         
         if (!$btn.prop('disabled')) {
-            // MBlock v3.5 - Löschbestätigung prüfen
+            // MBlock v4.0 - Show button click feedback
+            mblock_show_button_feedback($btn);
+            
+            // Löschbestätigung prüfen
             if (element.data().hasOwnProperty('delete_confirm')) {
                 if (!confirm(element.data('delete_confirm'))) {
                     return false;
                 }
             }
             
-            $block.remove();
-            mblock_reindex(element);
-            mblock_update_button_states(element);
+            // MBlock v4.0 - Show visual feedback before removal
+            $block.addClass('mblock-move-feedback');
             
-            // Trigger change event
-            element.trigger('mblock:change', [element]);
+            setTimeout(function() {
+                $block.remove();
+                mblock_reindex(element);
+                mblock_update_button_states(element);
+                
+                // Trigger change event
+                element.trigger('mblock:change', [element]);
+            }, 200);
         }
         return false;
     });
 }
 
-// MBlock v3.5 - Update move button states based on position
+// Update move button states based on position
 function mblock_update_move_button_states(element) {
     const $blocks = element.find('> div.sortitem');
     
     if (window.console && window.rex_debug) {
-        console.log('MBlock v3.5 - Updating move button states for', $blocks.length, 'blocks');
+        console.log('MBlock - Updating move button states for', $blocks.length, 'blocks');
     }
     
     $blocks.each(function(index) {
@@ -295,7 +318,7 @@ function mblock_update_move_button_states(element) {
         }
         
         if (window.console && window.rex_debug) {
-            console.log('MBlock v3.5 - Block', (index + 1), ':', {
+            console.log('MBlock - Block', (index + 1), ':', {
                 upDisabled: $moveUpBtn.prop('disabled'),
                 downDisabled: $moveDownBtn.prop('disabled'),
                 isFirst: index === 0,
@@ -305,7 +328,7 @@ function mblock_update_move_button_states(element) {
     });
 }
 
-// MBlock v3.5 - Helper function to clean old buttons and ensure v3.5 compatibility
+// Helper function to clean old buttons and ensure compatibility
 function mblock_clean_old_buttons(block) {
     // Remove all old-style buttons that are not part of v3.5 controls
     block.find('.btn-default, .btn-success, .btn-danger, .btn-info').not('.mblock-controls .btn').each(function() {
@@ -314,7 +337,7 @@ function mblock_clean_old_buttons(block) {
         // Double-check this is actually an old mblock button
         if ($btn.text().includes('+') || $btn.text().includes('-') || 
             $btn.find('.fa-plus, .fa-minus, .fa-arrow-up, .fa-arrow-down, .fa-trash').length > 0) {
-            console.log('MBlock v3.5 - Removing old button:', $btn.attr('class'), $btn.text());
+            console.log('MBlock - Removing old button:', $btn.attr('class'), $btn.text());
             $btn.remove();
         }
     });
@@ -354,8 +377,8 @@ function mblock_init(element) {
     if (!element.data('mblock_run')) {
         element.data('mblock_run', 1);
         
-        // Initialize v3.5 modern controls
-        mblock_init_v35_controls(element);
+        // Initialize modern controls
+        mblock_init_controls(element);
         
         mblock_sort(element);
         mblock_set_unique_id(element, false);
@@ -377,12 +400,12 @@ function mblock_init(element) {
 function mblock_init_sort(element) {
     // reindex
     mblock_reindex(element);
-    // MBlock v3.5 - Only initialize sortable, no event handlers  
+    // Only initialize sortable, no event handlers  
     mblock_sort_it(element);
 }
 
 function mblock_sort(element) {
-    // MBlock v3.5 - Simplified: only manage button states and sortable
+    // Simplified: only manage button states and sortable
     mblock_update_button_states(element);
     mblock_sort_it(element);
 }
@@ -391,7 +414,7 @@ function mblock_add_plus(element) {
     if (!element.find('> div.sortitem').length) {
         element.prepend($($.parseHTML(element.data('mblock-single-add'))));
         
-        // MBlock v3.5 - Use modern event handler (remove old .handler)
+        // Use modern event handler (remove old .handler)
         element.find('> div.mblock-single-add .mblock-add-btn').off('.mblock-single').on('click.mblock-single', function () {
             mblock_add_item(element, false);
             $(this).parents('.mblock-single-add').remove();
@@ -400,11 +423,11 @@ function mblock_add_plus(element) {
 }
 
 function mblock_remove(element) {
-    // MBlock v3.5 - Use new unified button state management
+    // Use new unified button state management
     mblock_update_button_states(element);
 }
 
-// MBlock v3.5 - Update all button states (add/delete limits, move states)
+// Update all button states (add/delete limits, move states)
 function mblock_update_button_states(element) {
     const $blocks = element.find('> div.sortitem');
     const minBlocks = element.data('min') || 0;
@@ -670,7 +693,7 @@ function mblock_add_item(element, item) {
         $(this).attr('data-value', $(this).val());
     });
 
-    // MBlock v3.5 - Remove any old button structures from server template
+    // Remove any old button structures from server template
     mblock_clean_old_buttons(iClone);
     iClone.find('.mblock-controls').remove(); // Remove any existing controls to avoid duplicates
 
@@ -690,17 +713,19 @@ function mblock_add_item(element, item) {
     // add unique id
     mblock_set_unique_id(iClone, true);
     
-    // MBlock v3.5 - Add buttons to new block (this ensures clean v3.5 buttons)
-    mblock_add_v35_buttons_to_new_block(element, iClone);
+    // Add buttons to new block (this ensures clean modern buttons)
+    mblock_add_buttons_to_new_block(element, iClone);
     
     // reinit sortable only (no old event handlers)
     mblock_init_sort(element);
     
-    // MBlock v3.5 - Update button states
+    // Update button states
     mblock_update_button_states(element);
     
-    // scroll to item
+    // scroll to item and highlight immediately
     mblock_scroll(element, iClone);
+    // Highlight the new block
+    mblock_highlight_new_block(iClone);
     
     // MBlock v4.0 - Enhanced Widget Support for new items
     mblock_reinit_widgets(iClone);
@@ -710,8 +735,8 @@ function mblock_add_item(element, item) {
     $(document).trigger('rex:ready', [iClone]);
 }
 
-// MBlock v3.5 - Add buttons to newly created blocks
-function mblock_add_v35_buttons_to_new_block(element, newBlock) {
+// Add buttons to newly created blocks
+function mblock_add_buttons_to_new_block(element, newBlock) {
     // Get translations (fallback to English if not available)
     const i18n = window.mblock_i18n || {
         toggle_active: 'Deactivate block',
@@ -729,35 +754,7 @@ function mblock_add_v35_buttons_to_new_block(element, newBlock) {
     // Check if controls already exist (shouldn't, but safety check)
     if (newBlock.find('.mblock-controls').length === 0) {
         // Create modern control group with translated tooltips
-        const controls = $(`
-            <div class="mblock-controls">
-                <button type="button" class="btn mblock-toggle-btn active" 
-                        data-toggle="tooltip" title="${i18n.toggle_active}"
-                        data-block-index="${blockIndex}">
-                    <i class="rex-icon fa-eye"></i>
-                </button>
-                <button type="button" class="btn mblock-move-btn mblock-move-up " 
-                        data-toggle="tooltip" title="${i18n.move_up}">
-                    <i class="rex-icon fa-arrow-up"></i>
-                </button>
-                <button type="button" class="btn mblock-move-btn mblock-move-down " 
-                        data-toggle="tooltip" title="${i18n.move_down}">
-                    <i class="rex-icon fa-arrow-down"></i>
-                </button>
-                <button type="button" class="btn mblock-move-btn sorthandle" 
-                        data-toggle="tooltip" title="${i18n.drag_handle}">
-                    <i class="rex-icon fa-arrows"></i>
-                </button>
-                <button type="button" class="btn mblock-add-btn " 
-                        data-toggle="tooltip" title="${i18n.add}">
-                    <i class="rex-icon fa-plus"></i>
-                </button>
-                <button type="button" class="btn mblock-delete-btn " 
-                        data-toggle="tooltip" title="${i18n.delete}">
-                    <i class="rex-icon fa-trash"></i>
-                </button>
-            </div>
-        `);
+        const controls = mblock_create_controls(blockIndex, i18n);
         
         newBlock.prepend(controls);
         
@@ -767,13 +764,13 @@ function mblock_add_v35_buttons_to_new_block(element, newBlock) {
         }
     }
     
-    // MBlock v3.5 - Events are already bound globally, no need to rebind
+    // Events are already bound globally, no need to rebind
     // Just update button states for all blocks
     mblock_update_button_states(element);
     
     // Debug output
     if (window.console && window.rex_debug) {
-        console.log('MBlock v3.5 - Added buttons to new block:', {
+        console.log('MBlock - Added buttons to new block:', {
             blockIndex: blockIndex,
             element: element.attr('id') || 'unnamed'
         });
@@ -842,6 +839,9 @@ function mblock_moveup(element, item) {
     var prev = item.prev();
     if (prev.length == 0) return;
 
+    // MBlock v4.0 - Show visual feedback immediately
+    mblock_show_move_feedback(item, 'up');
+
     setTimeout(function () {
         item.insertBefore(prev);
         // set last user action
@@ -852,12 +852,15 @@ function mblock_moveup(element, item) {
         // trigger event
         let iClone = prev;
         iClone.trigger('mblock:change', [iClone]);
-    }, 150);
+    }, 50);
 }
 
 function mblock_movedown(element, item) {
     var next = item.next();
     if (next.length == 0) return;
+
+    // MBlock v4.0 - Show visual feedback immediately
+    mblock_show_move_feedback(item, 'down');
 
     setTimeout(function () {
         item.insertAfter(next);
@@ -869,36 +872,64 @@ function mblock_movedown(element, item) {
         // trigger event
         let iClone = next;
         iClone.trigger('mblock:change', [iClone]);
-    }, 150);
+    }, 50);
 }
 
 function mblock_scroll(element, item) {
     if (element.data().hasOwnProperty('smooth_scroll')) {
         if (element.data('smooth_scroll') == true) {
-            $.mblockSmoothScroll({
-                scrollTarget: item,
-                speed: 500
-            });
+            // Prüfe ob das Element sichtbar ist
+            if (item.is(':visible')) {
+                $.mblockSmoothScroll({
+                    scrollTarget: item,
+                    speed: 600
+                });
+            } else {
+                // Element ist nicht sichtbar (z.B. in inaktivem Tab)
+                // Versuche zum sichtbaren Container zu scrollen
+                var visibleParent = item.parents(':visible').first();
+                if (visibleParent.length > 0) {
+                    $.mblockSmoothScroll({
+                        scrollTarget: visibleParent,
+                        speed: 600
+                    });
+                }
+                
+                // Zusätzlich: Versuche nach kurzer Verzögerung nochmal zum eigentlichen Element
+                setTimeout(function() {
+                    if (item.is(':visible')) {
+                        $.mblockSmoothScroll({
+                            scrollTarget: item,
+                            speed: 400
+                        });
+                    }
+                }, 100);
+            }
         }
     }
 }
 
+// Debug function for smooth scroll troubleshooting
+// Removed - not needed for production
+
 function mblock_add(element) {
-    // MBlock v3.5 - Use only our new event handlers, no old ones
-    // All events are now handled by the v3.5 button system
+    // Use only our new event handlers, no old ones
+    // All events are now handled by the modern button system
     
-    // Ensure all blocks have v3.5 controls
-    mblock_init_v35_controls(element);
+    // Ensure all blocks have modern controls
+    mblock_init_controls(element);
     
     // Update button states
     mblock_update_move_button_states(element);
 }
 
-// MBlock v3.5 - Debug function for move buttons
+// Global debug functions removed - not needed for production
+
+// Debug function for move buttons
 function mblock_debug_move_buttons(element) {
     const $blocks = element.find('> div.sortitem');
     
-    console.log('MBlock v3.5 - Debug Move Buttons:', {
+    console.log('MBlock - Debug Move Buttons:', {
         totalBlocks: $blocks.length,
         wrapperID: element.attr('id')
     });
@@ -1072,6 +1103,17 @@ function mblock_reinit_widgets(newBlock) {
     console.log('Widget reinitialization completed for new MBlock item');
 }
 
+// MBlock v4.0 - Highlight newly added block
+function mblock_highlight_new_block(block) {
+    // Add temporary highlight class
+    block.addClass('mblock-new-highlight');
+    
+    // Remove highlight after animation
+    setTimeout(function() {
+        block.removeClass('mblock-new-highlight');
+    }, 800);
+}
+
 // MBlock v4.0 - Ensure functions are available globally for debugging
 window.mblock_add_item = mblock_add_item;
 window.mblock_moveup = mblock_moveup;
@@ -1079,3 +1121,31 @@ window.mblock_movedown = mblock_movedown;
 window.mblock_init = mblock_init;
 window.mblock_debug_move_buttons = mblock_debug_move_buttons;
 window.mblock_reinit_widgets = mblock_reinit_widgets;
+
+// MBlock v4.0 - Visual feedback for move operations
+function mblock_show_move_feedback(block, direction) {
+    // Remove any existing feedback classes first
+    block.removeClass('mblock-move-feedback mblock-move-up-feedback mblock-move-down-feedback mblock-new-highlight');
+    
+    // Add the appropriate feedback classes
+    block.addClass('mblock-move-feedback');
+    
+    if (direction === 'up') {
+        block.addClass('mblock-move-up-feedback');
+    } else if (direction === 'down') {
+        block.addClass('mblock-move-down-feedback');
+    }
+    
+    // Remove feedback classes after animation completes
+    setTimeout(function() {
+        block.removeClass('mblock-move-feedback mblock-move-up-feedback mblock-move-down-feedback');
+    }, 200);
+}
+
+// MBlock v4.0 - Button click feedback
+function mblock_show_button_feedback(button) {
+    button.addClass('mblock-btn-clicked');
+    setTimeout(function() {
+        button.removeClass('mblock-btn-clicked');
+    }, 100);
+}

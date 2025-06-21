@@ -30,13 +30,27 @@ if (rex::isBackend() && is_object(rex::getUser())) {
             return $params->getSubject();
     });
 
-    // assets
-    rex_view::addJsFile($this->getAssetsUrl('mblock_sortable.min.js'));
-    rex_view::addJsFile($this->getAssetsUrl('mblock_smooth_scroll.min.js'));
-    rex_view::addJsFile($this->getAssetsUrl('mblock.js'));
-    rex_view::addCssFile($this->getAssetsUrl('mblock.css'));
+    // assets - intelligent loading based on debug mode and available files
+    // Debug mode: Load separate files for easier debugging and development
+    // Production mode: Load minified bundle for optimal performance
+    $isDebugMode = rex::isDebugMode();
+    $hasBundleDist = file_exists($this->getPath('assets/dist/mblock.min.js'));
     
-    // MBlock v3.5 - Add internationalization support for JavaScript
+    if (!$isDebugMode && $hasBundleDist) {
+        // Production mode - use minified bundle (16.8KB, no console logs)
+        rex_view::addJsFile($this->getAssetsUrl('mblock_sortable.min.js'));
+        rex_view::addJsFile($this->getAssetsUrl('mblock_smooth_scroll.js'));
+        rex_view::addJsFile($this->getAssetsUrl('dist/mblock.min.js'));
+        rex_view::addCssFile($this->getAssetsUrl('dist/mblock.css'));
+    } else {
+        // Debug mode or no bundle available - use separate files for debugging
+        rex_view::addJsFile($this->getAssetsUrl('mblock_sortable.min.js'));
+        rex_view::addJsFile($this->getAssetsUrl('mblock_smooth_scroll.min.js'));
+        rex_view::addJsFile($this->getAssetsUrl('mblock.js')); // Contains console logs for debugging
+        rex_view::addCssFile($this->getAssetsUrl('mblock.css'));
+    }
+    
+    // MBlock v4.0 - Add internationalization support for JavaScript
     rex_extension::register('OUTPUT_FILTER', function(rex_extension_point $ep) {
         if (rex::isBackend()) {
             $content = $ep->getSubject();

@@ -1,4 +1,4 @@
-# MBlock v4.0 - Mehrfachblöcke für REDAXO Module
+# MBlock v5.0 - Mehrfachblöcke für REDAXO Module
 
 Mit **MBlock** können Sie innerhalb eines REDAXO-Moduls beliebig viele gleichartige Datenblöcke erstellen, die der Redakteur einfach hinzufügen, löschen, sortieren und ein-/ausklappen kann.
 
@@ -286,7 +286,85 @@ foreach ($blocks as $blockType => $blockData) {
 5. **Validieren Sie Eingaben** in der Ausgabe
 6. **Nutzen Sie die neuen API-Methoden** für sauberen Code
 
-## 📞 Support & Community
+## � Entwicklung & Build-System
+
+### Build-System Setup
+
+MBlock verwendet ein modernes Build-System basierend auf **Rollup** für optimierte JavaScript-Bundles:
+
+```bash
+# Dependencies installieren
+npm install
+
+# Development-Build (mit Debug-Logs)
+npm run build
+
+# Production-Build (minifiziert, ohne Logs)
+npm run prod
+
+# Watch-Modus für Entwicklung
+npm run dev
+
+# Build-Artefakte löschen
+npm run clean
+```
+
+### Shell-Scripts
+
+Für erweiterte Build-Optionen stehen Shell-Scripts zur Verfügung:
+
+```bash
+# Produktionsbuild mit Validierung
+./build.sh production
+
+# Entwicklungsbuild
+./build.sh development
+
+# Watch-Modus
+./build.sh watch
+
+# Cleanup
+./build.sh clean
+
+# Deployment-Vorbereitung
+./deploy.sh
+```
+
+### Build-Output
+
+Das Build-System erstellt optimierte Dateien in `assets/dist/`:
+
+- **mblock.min.js** (16.8KB) - Haupt-Bundle, minifiziert
+- **mblock.css** - CSS-Styles
+- **BUILD_INFO.txt** - Build-Informationen
+
+### Performance-Optimierungen
+
+- ✅ **Console-Logs entfernt** in Production-Builds
+- ✅ **Dead Code Elimination** durch Rollup
+- ✅ **Minifizierung** durch Terser (62% Größenreduktion)
+- ✅ **ES5-Kompatibilität** für maximale Browser-Unterstützung
+
+### Development vs. Production
+
+| Modus | Dateigröße | Console-Logs | Source Maps | Debug-Mode | Verwendung |
+|-------|------------|--------------|-------------|------------|------------|
+| Production | ~17KB | ❌ Nein | ❌ Nein | ❌ Aus | Live-Server |
+| Debug | ~45KB | ✅ Ja | ✅ Ja | ✅ Ein | Lokale Entwicklung |
+
+**Automatische Asset-Ladung:**
+- **Debug-Modus ein** (`rex::isDebugMode()` = true): Separate Dateien mit Console-Logs
+- **Debug-Modus aus** + Bundle vorhanden: Minifiziertes Bundle ohne Logs
+- **Fallback**: Separate Dateien falls Bundle nicht verfügbar
+
+### Git-Workflow
+
+Das Build-System ist Git-freundlich konfiguriert:
+- `node_modules/` wird ignoriert
+- Nur Source-Code wird versioniert
+- Build-Artefakte werden lokal generiert
+
+## �📞 Support & Community
 
 - **GitHub**: [FriendsOfREDAXO/mblock](https://github.com/FriendsOfREDAXO/mblock)
 - **REDAXO Slack**: #addons Channel
@@ -294,4 +372,4 @@ foreach ($blocks as $blockType => $blockData) {
 
 ---
 
-**MBlock v4.0** - Entwickelt von [Friends Of REDAXO](https://friendsofredaxo.github.io/)
+**MBlock v5.0** - Entwickelt von [Friends Of REDAXO](https://friendsofredaxo.github.io/)

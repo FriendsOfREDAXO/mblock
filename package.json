@@ -1,0 +1,43 @@
+{
+  "name": "redaxo-mblock",
+  "version": "5.0.0",
+  "type": "module",
+  "description": "Modern MBlock addon for REDAXO CMS with enhanced user experience",
+  "main": "assets/mblock.js",
+  "scripts": {
+    "build": "npm run clean && npm run build:js && npm run build:css",
+    "build:js": "rollup -c",
+    "build:css": "npm run build:css:copy",
+    "build:css:copy": "cp assets/mblock_smooth_scroll.js assets/dist/ && cp assets/mblock_sortable.js assets/dist/ && cp assets/mblock.css assets/dist/",
+    "clean": "rm -rf assets/dist && mkdir -p assets/dist",
+    "dev": "rollup -c --watch",
+    "prod": "NODE_ENV=production npm run build"
+  },
+  "devDependencies": {
+    "@rollup/plugin-terser": "^0.4.4",
+    "rollup": "^4.0.0",
+    "@rollup/plugin-strip": "^3.0.0"
+  },
+  "files": [
+    "assets/dist/*",
+    "lib/**/*",
+    "pages/**/*",
+    "lang/**/*",
+    "data/**/*",
+    "*.php",
+    "*.yml"
+  ],
+  "keywords": [
+    "redaxo",
+    "cms",
+    "mblock",
+    "content",
+    "blocks"
+  ],
+  "author": "MBlock Development Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/redaxo/redaxo_mblock.git"
+  }
+}
