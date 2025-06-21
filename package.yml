@@ -17,9 +17,7 @@ page:
                 demo_mform: { title: translate:demo_mform }
                 demo_html: { title: translate:demo_html }
         rexform_demo: { title: translate:rexform_demo }
-        debug_fixed: { title: "Debug & Test", perm: admin }
         help: { title: translate:help, subPath: README.md }
-        ajax: { title: "AJAX Handler", hidden: true }
 
 requires:
     redaxo: ^5.12.0
