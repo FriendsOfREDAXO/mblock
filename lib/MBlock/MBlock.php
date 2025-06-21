@@ -97,8 +97,7 @@ class MBlock
      */
     private static function isBlockActive($valueId, $blockIndex)
     {
-        // This method is now simplified - actual check happens in getBlocks()
-        // keeping for backwards compatibility
+        trigger_error('MBlock::isBlockActive() is deprecated and will be removed in future versions. Use MBlock::getBlocks() instead.', E_USER_DEPRECATED);
         return true;
     }
 
