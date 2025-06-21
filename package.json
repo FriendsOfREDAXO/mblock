@@ -1,6 +1,6 @@
 {
   "name": "redaxo-mblock",
-  "version": "5.0.0-dev",
+  "version": "5.0.0",
   "type": "module",
   "description": "Modern MBlock addon for REDAXO CMS with enhanced user experience",
   "main": "assets/mblock.js",
