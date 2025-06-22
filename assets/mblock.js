@@ -31,19 +31,22 @@ function mblock_init_controls(element) {
         const blockIndex = $block.data('mblock_index') || (index + 1);
         
         // Remove old controls first to avoid duplicates
-        $block.find('.mblock-controls').remove();
+        $block.find('.mblock-controls, .mblock-copy-paste-controls').remove();
         
         // Remove old buttons completely to avoid conflicts  
         mblock_clean_old_buttons($block);
         
         // Create modern control group with translated tooltips
         const controls = mblock_create_controls(blockIndex, i18n);
+        const copyPasteControls = mblock_create_copy_paste_controls(i18n);
         
         $block.prepend(controls);
+        $block.prepend(copyPasteControls);
         
         // Initialize tooltips if available
         if (typeof $().tooltip === 'function') {
             controls.find('[data-toggle="tooltip"]').tooltip();
+            copyPasteControls.find('[data-toggle="tooltip"]').tooltip();
         }
     });
     
@@ -73,14 +76,6 @@ function mblock_create_controls(blockIndex, i18n) {
                     data-block-index="${blockIndex}">
                 <i class="rex-icon fa-eye"></i>
             </button>
-            <button type="button" class="btn mblock-copy-btn " 
-                    data-toggle="tooltip" title="${i18n.copy}">
-                <i class="rex-icon fa-copy"></i>
-            </button>
-            <button type="button" class="btn mblock-paste-btn " 
-                    data-toggle="tooltip" title="${i18n.paste}">
-                <i class="rex-icon fa-paste"></i>
-            </button>
             <button type="button" class="btn mblock-move-btn mblock-move-up " 
                     data-toggle="tooltip" title="${i18n.move_up}">
                 <i class="rex-icon fa-arrow-up"></i>
@@ -96,6 +91,22 @@ function mblock_create_controls(blockIndex, i18n) {
             <button type="button" class="btn mblock-add-btn " 
                     data-toggle="tooltip" title="${i18n.add}">
                 <i class="rex-icon fa-plus"></i>
+            </button>
+        </div>
+    `);
+}
+
+// MBlock - Copy/Paste toolbar template function
+function mblock_create_copy_paste_controls(i18n) {
+    return $(`
+        <div class="mblock-copy-paste-controls">
+            <button type="button" class="btn mblock-copy-btn " 
+                    data-toggle="tooltip" title="${i18n.copy}">
+                <i class="rex-icon fa-copy"></i>
+            </button>
+            <button type="button" class="btn mblock-paste-btn " 
+                    data-toggle="tooltip" title="${i18n.paste}">
+                <i class="rex-icon fa-paste"></i>
             </button>
         </div>
     `);
@@ -272,7 +283,7 @@ function mblock_copy_block_data($block) {
     const $clone = $block.clone(true, true);
     
     // Remove control buttons from the copy to avoid issues
-    $clone.find('.mblock-controls').remove();
+    $clone.find('.mblock-controls, .mblock-copy-paste-controls').remove();
     
     // Extract form data from the block
     const formData = {};
@@ -874,7 +885,7 @@ function mblock_add_item(element, item) {
 
     // Remove any old button structures from server template
     mblock_clean_old_buttons(iClone);
-    iClone.find('.mblock-controls').remove(); // Remove any existing controls to avoid duplicates
+    iClone.find('.mblock-controls, .mblock-copy-paste-controls').remove(); // Remove any existing controls to avoid duplicates
 
     if (item === false) {
         // add clone
@@ -933,15 +944,18 @@ function mblock_add_buttons_to_new_block(element, newBlock) {
     const blockIndex = newBlock.data('mblock_index') || element.find('> div.sortitem').length;
     
     // Check if controls already exist (shouldn't, but safety check)
-    if (newBlock.find('.mblock-controls').length === 0) {
+    if (newBlock.find('.mblock-controls, .mblock-copy-paste-controls').length === 0) {
         // Create modern control group with translated tooltips
         const controls = mblock_create_controls(blockIndex, i18n);
+        const copyPasteControls = mblock_create_copy_paste_controls(i18n);
         
         newBlock.prepend(controls);
+        newBlock.prepend(copyPasteControls);
         
         // Initialize tooltips if available
         if (typeof $().tooltip === 'function') {
             controls.find('[data-toggle="tooltip"]').tooltip();
+            copyPasteControls.find('[data-toggle="tooltip"]').tooltip();
         }
     }
     

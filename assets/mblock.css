@@ -135,11 +135,6 @@ div.sortable-ghost {
     margin-right: 8px;
 }
 
-.mblock_wrapper .mblock-controls .mblock-copy-btn,
-.mblock_wrapper .mblock-controls .mblock-paste-btn {
-    margin-right: 4px;
-}
-
 .mblock_wrapper .mblock-controls .mblock-add-btn {
     margin-left: 4px;
 }
@@ -225,27 +220,59 @@ div.sortable-ghost {
     border-color: #c23321 !important;
 }
 
-/* Copy/Paste buttons */
+/* Copy/Paste toolbar - separate from main controls */
+.mblock_wrapper .mblock-copy-paste-controls {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    display: flex;
+    gap: 2px;
+    z-index: 10;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    padding: 3px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.mblock_wrapper .mblock-copy-paste-controls .btn {
+    padding: 4px 8px;
+    font-size: 12px;
+    line-height: 1.2;
+    border-radius: var(--mblock-border-radius);
+    border: 1px solid;
+    transition: var(--mblock-transition);
+    min-width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Copy/Paste buttons - neutral styling */
 .mblock_wrapper .mblock-copy-btn {
-    background-color: #17a2b8 !important;
-    border-color: #17a2b8 !important;
-    color: white !important;
+    background-color: #f8f9fa !important;
+    border-color: #dee2e6 !important;
+    color: #495057 !important;
 }
 
 .mblock_wrapper .mblock-copy-btn:hover {
-    background-color: #138496 !important;
-    border-color: #117a8b !important;
+    background-color: #e9ecef !important;
+    border-color: #adb5bd !important;
+    color: #212529 !important;
 }
 
 .mblock_wrapper .mblock-paste-btn {
-    background-color: #6f42c1 !important;
-    border-color: #6f42c1 !important;
-    color: white !important;
+    background-color: #f8f9fa !important;
+    border-color: #dee2e6 !important;
+    color: #495057 !important;
 }
 
 .mblock_wrapper .mblock-paste-btn:hover {
-    background-color: #5a32a3 !important;
-    border-color: #512d92 !important;
+    background-color: #e9ecef !important;
+    border-color: #adb5bd !important;
+    color: #212529 !important;
 }
 
 .mblock_wrapper .mblock-paste-btn:disabled,
@@ -371,6 +398,12 @@ div.sortable-ghost {
 
 /* Dark mode support for button container */
 .rex-theme-dark .mblock_wrapper .mblock-controls {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.8);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.rex-theme-dark .mblock_wrapper .mblock-copy-paste-controls {
     border-color: rgba(255, 255, 255, 0.2);
     background: rgba(0, 0, 0, 0.8);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
