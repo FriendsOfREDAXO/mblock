@@ -382,25 +382,8 @@ function mblock_paste_block_data(element, $afterBlock, copiedData) {
     // Generate unique IDs and names for form elements
     mblock_set_unique_id($newBlock, true);
     
-    // Apply the copied form data to the new block
-    $newBlock.find('input, textarea, select').each(function() {
-        const $input = $(this);
-        const baseName = $input.attr('name');
-        if (baseName) {
-            // Find the original name in the form data
-            let originalName = baseName;
-            for (const [name, value] of Object.entries(copiedData.formData)) {
-                if (baseName.includes(name.replace(/\[.*\]/, ''))) {
-                    if ($input.is(':checkbox') || $input.is(':radio')) {
-                        $input.prop('checked', value);
-                    } else {
-                        $input.val(value);
-                    }
-                    break;
-                }
-            }
-        }
-    });
+    // The form values are already preserved in the HTML attributes by the copy function
+    // No additional form data application needed
     
     // Insert the new block after the current one
     if ($afterBlock && $afterBlock.length) {
