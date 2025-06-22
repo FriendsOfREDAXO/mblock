@@ -256,7 +256,8 @@ class MBlock
         $plainItem = rex_escape(self::createOutput($plainItem, 0, $theme));
 
         // Generate unique MBlock type identifier for copy/paste functionality
-        $mblockTypeId = 'mblock_' . uniqid();
+        // Allow manual override via settings (only if non-empty)
+        $mblockTypeId = (!empty($settings['mblock_type_id'])) ? $settings['mblock_type_id'] : 'mblock_' . uniqid();
         
         // wrap parsed form items
         $wrapper = new MBlockElement();
