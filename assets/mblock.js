@@ -25,6 +25,10 @@ function mblock_init_controls(element) {
         paste: 'Paste block'
     };
     
+    // Check if this MBlock has a type identifier for copy/paste functionality
+    const $wrapper = element.closest('.mblock_wrapper');
+    const hasMblockTypeId = $wrapper.attr('data-mblock-type-id');
+    
     // Add modern control buttons to each block that doesn't have them yet
     element.find('> div.sortitem').each(function(index) {
         const $block = $(this);
@@ -38,23 +42,33 @@ function mblock_init_controls(element) {
         
         // Create modern control group with translated tooltips
         const controls = mblock_create_controls(blockIndex, i18n);
-        const copyPasteControls = mblock_create_copy_paste_controls(i18n);
         
         $block.prepend(controls);
-        $block.prepend(copyPasteControls);
+        
+        // Only add copy/paste controls if MBlock has type identifier
+        if (hasMblockTypeId) {
+            const copyPasteControls = mblock_create_copy_paste_controls(i18n);
+            $block.prepend(copyPasteControls);
+            
+            // Initialize tooltips for copy/paste controls if available
+            if (typeof $().tooltip === 'function') {
+                copyPasteControls.find('[data-toggle="tooltip"]').tooltip();
+            }
+        }
         
         // Initialize tooltips if available
         if (typeof $().tooltip === 'function') {
             controls.find('[data-toggle="tooltip"]').tooltip();
-            copyPasteControls.find('[data-toggle="tooltip"]').tooltip();
         }
     });
     
     // Bind toggle functionality
     mblock_bind_toggle_events(element);
     
-    // Bind copy/paste functionality
-    mblock_bind_copy_paste_events(element);
+    // Bind copy/paste functionality only if type identifier exists
+    if (hasMblockTypeId) {
+        mblock_bind_copy_paste_events(element);
+    }
     
     // Bind move button functionality (up/down arrows)
     mblock_bind_move_events(element);
@@ -241,15 +255,21 @@ function mblock_bind_copy_paste_events(element) {
             mblock_show_button_feedback($btn);
             
             // Copy the block data
-            mblock_copied_data = mblock_copy_block_data($block);
+            const copiedData = mblock_copy_block_data($block);
             
-            // Update paste button states for all mblock instances on the page
-            mblock_update_paste_button_states();
-            
-            // Show success feedback
-            mblock_show_copy_feedback($btn);
-            
-            console.log('MBlock - Block copied');
+            if (copiedData) {
+                mblock_copied_data = copiedData;
+                
+                // Update paste button states for all mblock instances on the page
+                mblock_update_paste_button_states();
+                
+                // Show success feedback
+                mblock_show_copy_feedback($btn);
+                
+                console.log('MBlock - Block copied with type ID:', copiedData.mblockTypeId);
+            } else {
+                console.log('MBlock - Copy failed: no type identifier found');
+            }
         }
         return false;
     });
@@ -285,20 +305,15 @@ function mblock_copy_block_data($block) {
     // Remove control buttons from the copy to avoid issues
     $clone.find('.mblock-controls, .mblock-copy-paste-controls').remove();
     
-    // Extract MBlock ID from form field names to identify the source MBlock
-    let mblockId = null;
-    $block.find('input, textarea, select').each(function() {
-        const $input = $(this);
-        const name = $input.attr('name');
-        if (name && name.includes('REX_INPUT_VALUE[')) {
-            // Extract MBlock ID from name like "REX_INPUT_VALUE[1][0][field]"
-            const match = name.match(/REX_INPUT_VALUE\[([^\]]+)\]/);
-            if (match) {
-                mblockId = match[1];
-                return false; // Break the loop
-            }
-        }
-    });
+    // Extract MBlock type ID from the wrapper data attribute
+    const $wrapper = $block.closest('.mblock_wrapper');
+    const mblockTypeId = $wrapper.attr('data-mblock-type-id');
+    
+    // Only proceed if MBlock has a type identifier
+    if (!mblockTypeId) {
+        console.log('MBlock - No type identifier found, copy/paste not available');
+        return null;
+    }
     
     // Extract form data from the block
     const formData = {};
@@ -317,7 +332,7 @@ function mblock_copy_block_data($block) {
     return {
         html: $clone.get(0).outerHTML,
         formData: formData,
-        mblockId: mblockId,
+        mblockTypeId: mblockTypeId,
         timestamp: Date.now()
     };
 }
@@ -325,24 +340,13 @@ function mblock_copy_block_data($block) {
 function mblock_paste_block_data(element, $afterBlock, copiedData) {
     if (!copiedData) return;
     
-    // Get the target MBlock ID from existing blocks in this element
-    let targetMblockId = null;
-    element.find('input, textarea, select').each(function() {
-        const $input = $(this);
-        const name = $input.attr('name');
-        if (name && name.includes('REX_INPUT_VALUE[')) {
-            // Extract MBlock ID from name like "REX_INPUT_VALUE[1][0][field]"
-            const match = name.match(/REX_INPUT_VALUE\[([^\]]+)\]/);
-            if (match) {
-                targetMblockId = match[1];
-                return false; // Break the loop
-            }
-        }
-    });
+    // Get the target MBlock type ID from the wrapper
+    const $wrapper = element.closest('.mblock_wrapper');
+    const targetMblockTypeId = $wrapper.attr('data-mblock-type-id');
     
-    // Validate that we're pasting within the same MBlock instance
-    if (copiedData.mblockId && targetMblockId && copiedData.mblockId !== targetMblockId) {
-        console.log('MBlock - Cannot paste block from different MBlock instance');
+    // Validate that we're pasting within the same MBlock type
+    if (!copiedData.mblockTypeId || !targetMblockTypeId || copiedData.mblockTypeId !== targetMblockTypeId) {
+        console.log('MBlock - Cannot paste block from different MBlock type or missing type identifier');
         return;
     }
     
@@ -403,33 +407,21 @@ function mblock_paste_block_data(element, $afterBlock, copiedData) {
 }
 
 function mblock_update_paste_button_states() {
-    // Enable/disable paste buttons based on whether we have copied data and MBlock compatibility
+    // Enable/disable paste buttons based on whether we have copied data and MBlock type compatibility
     const hasData = mblock_copied_data !== null;
     
     $('.mblock-paste-btn').each(function() {
         const $btn = $(this);
         const $mblockWrapper = $btn.closest('.mblock_wrapper');
         
-        let canPaste = hasData;
+        let canPaste = false;
         
-        if (hasData && mblock_copied_data.mblockId) {
-            // Check if this MBlock instance matches the source MBlock ID
-            let targetMblockId = null;
-            $mblockWrapper.find('input, textarea, select').each(function() {
-                const $input = $(this);
-                const name = $input.attr('name');
-                if (name && name.includes('REX_INPUT_VALUE[')) {
-                    // Extract MBlock ID from name like "REX_INPUT_VALUE[1][0][field]"
-                    const match = name.match(/REX_INPUT_VALUE\[([^\]]+)\]/);
-                    if (match) {
-                        targetMblockId = match[1];
-                        return false; // Break the loop
-                    }
-                }
-            });
+        if (hasData && mblock_copied_data.mblockTypeId) {
+            // Check if this MBlock instance has a type identifier and matches the source
+            const targetMblockTypeId = $mblockWrapper.attr('data-mblock-type-id');
             
-            // Only allow paste if MBlock IDs match
-            canPaste = hasData && (mblock_copied_data.mblockId === targetMblockId);
+            // Only allow paste if type identifiers exist and match
+            canPaste = targetMblockTypeId && (mblock_copied_data.mblockTypeId === targetMblockTypeId);
         }
         
         $btn.prop('disabled', !canPaste).toggleClass('disabled', !canPaste);
@@ -1005,6 +997,10 @@ function mblock_add_buttons_to_new_block(element, newBlock) {
         paste: 'Paste block'
     };
     
+    // Check if this MBlock has a type identifier for copy/paste functionality
+    const $wrapper = element.closest('.mblock_wrapper');
+    const hasMblockTypeId = $wrapper.attr('data-mblock-type-id');
+    
     // Get the block index for the new block
     const blockIndex = newBlock.data('mblock_index') || element.find('> div.sortitem').length;
     
@@ -1012,15 +1008,23 @@ function mblock_add_buttons_to_new_block(element, newBlock) {
     if (newBlock.find('.mblock-controls, .mblock-copy-paste-controls').length === 0) {
         // Create modern control group with translated tooltips
         const controls = mblock_create_controls(blockIndex, i18n);
-        const copyPasteControls = mblock_create_copy_paste_controls(i18n);
         
         newBlock.prepend(controls);
-        newBlock.prepend(copyPasteControls);
+        
+        // Only add copy/paste controls if MBlock has type identifier
+        if (hasMblockTypeId) {
+            const copyPasteControls = mblock_create_copy_paste_controls(i18n);
+            newBlock.prepend(copyPasteControls);
+            
+            // Initialize tooltips for copy/paste controls if available
+            if (typeof $().tooltip === 'function') {
+                copyPasteControls.find('[data-toggle="tooltip"]').tooltip();
+            }
+        }
         
         // Initialize tooltips if available
         if (typeof $().tooltip === 'function') {
             controls.find('[data-toggle="tooltip"]').tooltip();
-            copyPasteControls.find('[data-toggle="tooltip"]').tooltip();
         }
     }
     
@@ -1032,6 +1036,7 @@ function mblock_add_buttons_to_new_block(element, newBlock) {
     if (window.console && window.rex_debug) {
         console.log('MBlock - Added buttons to new block:', {
             blockIndex: blockIndex,
+            hasCopyPaste: hasMblockTypeId,
             element: element.attr('id') || 'unnamed'
         });
     }

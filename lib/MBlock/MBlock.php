@@ -255,10 +255,17 @@ class MBlock
         $addItem = rex_escape('<div class="mblock-single-add"><span class="singleadded"><button type="button" class="btn btn-success mblock-add-btn" title="duplicate"><i class="rex-icon rex-icon-add-module"></i>' . $addText . '</button></span></div>');
         $plainItem = rex_escape(self::createOutput($plainItem, 0, $theme));
 
+        // Generate unique MBlock type identifier for copy/paste functionality
+        $mblockTypeId = 'mblock_' . uniqid();
+        
         // wrap parsed form items
         $wrapper = new MBlockElement();
         $wrapper->setOutput(implode('', static::$output))
-            ->setSettings(MBlockSettingsHelper::getSettings(array_merge($settings, ['mblock-plain-sortitem' => $plainItem, 'mblock-single-add' => $addItem])));
+            ->setSettings(MBlockSettingsHelper::getSettings(array_merge($settings, [
+                'mblock-plain-sortitem' => $plainItem, 
+                'mblock-single-add' => $addItem,
+                'mblock-type-id' => $mblockTypeId
+            ])));
 
         // return wrapped from elements
         $output = MBlockParser::parseElement($wrapper, 'wrapper', $theme);
