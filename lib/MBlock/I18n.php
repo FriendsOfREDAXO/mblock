@@ -23,6 +23,8 @@ class MBlockI18n
             'drag_handle' => rex_i18n::msg('mblock_v35_tooltip_drag_handle'),
             'add' => rex_i18n::msg('mblock_v35_tooltip_add'),
             'delete' => rex_i18n::msg('mblock_v35_tooltip_delete'),
+            'copy' => rex_i18n::msg('mblock_v35_tooltip_copy'),
+            'paste' => rex_i18n::msg('mblock_v35_tooltip_paste'),
             'block_active' => rex_i18n::msg('mblock_v35_block_active'),
             'block_inactive' => rex_i18n::msg('mblock_v35_block_inactive'),
         ];
@@ -64,6 +66,8 @@ class MBlockI18n
             'mblock_v35_tooltip_drag_handle',
             'mblock_v35_tooltip_add',
             'mblock_v35_tooltip_delete',
+            'mblock_v35_tooltip_copy',
+            'mblock_v35_tooltip_paste',
             'mblock_v35_block_active',
             'mblock_v35_block_inactive'
         ];

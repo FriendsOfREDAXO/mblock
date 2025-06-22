@@ -135,6 +135,11 @@ div.sortable-ghost {
     margin-right: 8px;
 }
 
+.mblock_wrapper .mblock-controls .mblock-copy-btn,
+.mblock_wrapper .mblock-controls .mblock-paste-btn {
+    margin-right: 4px;
+}
+
 .mblock_wrapper .mblock-controls .mblock-add-btn {
     margin-left: 4px;
 }
@@ -218,6 +223,39 @@ div.sortable-ghost {
 .mblock_wrapper .mblock-delete-btn:hover {
     background-color: #c23321 !important;
     border-color: #c23321 !important;
+}
+
+/* Copy/Paste buttons */
+.mblock_wrapper .mblock-copy-btn {
+    background-color: #17a2b8 !important;
+    border-color: #17a2b8 !important;
+    color: white !important;
+}
+
+.mblock_wrapper .mblock-copy-btn:hover {
+    background-color: #138496 !important;
+    border-color: #117a8b !important;
+}
+
+.mblock_wrapper .mblock-paste-btn {
+    background-color: #6f42c1 !important;
+    border-color: #6f42c1 !important;
+    color: white !important;
+}
+
+.mblock_wrapper .mblock-paste-btn:hover {
+    background-color: #5a32a3 !important;
+    border-color: #512d92 !important;
+}
+
+.mblock_wrapper .mblock-paste-btn:disabled,
+.mblock_wrapper .mblock-paste-btn.disabled {
+    background-color: #e9ecef !important;
+    border-color: #dee2e6 !important;
+    color: #6c757d !important;
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+}
 }
 
 /* Add button */

@@ -20,7 +20,9 @@ function mblock_init_controls(element) {
         move_down: 'Move block down', 
         drag_handle: 'Move block by drag & drop',
         add: 'Add block',
-        delete: 'Delete block'
+        delete: 'Delete block',
+        copy: 'Copy block',
+        paste: 'Paste block'
     };
     
     // Add modern control buttons to each block that doesn't have them yet
@@ -48,6 +50,9 @@ function mblock_init_controls(element) {
     // Bind toggle functionality
     mblock_bind_toggle_events(element);
     
+    // Bind copy/paste functionality
+    mblock_bind_copy_paste_events(element);
+    
     // Bind move button functionality (up/down arrows)
     mblock_bind_move_events(element);
     
@@ -67,6 +72,14 @@ function mblock_create_controls(blockIndex, i18n) {
                     data-toggle="tooltip" title="${i18n.toggle_active}"
                     data-block-index="${blockIndex}">
                 <i class="rex-icon fa-eye"></i>
+            </button>
+            <button type="button" class="btn mblock-copy-btn " 
+                    data-toggle="tooltip" title="${i18n.copy}">
+                <i class="rex-icon fa-copy"></i>
+            </button>
+            <button type="button" class="btn mblock-paste-btn " 
+                    data-toggle="tooltip" title="${i18n.paste}">
+                <i class="rex-icon fa-paste"></i>
             </button>
             <button type="button" class="btn mblock-move-btn mblock-move-up " 
                     data-toggle="tooltip" title="${i18n.move_up}">
@@ -198,6 +211,169 @@ function mblock_bind_toggle_events(element) {
         
         return false;
     });
+}
+
+// Global variable to store copied block data
+let mblock_copied_data = null;
+
+function mblock_bind_copy_paste_events(element) {
+    // Copy button handler
+    element.off('click.mblock-copy').on('click.mblock-copy', '.mblock-copy-btn', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const $btn = $(this);
+        const $block = $btn.closest('.sortitem');
+        
+        if (!$btn.prop('disabled')) {
+            // Show button click feedback
+            mblock_show_button_feedback($btn);
+            
+            // Copy the block data
+            mblock_copied_data = mblock_copy_block_data($block);
+            
+            // Update paste button states for all mblock instances on the page
+            mblock_update_paste_button_states();
+            
+            // Show success feedback
+            mblock_show_copy_feedback($btn);
+            
+            console.log('MBlock - Block copied');
+        }
+        return false;
+    });
+    
+    // Paste button handler
+    element.off('click.mblock-paste').on('click.mblock-paste', '.mblock-paste-btn', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const $btn = $(this);
+        const $block = $btn.closest('.sortitem');
+        
+        if (!$btn.prop('disabled') && mblock_copied_data) {
+            // Show button click feedback
+            mblock_show_button_feedback($btn);
+            
+            // Paste the block data
+            mblock_paste_block_data(element, $block, mblock_copied_data);
+            
+            // Show success feedback
+            mblock_show_paste_feedback($btn);
+            
+            console.log('MBlock - Block pasted');
+        }
+        return false;
+    });
+}
+
+function mblock_copy_block_data($block) {
+    // Create a deep copy of the block's HTML
+    const $clone = $block.clone(true, true);
+    
+    // Remove control buttons from the copy to avoid issues
+    $clone.find('.mblock-controls').remove();
+    
+    // Extract form data from the block
+    const formData = {};
+    $block.find('input, textarea, select').each(function() {
+        const $input = $(this);
+        const name = $input.attr('name');
+        if (name && !name.startsWith('mblock_')) {
+            if ($input.is(':checkbox') || $input.is(':radio')) {
+                formData[name] = $input.is(':checked');
+            } else {
+                formData[name] = $input.val();
+            }
+        }
+    });
+    
+    return {
+        html: $clone.get(0).outerHTML,
+        formData: formData,
+        timestamp: Date.now()
+    };
+}
+
+function mblock_paste_block_data(element, $afterBlock, copiedData) {
+    if (!copiedData) return;
+    
+    // Create new block from copied HTML
+    const $newBlock = $(copiedData.html);
+    
+    // Generate unique IDs and names for form elements
+    mblock_set_unique_id($newBlock, true);
+    
+    // Apply the copied form data to the new block
+    $newBlock.find('input, textarea, select').each(function() {
+        const $input = $(this);
+        const baseName = $input.attr('name');
+        if (baseName) {
+            // Find the original name in the form data
+            let originalName = baseName;
+            for (const [name, value] of Object.entries(copiedData.formData)) {
+                if (baseName.includes(name.replace(/\[.*\]/, ''))) {
+                    if ($input.is(':checkbox') || $input.is(':radio')) {
+                        $input.prop('checked', value);
+                    } else {
+                        $input.val(value);
+                    }
+                    break;
+                }
+            }
+        }
+    });
+    
+    // Insert the new block after the current one
+    if ($afterBlock && $afterBlock.length) {
+        element.mblock_sortable("destroy");
+        $afterBlock.after($newBlock);
+        mblock_set_count(element, $afterBlock);
+    } else {
+        element.prepend($newBlock);
+    }
+    
+    // Add buttons to new block
+    mblock_add_buttons_to_new_block(element, $newBlock);
+    
+    // Reinitialize sortable
+    mblock_init_sort(element);
+    
+    // Update button states
+    mblock_update_button_states(element);
+    
+    // Scroll to and highlight the new block
+    mblock_scroll(element, $newBlock);
+    mblock_highlight_new_block($newBlock);
+    
+    // Reinitialize widgets for the new block
+    mblock_reinit_widgets($newBlock);
+    
+    // Trigger rex ready events
+    $newBlock.trigger('rex:ready', [$newBlock]);
+    $(document).trigger('rex:ready', [$newBlock]);
+}
+
+function mblock_update_paste_button_states() {
+    // Enable/disable paste buttons based on whether we have copied data
+    const hasData = mblock_copied_data !== null;
+    $('.mblock-paste-btn').prop('disabled', !hasData).toggleClass('disabled', !hasData);
+}
+
+function mblock_show_copy_feedback($btn) {
+    const originalIcon = $btn.find('i').attr('class');
+    $btn.find('i').attr('class', 'rex-icon fa-check');
+    setTimeout(function() {
+        $btn.find('i').attr('class', originalIcon);
+    }, 1000);
+}
+
+function mblock_show_paste_feedback($btn) {
+    const originalIcon = $btn.find('i').attr('class');
+    $btn.find('i').attr('class', 'rex-icon fa-check');
+    setTimeout(function() {
+        $btn.find('i').attr('class', originalIcon);
+    }, 1000);
 }
 
 function mblock_bind_move_events(element) {
@@ -435,6 +611,9 @@ function mblock_update_button_states(element) {
     
     // Update move button states
     mblock_update_move_button_states(element);
+    
+    // Update paste button states based on copied data availability
+    mblock_update_paste_button_states();
     
     // Update add/delete button states based on min/max limits
     $blocks.each(function() {
@@ -745,7 +924,9 @@ function mblock_add_buttons_to_new_block(element, newBlock) {
         move_down: 'Move block down', 
         drag_handle: 'Move block by drag & drop',
         add: 'Add block',
-        delete: 'Delete block'
+        delete: 'Delete block',
+        copy: 'Copy block',
+        paste: 'Paste block'
     };
     
     // Get the block index for the new block

@@ -57,8 +57,13 @@ mblock_v35_tooltip_move_down = Move block down
 mblock_v35_tooltip_drag_handle = Move block by drag & drop
 mblock_v35_tooltip_add = Add block
 mblock_v35_tooltip_delete = Delete block
+mblock_v35_tooltip_copy = Copy block
+mblock_v35_tooltip_paste = Paste block
 mblock_v35_block_active = Active
 mblock_v35_block_inactive = Inactive
+mblock_v35_copy_success = Block copied
+mblock_v35_paste_success = Block pasted
+mblock_v35_no_copy_data = No copied block available
 
 # MForm Demo Error Messages
 mform_demo_error_title = MForm AddOn Required
