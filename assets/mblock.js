@@ -285,6 +285,21 @@ function mblock_copy_block_data($block) {
     // Remove control buttons from the copy to avoid issues
     $clone.find('.mblock-controls, .mblock-copy-paste-controls').remove();
     
+    // Extract MBlock ID from form field names to identify the source MBlock
+    let mblockId = null;
+    $block.find('input, textarea, select').each(function() {
+        const $input = $(this);
+        const name = $input.attr('name');
+        if (name && name.includes('REX_INPUT_VALUE[')) {
+            // Extract MBlock ID from name like "REX_INPUT_VALUE[1][0][field]"
+            const match = name.match(/REX_INPUT_VALUE\[([^\]]+)\]/);
+            if (match) {
+                mblockId = match[1];
+                return false; // Break the loop
+            }
+        }
+    });
+    
     // Extract form data from the block
     const formData = {};
     $block.find('input, textarea, select').each(function() {
@@ -302,12 +317,34 @@ function mblock_copy_block_data($block) {
     return {
         html: $clone.get(0).outerHTML,
         formData: formData,
+        mblockId: mblockId,
         timestamp: Date.now()
     };
 }
 
 function mblock_paste_block_data(element, $afterBlock, copiedData) {
     if (!copiedData) return;
+    
+    // Get the target MBlock ID from existing blocks in this element
+    let targetMblockId = null;
+    element.find('input, textarea, select').each(function() {
+        const $input = $(this);
+        const name = $input.attr('name');
+        if (name && name.includes('REX_INPUT_VALUE[')) {
+            // Extract MBlock ID from name like "REX_INPUT_VALUE[1][0][field]"
+            const match = name.match(/REX_INPUT_VALUE\[([^\]]+)\]/);
+            if (match) {
+                targetMblockId = match[1];
+                return false; // Break the loop
+            }
+        }
+    });
+    
+    // Validate that we're pasting within the same MBlock instance
+    if (copiedData.mblockId && targetMblockId && copiedData.mblockId !== targetMblockId) {
+        console.log('MBlock - Cannot paste block from different MBlock instance');
+        return;
+    }
     
     // Create new block from copied HTML
     const $newBlock = $(copiedData.html);
@@ -366,9 +403,37 @@ function mblock_paste_block_data(element, $afterBlock, copiedData) {
 }
 
 function mblock_update_paste_button_states() {
-    // Enable/disable paste buttons based on whether we have copied data
+    // Enable/disable paste buttons based on whether we have copied data and MBlock compatibility
     const hasData = mblock_copied_data !== null;
-    $('.mblock-paste-btn').prop('disabled', !hasData).toggleClass('disabled', !hasData);
+    
+    $('.mblock-paste-btn').each(function() {
+        const $btn = $(this);
+        const $mblockWrapper = $btn.closest('.mblock_wrapper');
+        
+        let canPaste = hasData;
+        
+        if (hasData && mblock_copied_data.mblockId) {
+            // Check if this MBlock instance matches the source MBlock ID
+            let targetMblockId = null;
+            $mblockWrapper.find('input, textarea, select').each(function() {
+                const $input = $(this);
+                const name = $input.attr('name');
+                if (name && name.includes('REX_INPUT_VALUE[')) {
+                    // Extract MBlock ID from name like "REX_INPUT_VALUE[1][0][field]"
+                    const match = name.match(/REX_INPUT_VALUE\[([^\]]+)\]/);
+                    if (match) {
+                        targetMblockId = match[1];
+                        return false; // Break the loop
+                    }
+                }
+            });
+            
+            // Only allow paste if MBlock IDs match
+            canPaste = hasData && (mblock_copied_data.mblockId === targetMblockId);
+        }
+        
+        $btn.prop('disabled', !canPaste).toggleClass('disabled', !canPaste);
+    });
 }
 
 function mblock_show_copy_feedback($btn) {
