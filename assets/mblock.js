@@ -8,6 +8,12 @@ $(document).on('rex:ready', function (e, container) {
     container.find(mblock).each(function () {
         mblock_init($(this));
     });
+    
+    // Ensure paste button states are updated after any rex:ready event
+    // This is important when MBlocks are dynamically added to the page
+    if (typeof mblock_update_paste_button_states === 'function') {
+        mblock_update_paste_button_states();
+    }
 });
 
 // MBlock - Initialize modern control buttons for blocks
@@ -283,6 +289,18 @@ function mblock_bind_copy_paste_events(element) {
         const $block = $btn.closest('.sortitem');
         
         if (!$btn.prop('disabled') && mblock_copied_data) {
+            // Additional validation: Ensure we can only paste within the same MBlock type
+            const $wrapper = element.closest('.mblock_wrapper');
+            const targetMblockTypeId = $wrapper.attr('data-mblock-type-id');
+            
+            if (!mblock_copied_data.mblockTypeId || !targetMblockTypeId || mblock_copied_data.mblockTypeId !== targetMblockTypeId) {
+                console.log('MBlock - Paste blocked: Type mismatch', {
+                    sourceType: mblock_copied_data.mblockTypeId,
+                    targetType: targetMblockTypeId
+                });
+                return false;
+            }
+            
             // Show button click feedback
             mblock_show_button_feedback($btn);
             
@@ -308,6 +326,14 @@ function mblock_copy_block_data($block) {
     // Extract MBlock type ID from the wrapper data attribute
     const $wrapper = $block.closest('.mblock_wrapper');
     const mblockTypeId = $wrapper.attr('data-mblock-type-id');
+    
+    if (window.console && window.rex_debug) {
+        console.log('MBlock - Copy operation:', {
+            wrapperFound: $wrapper.length > 0,
+            typeId: mblockTypeId,
+            wrapperAttributes: $wrapper.get(0) ? Array.from($wrapper.get(0).attributes).map(attr => `${attr.name}="${attr.value}"`).join(' ') : 'none'
+        });
+    }
     
     // Only proceed if MBlock has a type identifier
     if (!mblockTypeId) {
@@ -410,6 +436,13 @@ function mblock_update_paste_button_states() {
     // Enable/disable paste buttons based on whether we have copied data and MBlock type compatibility
     const hasData = mblock_copied_data !== null;
     
+    if (window.console && window.rex_debug) {
+        console.log('MBlock - Updating paste button states:', {
+            hasData: hasData,
+            sourceType: hasData ? mblock_copied_data.mblockTypeId : null
+        });
+    }
+    
     $('.mblock-paste-btn').each(function() {
         const $btn = $(this);
         const $mblockWrapper = $btn.closest('.mblock_wrapper');
@@ -422,6 +455,14 @@ function mblock_update_paste_button_states() {
             
             // Only allow paste if type identifiers exist and match
             canPaste = targetMblockTypeId && (mblock_copied_data.mblockTypeId === targetMblockTypeId);
+            
+            if (window.console && window.rex_debug) {
+                console.log('MBlock - Button state check:', {
+                    targetType: targetMblockTypeId,
+                    sourceType: mblock_copied_data.mblockTypeId,
+                    canPaste: canPaste
+                });
+            }
         }
         
         $btn.prop('disabled', !canPaste).toggleClass('disabled', !canPaste);
