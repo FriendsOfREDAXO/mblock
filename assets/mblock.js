@@ -410,9 +410,16 @@ function mblock_paste_block_data(element, $afterBlock, copiedData) {
     // Reinitialize widgets for the new block
     mblock_reinit_widgets($newBlock);
     
-    // Trigger rex ready events
+    // Trigger rex ready events for REDAXO widgets
     $newBlock.trigger('rex:ready', [$newBlock]);
     $(document).trigger('rex:ready', [$newBlock]);
+    
+    // Additional trigger for Bootstrap selectpicker with slight delay
+    setTimeout(function() {
+        if (typeof $.fn.selectpicker === 'function') {
+            $newBlock.find('select.selectpicker').selectpicker('refresh');
+        }
+    }, 10);
 }
 
 function mblock_update_paste_button_states() {
@@ -1001,9 +1008,16 @@ function mblock_add_item(element, item) {
     // MBlock v4.0 - Enhanced Widget Support for new items
     mblock_reinit_widgets(iClone);
     
-    // trigger rex ready on the new block and document
+    // trigger rex ready on the new block and document for REDAXO widgets
     iClone.trigger('rex:ready', [iClone]);
     $(document).trigger('rex:ready', [iClone]);
+    
+    // Additional trigger for Bootstrap selectpicker with slight delay
+    setTimeout(function() {
+        if (typeof $.fn.selectpicker === 'function') {
+            iClone.find('select.selectpicker').selectpicker('refresh');
+        }
+    }, 10);
 }
 
 // Add buttons to newly created blocks
@@ -1364,6 +1378,33 @@ function mblock_reinit_widgets(newBlock) {
         }
         $select.select2();
     });
+    
+    // Re-initialize Bootstrap selectpicker elements
+    if (typeof $.fn.selectpicker === 'function') {
+        newBlock.find('select.selectpicker').each(function() {
+            const $select = $(this);
+            try {
+                // Check if selectpicker is already initialized
+                if ($select.data('selectpicker')) {
+                    // Refresh existing selectpicker instances
+                    $select.selectpicker('refresh');
+                    console.log('Bootstrap selectpicker refreshed');
+                } else {
+                    // Initialize new selectpicker instances
+                    $select.selectpicker();
+                    console.log('Bootstrap selectpicker initialized');
+                }
+            } catch (e) {
+                console.log('Bootstrap selectpicker handling failed:', e);
+                // Fallback: try basic initialization
+                try {
+                    $select.selectpicker();
+                } catch (e2) {
+                    console.log('Bootstrap selectpicker fallback failed:', e2);
+                }
+            }
+        });
+    }
     
     // Re-bind media preview events for new widgets
     newBlock.find('.rex-js-widget-media.rex-js-widget-preview, .rex-js-widget-medialist.rex-js-widget-preview')
