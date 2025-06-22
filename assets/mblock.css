@@ -422,6 +422,18 @@ div.sortable-ghost {
         padding: 2px 4px;
         font-size: 10px;
     }
+    
+    .mblock_wrapper .mblock-copy-paste-controls {
+        flex-wrap: wrap;
+        gap: 1px;
+    }
+    
+    .mblock_wrapper .mblock-copy-paste-controls .btn {
+        min-width: 24px;
+        height: 24px;
+        padding: 2px 4px;
+        font-size: 10px;
+    }
 }
 
 /* MBlock v4.0 - Highlight animation for new blocks */
