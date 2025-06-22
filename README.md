@@ -370,6 +370,19 @@ Das Build-System ist Git-freundlich konfiguriert:
 - **REDAXO Slack**: #addons Channel
 - **Dokumentation**: REDAXO Backend → MBlock → Hilfe
 
+## Authoren
+
+**Friends Of REDAXO**
+
+- <http://www.redaxo.org>
+- <https://github.com/FriendsOfREDAXO>
+
+## Credits
+
+**Thanks to:**
+[Joachim Dörr](https://github.com/joachimdoerr)
+
+
 ---
 
 **MBlock v5.0** - Entwickelt von [Friends Of REDAXO](https://friendsofredaxo.github.io/)
