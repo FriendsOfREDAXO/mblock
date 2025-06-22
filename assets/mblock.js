@@ -317,12 +317,6 @@ function mblock_bind_copy_paste_events(element) {
 }
 
 function mblock_copy_block_data($block) {
-    // Create a deep copy of the block's HTML
-    const $clone = $block.clone(true, true);
-    
-    // Remove control buttons from the copy to avoid issues
-    $clone.find('.mblock-controls, .mblock-copy-paste-controls').remove();
-    
     // Extract MBlock type ID from the wrapper data attribute
     const $wrapper = $block.closest('.mblock_wrapper');
     const mblockTypeId = $wrapper.attr('data-mblock-type-id');
@@ -341,26 +335,83 @@ function mblock_copy_block_data($block) {
         return null;
     }
     
-    // Extract form data from the block
-    const formData = {};
-    $block.find('input, textarea, select').each(function() {
+    // Create a clean copy of the block's HTML with all current form values preserved
+    const $clone = $block.clone(true, true);
+    
+    // Remove control buttons from the copy to avoid issues
+    $clone.find('.mblock-controls, .mblock-copy-paste-controls').remove();
+    
+    // Ensure all form values are properly preserved in the HTML attributes
+    $clone.find('input, textarea, select').each(function() {
         const $input = $(this);
-        const name = $input.attr('name');
-        if (name && !name.startsWith('mblock_')) {
-            if ($input.is(':checkbox') || $input.is(':radio')) {
-                formData[name] = $input.is(':checked');
+        if ($input.is(':checkbox') || $input.is(':radio')) {
+            if ($input.is(':checked')) {
+                $input.attr('checked', 'checked');
             } else {
-                formData[name] = $input.val();
+                $input.removeAttr('checked');
             }
+        } else if ($input.is('select')) {
+            // For select elements, set the selected attribute on the correct option
+            const selectedValue = $input.val();
+            $input.find('option').each(function() {
+                const $option = $(this);
+                if ($option.val() === selectedValue) {
+                    $option.attr('selected', 'selected');
+                } else {
+                    $option.removeAttr('selected');
+                }
+            });
+        } else {
+            // For text inputs and textareas, set the value attribute
+            $input.attr('value', $input.val());
         }
     });
     
     return {
         html: $clone.get(0).outerHTML,
-        formData: formData,
         mblockTypeId: mblockTypeId,
         timestamp: Date.now()
     };
+}
+
+function mblock_update_field_references($newBlock, element) {
+    // Get the target block index for the new block
+    const $wrapper = element.closest('.mblock_wrapper');
+    const targetIndex = $wrapper.find('> div.sortitem').length; // This will be the index of the new block
+    
+    // Update all form field names to use the correct block index
+    $newBlock.find('input, textarea, select').each(function() {
+        const $input = $(this);
+        const name = $input.attr('name');
+        const id = $input.attr('id');
+        
+        if (name) {
+            // Update the name attribute to use the correct block index
+            // Pattern: REX_INPUT_VALUE[X][Y][field] -> REX_INPUT_VALUE[X][targetIndex][field]
+            const newName = name.replace(/(\[)(\d+)(\]\[)([^\]]+)(\].*)/g, function(match, p1, blockIndex, p3, valueIndex, p5) {
+                return p1 + targetIndex + p3 + valueIndex + p5;
+            });
+            $input.attr('name', newName);
+        }
+        
+        if (id) {
+            // Update the id attribute as well
+            const newId = id.replace(/(\d+)/g, function(match, num) {
+                // For IDs, we need to generate unique identifiers
+                return targetIndex + '' + Date.now().toString().slice(-6) + '00' + (parseInt(num) % 100);
+            });
+            $input.attr('id', newId);
+            
+            // Update any corresponding label 'for' attributes
+            $newBlock.find('label[for="' + id + '"]').attr('for', newId);
+        }
+    });
+    
+    // Update any data attributes or other references that might need updating
+    $newBlock.find('[data-mblock_index]').attr('data-mblock_index', targetIndex + 1);
+    
+    // Call the original unique ID function for any special cases
+    mblock_set_unique_id($newBlock, false);
 }
 
 function mblock_paste_block_data(element, $afterBlock, copiedData) {
@@ -376,31 +427,11 @@ function mblock_paste_block_data(element, $afterBlock, copiedData) {
         return;
     }
     
-    // Create new block from copied HTML
+    // Create new block from copied HTML - values are already preserved in the HTML
     const $newBlock = $(copiedData.html);
     
-    // Generate unique IDs and names for form elements
-    mblock_set_unique_id($newBlock, true);
-    
-    // Apply the copied form data to the new block
-    $newBlock.find('input, textarea, select').each(function() {
-        const $input = $(this);
-        const baseName = $input.attr('name');
-        if (baseName) {
-            // Find the original name in the form data
-            let originalName = baseName;
-            for (const [name, value] of Object.entries(copiedData.formData)) {
-                if (baseName.includes(name.replace(/\[.*\]/, ''))) {
-                    if ($input.is(':checkbox') || $input.is(':radio')) {
-                        $input.prop('checked', value);
-                    } else {
-                        $input.val(value);
-                    }
-                    break;
-                }
-            }
-        }
-    });
+    // Update form field names and IDs to make them unique within this MBlock
+    mblock_update_field_references($newBlock, element);
     
     // Insert the new block after the current one
     if ($afterBlock && $afterBlock.length) {
