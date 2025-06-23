@@ -56,6 +56,7 @@ mblock_v35_tooltip_move_up = Blok naar boven verplaatsen
 mblock_v35_tooltip_move_down = Blok naar beneden verplaatsen
 mblock_v35_tooltip_drag_handle = Blok verplaatsen door slepen en neerzetten
 mblock_v35_tooltip_add = Blok toevoegen
+mblock_v35_tooltip_copy = Blok kopiëren
 mblock_v35_tooltip_delete = Blok verwijderen
 mblock_v35_block_active = Actief
 mblock_v35_block_inactive = Inactief

@@ -20,6 +20,7 @@ function mblock_init_controls(element) {
         move_down: 'Move block down', 
         drag_handle: 'Move block by drag & drop',
         add: 'Add block',
+        copy: 'Copy block',
         delete: 'Delete block'
     };
     
@@ -53,6 +54,9 @@ function mblock_init_controls(element) {
     
     // Bind add and delete events
     mblock_bind_add_delete_events(element);
+    
+    // Bind copy events
+    mblock_bind_copy_events(element);
 }
 
 // MBlock - Central button bar template function
@@ -79,6 +83,10 @@ function mblock_create_controls(blockIndex, i18n) {
             <button type="button" class="btn mblock-move-btn sorthandle" 
                     data-toggle="tooltip" title="${i18n.drag_handle}">
                 <i class="rex-icon fa-arrows"></i>
+            </button>
+            <button type="button" class="btn mblock-copy-btn " 
+                    data-toggle="tooltip" title="${i18n.copy}">
+                <i class="rex-icon fa-copy"></i>
             </button>
             <button type="button" class="btn mblock-add-btn " 
                     data-toggle="tooltip" title="${i18n.add}">
@@ -290,6 +298,26 @@ function mblock_bind_add_delete_events(element) {
     });
 }
 
+function mblock_bind_copy_events(element) {
+    // Use event delegation for copy buttons
+    element.off('click.mblock-copy').on('click.mblock-copy', '.mblock-copy-btn', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const $btn = $(this);
+        const $block = $btn.closest('.sortitem');
+        
+        if (!$btn.prop('disabled')) {
+            // MBlock v4.0 - Show button click feedback
+            mblock_show_button_feedback($btn);
+            
+            // Copy the current block
+            mblock_copy_item(element, $block);
+        }
+        return false;
+    });
+}
+
 // Update move button states based on position
 function mblock_update_move_button_states(element) {
     const $blocks = element.find('> div.sortitem');
@@ -440,13 +468,16 @@ function mblock_update_button_states(element) {
     $blocks.each(function() {
         const $block = $(this);
         const $addBtn = $block.find('.mblock-add-btn');
+        const $copyBtn = $block.find('.mblock-copy-btn');
         const $deleteBtn = $block.find('.mblock-delete-btn');
         
-        // Add button: disable if at max
+        // Add and Copy buttons: disable if at max
         if ($blocks.length >= maxBlocks) {
             $addBtn.prop('disabled', true).addClass('disabled');
+            $copyBtn.prop('disabled', true).addClass('disabled');
         } else {
             $addBtn.prop('disabled', false).removeClass('disabled');
+            $copyBtn.prop('disabled', false).removeClass('disabled');
         }
         
         // Delete button: disable if at min
@@ -735,6 +766,60 @@ function mblock_add_item(element, item) {
     $(document).trigger('rex:ready', [iClone]);
 }
 
+// Copy an existing block within the same MBlock instance
+function mblock_copy_item(element, sourceBlock) {
+    // Clone the source block completely (including all content and values)
+    var iClone = sourceBlock.clone(true);
+    
+    // Clean up the cloned block
+    // Remove any old button structures and controls
+    mblock_clean_old_buttons(iClone);
+    iClone.find('.mblock-controls').remove();
+    
+    // Fix radio and checkbox names to avoid conflicts
+    iClone.find('input:radio, input:checkbox').each(function () {
+        var currentName = $(this).attr('name');
+        if (currentName) {
+            // Add prefix to avoid conflicts during reindexing
+            $(this).attr('name', 'mblock_new_' + currentName);
+        }
+    });
+    
+    // Insert the clone after the source block
+    if (sourceBlock.parent().hasClass(element.attr('class'))) {
+        // unset sortable
+        element.mblock_sortable("destroy");
+        // add clone after source
+        sourceBlock.after(iClone);
+        // set count
+        mblock_set_count(element, sourceBlock);
+    }
+
+    // add unique id
+    mblock_set_unique_id(iClone, true);
+    
+    // Add buttons to new block (this ensures clean modern buttons)
+    mblock_add_buttons_to_new_block(element, iClone);
+    
+    // reinit sortable only (no old event handlers)
+    mblock_init_sort(element);
+    
+    // Update button states
+    mblock_update_button_states(element);
+    
+    // scroll to item and highlight immediately
+    mblock_scroll(element, iClone);
+    // Highlight the new block
+    mblock_highlight_new_block(iClone);
+    
+    // MBlock v4.0 - Enhanced Widget Support for copied items
+    mblock_reinit_widgets(iClone);
+    
+    // trigger rex ready on the new block and document
+    iClone.trigger('rex:ready', [iClone]);
+    $(document).trigger('rex:ready', [iClone]);
+}
+
 // Add buttons to newly created blocks
 function mblock_add_buttons_to_new_block(element, newBlock) {
     // Get translations (fallback to English if not available)
@@ -745,6 +830,7 @@ function mblock_add_buttons_to_new_block(element, newBlock) {
         move_down: 'Move block down', 
         drag_handle: 'Move block by drag & drop',
         add: 'Add block',
+        copy: 'Copy block',
         delete: 'Delete block'
     };
     

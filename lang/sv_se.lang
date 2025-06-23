@@ -56,6 +56,7 @@ mblock_v35_tooltip_move_up = Flytta block uppåt
 mblock_v35_tooltip_move_down = Flytta block nedåt
 mblock_v35_tooltip_drag_handle = Flytta block genom att dra och släppa
 mblock_v35_tooltip_add = Lägg till block
+mblock_v35_tooltip_copy = Kopiera block
 mblock_v35_tooltip_delete = Ta bort block
 mblock_v35_block_active = Aktiv
 mblock_v35_block_inactive = Inaktiv

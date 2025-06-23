@@ -56,6 +56,7 @@ mblock_v35_tooltip_move_up = Block nach oben verschieben
 mblock_v35_tooltip_move_down = Block nach unten verschieben
 mblock_v35_tooltip_drag_handle = Block per Drag & Drop verschieben
 mblock_v35_tooltip_add = Block hinzufügen
+mblock_v35_tooltip_copy = Block kopieren
 mblock_v35_tooltip_delete = Block löschen
 mblock_v35_block_active = Aktiv
 mblock_v35_block_inactive = Inaktiv
