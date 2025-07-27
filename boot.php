@@ -38,7 +38,8 @@ if (rex::isBackend() && is_object(rex::getUser())) {
 
 }
 
-if (isset($_SESSION['mblock_count'])) {
+// Sichere Session-Reset mit REDAXO Session API
+if (session_status() === PHP_SESSION_ACTIVE && rex_session('mblock_count', 'int', null) !== null) {
     // reset mblock page count
-    $_SESSION['mblock_count'] = 0;
+    rex_set_session('mblock_count', 0);
 }

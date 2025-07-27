@@ -29,10 +29,11 @@ class MBlock
      */
     public function __construct()
     {
-        // Sichere Session-Initialisierung
+        // Sichere Session-Initialisierung mit REDAXO Session API
         if (session_status() === PHP_SESSION_ACTIVE) {
-            if (!isset($_SESSION['mblock_count']) || !is_numeric($_SESSION['mblock_count'])) {
-                $_SESSION['mblock_count'] = 0;
+            $currentCount = rex_session('mblock_count', 'int', 0);
+            if (!is_numeric($currentCount) || $currentCount < 0) {
+                rex_set_session('mblock_count', 0);
             }
         }
     }
@@ -48,12 +49,14 @@ class MBlock
     public static function show($id, $form, $settings = array(), $theme = null)
     {
         $plain = false;
-        // Sichere Session-Initialisierung und Count-Management
+        // Sichere Session-Initialisierung und Count-Management mit REDAXO Session API
         if (session_status() === PHP_SESSION_ACTIVE) {
-            if (!isset($_SESSION['mblock_count']) || !is_numeric($_SESSION['mblock_count'])) {
-                $_SESSION['mblock_count'] = 0;
+            $currentCount = rex_session('mblock_count', 'int', 0);
+            if (!is_numeric($currentCount) || $currentCount < 0) {
+                rex_set_session('mblock_count', 0);
+            } else {
+                rex_set_session('mblock_count', $currentCount + 1);
             }
-            $_SESSION['mblock_count']++;
         }
 
         if (is_integer($id) or is_numeric($id)) {
