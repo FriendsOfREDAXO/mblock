@@ -95,32 +95,43 @@ echo '</pre>';
 
 ## Large Data Handling / Große Datenmengen
 
-MBlock stores data as JSON in REDAXO's article_slice table. When working with large amounts of data (> 4000 characters), you may encounter limitations due to database column size restrictions.
+MBlock can handle large datasets, but you may encounter limitations due to PHP configuration settings when working with many items or complex nested data.
 
-_German:_ MBlock speichert Daten als JSON in REDAXOs article_slice Tabelle. Bei großen Datenmengen (> 4000 Zeichen) können Beschränkungen durch die Datenbankspaltengröße auftreten.
+_German:_ MBlock kann große Datenmengen verarbeiten, aber bei vielen Elementen oder komplexen verschachtelten Daten können PHP-Konfigurationsbeschränkungen auftreten.
 
-### Symptoms / Symptome
+### Common Issue: max_input_vars Limit
 
-- Form does not render with large JSON data
-- Data appears to be truncated after saving
-- Console errors about JSON decode failures
+**Problem:** PHP's `max_input_vars` setting (default: 1000) limits the number of form variables that can be processed. MBlock forms with many items can easily exceed this limit, causing data truncation.
+
+**Symptoms / Symptome:**
+- Only partial MBlock data is saved (first ~100-200 items depending on complexity)
+- No error messages visible to users
+- Data appears to be "lost" during saving
+- REDAXO logs show warnings about approaching max_input_vars limit
+
+**Solutions / Lösungen:**
+
+1. **Increase PHP max_input_vars** (recommended):
+   ```ini
+   ; In php.ini or .htaccess
+   max_input_vars = 3000
+   ```
+
+2. **Monitor your data size**:
+   - Check REDAXO error logs for MBlock warnings
+   - Each MBlock item with multiple fields counts as several variables
+   - Nested arrays (like multi-select fields) multiply the variable count
+
+3. **Restructure large datasets**:
+   - Split very large MBlock instances into multiple smaller ones
+   - Use separate database tables for bulk data
+   - Consider pagination for user interface
+
+### Legacy Note
+
+Previous versions of this documentation mentioned 4000-character JSON limits and database column restrictions. These were incorrect assumptions. The actual limitation is PHP's `max_input_vars` setting, not database storage or JSON size.
 
 _German:_
-- Formular wird bei großen JSON-Daten nicht gerendert  
-- Daten scheinen nach dem Speichern abgeschnitten zu sein
-- Konsolenfehler über JSON-Dekodierungsfehler
-
-### Solutions / Lösungen
-
-1. **Check REDAXO logs** for warnings about large data
-2. **Monitor data size** - keep individual MBlock entries under 4000 characters when possible
-3. **Use separate storage** for very large content (e.g., separate tables, files)
-4. **Database optimization** - ensure REDAXO's value columns use TEXT instead of VARCHAR
-
-_German:_
-1. **REDAXO-Logs prüfen** auf Warnungen über große Daten
-2. **Datengröße überwachen** - einzelne MBlock-Einträge wenn möglich unter 4000 Zeichen halten
-3. **Separate Speicherung** für sehr große Inhalte verwenden (z.B. separate Tabellen, Dateien)
-4. **Datenbankoptimierung** - sicherstellen, dass REDAXOs Wertspalten TEXT statt VARCHAR verwenden
+Frühere Versionen dieser Dokumentation erwähnten 4000-Zeichen-JSON-Limits und Datenbankspaltenbeschränkungen. Dies waren falsche Annahmen. Die tatsächliche Begrenzung ist PHPs `max_input_vars`-Einstellung, nicht die Datenbankspeicherung oder JSON-Größe.
 
 

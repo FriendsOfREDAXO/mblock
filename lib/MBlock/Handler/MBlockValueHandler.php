@@ -36,6 +36,14 @@ class MBlockValueHandler
             $result = [];
 
             if (rex_request('REX_INPUT_VALUE', 'array')) {
+                // Check for potential max_input_vars truncation
+                $maxInputVars = ini_get('max_input_vars');
+                $postVarCount = self::countPostVars($_POST);
+                
+                if ($postVarCount >= $maxInputVars * 0.9) { // Warn at 90% of limit
+                    error_log('MBlock Warning: POST data contains ' . $postVarCount . ' variables, approaching PHP max_input_vars limit of ' . $maxInputVars . '. Large MBlock datasets may be truncated. Consider increasing max_input_vars in PHP configuration.');
+                }
+                
                 foreach (rex_request('REX_INPUT_VALUE') as $key => $value) {
                     $result['value'][$key] = $value;
                 }
@@ -68,23 +76,32 @@ class MBlockValueHandler
                         $result['link'][$i] = $sql->getValue('link' . $i);
                     }
 
-                    $decodedValue = htmlspecialchars_decode((string) $result['value'][$i]);
-                    $jsonResult = json_decode($decodedValue, true);
+                    $jsonResult = json_decode(htmlspecialchars_decode((string) $result['value'][$i]), true);
 
-                    if (is_array($jsonResult)) {
+                    if (is_array($jsonResult))
                         $result['value'][$i] = $jsonResult;
-                    } else if (!empty($decodedValue) && json_last_error() !== JSON_ERROR_NONE) {
-                        // JSON decode failed, likely due to truncated data
-                        // Log the error using error_log to avoid form rendering issues
-                        error_log('MBlock: JSON decode failed for value' . $i . ': ' . json_last_error_msg() . '. Data may be truncated due to database column size limitations.');
-                        
-                        // Try to salvage data by providing an empty array to prevent form rendering issues
-                        $result['value'][$i] = array();
-                    }
                 }
             }
         }
         return $result;
+    }
+
+    /**
+     * Recursively count variables in an array (like $_POST)
+     * Used to detect max_input_vars truncation issues
+     * @param array $array
+     * @return int
+     */
+    private static function countPostVars($array)
+    {
+        $count = 0;
+        foreach ($array as $key => $value) {
+            $count++;
+            if (is_array($value)) {
+                $count += self::countPostVars($value);
+            }
+        }
+        return $count;
     }
 
     /**
@@ -115,8 +132,7 @@ class MBlockValueHandler
 
         if ($sql->getRows() > 0) {
             if (array_key_exists($tableName . '.' . $columnName, $sql->getRow())) {
-                $decodedValue = htmlspecialchars_decode($sql->getRow()[$tableName . '.' . $columnName]);
-                $jsonResult = json_decode($decodedValue, true);
+                $jsonResult = json_decode(htmlspecialchars_decode($sql->getRow()[$tableName . '.' . $columnName]), true);
 
                 if (!is_null($attrType) && is_array($jsonResult) && array_key_exists($attrType, $jsonResult)) {
                     $jsonResult = $jsonResult[$attrType];
@@ -124,15 +140,8 @@ class MBlockValueHandler
 
                 $tableKey = ($table[0] != $tableName) ? $table[0] : $tableName;
 
-                if (is_array($jsonResult)) {
+                if (is_array($jsonResult))
                     $result['value'][$tableKey . '::' . $columnName] = $jsonResult;
-                } else if (!empty($decodedValue) && json_last_error() !== JSON_ERROR_NONE) {
-                    // JSON decode failed, likely due to truncated data
-                    error_log('MBlock: JSON decode failed for table ' . $tableName . ' column ' . $columnName . ': ' . json_last_error_msg() . '. Data may be truncated due to database column size limitations.');
-                    
-                    // Provide empty array as fallback to prevent form rendering issues
-                    $result['value'][$tableKey . '::' . $columnName] = array();
-                }
             }
         }
 

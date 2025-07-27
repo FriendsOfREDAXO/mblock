@@ -74,18 +74,19 @@ class MBlockRexFormProcessor
                     $rows[] = array_pop($newRow);
                 }
 
-        if (isset($post[$form->getName()]))
+        if (isset($post[$form->getName()])) {
+            // Check for potential max_input_vars truncation
+            $maxInputVars = ini_get('max_input_vars');
+            $postVarCount = self::countPostVars($post);
+            
+            if ($postVarCount >= $maxInputVars * 0.9) { // Warn at 90% of limit
+                error_log('MBlock Warning: Form POST data contains ' . $postVarCount . ' variables, approaching PHP max_input_vars limit of ' . $maxInputVars . '. Large MBlock datasets may be truncated. Consider increasing max_input_vars in PHP configuration.');
+            }
+            
             foreach ($post[$form->getName()] as $row => $field)
-                if (is_array($field)) {
-                    $jsonValue = json_encode($field);
-                    
-                    // Warn if JSON data is approaching database column limits
-                    if (strlen($jsonValue) > 4000) {
-                        error_log('MBlock: Large JSON data detected for column ' . $row . ' (' . strlen($jsonValue) . ' characters). This may be truncated by database column size limitations and cause data loss.');
-                    }
-                    
-                    $updateValues[$row] = $jsonValue;
-                }
+                if (is_array($field))
+                    $updateValues[$row] = json_encode($field);
+        }
 
         // is row not in update list?
         if (sizeof($rows) > 0)
@@ -95,5 +96,23 @@ class MBlockRexFormProcessor
 
         if (sizeof($updateValues) > 0)
             $sql->setValues($updateValues)->update();
+    }
+
+    /**
+     * Recursively count variables in an array (like $_POST)
+     * Used to detect max_input_vars truncation issues
+     * @param array $array
+     * @return int
+     */
+    private static function countPostVars($array)
+    {
+        $count = 0;
+        foreach ($array as $key => $value) {
+            $count++;
+            if (is_array($value)) {
+                $count += self::countPostVars($value);
+            }
+        }
+        return $count;
     }
 }
