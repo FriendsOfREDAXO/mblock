@@ -43,10 +43,10 @@ class MBlockValueHandler
             }
         }
 
-        if ($sliceId != false) {
+        if ($sliceId !== false && is_numeric($sliceId) && $sliceId > 0) {
             $table = rex::getTablePrefix() . 'article_slice';
             $fields = '*';
-            $where = 'id="' . $_REQUEST['slice_id'] . '"';
+            $where = 'id=' . (int) $sliceId;
 
             $sql = rex_sql::factory();
             $query = '
@@ -68,10 +68,17 @@ class MBlockValueHandler
                         $result['link'][$i] = $sql->getValue('link' . $i);
                     }
 
-                    $jsonResult = json_decode(htmlspecialchars_decode((string) $result['value'][$i]), true);
-
-                    if (is_array($jsonResult))
-                        $result['value'][$i] = $jsonResult;
+                    // Sichere JSON-Dekodierung mit Error-Handling
+                    $decodedValue = htmlspecialchars_decode((string) $result['value'][$i]);
+                    if (!empty($decodedValue) && is_string($decodedValue)) {
+                        $jsonResult = json_decode($decodedValue, true);
+                        
+                        // Überprüfung auf JSON-Dekodierung-Fehler
+                        if (json_last_error() === JSON_ERROR_NONE && is_array($jsonResult)) {
+                            $result['value'][$i] = $jsonResult;
+                        }
+                        // Bei JSON-Fehlern bleibt der ursprüngliche Wert erhalten
+                    }
                 }
             }
         }
