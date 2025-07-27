@@ -81,7 +81,7 @@ class MBlockRexFormProcessor
                     
                     // Warn if JSON data is approaching database column limits
                     if (strlen($jsonValue) > 4000) {
-                        rex_logger::logWarning('mblock', 'Large JSON data detected for column ' . $row . ' (' . strlen($jsonValue) . ' characters). This may be truncated by database column size limitations and cause data loss.');
+                        error_log('MBlock: Large JSON data detected for column ' . $row . ' (' . strlen($jsonValue) . ' characters). This may be truncated by database column size limitations and cause data loss.');
                     }
                     
                     $updateValues[$row] = $jsonValue;

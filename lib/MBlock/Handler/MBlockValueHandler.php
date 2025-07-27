@@ -75,8 +75,8 @@ class MBlockValueHandler
                         $result['value'][$i] = $jsonResult;
                     } else if (!empty($decodedValue) && json_last_error() !== JSON_ERROR_NONE) {
                         // JSON decode failed, likely due to truncated data
-                        // Log the error and provide fallback behavior
-                        rex_logger::logError('mblock', 'JSON decode failed for value' . $i . ': ' . json_last_error_msg() . '. Data may be truncated due to database column size limitations.');
+                        // Log the error using error_log to avoid form rendering issues
+                        error_log('MBlock: JSON decode failed for value' . $i . ': ' . json_last_error_msg() . '. Data may be truncated due to database column size limitations.');
                         
                         // Try to salvage data by providing an empty array to prevent form rendering issues
                         $result['value'][$i] = array();
@@ -128,7 +128,7 @@ class MBlockValueHandler
                     $result['value'][$tableKey . '::' . $columnName] = $jsonResult;
                 } else if (!empty($decodedValue) && json_last_error() !== JSON_ERROR_NONE) {
                     // JSON decode failed, likely due to truncated data
-                    rex_logger::logError('mblock', 'JSON decode failed for table ' . $tableName . ' column ' . $columnName . ': ' . json_last_error_msg() . '. Data may be truncated due to database column size limitations.');
+                    error_log('MBlock: JSON decode failed for table ' . $tableName . ' column ' . $columnName . ': ' . json_last_error_msg() . '. Data may be truncated due to database column size limitations.');
                     
                     // Provide empty array as fallback to prevent form rendering issues
                     $result['value'][$tableKey . '::' . $columnName] = array();
