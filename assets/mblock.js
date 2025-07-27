@@ -569,6 +569,31 @@ function mblock_add(element) {
 }
 
 /**
+ * Entfernt alle IDs aus einem Item vor dem Paste um Duplikate zu vermeiden
+ * @param {jQuery} item - MBlock Item das eingefügt werden soll
+ */
+function mblock_clear_ids_before_paste(item) {
+    // Alle Elemente mit ID-Attribut finden und IDs entfernen
+    item.find('[id]').each(function() {
+        $(this).removeAttr('id');
+    });
+    
+    // Alle data-target und href Attribute auf Tabs/Collapse entfernen
+    item.find('a[data-toggle="tab"]').each(function() {
+        $(this).removeAttr('href');
+    });
+    
+    item.find('a[data-toggle="collapse"]').each(function() {
+        $(this).removeAttr('data-target').removeAttr('data-parent');
+    });
+    
+    // Alle for-Attribute von Labels entfernen
+    item.find('label[for]').each(function() {
+        $(this).removeAttr('for');
+    });
+}
+
+/**
  * Kopiert ein MBlock Item in das Clipboard dieser MBlock-Instanz
  * @param {jQuery} element - MBlock Container Element
  * @param {jQuery} item - Zu kopierendes MBlock Item
@@ -614,6 +639,9 @@ function mblock_paste_item(element, currentItem) {
     // Item aus Clipboard erstellen
     var newItem = $(clipboard.html);
     
+    // WICHTIG: Alle IDs temporär entfernen um Duplikate zu vermeiden
+    mblock_clear_ids_before_paste(newItem);
+    
     // Nach dem aktuellen Item einfügen
     currentItem.after(newItem);
     
@@ -622,6 +650,9 @@ function mblock_paste_item(element, currentItem) {
     
     // Unique IDs generieren (leert auch Felder mit data-unique Attribut)
     mblock_set_unique_id(newItem, true);
+    
+    // VOLLSTÄNDIGE Reindexierung aller Items (behebt Tab/Collapse/Field IDs)
+    mblock_reindex(element);
     
     // Alles neu initialisieren
     mblock_init_sort(element);
