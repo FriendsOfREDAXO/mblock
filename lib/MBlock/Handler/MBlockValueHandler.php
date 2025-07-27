@@ -68,10 +68,19 @@ class MBlockValueHandler
                         $result['link'][$i] = $sql->getValue('link' . $i);
                     }
 
-                    $jsonResult = json_decode(htmlspecialchars_decode((string) $result['value'][$i]), true);
+                    $decodedValue = htmlspecialchars_decode((string) $result['value'][$i]);
+                    $jsonResult = json_decode($decodedValue, true);
 
-                    if (is_array($jsonResult))
+                    if (is_array($jsonResult)) {
                         $result['value'][$i] = $jsonResult;
+                    } else if (!empty($decodedValue) && json_last_error() !== JSON_ERROR_NONE) {
+                        // JSON decode failed, likely due to truncated data
+                        // Log the error and provide fallback behavior
+                        rex_logger::logError('mblock', 'JSON decode failed for value' . $i . ': ' . json_last_error_msg() . '. Data may be truncated due to database column size limitations.');
+                        
+                        // Try to salvage data by providing an empty array to prevent form rendering issues
+                        $result['value'][$i] = array();
+                    }
                 }
             }
         }
@@ -106,7 +115,8 @@ class MBlockValueHandler
 
         if ($sql->getRows() > 0) {
             if (array_key_exists($tableName . '.' . $columnName, $sql->getRow())) {
-                $jsonResult = json_decode(htmlspecialchars_decode($sql->getRow()[$tableName . '.' . $columnName]), true);
+                $decodedValue = htmlspecialchars_decode($sql->getRow()[$tableName . '.' . $columnName]);
+                $jsonResult = json_decode($decodedValue, true);
 
                 if (!is_null($attrType) && is_array($jsonResult) && array_key_exists($attrType, $jsonResult)) {
                     $jsonResult = $jsonResult[$attrType];
@@ -114,8 +124,15 @@ class MBlockValueHandler
 
                 $tableKey = ($table[0] != $tableName) ? $table[0] : $tableName;
 
-                if (is_array($jsonResult))
+                if (is_array($jsonResult)) {
                     $result['value'][$tableKey . '::' . $columnName] = $jsonResult;
+                } else if (!empty($decodedValue) && json_last_error() !== JSON_ERROR_NONE) {
+                    // JSON decode failed, likely due to truncated data
+                    rex_logger::logError('mblock', 'JSON decode failed for table ' . $tableName . ' column ' . $columnName . ': ' . json_last_error_msg() . '. Data may be truncated due to database column size limitations.');
+                    
+                    // Provide empty array as fallback to prevent form rendering issues
+                    $result['value'][$tableKey . '::' . $columnName] = array();
+                }
             }
         }
 

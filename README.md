@@ -93,4 +93,34 @@ dump(rex_var::toArray("REX_VALUE[1]"));
 echo '</pre>';
 ```
 
+## Large Data Handling / Große Datenmengen
+
+MBlock stores data as JSON in REDAXO's article_slice table. When working with large amounts of data (> 4000 characters), you may encounter limitations due to database column size restrictions.
+
+_German:_ MBlock speichert Daten als JSON in REDAXOs article_slice Tabelle. Bei großen Datenmengen (> 4000 Zeichen) können Beschränkungen durch die Datenbankspaltengröße auftreten.
+
+### Symptoms / Symptome
+
+- Form does not render with large JSON data
+- Data appears to be truncated after saving
+- Console errors about JSON decode failures
+
+_German:_
+- Formular wird bei großen JSON-Daten nicht gerendert  
+- Daten scheinen nach dem Speichern abgeschnitten zu sein
+- Konsolenfehler über JSON-Dekodierungsfehler
+
+### Solutions / Lösungen
+
+1. **Check REDAXO logs** for warnings about large data
+2. **Monitor data size** - keep individual MBlock entries under 4000 characters when possible
+3. **Use separate storage** for very large content (e.g., separate tables, files)
+4. **Database optimization** - ensure REDAXO's value columns use TEXT instead of VARCHAR
+
+_German:_
+1. **REDAXO-Logs prüfen** auf Warnungen über große Daten
+2. **Datengröße überwachen** - einzelne MBlock-Einträge wenn möglich unter 4000 Zeichen halten
+3. **Separate Speicherung** für sehr große Inhalte verwenden (z.B. separate Tabellen, Dateien)
+4. **Datenbankoptimierung** - sicherstellen, dass REDAXOs Wertspalten TEXT statt VARCHAR verwenden
+
 

@@ -76,8 +76,16 @@ class MBlockRexFormProcessor
 
         if (isset($post[$form->getName()]))
             foreach ($post[$form->getName()] as $row => $field)
-                if (is_array($field))
-                    $updateValues[$row] = json_encode($field);
+                if (is_array($field)) {
+                    $jsonValue = json_encode($field);
+                    
+                    // Warn if JSON data is approaching database column limits
+                    if (strlen($jsonValue) > 4000) {
+                        rex_logger::logWarning('mblock', 'Large JSON data detected for column ' . $row . ' (' . strlen($jsonValue) . ' characters). This may be truncated by database column size limitations and cause data loss.');
+                    }
+                    
+                    $updateValues[$row] = $jsonValue;
+                }
 
         // is row not in update list?
         if (sizeof($rows) > 0)
