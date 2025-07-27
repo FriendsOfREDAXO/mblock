@@ -15,12 +15,28 @@ function mblock_init(element) {
         element.data('mblock_run', 1);
         mblock_sort(element);
         mblock_set_unique_id(element, false);
+        // Copy & Paste Funktionalität initialisieren
+        mblock_init_copy_paste(element);
 
         if (element.data('min') == 1 && element.data('max') == 1) {
             element.addClass('hide_removeadded').addClass('hide_sorthandle');
         }
     }
     mblock_add_plus(element);
+}
+
+/**
+ * Initialisiert Copy & Paste Funktionalität für MBlock
+ * @param {jQuery} element - MBlock Container Element
+ */
+function mblock_init_copy_paste(element) {
+    // Clipboard für dieses MBlock (nur innerhalb einer Instanz)
+    if (!element.data('mblock_clipboard')) {
+        element.data('mblock_clipboard', null);
+    }
+    
+    // Copy & Paste Buttons zu bestehenden Blöcken hinzufügen
+    mblock_add_copy_paste_buttons(element);
 }
 
 // List with handle
@@ -38,6 +54,74 @@ function mblock_sort(element) {
     mblock_remove(element);
     // init sortable
     mblock_sort_it(element);
+    // Copy & Paste Buttons aktualisieren
+    mblock_add_copy_paste_buttons(element);
+}
+
+/**
+ * Fügt Copy & Paste Buttons zu allen MBlock Items hinzu
+ * @param {jQuery} element - MBlock Container Element
+ */
+function mblock_add_copy_paste_buttons(element) {
+    element.find('> div.sortitem').each(function() {
+        var item = $(this);
+        
+        // Prüfen ob bereits Copy/Paste Buttons vorhanden sind
+        if (item.find('.mblock-copy-paste-toolbar').length === 0) {
+            // Toolbar für Copy & Paste Buttons erstellen
+            var toolbar = $('<div class="mblock-copy-paste-toolbar" style="margin-bottom: 10px; padding: 5px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px;"></div>');
+            
+            // Copy Button
+            var copyBtn = $('<button type="button" class="btn btn-sm btn-default mblock-copy-btn" title="Block kopieren" style="margin-right: 5px;"><i class="rex-icon fa-copy"></i> Kopieren</button>');
+            
+            // Paste Button (anfangs deaktiviert wenn kein Clipboard-Inhalt)
+            var pasteBtn = $('<button type="button" class="btn btn-sm btn-default mblock-paste-btn" title="Block einfügen"><i class="rex-icon fa-paste"></i> Einfügen</button>');
+            
+            // Paste Button Status aktualisieren
+            if (!element.data('mblock_clipboard')) {
+                pasteBtn.prop('disabled', true).addClass('disabled');
+            }
+            
+            toolbar.append(copyBtn).append(pasteBtn);
+            item.prepend(toolbar);
+            
+            // Event Handlers
+            mblock_bind_copy_paste_events(element, item, copyBtn, pasteBtn);
+        }
+    });
+}
+
+/**
+ * Bindet Events für Copy & Paste Buttons
+ * @param {jQuery} element - MBlock Container
+ * @param {jQuery} item - MBlock Item
+ * @param {jQuery} copyBtn - Copy Button
+ * @param {jQuery} pasteBtn - Paste Button
+ */
+function mblock_bind_copy_paste_events(element, item, copyBtn, pasteBtn) {
+    // Copy Event
+    copyBtn.off('click').on('click', function(e) {
+        e.preventDefault();
+        mblock_copy_item(element, item);
+        
+        // Alle Paste Buttons in dieser MBlock-Instanz aktivieren
+        element.find('.mblock-paste-btn').prop('disabled', false).removeClass('disabled');
+        
+        // Visuelles Feedback
+        var originalText = copyBtn.html();
+        copyBtn.html('<i class="rex-icon fa-check"></i> Kopiert!').addClass('btn-success');
+        setTimeout(function() {
+            copyBtn.html(originalText).removeClass('btn-success');
+        }, 1500);
+    });
+    
+    // Paste Event
+    pasteBtn.off('click').on('click', function(e) {
+        e.preventDefault();
+        if (element.data('mblock_clipboard')) {
+            mblock_paste_item(element, item);
+        }
+    });
 }
 
 function mblock_add_plus(element) {
@@ -481,5 +565,141 @@ function mblock_add(element) {
             mblock_movedown(element, $(this).closest('div[class^="sortitem"]'));
         }
         return false;
+    });
+}
+
+/**
+ * Kopiert ein MBlock Item in das Clipboard dieser MBlock-Instanz
+ * @param {jQuery} element - MBlock Container Element
+ * @param {jQuery} item - Zu kopierendes MBlock Item
+ */
+function mblock_copy_item(element, item) {
+    // Item klonen (mit allen Daten und Events)
+    var clonedItem = item.clone(true, true);
+    
+    // Copy & Paste Toolbar aus dem Klon entfernen (wird beim Einfügen neu erstellt)
+    clonedItem.find('.mblock-copy-paste-toolbar').remove();
+    
+    // In Clipboard dieser MBlock-Instanz speichern
+    element.data('mblock_clipboard', {
+        html: clonedItem.prop('outerHTML'),
+        data: mblock_extract_form_data(item),
+        timestamp: Date.now()
+    });
+    
+    console.log('MBlock Item copied to clipboard:', element.data('mblock_clipboard'));
+}
+
+/**
+ * Fügt ein Item aus dem Clipboard nach dem aktuellen Item ein
+ * @param {jQuery} element - MBlock Container Element  
+ * @param {jQuery} currentItem - Item nach dem eingefügt werden soll
+ */
+function mblock_paste_item(element, currentItem) {
+    var clipboard = element.data('mblock_clipboard');
+    if (!clipboard) {
+        console.warn('Kein Item im Clipboard verfügbar');
+        return;
+    }
+    
+    // Prüfen ob maximale Anzahl erreicht
+    if (element.data('max') && element.find('> div.sortitem').length >= element.data('max')) {
+        alert('Maximale Anzahl von Blöcken erreicht');
+        return;
+    }
+    
+    // Sortable deaktivieren
+    element.mblock_sortable("destroy");
+    
+    // Item aus Clipboard erstellen
+    var newItem = $(clipboard.html);
+    
+    // Nach dem aktuellen Item einfügen
+    currentItem.after(newItem);
+    
+    // Form-Daten wiederherstellen
+    mblock_restore_form_data(newItem, clipboard.data);
+    
+    // Unique IDs generieren (leert auch Felder mit data-unique Attribut)
+    mblock_set_unique_id(newItem, true);
+    
+    // Alles neu initialisieren
+    mblock_init_sort(element);
+    
+    // Scroll zum neuen Item
+    mblock_scroll(element, newItem);
+    
+    // Rex Ready Event triggern für Widget-Reinitialisierung
+    newItem.trigger('rex:ready', [newItem]);
+    
+    console.log('MBlock Item pasted successfully');
+}
+
+/**
+ * Extrahiert Formulardaten aus einem MBlock Item
+ * @param {jQuery} item - MBlock Item
+ * @returns {Object} Formulardaten
+ */
+function mblock_extract_form_data(item) {
+    var formData = {};
+    
+    item.find('input, textarea, select').each(function() {
+        var $field = $(this);
+        var name = $field.attr('name');
+        var type = $field.attr('type');
+        
+        if (name) {
+            if (type === 'checkbox' || type === 'radio') {
+                formData[name] = {
+                    value: $field.val(),
+                    checked: $field.prop('checked')
+                };
+            } else {
+                formData[name] = {
+                    value: $field.val()
+                };
+            }
+        }
+    });
+    
+    return formData;
+}
+
+/**
+ * Stellt Formulardaten in einem MBlock Item wieder her
+ * @param {jQuery} item - MBlock Item
+ * @param {Object} formData - Formulardaten
+ */
+function mblock_restore_form_data(item, formData) {
+    // Erst alle Felder zurücksetzen
+    item.find('input, textarea, select').each(function() {
+        var $field = $(this);
+        var type = $field.attr('type');
+        
+        if (type === 'checkbox' || type === 'radio') {
+            $field.prop('checked', false);
+        } else if (type !== 'hidden') {
+            $field.val('');
+        }
+    });
+    
+    // Dann gespeicherte Daten wiederherstellen
+    Object.keys(formData).forEach(function(fieldName) {
+        var fieldData = formData[fieldName];
+        var $field = item.find('[name="' + fieldName + '"]');
+        
+        if ($field.length > 0) {
+            var type = $field.attr('type');
+            
+            if (type === 'checkbox' || type === 'radio') {
+                $field.val(fieldData.value);
+                $field.prop('checked', fieldData.checked);
+            } else {
+                // Für unique Felder keine Werte wiederherstellen
+                if (!$field.attr('data-unique') && !$field.attr('data-unique-int')) {
+                    $field.val(fieldData.value);
+                }
+            }
+        }
     });
 }

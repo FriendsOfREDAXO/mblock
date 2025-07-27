@@ -88,4 +88,56 @@ div.sortable-ghost {
     padding-top: 15px;
 }
 
+/* Copy & Paste Funktionalität */
+.mblock-copy-paste-toolbar {
+    margin-bottom: 10px !important;
+    padding: 8px 12px !important;
+    background: #f8f9fa !important;
+    border: 1px solid #dee2e6 !important;
+    border-radius: 4px !important;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+}
+
+.mblock-copy-paste-toolbar .btn {
+    margin: 0 !important;
+    font-size: 12px;
+    padding: 4px 8px;
+    line-height: 1.4;
+}
+
+.mblock-copy-btn:hover {
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+}
+
+.mblock-paste-btn:hover:not(.disabled) {
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+}
+
+.mblock-paste-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Dark Mode Support für Copy & Paste */
+body.rex-theme-dark .mblock-copy-paste-toolbar {
+    background: #2d3436 !important;
+    border-color: #636e72 !important;
+    color: #ddd;
+}
+
+body.rex-theme-dark .mblock-copy-btn:hover {
+    background-color: #636e72;
+    border-color: #74b9ff;
+}
+
+body.rex-theme-dark .mblock-paste-btn:hover:not(.disabled) {
+    background-color: #636e72;
+    border-color: #74b9ff;
+}
+
 
