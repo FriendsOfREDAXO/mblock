@@ -36,11 +36,9 @@ class MBlockSettingsHelper
             if ($settings['delete_confirm'] === 0)
                 unset($settings['delete_confirm']);
         }
-        if (isset($_SESSION['mblock_count'])) {
-            $settings['mblock_count'] = $_SESSION['mblock_count'];
-        } else {
-            $settings['mblock_count'] = 0;
-        }
+        
+        // Sichere Session-basierte mblock_count mit MBlockSessionHelper
+        $settings['mblock_count'] = MBlockSessionHelper::getCurrentCount();
 
         foreach ($settings as $key => $value) {
             if (!$value) {

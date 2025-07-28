@@ -27,19 +27,24 @@ class MBlockBootstrapReplacer
                 $item->addPayload('replace-id', $key);
 
                 $href = str_replace('#','',$match->getAttribute('href'));
-                $newHref = $href . '_' . $count . $_SESSION['mblock_count'] . '00' . $key;
+                $mblockCount = MBlockSessionHelper::getCurrentCount();
+                $newHref = $href . '_' . $count . $mblockCount . '00' . $key;
                 $match->setAttribute('href', '#' . $newHref);
 
-                $parent = $match->parentNode->parentNode->parentNode;
-
-                if ($parent->hasChildNodes()) {
-                    /** @var DOMElement $childNode */
-                    foreach ($parent->getElementsByTagName('div') as $childNode) {
-                        if ($childNode->hasChildNodes()) {
-                            /** @var DOMElement $child */
-                            foreach ($childNode->getElementsByTagName('div') as $child) {
-                                if ($child->getAttribute('id') == $href) {
-                                    $child->setAttribute('id', $newHref);
+                // Sichere DOM-Navigation mit Null-Checks
+                $parent = $match->parentNode;
+                if ($parent && $parent->parentNode && $parent->parentNode->parentNode) {
+                    $parent = $parent->parentNode->parentNode;
+                    
+                    if ($parent->hasChildNodes()) {
+                        /** @var DOMElement $childNode */
+                        foreach ($parent->getElementsByTagName('div') as $childNode) {
+                            if ($childNode->hasChildNodes()) {
+                                /** @var DOMElement $child */
+                                foreach ($childNode->getElementsByTagName('div') as $child) {
+                                    if ($child->getAttribute('id') == $href) {
+                                        $child->setAttribute('id', $newHref);
+                                    }
                                 }
                             }
                         }
@@ -69,10 +74,11 @@ class MBlockBootstrapReplacer
                 $item->addPayload('replace-id', $key);
 
                 $href = str_replace('#','',$match->getAttribute('data-target'));
-                $newHref = $href . '_' . $count . $_SESSION['mblock_count'] . '00' . $key;
+                $mblockCount = MBlockSessionHelper::getCurrentCount();
+                $newHref = $href . '_' . $count . $mblockCount . '00' . $key;
                 $match->setAttribute('data-target', '#' . $newHref);
                 if ($match->hasAttribute('data-parent')) {
-                    $match->setAttribute('data-parent', '#accgr' . '_' . $count . $_SESSION['mblock_count'] . '00');
+                    $match->setAttribute('data-parent', '#accgr' . '_' . $count . $mblockCount . '00');
                 }
 
                 $next = $match->nextSibling;
@@ -81,10 +87,16 @@ class MBlockBootstrapReplacer
                     $next->setAttribute('id', $newHref);
                 }
 
-                $parent = $match->parentNode->parentNode;
-
-                if ($parent->hasAttribute('data-group-accordion') && $parent->getAttribute('data-group-accordion') == 1) {
-                    $parent->setAttribute('id', 'accgr' . '_' . $count . $_SESSION['mblock_count'] . '00');
+                // Sichere DOM-Navigation mit Null-Checks  
+                $parent = $match->parentNode;
+                if ($parent && $parent->parentNode) {
+                    $parent = $parent->parentNode;
+                    
+                    if ($parent instanceof DOMElement && 
+                        $parent->hasAttribute('data-group-accordion') && 
+                        $parent->getAttribute('data-group-accordion') == 1) {
+                        $parent->setAttribute('id', 'accgr' . '_' . $count . $mblockCount . '00');
+                    }
                 }
             }
         }

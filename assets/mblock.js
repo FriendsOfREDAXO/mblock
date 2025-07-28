@@ -1,28 +1,129 @@
 /**
  * Created by joachimdoerr on 30.07.16.
+ * Enhanced with robust error handling and memory management
  */
 
 let mblock = '.mblock_wrapper';
 
+/**
+ * Utility-Funktion zur sicheren jQuery-Element-Validierung
+ * @param {jQuery|HTMLElement|string} element - Element zum Validieren
+ * @returns {boolean} Ob Element gültig ist
+ */
+function mblock_validate_element(element) {
+    try {
+        if (!element) return false;
+        
+        // jQuery-Objekt prüfen
+        if (element.jquery) {
+            return element.length > 0 && typeof element.data === 'function';
+        }
+        
+        // DOM-Element prüfen
+        if (element.nodeType) {
+            return true;
+        }
+        
+        // String-Selector prüfen
+        if (typeof element === 'string') {
+            return element.length > 0;
+        }
+        
+        return false;
+    } catch (error) {
+        console.error('MBlock: Fehler bei Element-Validierung:', error);
+        return false;
+    }
+}
+
+/**
+ * Sichere Event-Cleanup-Funktion für besseres Memory-Management
+ * @param {jQuery} element - Element dessen Events bereinigt werden sollen
+ * @param {string} namespace - Event-Namespace (optional)
+ */
+function mblock_cleanup_events(element, namespace = '.mblock') {
+    try {
+        if (mblock_validate_element(element) && element.jquery) {
+            // Alle Event-Listener mit Namespace entfernen
+            element.find('*').off(namespace);
+            element.off(namespace);
+        }
+    } catch (error) {
+        console.error('MBlock: Fehler bei Event-Cleanup:', error);
+    }
+}
+
 $(document).on('rex:ready', function (e, container) {
-    container.find(mblock).each(function () {
-        mblock_init($(this));
-    });
+    try {
+        if (container && typeof container.find === 'function') {
+            container.find(mblock).each(function () {
+                const $element = $(this);
+                if ($element.length) {
+                    try {
+                        mblock_init($element);
+                    } catch (initError) {
+                        console.error('MBlock: Fehler beim Initialisieren eines einzelnen MBlock-Elements:', initError);
+                        // Einzelne Fehler nicht die gesamte Initialisierung abbrechen lassen
+                    }
+                }
+            });
+        } else {
+            // Fallback: Wenn kein Container, alle MBlock-Elemente initialisieren
+            $(mblock).each(function () {
+                const $element = $(this);
+                if ($element.length) {
+                    try {
+                        mblock_init($element);
+                    } catch (initError) {
+                        console.error('MBlock: Fehler beim Initialisieren (Fallback):', initError);
+                    }
+                }
+            });
+        }
+    } catch (error) {
+        console.error('MBlock: Kritischer Fehler bei rex:ready:', error);
+        
+        // Emergency-Fallback: Versuche zumindest eine Basic-Initialisierung
+        try {
+            $(mblock).each(function () {
+                const $element = $(this);
+                if ($element.length && !$element.data('mblock_run')) {
+                    console.warn('MBlock: Notfall-Initialisierung für Element');
+                    $element.data('mblock_run', 1);
+                }
+            });
+        } catch (emergencyError) {
+            console.error('MBlock: Notfall-Initialisierung fehlgeschlagen:', emergencyError);
+        }
+    }
 });
 
 function mblock_init(element) {
-    if (!element.data('mblock_run')) {
-        element.data('mblock_run', 1);
-        mblock_sort(element);
-        mblock_set_unique_id(element, false);
-        // Copy & Paste Funktionalität initialisieren
-        mblock_init_copy_paste(element);
-
-        if (element.data('min') == 1 && element.data('max') == 1) {
-            element.addClass('hide_removeadded').addClass('hide_sorthandle');
+    try {
+        if (!element || !element.length || typeof element.data !== 'function') {
+            console.warn('MBlock: Ungültiges Element bei mblock_init');
+            return false;
         }
+
+        if (!element.data('mblock_run')) {
+            element.data('mblock_run', 1);
+            mblock_sort(element);
+            mblock_set_unique_id(element, false);
+            // Copy & Paste Funktionalität initialisieren
+            mblock_init_copy_paste(element);
+
+            const minValue = element.data('min');
+            const maxValue = element.data('max');
+            if (minValue == 1 && maxValue == 1) {
+                element.addClass('hide_removeadded').addClass('hide_sorthandle');
+            }
+        }
+        mblock_add_plus(element);
+        return true;
+    } catch (error) {
+        console.error('MBlock: Fehler in mblock_init:', error);
+        return false;
     }
-    mblock_add_plus(element);
 }
 
 /**
@@ -30,32 +131,60 @@ function mblock_init(element) {
  * @param {jQuery} element - MBlock Container Element
  */
 function mblock_init_copy_paste(element) {
-    // Clipboard für dieses MBlock (nur innerhalb einer Instanz)
-    if (!element.data('mblock_clipboard')) {
-        element.data('mblock_clipboard', null);
+    try {
+        if (!element || !element.length) {
+            return false;
+        }
+
+        // Clipboard für dieses MBlock (nur innerhalb einer Instanz)
+        if (!element.data('mblock_clipboard')) {
+            element.data('mblock_clipboard', null);
+        }
+        
+        // Copy & Paste Buttons zu bestehenden Blöcken hinzufügen
+        mblock_add_copy_paste_buttons(element);
+        return true;
+    } catch (error) {
+        console.error('MBlock: Fehler in mblock_init_copy_paste:', error);
+        return false;
     }
-    
-    // Copy & Paste Buttons zu bestehenden Blöcken hinzufügen
-    mblock_add_copy_paste_buttons(element);
 }
 
 // List with handle
 function mblock_init_sort(element) {
-    // reindex
-    mblock_reindex(element);
-    // init
-    mblock_sort(element);
+    try {
+        if (!element || !element.length) {
+            return false;
+        }
+        // reindex
+        mblock_reindex(element);
+        // init
+        mblock_sort(element);
+        return true;
+    } catch (error) {
+        console.error('MBlock: Fehler in mblock_init_sort:', error);
+        return false;
+    }
 }
 
 function mblock_sort(element) {
-    // add linking
-    mblock_add(element);
-    // remove mblock_remove
-    mblock_remove(element);
-    // init sortable
-    mblock_sort_it(element);
-    // Copy & Paste Buttons aktualisieren
-    mblock_add_copy_paste_buttons(element);
+    try {
+        if (!element || !element.length) {
+            return false;
+        }
+        // add linking
+        mblock_add(element);
+        // remove mblock_remove
+        mblock_remove(element);
+        // init sortable
+        mblock_sort_it(element);
+        // Copy & Paste Buttons aktualisieren
+        mblock_add_copy_paste_buttons(element);
+        return true;
+    } catch (error) {
+        console.error('MBlock: Fehler in mblock_sort:', error);
+        return false;
+    }
 }
 
 /**
@@ -183,197 +312,277 @@ function mblock_remove(element) {
 }
 
 function mblock_sort_it(element) {
-    element.mblock_sortable({
-        handle: '.sorthandle',
-        animation: 150,
-        onEnd: function (event) {
-            mblock_reindex(element);
-            mblock_remove(element);
-            // trigger event
-            let iClone = $(event.item);
-            iClone.trigger('mblock:change', [iClone]);
+    try {
+        if (!element || !element.length || typeof element.mblock_sortable !== 'function') {
+            console.warn('MBlock: Sortable nicht verfügbar für Element');
+            return false;
         }
-    });
+
+        element.mblock_sortable({
+            handle: '.sorthandle',
+            animation: 150,
+            onEnd: function (event) {
+                try {
+                    if (event && event.item) {
+                        mblock_reindex(element);
+                        mblock_remove(element);
+                        // trigger event
+                        let iClone = $(event.item);
+                        if (iClone.length) {
+                            iClone.trigger('mblock:change', [iClone]);
+                        }
+                    }
+                } catch (error) {
+                    console.error('MBlock: Fehler in sortable onEnd:', error);
+                }
+            }
+        });
+        return true;
+    } catch (error) {
+        console.error('MBlock: Fehler in mblock_sort_it:', error);
+        return false;
+    }
 }
 
 function mblock_reindex(element) {
+    try {
+        if (!mblock_validate_element(element)) {
+            console.warn('MBlock: Ungültiges Element bei mblock_reindex');
+            return false;
+        }
 
-    var mblock_count = element.data('mblock_count');
+        const mblock_count = element.data('mblock_count') || 0;
+        const sortItems = element.find('> div.sortitem');
+        
+        if (!sortItems.length) {
+            return true;
+        }
 
-    element.find('> div.sortitem').each(function (index) {
-        // find input elements
-        $(this).attr('data-mblock_index', (index + 1));
-        $(this).find('input,textarea,select,button').each(function (key) {
-            var attr = $(this).attr('name');
-            eindex = key + 1;
-            sindex = index + 1;
-            // For some browsers, `attr` is undefined; for others,
-            // `attr` is false. Check for both.
-            if (typeof attr !== typeof undefined && attr !== false) {
-                var value = attr.replace($(this).attr('name').match(/\]\[\d+\]\[/g), '][' + index + '][').replace('mblock_new_', '');
-                $(this).attr('name', value);
+        // Performance-Optimierung: Batch DOM-Updates
+        sortItems.each(function (index) {
+            const $sortItem = $(this);
+            const sindex = index + 1;
+            
+            // Set index attribute
+            $sortItem.attr('data-mblock_index', sindex);
+            
+            // Optimierte Element-Behandlung
+            mblock_reindex_form_elements($sortItem, index, sindex, mblock_count);
+            mblock_reindex_special_elements($sortItem, index, sindex, mblock_count);
+        });
+
+        // Nach Reindexierung: for-Attribute korrigieren
+        mblock_replace_for(element);
+        
+        return true;
+    } catch (error) {
+        console.error('MBlock: Fehler in mblock_reindex:', error);
+        return false;
+    }
+}
+
+/**
+ * Optimierte Behandlung von Formularelementen beim Reindexing
+ */
+function mblock_reindex_form_elements($sortItem, index, sindex, mblock_count) {
+    try {
+        $sortItem.find('input,textarea,select,button').each(function (key) {
+            const $element = $(this);
+            const eindex = key + 1;
+            const attr = $element.attr('name');
+            
+            // Name-Attribut aktualisieren
+            if (attr && typeof attr !== 'undefined') {
+                const nameMatches = attr.match(/\]\[\d+\]\[/g);
+                if (nameMatches) {
+                    const newValue = attr.replace(nameMatches, '][' + index + '][').replace('mblock_new_', '');
+                    $element.attr('name', newValue);
+                }
             }
 
-            // checkbox problem fix
-            if ($(this).attr('type') == 'checkbox') {
-                $(this).unbind().bind('change', function () {
-                    if ($(this).is(':checked')) {
-                        $(this).val(1);
-                    } else {
-                        $(this).val(0);
-                    }
+            // Event-Handler für Checkboxen optimieren
+            const elementType = $element.attr('type');
+            if (elementType === 'checkbox') {
+                $element.off('change.mblock').on('change.mblock', function () {
+                    $(this).val($(this).is(':checked') ? 1 : 0);
                 });
             }
 
-            // radio problem fix
-            if ($(this).attr('type') == 'radio' && $(this).attr('data-value')) {
-                $(this).val($(this).attr('data-value'));
-            }
-
-            // select rex button
-            if ($(this).prop("nodeName") == 'SELECT' && $(this).attr('id') && (
-                $(this).attr('id').indexOf("REX_MEDIALIST_SELECT_") >= 0 ||
-                $(this).attr('id').indexOf("REX_LINKLIST_SELECT_") >= 0
-            )) {
-                $(this).parent().data('eindex', eindex);
-                $(this).attr('id', $(this).attr('id').replace(/_\d+/, '_' + sindex + '' + mblock_count + '00' + eindex));
-                if ($(this).attr('name') != undefined) {
-                    $(this).attr('name', $(this).attr('name').replace(/_\d+/, '_' + sindex + '' + mblock_count + '00' + eindex));
+            // Radio-Button Werte wiederherstellen
+            if (elementType === 'radio') {
+                const dataValue = $element.attr('data-value');
+                if (dataValue) {
+                    $element.val(dataValue);
                 }
             }
 
-            // input rex button
-            if ($(this).prop("nodeName") == 'INPUT' && $(this).attr('id') && (
-                $(this).attr('id').indexOf("REX_LINKLIST_") >= 0 ||
-                $(this).attr('id').indexOf("REX_MEDIALIST_") >= 0
-            )) {
-                if ($(this).parent().data('eindex')) {
-                    eindex = $(this).parent().data('eindex');
-                }
-                $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '' + mblock_count + '00' + eindex));
+            // REX-spezifische IDs aktualisieren
+            mblock_update_rex_ids($element, sindex, mblock_count, eindex);
+        });
+    } catch (error) {
+        console.error('MBlock: Fehler in mblock_reindex_form_elements:', error);
+    }
+}
 
-                // button
-                $(this).parent().find('a.btn-popup').each(function () {
-                    $(this).attr('onclick', $(this).attr('onclick').replace(/\('?\d+/, '(\'' + sindex + '' + mblock_count + '00' + eindex));
-                    $(this).attr('onclick', $(this).attr('onclick').replace(/_\d+/, '_' + sindex + '' + mblock_count + '00' + eindex));
-                });
+/**
+ * REX-System-IDs aktualisieren (SELECT/INPUT)
+ */
+function mblock_update_rex_ids($element, sindex, mblock_count, eindex) {
+    try {
+        const elementId = $element.attr('id');
+        const nodeName = $element.prop('nodeName');
+        
+        if (!elementId) return;
+
+        // SELECT-Elemente (REX_MEDIALIST_SELECT, REX_LINKLIST_SELECT)
+        if (nodeName === 'SELECT' && 
+            (elementId.indexOf('REX_MEDIALIST_SELECT_') >= 0 || elementId.indexOf('REX_LINKLIST_SELECT_') >= 0)) {
+            
+            $element.parent().data('eindex', eindex);
+            const newId = elementId.replace(/_\d+/, '_' + sindex + mblock_count + '00' + eindex);
+            $element.attr('id', newId);
+            
+            const nameAttr = $element.attr('name');
+            if (nameAttr) {
+                $element.attr('name', nameAttr.replace(/_\d+/, '_' + sindex + mblock_count + '00' + eindex));
             }
+        }
 
-            // input rex button
-            if ($(this).prop("nodeName") == 'INPUT' && $(this).attr('id') && (
-                $(this).attr('id').indexOf("REX_LINK_") >= 0 ||
-                $(this).attr('id').indexOf("REX_MEDIA_") >= 0
-            )) {
-                if ($(this).attr('type') != 'hidden') {
-                    if ($(this).parent().data('eindex')) {
-                        eindex = $(this).parent().data('eindex');
-                    }
-                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '' + mblock_count + '00' + eindex));
+        // INPUT-Elemente (REX_LINKLIST, REX_MEDIALIST)
+        if (nodeName === 'INPUT' && 
+            (elementId.indexOf('REX_LINKLIST_') >= 0 || elementId.indexOf('REX_MEDIALIST_') >= 0)) {
+            
+            const parentEindex = $element.parent().data('eindex') || eindex;
+            const newId = elementId.replace(/\d+/, sindex + mblock_count + '00' + parentEindex);
+            $element.attr('id', newId);
 
-                    if ($(this).next().attr('type') == 'hidden') {
-                        $(this).next().attr('id', $(this).next().attr('id').replace(/\d+/, sindex + '' + mblock_count + '00' + eindex));
-                    }
-                }
+            // Button-Updates für Popup-Funktionen
+            mblock_update_rex_buttons($element, sindex, mblock_count, parentEindex);
+        }
+    } catch (error) {
+        console.error('MBlock: Fehler in mblock_update_rex_ids:', error);
+    }
+}
+
+/**
+ * REX-Popup-Buttons aktualisieren
+ */
+function mblock_update_rex_buttons($element, sindex, mblock_count, eindex) {
+    try {
+        const $parent = $element.parent();
+        $parent.find('a.btn-popup').each(function () {
+            const $btn = $(this);
+            const onclick = $btn.attr('onclick');
+            if (onclick) {
+                const newOnclick = onclick
+                    .replace(/\('?\d+/, '(\'' + sindex + mblock_count + '00' + eindex)
+                    .replace(/_\d+/, '_' + sindex + mblock_count + '00' + eindex);
+                $btn.attr('onclick', newOnclick);
             }
+        });
+    } catch (error) {
+        console.error('MBlock: Fehler in mblock_update_rex_buttons:', error);
+    }
+}
 
-            // input rex link button
-            if ($(this).prop("nodeName") == 'INPUT' && $(this).attr('id') && (
-                $(this).attr('id').indexOf("REX_LINK_") >= 0
-            )) {
-                if ($(this).attr('type') != 'hidden') {
-                    // button
-                    $(this).parent().find('a.btn-popup').each(function () {
-                        if ($(this).attr('onclick')) {
-                            $(this).attr('onclick', $(this).attr('onclick').replace(/\('?\d+/, '(\'' + sindex + '' + mblock_count + '00' + eindex));
-                            $(this).attr('onclick', $(this).attr('onclick').replace(/_\d+/, '_' + sindex + '' + mblock_count + '00' + eindex));
+/**
+ * Behandlung spezieller Elemente beim Reindexing (Bootstrap-Tabs, Accordions, etc.)
+ */
+function mblock_reindex_special_elements($sortItem, index, sindex, mblock_count) {
+    try {
+        // Bootstrap Tabs
+        $sortItem.find('a[data-toggle="tab"]').each(function (key) {
+            const eindex = key + 1;
+            const $tab = $(this);
+            const href = $tab.attr('href');
+            
+            if (href) {
+                const newHref = href.replace(/_\d+/, '_' + sindex + mblock_count + '00' + eindex);
+                $tab.attr('href', newHref);
+                
+                // Update corresponding tab content
+                const $container = $tab.parent().parent().parent().find('.tab-content ' + href);
+                if ($container.length) {
+                    $container.attr('id', newHref.replace('#', ''));
+                }
+
+                // LocalStorage tab handling mit Error-Handling
+                $tab.off('shown.bs.tab.mblock').on('shown.bs.tab.mblock', function (e) {
+                    try {
+                        const id = $(e.target).attr('href');
+                        if (id && typeof localStorage !== 'undefined') {
+                            localStorage.setItem('selectedTab', id);
                         }
-                    });
-                }
-            }
-
-            // input rex media button
-            if ($(this).prop("nodeName") == 'INPUT' && $(this).attr('id') && (
-                $(this).attr('id').indexOf("REX_MEDIA_") >= 0
-            )) {
-                if ($(this).attr('type') != 'hidden') {
-                    // button
-                    $(this).parent().find('a.btn-popup').each(function () {
-                        if ($(this).attr('onclick')) {
-                            $(this).attr('onclick', $(this).attr('onclick').replace(/\('?\d+/, '(\'' + sindex + '' + mblock_count + '00' + eindex));
-                            $(this).attr('onclick', $(this).attr('onclick').replace(/_\d+/, '_' + sindex + '' + mblock_count + '00' + eindex));
-                        }
-                    });
-                }
+                    } catch (storageError) {
+                        console.warn('MBlock: LocalStorage nicht verfügbar:', storageError);
+                    }
+                });
             }
         });
 
-        $(this).find('a[data-toggle="collapse"]').each(function (key) {
-            eindex = key + 1;
-            sindex = index + 1;
-            togglecollase = $(this);
-            if (!$(this).attr('data-ignore-mblock')) {
-                href = $(this).attr('data-target');
-                container = togglecollase.parent().find(href);
-                if (container.length) {
-                    group = togglecollase.parent().parent().parent().find('.panel-group');
-                    nexit = container.attr('id').replace(/_\d+/, '_' + sindex + '' + mblock_count + '00' + eindex);
-
-                    container.attr('id', nexit);
-                    togglecollase.attr('data-target', '#' + nexit);
-
-                    if (group.length) {
-                        parentit = group.attr('id').replace(/_\d+/, '_' + sindex + '' + mblock_count + '00');
-                        group.attr('id', parentit);
-                        togglecollase.attr('data-parent', '#' + parentit);
+        // Bootstrap Collapse/Accordion
+        $sortItem.find('a[data-toggle="collapse"]').each(function (key) {
+            const eindex = key + 1;
+            const $collapse = $(this);
+            
+            if (!$collapse.attr('data-ignore-mblock')) {
+                const href = $collapse.attr('data-target');
+                if (href) {
+                    const newHref = href.replace(/_\d+/, '_' + sindex + mblock_count + '00' + eindex);
+                    $collapse.attr('data-target', newHref);
+                    
+                    // Update collapse content
+                    const $container = $collapse.parent().find(href);
+                    if ($container.length) {
+                        $container.attr('id', newHref.replace('#', ''));
+                    }
+                    
+                    // Update group parent if exists
+                    const $group = $collapse.parent().parent().parent().find('.panel-group');
+                    if ($group.length) {
+                        const parentId = 'accgr_' + sindex + mblock_count + '00';
+                        $group.attr('id', parentId);
+                        $collapse.attr('data-parent', '#' + parentId);
                     }
                 }
             }
         });
 
-        $(this).find('a[data-toggle="tab"]').each(function (key) {
-            eindex = key + 1;
-            sindex = index + 1;
-            toggletab = $(this);
-            href = $(this).attr('href');
-            container = toggletab.parent().parent().parent().find('.tab-content ' + href);
-            if (container.length) {
-                nexit = container.attr('id').replace(/_\d+/, '_' + sindex + '' + mblock_count + '00' + eindex);
-
-                container.attr('id', nexit);
-                toggletab.attr('href', '#' + nexit);
-
-                toggletab.unbind().bind("shown.bs.tab", function (e) {
-                    var id = $(e.target).attr("href");
-                    localStorage.setItem('selectedTab', id)
-                });
-
-                var selectedTab = localStorage.getItem('selectedTab');
-                if (selectedTab != null) {
-                    $('a[data-toggle="tab"][href="' + selectedTab + '"]').tab('show');
-                }
-            }
-        });
-
-        $(this).find('.custom-link').each(function (key) {
-            eindex = key + 1;
-            sindex = index + 1;
-            customlink = $(this);
-            $(this).find('input').each(function () {
-                if ($(this).attr('id')) {
-                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '' + mblock_count + '00' + eindex));
+        // Custom Links (MForm)
+        $sortItem.find('.custom-link').each(function (key) {
+            const eindex = key + 1;
+            const $customlink = $(this);
+            
+            $customlink.find('input').each(function () {
+                const $input = $(this);
+                const inputId = $input.attr('id');
+                if (inputId) {
+                    $input.attr('id', inputId.replace(/\d+/, sindex + mblock_count + '00' + eindex));
                 }
             });
-            $(this).find('a.btn-popup').each(function () {
-                if ($(this).attr('id')) {
-                    $(this).attr('id', $(this).attr('id').replace(/\d+/, sindex + '' + mblock_count + '00' + eindex));
+            
+            $customlink.find('a.btn-popup').each(function () {
+                const $btn = $(this);
+                const btnId = $btn.attr('id');
+                if (btnId) {
+                    $btn.attr('id', btnId.replace(/\d+/, sindex + mblock_count + '00' + eindex));
                 }
             });
-            customlink.attr('data-id', sindex + '' + mblock_count + '00' + eindex);
-            if (typeof mform_custom_link === 'function') mform_custom_link(customlink);
+            
+            $customlink.attr('data-id', sindex + mblock_count + '00' + eindex);
+            
+            // Trigger MForm custom link function if available
+            if (typeof window.mform_custom_link === 'function') {
+                try {
+                    window.mform_custom_link($customlink);
+                } catch (mformError) {
+                    console.warn('MBlock: MForm custom link Fehler:', mformError);
+                }
+            }
         });
-    });
-
-    mblock_replace_for(element);
+    } catch (error) {
+        console.error('MBlock: Fehler in mblock_reindex_special_elements:', error);
+    }
 }
 
 function mblock_replace_for(element) {
@@ -441,22 +650,42 @@ function mblock_add_item(element, item) {
 }
 
 function mblock_set_unique_id(item, input_delete) {
-    item.find('input').each(function () {
-        var unique_id = Math.random().toString(16).slice(2),
-            unique_int = parseInt(Math.random() * 1000000000000);
+    try {
+        if (!item || !item.length || typeof item.find !== 'function') {
+            console.warn('MBlock: Ungültiges Item bei mblock_set_unique_id');
+            return false;
+        }
 
-        if ($(this).attr('data-unique-int') == 1) {
-            unique_id = unique_int;
-        }
-        if ($(this).attr('data-unique') == 1 || $(this).attr('data-unique-int') == 1) {
-            if (input_delete == true) {
-                $(this).val('');
+        item.find('input').each(function () {
+            try {
+                const $input = $(this);
+                const isUniqueInt = $input.attr('data-unique-int') == 1;
+                const isUnique = $input.attr('data-unique') == 1 || isUniqueInt;
+                
+                if (isUnique) {
+                    let unique_id;
+                    if (isUniqueInt) {
+                        unique_id = Math.floor(Math.random() * 1000000000000);
+                    } else {
+                        unique_id = Math.random().toString(16).slice(2);
+                    }
+
+                    if (input_delete === true) {
+                        $input.val('');
+                    }
+                    if ($input.val() === '' || $input.val() === null) {
+                        $input.val(unique_id);
+                    }
+                }
+            } catch (error) {
+                console.error('MBlock: Fehler bei unique_id Generierung:', error);
             }
-            if ($(this).val() == '') {
-                $(this).val(unique_id);
-            }
-        }
-    });
+        });
+        return true;
+    } catch (error) {
+        console.error('MBlock: Fehler in mblock_set_unique_id:', error);
+        return false;
+    }
 }
 
 function mblock_set_count(element, item) {
@@ -472,29 +701,64 @@ function mblock_set_count(element, item) {
 }
 
 function mblock_remove_item(element, item) {
-    if (element.data().hasOwnProperty('delete_confirm')) {
-        if (!confirm(element.data('delete_confirm'))) {
+    try {
+        if (!element || !element.length || !item || !item.length) {
+            console.warn('MBlock: Ungültige Parameter bei mblock_remove_item');
             return false;
         }
-    }
 
-    if (item.parent().hasClass(element.attr('class'))) {
-        // unset sortable
-        element.mblock_sortable("destory");
-        // set prev item
-        var prevItem = item.prev();
-        // is prev exist?
-        if (!prevItem.hasClass('sortitem')) {
-            prevItem = item.next(); // go to next
+        const elementData = element.data();
+        if (elementData && elementData.hasOwnProperty('delete_confirm')) {
+            if (!confirm(elementData.delete_confirm)) {
+                return false;
+            }
         }
-        // remove element
+
+        const itemParent = item.parent();
+        const elementClass = element.attr('class');
+        
+        if (itemParent.length && elementClass && itemParent.hasClass(elementClass)) {
+            // Sichere Sortable-Deaktivierung
+            try {
+                if (typeof element.mblock_sortable === 'function') {
+                    element.mblock_sortable("destroy"); // Fixed typo: "destory" -> "destroy"
+                }
+            } catch (sortableError) {
+                console.warn('MBlock: Sortable destroy fehlgeschlagen:', sortableError);
+            }
+
+            // set prev item
+            let prevItem = item.prev();
+            // is prev exist?
+            if (!prevItem.length || !prevItem.hasClass('sortitem')) {
+                prevItem = item.next(); // go to next
+            }
+
+            // Sichere Element-Entfernung mit Event-Cleanup
+            try {
+                // Event-Listeners entfernen um Memory Leaks zu verhindern
+                item.find('*').off('.mblock');
+                item.off('.mblock');
+                item.remove();
+            } catch (removeError) {
+                console.error('MBlock: Fehler beim Entfernen des Items:', removeError);
+                return false;
+            }
         item.remove();
-        // reinit
-        mblock_init_sort(element);
-        // scroll to item
-        mblock_scroll(element, prevItem);
-        // add add button
-        mblock_add_plus(element);
+            // reinit
+            mblock_init_sort(element);
+            // scroll to item
+            mblock_scroll(element, prevItem);
+            // add add button
+            mblock_add_plus(element);
+
+            return true;
+        }
+        
+        return false;
+    } catch (error) {
+        console.error('MBlock: Fehler in mblock_remove_item:', error);
+        return false;
     }
 }
 
@@ -529,43 +793,104 @@ function mblock_movedown(element, item) {
 }
 
 function mblock_scroll(element, item) {
-    if (element.data().hasOwnProperty('smooth_scroll')) {
-        if (element.data('smooth_scroll') == true) {
-            $.mblockSmoothScroll({
-                scrollTarget: item,
-                speed: 500
-            });
+    try {
+        if (!element || !element.length || !item || !item.length) {
+            return false;
         }
+
+        const elementData = element.data();
+        if (elementData && elementData.hasOwnProperty('smooth_scroll') && elementData.smooth_scroll === true) {
+            if (typeof $.mblockSmoothScroll === 'function') {
+                $.mblockSmoothScroll({
+                    scrollTarget: item,
+                    speed: 500
+                });
+            }
+        }
+        return true;
+    } catch (error) {
+        console.error('MBlock: Fehler in mblock_scroll:', error);
+        return false;
     }
 }
 
 function mblock_add(element) {
-    element.find('> div.sortitem .addme').unbind().bind('click', function () {
-        if (!$(this).prop('disabled')) {
-            $item = $(this).parents('.sortitem');
-            element.attr('data-mblock_clicked_add_item', $item.attr('data-mblock_index'));
-            mblock_add_item(element, $(this).closest('div[class^="sortitem"]'));
+    try {
+        if (!element || !element.length) {
+            return false;
         }
+
+        // Sichere Event-Bindung mit Namespace für bessere Memory-Management
+        element.find('> div.sortitem .addme')
+            .off('click.mblock')
+            .on('click.mblock', function (e) {
+                e.preventDefault();
+                try {
+                    const $this = $(this);
+                    if (!$this.prop('disabled')) {
+                        const $item = $this.parents('.sortitem');
+                        const itemIndex = $item.attr('data-mblock_index');
+                        if (itemIndex) {
+                            element.attr('data-mblock_clicked_add_item', itemIndex);
+                        }
+                        mblock_add_item(element, $this.closest('div[class^="sortitem"]'));
+                    }
+                } catch (error) {
+                    console.error('MBlock: Fehler in addme click handler:', error);
+                }
+                return false;
+            });
+
+        element.find('> div.sortitem .removeme')
+            .off('click.mblock')
+            .on('click.mblock', function (e) {
+                e.preventDefault();
+                try {
+                    const $this = $(this);
+                    if (!$this.prop('disabled')) {
+                        mblock_remove_item(element, $this.closest('div[class^="sortitem"]'));
+                    }
+                } catch (error) {
+                    console.error('MBlock: Fehler in removeme click handler:', error);
+                }
+                return false;
+            });
+
+        element.find('> div.sortitem .moveup')
+            .off('click.mblock')
+            .on('click.mblock', function (e) {
+                e.preventDefault();
+                try {
+                    const $this = $(this);
+                    if (!$this.prop('disabled')) {
+                        mblock_moveup(element, $this.closest('div[class^="sortitem"]'));
+                    }
+                } catch (error) {
+                    console.error('MBlock: Fehler in moveup click handler:', error);
+                }
+                return false;
+            });
+
+        element.find('> div.sortitem .movedown')
+            .off('click.mblock')
+            .on('click.mblock', function (e) {
+                e.preventDefault();
+                try {
+                    const $this = $(this);
+                    if (!$this.prop('disabled')) {
+                        mblock_movedown(element, $this.closest('div[class^="sortitem"]'));
+                    }
+                } catch (error) {
+                    console.error('MBlock: Fehler in movedown click handler:', error);
+                }
+                return false;
+            });
+
+        return true;
+    } catch (error) {
+        console.error('MBlock: Fehler in mblock_add:', error);
         return false;
-    });
-    element.find('> div.sortitem .removeme').unbind().bind('click', function () {
-        if (!$(this).prop('disabled')) {
-            mblock_remove_item(element, $(this).closest('div[class^="sortitem"]'));
-        }
-        return false;
-    });
-    element.find('> div.sortitem .moveup').unbind().bind('click', function () {
-        if (!$(this).prop('disabled')) {
-            mblock_moveup(element, $(this).closest('div[class^="sortitem"]'));
-        }
-        return false;
-    });
-    element.find('> div.sortitem .movedown').unbind().bind('click', function () {
-        if (!$(this).prop('disabled')) {
-            mblock_movedown(element, $(this).closest('div[class^="sortitem"]'));
-        }
-        return false;
-    });
+    }
 }
 
 /**

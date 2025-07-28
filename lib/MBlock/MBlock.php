@@ -29,13 +29,8 @@ class MBlock
      */
     public function __construct()
     {
-        // Sichere Session-Initialisierung mit REDAXO Session API
-        if (session_status() === PHP_SESSION_ACTIVE) {
-            $currentCount = rex_session('mblock_count', 'int', 0);
-            if (!is_numeric($currentCount) || $currentCount < 0) {
-                rex_set_session('mblock_count', 0);
-            }
-        }
+        // Sichere Session-Initialisierung mit MBlockSessionHelper
+        MBlockSessionHelper::initializeSession();
     }
 
     /**
@@ -48,16 +43,22 @@ class MBlock
      */
     public static function show($id, $form, $settings = array(), $theme = null)
     {
-        $plain = false;
-        // Sichere Session-Initialisierung und Count-Management mit REDAXO Session API
-        if (session_status() === PHP_SESSION_ACTIVE) {
-            $currentCount = rex_session('mblock_count', 'int', 0);
-            if (!is_numeric($currentCount) || $currentCount < 0) {
-                rex_set_session('mblock_count', 0);
-            } else {
-                rex_set_session('mblock_count', $currentCount + 1);
-            }
+        // Input-Validierung für kritische Parameter
+        if (empty($id) || (!is_string($id) && !is_numeric($id))) {
+            throw new InvalidArgumentException('MBlock: ID muss eine nicht-leere Zeichenkette oder Zahl sein');
         }
+
+        if (empty($form)) {
+            throw new InvalidArgumentException('MBlock: Form-Parameter darf nicht leer sein');
+        }
+
+        if (!is_array($settings)) {
+            $settings = array(); // Fallback für ungültige Settings
+        }
+
+        $plain = false;
+        // Sichere Session-Counter-Verwaltung mit MBlockSessionHelper
+        MBlockSessionHelper::incrementCount();
 
         if (is_integer($id) or is_numeric($id)) {
             // load rex value by id

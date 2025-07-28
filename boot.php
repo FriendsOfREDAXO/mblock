@@ -5,6 +5,7 @@
  * @license MIT
  */
 
+
 if (rex::isBackend() && is_object(rex::getUser())) {
 
     // check theme css exists
@@ -38,8 +39,5 @@ if (rex::isBackend() && is_object(rex::getUser())) {
 
 }
 
-// Sichere Session-Reset mit REDAXO Session API
-if (session_status() === PHP_SESSION_ACTIVE && rex_session('mblock_count', 'int', null) !== null) {
-    // reset mblock page count
-    rex_set_session('mblock_count', 0);
-}
+// Sichere Session-Reset mit optimiertem MBlockSessionHelper
+MBlockSessionHelper::resetCountIfNeeded();

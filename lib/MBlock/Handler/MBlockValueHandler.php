@@ -36,8 +36,26 @@ class MBlockValueHandler
             $result = [];
 
             if (rex_request('REX_INPUT_VALUE', 'array')) {
-                foreach (rex_request('REX_INPUT_VALUE') as $key => $value) {
-                    $result['value'][$key] = $value;
+                $inputValues = rex_request('REX_INPUT_VALUE', 'array');
+                
+                // Sichere Validierung der Input-Werte
+                foreach ($inputValues as $key => $value) {
+                    // Schlüssel-Validierung: Nur numerische und String-Schlüssel erlauben
+                    if (!is_string($key) && !is_numeric($key)) {
+                        continue; // Ungültige Schlüssel überspringen
+                    }
+                    
+                    // Wert-Validierung: SQL-Injection-Schutz und Datentypprüfung
+                    if (is_array($value)) {
+                        // Arrays rekursiv validieren und bereinigen
+                        $result['value'][$key] = self::sanitizeArrayValue($value);
+                    } elseif (is_scalar($value) || is_null($value)) {
+                        // Skalare Werte sind erlaubt
+                        $result['value'][$key] = $value;
+                    } else {
+                        // Objekte und Ressourcen überspringen
+                        continue;
+                    }
                 }
                 return $result;
             }
@@ -46,15 +64,13 @@ class MBlockValueHandler
         if ($sliceId !== false && is_numeric($sliceId) && $sliceId > 0) {
             $table = rex::getTablePrefix() . 'article_slice';
             $fields = '*';
-            $where = 'id=' . (int) $sliceId;
+            $sliceId = (int) $sliceId; // Explizite Typisierung für SQL-Sicherheit
 
             $sql = rex_sql::factory();
-            $query = '
-                SELECT ' . $fields . '
-                FROM ' . $table . '
-                WHERE ' . $where;
-
-            $sql->setQuery($query);
+            $sql->setTable($table);
+            $sql->setWhere(['id' => $sliceId]); // Sichere Parameter-Bindung
+            $sql->select($fields);
+            
             $rows = $sql->getRows();
 
             if ($rows > 0) {
@@ -68,16 +84,16 @@ class MBlockValueHandler
                         $result['link'][$i] = $sql->getValue('link' . $i);
                     }
 
-                    // Sichere JSON-Dekodierung mit Error-Handling
-                    $decodedValue = htmlspecialchars_decode((string) $result['value'][$i]);
-                    if (!empty($decodedValue) && is_string($decodedValue)) {
-                        $jsonResult = json_decode($decodedValue, true);
+                    // Robuste JSON-Dekodierung mit MBlockJsonHelper
+                    $valueString = (string) $result['value'][$i];
+                    if (!empty($valueString)) {
+                        $jsonResult = MBlockJsonHelper::decodeFromHtml($valueString, true, false);
                         
-                        // Überprüfung auf JSON-Dekodierung-Fehler
-                        if (json_last_error() === JSON_ERROR_NONE && is_array($jsonResult)) {
+                        // Nur gültige Arrays als Ergebnis verwenden
+                        if (is_array($jsonResult) && !empty($jsonResult)) {
                             $result['value'][$i] = $jsonResult;
                         }
-                        // Bei JSON-Fehlern bleibt der ursprüngliche Wert erhalten
+                        // Bei Fehlern bleibt der ursprüngliche Wert erhalten
                     }
                 }
             }
@@ -94,26 +110,43 @@ class MBlockValueHandler
      */
     public static function loadFromTable($table, $id = 0)
     {
-        $tableName = str_replace('yform_', '', $table[0]);
-        $columnName = $table[1];
-        $attrType = (isset($table[2])) ? $table[2] : null;
-        $id = ($id == 0 && isset($table[3])) ? $table[3] : $id;
-        $idField = 'id';
+                $result = array();
 
-        if (strpos($id, '>>') !== false) {
-            $explodedId = explode('>>', $id);
-            $idField = $explodedId[0];
-            $id = $explodedId[1];
+        // Input-Validierung für SQL-Injection-Schutz
+        if (!is_array($table) || count($table) < 2) {
+            return $result;
         }
 
-        $result = array();
+        $tableName = rex_string::normalize($table[0], '_'); // Sanitize table name
+        $columnName = rex_string::normalize($table[1], '_'); // Sanitize column name
+        $idField = 'id';
+        $attrType = (sizeof($table) > 3) ? rex_string::normalize($table[3], '_') : null;
+
+        // Sichere ID-Validierung
+        if (!is_numeric($id) || $id <= 0) {
+            return $result;
+        }
+        $id = (int) $id;
+
+        if (strpos($table[0], '>>') !== false) {
+            $explodedId = explode('>>', $table[0]);
+            $idField = rex_string::normalize($explodedId[0], '_');
+            $tableName = rex_string::normalize($explodedId[1], '_');
+        }
 
         $sql = rex_sql::factory();
-        $sql->setQuery("SELECT * FROM $tableName WHERE $idField='$id' LIMIT 1");
+        $sql->setTable($tableName);
+        $sql->setWhere([$idField => $id]);
+        $sql->select('*');
+        // rex_sql select hat bereits ein implizites LIMIT wenn setWhere mit einem einzelnen ID verwendet wird
 
         if ($sql->getRows() > 0) {
-            if (array_key_exists($tableName . '.' . $columnName, $sql->getRow())) {
-                $jsonResult = json_decode(htmlspecialchars_decode($sql->getRow()[$tableName . '.' . $columnName]), true);
+            $row = $sql->getRow();
+            $fullColumnName = $tableName . '.' . $columnName;
+            
+            if (array_key_exists($fullColumnName, $row)) {
+                $jsonString = $row[$fullColumnName];
+                $jsonResult = MBlockJsonHelper::decodeFromHtml($jsonString, true, false);
 
                 if (!is_null($attrType) && is_array($jsonResult) && array_key_exists($attrType, $jsonResult)) {
                     $jsonResult = $jsonResult[$attrType];
@@ -127,6 +160,37 @@ class MBlockValueHandler
         }
 
         return $result;
+    }
+
+    /**
+     * Bereinigt Array-Werte rekursiv für sicherere Verarbeitung
+     * @param array $array - Zu bereinigendes Array
+     * @return array - Bereinigtes Array
+     * @author Joachim Doerr
+     */
+    private static function sanitizeArrayValue($array)
+    {
+        if (!is_array($array)) {
+            return $array;
+        }
+
+        $sanitized = [];
+        foreach ($array as $key => $value) {
+            // Schlüssel-Validierung
+            if (!is_string($key) && !is_numeric($key)) {
+                continue;
+            }
+
+            // Wert-Validierung
+            if (is_array($value)) {
+                $sanitized[$key] = self::sanitizeArrayValue($value); // Rekursiver Aufruf
+            } elseif (is_scalar($value) || is_null($value)) {
+                $sanitized[$key] = $value;
+            }
+            // Objekte und Ressourcen werden übersprungen
+        }
+
+        return $sanitized;
     }
 }
 
