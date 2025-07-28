@@ -547,10 +547,16 @@ function mblock_add_item(element, item) {
 
     // add unique id
     mblock_set_unique_id(iClone, true);
-    // reinit
+    // reinit first
     mblock_init_sort(element);
-    // scroll to item
-    mblock_scroll(element, iClone);
+    
+    // scroll to item with slight delay to ensure DOM is ready
+    setTimeout(function() {
+        if (iClone && iClone.length && iClone.is(':visible')) {
+            mblock_scroll(element, iClone);
+        }
+    }, 100);
+    
     // trigger rex ready
     iClone.trigger('rex:ready', [iClone]);
 }
@@ -650,11 +656,13 @@ function mblock_remove_item(element, item) {
                 console.error('MBlock: Fehler beim Entfernen des Items:', removeError);
                 return false;
             }
-        item.remove();
+            
             // reinit
             mblock_init_sort(element);
-            // scroll to item
-            mblock_scroll(element, prevItem);
+            // scroll to item (falls ein vorheriges Element existiert)
+            if (prevItem && prevItem.length) {
+                mblock_scroll(element, prevItem);
+            }
             // add add button
             mblock_add_plus(element);
 
@@ -705,14 +713,32 @@ function mblock_scroll(element, item) {
         }
 
         const elementData = element.data();
+        
+        // Wenn smooth_scroll aktiviert ist, verwende die smooth scroll Funktion
         if (elementData && elementData.hasOwnProperty('smooth_scroll') && elementData.smooth_scroll === true) {
             if (typeof $.mblockSmoothScroll === 'function') {
                 $.mblockSmoothScroll({
                     scrollTarget: item,
                     speed: 500
                 });
+                return true;
             }
         }
+        
+        // Fallback: Standard-Browser-Scrolling zu dem Element
+        if (item.length && item.offset()) {
+            const itemOffset = item.offset().top;
+            const windowHeight = $(window).height();
+            const scrollTop = $(window).scrollTop();
+            
+            // Nur scrollen wenn Element nicht bereits sichtbar ist
+            if (itemOffset < scrollTop || itemOffset > (scrollTop + windowHeight - 200)) {
+                $('html, body').animate({
+                    scrollTop: itemOffset - 100 // 100px Abstand vom oberen Rand
+                }, 300);
+            }
+        }
+        
         return true;
     } catch (error) {
         console.error('MBlock: Fehler in mblock_scroll:', error);

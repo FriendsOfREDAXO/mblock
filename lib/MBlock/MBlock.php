@@ -44,7 +44,7 @@ class MBlock
     public static function show($id, $form, $settings = array(), $theme = null)
     {
         // Input-Validierung für kritische Parameter
-        if (empty($id) || (!is_string($id) && !is_numeric($id))) {
+        if (($id === '' || $id === null) || (!is_string($id) && !is_numeric($id))) {
             throw new InvalidArgumentException('MBlock: ID muss eine nicht-leere Zeichenkette oder Zahl sein');
         }
 

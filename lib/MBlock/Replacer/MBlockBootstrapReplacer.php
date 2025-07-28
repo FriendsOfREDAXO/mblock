@@ -32,13 +32,13 @@ class MBlockBootstrapReplacer
                 $match->setAttribute('href', '#' . $newHref);
 
                 // Sichere DOM-Navigation mit Null-Checks
-                $parent = $match->parentNode;
-                if ($parent && $parent->parentNode && $parent->parentNode->parentNode) {
-                    $parent = $parent->parentNode->parentNode;
+                $currentParent = $match->parentNode;
+                if ($currentParent && $currentParent->parentNode && $currentParent->parentNode->parentNode) {
+                    $targetParent = $currentParent->parentNode->parentNode;
                     
-                    if ($parent->hasChildNodes()) {
+                    if ($targetParent instanceof DOMElement && $targetParent->hasChildNodes()) {
                         /** @var DOMElement $childNode */
-                        foreach ($parent->getElementsByTagName('div') as $childNode) {
+                        foreach ($targetParent->getElementsByTagName('div') as $childNode) {
                             if ($childNode->hasChildNodes()) {
                                 /** @var DOMElement $child */
                                 foreach ($childNode->getElementsByTagName('div') as $child) {
@@ -88,14 +88,14 @@ class MBlockBootstrapReplacer
                 }
 
                 // Sichere DOM-Navigation mit Null-Checks  
-                $parent = $match->parentNode;
-                if ($parent && $parent->parentNode) {
-                    $parent = $parent->parentNode;
+                $currentParent = $match->parentNode;
+                if ($currentParent && $currentParent->parentNode) {
+                    $targetParent = $currentParent->parentNode;
                     
-                    if ($parent instanceof DOMElement && 
-                        $parent->hasAttribute('data-group-accordion') && 
-                        $parent->getAttribute('data-group-accordion') == 1) {
-                        $parent->setAttribute('id', 'accgr' . '_' . $count . $mblockCount . '00');
+                    if ($targetParent instanceof DOMElement && 
+                        $targetParent->hasAttribute('data-group-accordion') && 
+                        $targetParent->getAttribute('data-group-accordion') == 1) {
+                        $targetParent->setAttribute('id', 'accgr' . '_' . $count . $mblockCount . '00');
                     }
                 }
             }

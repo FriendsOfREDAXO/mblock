@@ -260,9 +260,26 @@ class MBlockJsonHelper
             return false;
         }
 
-        // Grundlegende JSON-Struktur-Prüfung
-        $firstChar = trim($json)[0] ?? '';
-        return in_array($firstChar, ['{', '[', '"'], true) || is_numeric($firstChar) || in_array(trim($json), ['true', 'false', 'null'], true);
+        // Erweiterte JSON-Struktur-Prüfung
+        $trimmed = trim($json);
+        $firstChar = $trimmed[0] ?? '';
+        
+        // Objekte und Arrays
+        if (in_array($firstChar, ['{', '[', '"'], true)) {
+            return true;
+        }
+        
+        // Literale Werte
+        if (in_array($trimmed, ['true', 'false', 'null'], true)) {
+            return true;
+        }
+        
+        // Numerische Werte (inklusive negative Zahlen)
+        if (is_numeric($trimmed) || ($firstChar === '-' && is_numeric(substr($trimmed, 1)))) {
+            return true;
+        }
+        
+        return false;
     }
 
     /**

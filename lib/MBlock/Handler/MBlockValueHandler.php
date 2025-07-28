@@ -117,10 +117,11 @@ class MBlockValueHandler
             return $result;
         }
 
-        $tableName = rex_string::normalize($table[0], '_'); // Sanitize table name
-        $columnName = rex_string::normalize($table[1], '_'); // Sanitize column name
+        // Sichere Tabellen- und Spaltennamen-Validierung
+        $tableName = preg_replace('/[^a-zA-Z0-9_]/', '', $table[0]);
+        $columnName = preg_replace('/[^a-zA-Z0-9_]/', '', $table[1]);
         $idField = 'id';
-        $attrType = (sizeof($table) > 3) ? rex_string::normalize($table[3], '_') : null;
+        $attrType = (sizeof($table) > 3) ? preg_replace('/[^a-zA-Z0-9_]/', '', $table[3]) : null;
 
         // Sichere ID-Validierung
         if (!is_numeric($id) || $id <= 0) {
@@ -130,8 +131,8 @@ class MBlockValueHandler
 
         if (strpos($table[0], '>>') !== false) {
             $explodedId = explode('>>', $table[0]);
-            $idField = rex_string::normalize($explodedId[0], '_');
-            $tableName = rex_string::normalize($explodedId[1], '_');
+            $idField = preg_replace('/[^a-zA-Z0-9_]/', '', $explodedId[0]);
+            $tableName = preg_replace('/[^a-zA-Z0-9_]/', '', $explodedId[1]);
         }
 
         $sql = rex_sql::factory();

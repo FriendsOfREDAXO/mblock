@@ -123,7 +123,13 @@ class MBlockSessionHelper
      */
     private static function isSessionActive(): bool
     {
-        return rex::isBackend() && session_status() === PHP_SESSION_ACTIVE;
+        // REDAXO-spezifische Session-Prüfung
+        if (!rex::isBackend() || !is_object(rex::getUser())) {
+            return false;
+        }
+        
+        // Zusätzliche Session-Status-Prüfung
+        return session_status() === PHP_SESSION_ACTIVE && session_id() !== '';
     }
 
     /**
