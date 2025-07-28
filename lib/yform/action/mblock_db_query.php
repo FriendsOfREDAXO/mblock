@@ -23,7 +23,10 @@ class rex_yform_action_mblock_db_query extends rex_yform_action_abstract
         foreach ($labels as $label) {
             $label = trim($label);
             if (!isset($this->params['value_pool']['sql'][$label])) {
-                $params[] = json_encode(rex_request::post($label));
+                $postData = rex_request::post($label);
+                $params[] = is_array($postData) 
+                    ? MBlockJsonHelper::encodeMBlockData($postData)
+                    : (string) $postData;
             } else {
                 $params[] = $this->params['value_pool']['sql'][$label];
             }

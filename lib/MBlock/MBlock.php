@@ -29,10 +29,8 @@ class MBlock
      */
     public function __construct()
     {
-        // create mblock page count is not exist
-        if (!isset($_SESSION['mblock_count'])) {
-            $_SESSION['mblock_count'] = 0;
-        }
+        // Sichere Session-Initialisierung mit MBlockSessionHelper
+        MBlockSessionHelper::initializeSession();
     }
 
     /**
@@ -45,12 +43,22 @@ class MBlock
      */
     public static function show($id, $form, $settings = array(), $theme = null)
     {
-        $plain = false;
-        if (!isset($_SESSION['mblock_count'])) {
-            // set mblock count is not exist
-            $_SESSION['mblock_count'] = 0;
+        // Input-Validierung für kritische Parameter
+        if (($id === '' || $id === null) || (!is_string($id) && !is_numeric($id))) {
+            throw new InvalidArgumentException('MBlock: ID muss eine nicht-leere Zeichenkette oder Zahl sein');
         }
-        $_SESSION['mblock_count']++;
+
+        if (empty($form)) {
+            throw new InvalidArgumentException('MBlock: Form-Parameter darf nicht leer sein');
+        }
+
+        if (!is_array($settings)) {
+            $settings = array(); // Fallback für ungültige Settings
+        }
+
+        $plain = false;
+        // Sichere Session-Counter-Verwaltung mit MBlockSessionHelper
+        MBlockSessionHelper::incrementCount();
 
         if (is_integer($id) or is_numeric($id)) {
             // load rex value by id
@@ -131,15 +139,21 @@ class MBlock
             ->addPayload('plain_item', true);
 
         // is loaded
-        if (array_key_exists('value', self::$result) && is_array(self::$result['value'][$id])) {
+        if (array_key_exists('value', self::$result) && 
+            is_array(self::$result['value']) && 
+            array_key_exists($id, self::$result['value']) && 
+            is_array(self::$result['value'][$id])) {
             // item result to item
             foreach (self::$result['value'][$id] as $jId => $values) {
-                // init item
-                self::$items[$jId] = new MBlockItem;
-                self::$items[$jId]->setId($jId)
-                    ->setValueId($id)
-                    ->setResult($values)
-                    ->setForm($form);
+                // Validierung der Schlüssel
+                if (is_numeric($jId) && is_array($values)) {
+                    // init item
+                    self::$items[$jId] = new MBlockItem;
+                    self::$items[$jId]->setId($jId)
+                        ->setValueId($id)
+                        ->setResult($values)
+                        ->setForm($form);
+                }
             }
         }
 
@@ -255,18 +269,37 @@ class MBlock
     }
 
     /**
+     * Sichere Reset-Methode mit verbesserter Speicherverwaltung
      * @author Joachim Doerr
      */
     private static function reset()
     {
-        foreach (self::$items as $key => $item) {
-            unset(self::$items[$key]);
+        // Sichere Array-Bereinigung
+        if (is_array(self::$items)) {
+            foreach (self::$items as $key => $item) {
+                if (isset(self::$items[$key])) {
+                    unset(self::$items[$key]);
+                }
+            }
+            self::$items = array();
         }
-        foreach (self::$result as $key => $value) {
-            unset(self::$result[$key]);
+        
+        if (is_array(self::$result)) {
+            foreach (self::$result as $key => $value) {
+                if (isset(self::$result[$key])) {
+                    unset(self::$result[$key]);
+                }
+            }
+            self::$result = array();
         }
-        foreach (self::$output as $key => $value) {
-            unset(self::$output[$key]);
+        
+        if (is_array(self::$output)) {
+            foreach (self::$output as $key => $value) {
+                if (isset(self::$output[$key])) {
+                    unset(self::$output[$key]);
+                }
+            }
+            self::$output = array();
         }
     }
 }

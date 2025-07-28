@@ -5,6 +5,7 @@
  * @license MIT
  */
 
+
 if (rex::isBackend() && is_object(rex::getUser())) {
 
     // check theme css exists
@@ -38,7 +39,5 @@ if (rex::isBackend() && is_object(rex::getUser())) {
 
 }
 
-if (isset($_SESSION['mblock_count'])) {
-    // reset mblock page count
-    $_SESSION['mblock_count'] = 0;
-}
+// Sichere Session-Reset mit optimiertem MBlockSessionHelper
+MBlockSessionHelper::resetCountIfNeeded();

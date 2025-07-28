@@ -69,7 +69,7 @@ class MBlockRexFormProcessor
 
         if (is_array($result) && sizeof($result) > 0)
             foreach ($result as $row => $value)
-                if(is_array(json_decode($value, true))) {
+                if (MBlockJsonHelper::isValid($value)) {
                     $newRow = explode('.', $row);
                     $rows[] = array_pop($newRow);
                 }
@@ -77,7 +77,7 @@ class MBlockRexFormProcessor
         if (isset($post[$form->getName()]))
             foreach ($post[$form->getName()] as $row => $field)
                 if (is_array($field))
-                    $updateValues[$row] = json_encode($field);
+                    $updateValues[$row] = MBlockJsonHelper::encodeMBlockData($field);
 
         // is row not in update list?
         if (sizeof($rows) > 0)
