@@ -5,9 +5,18 @@
  * @license MIT
  */
 
+
+
+namespace FriendsOfRedaxo\MBlock\Replacer;
+
+use FriendsOfRedaxo\MBlock\Decorator\MBlockReplacerTrait;
+use FriendsOfRedaxo\MBlock\Decorator\MBlockFormItemDecorator;
+use FriendsOfRedaxo\MBlock\DTO\MBlockItem;
+use DOMElement;
+
 class MBlockValueReplacer
 {
-    use \MBlock\Decorator\MBlockDOMTrait;
+    use MBlockReplacerTrait;
 
     /**
      * @param MBlockItem $item

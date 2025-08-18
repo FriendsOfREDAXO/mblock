@@ -5,6 +5,10 @@
  * @license MIT
  */
 
+
+
+namespace FriendsOfRedaxo\MBlock\DTO;
+
 class MBlockElement
 {
     const KEY = "<mblock:%s/>";

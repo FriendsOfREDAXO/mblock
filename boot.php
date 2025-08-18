@@ -5,15 +5,17 @@
  * @license MIT
  */
 
+
+
 if (rex::isBackend() && is_object(rex::getUser())) {
 
     // check theme css exists
-    MBlockThemeHelper::themeBootCheck($this->getConfig('mblock_theme'));
+    \FriendsOfRedaxo\MBlock\Utils\MBlockThemeHelper::themeBootCheck($this->getConfig('mblock_theme'));
 
     // use theme helper class
-    if (MBlockThemeHelper::getCssAssets($this->getConfig('mblock_theme'))) {
+    if (\FriendsOfRedaxo\MBlock\Utils\MBlockThemeHelper::getCssAssets($this->getConfig('mblock_theme'))) {
         // foreach all css files
-        foreach (MBlockThemeHelper::getCssAssets($this->getConfig('mblock_theme')) as $css) {
+        foreach (\FriendsOfRedaxo\MBlock\Utils\MBlockThemeHelper::getCssAssets($this->getConfig('mblock_theme')) as $css) {
             // add assets css file
             rex_view::addCssFile($this->getAssetsUrl($css));
         }
@@ -25,7 +27,7 @@ if (rex::isBackend() && is_object(rex::getUser())) {
         /** @var rex_form|null $form */
         $form = ($params->hasParam('form')) ? $params->getParam('form') : null;
         if ($form instanceof mblock_rex_form)
-            return MBlockRexFormProcessor::postPostSaveAction($params->getSubject(), $form, $_POST); // execute post post
+            return \FriendsOfRedaxo\MBlock\Processor\MBlockRexFormProcessor::postPostSaveAction($params->getSubject(), $form, $_POST); // execute post post
         else
             return $params->getSubject();
     });
@@ -49,4 +51,4 @@ if (rex::isBackend() && is_object(rex::getUser())) {
 }
 
 // Sichere Session-Reset mit optimiertem MBlockSessionHelper
-MBlockSessionHelper::resetCountIfNeeded();
+\FriendsOfRedaxo\MBlock\Utils\MBlockSessionHelper::resetCountIfNeeded();

@@ -6,6 +6,18 @@
  * @license MIT
  */
 
+
+
+namespace FriendsOfRedaxo\MBlock\Handler;
+
+use FriendsOfRedaxo\MBlock\Utils\MBlockJsonHelper;
+use rex;
+use rex_addon;
+use rex_get;
+use rex_request;
+use rex_sql;
+use rex_sql_exception;
+
 class MBlockValueHandler
 {
     /**
@@ -25,7 +37,7 @@ class MBlockValueHandler
         $prevent_action = false; 
         if (rex_addon::get('gridblock')->isAvailable())
         {
-            if (rex_gridblock::isBackend())
+            if (\rex_gridblock::isBackend())
             {
                 $prevent_action = true; 
             }

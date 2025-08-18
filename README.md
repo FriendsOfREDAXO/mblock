@@ -9,25 +9,52 @@ _English:_ MBlock lets you create an unlimited number of data blocks within a si
 
 ## Features / Funktionen
 
-### 🎯 Grundfunktionen / Core Features
+### Grundfunktionen / Core Features
 
-- ✅ **Beliebig viele Datenblöcke** pro Modul erstellen
-- ✅ **Drag & Drop Sortierung** mit bloecks addon (^5.2.0)
-- ✅ **Minimale/Maximale Anzahl** von Blöcken definierbar
-- ✅ **Collapsed/Expanded Darstellung** für bessere Übersicht
-- ✅ **MForm Integration** für professionelle Formulare
-- ✅ **Template System** mit Prioritätsladung
-- ✅ **Mehrsprachigkeit** (DE/EN)
+- **Beliebig viele Datenblöcke** pro Modul erstellen
+- **Drag & Drop Sortierung** mit bloecks addon (^5.2.0)
+- **Minimale/Maximale Anzahl** von Blöcken definierbar
+- **Collapsed/Expanded Darstellung** für bessere Übersicht
+- **MForm Integration** für professionelle Formulare
+- **Template System** mit Prioritätsladung
+- **Mehrsprachigkeit** (DE/EN)
 
-### 🚀 Erweiterte Funktionen / Advanced Features (MBlock 4.0)
+### Erweiterte Funktionen / Advanced Features (MBlock 4.0)
 
-- 🆕 **Online/Offline Toggle** - Blöcke aktivieren/deaktivieren ohne löschen
-- 🆕 **Copy & Paste** - Komfortable Duplizierung von Inhalten
-- 🆕 **Frontend API Methoden** - `filterByField()`, `sortByField()`, `groupByField()`
-- 🆕 **Schema.org Support** - SEO-optimierte JSON-LD Generierung
-- 🆕 **Erweiterte Datenabfrage** - Online/Offline/All Modi
-- 🆕 **Template-Priorität** - Custom templates überschreiben defaults
-- 🆕 **Media-ID Konflikt-Schutz** - Bessere Warnung bei ID-Überschneidungen
+- **Online/Offline Toggle** - Blöcke aktivieren/deaktivieren ohne löschen
+- **Copy & Paste** - Komfortable Duplizierung von Inhalten
+- **Frontend API Methoden** - `filterByField()`, `sortByField()`, `groupByField()`
+- **Schema.org Support** - SEO-optimierte JSON-LD Generierung
+- **Erweiterte Datenabfrage** - Online/Offline/All Modi
+- **Template-Priorität** - Custom templates überschreiben defaults
+- **Media-ID Konflikt-Schutz** - Bessere Warnung bei ID-Überschneidungen
+
+## Namespace Migration (Version 4.0)
+
+**MBlock 4.0 führt Namespaces ein!** Für neue Projekte wird die Verwendung des Namespace empfohlen:
+
+```php
+<?php
+// Empfohlen: Neue Namespace-Syntax (MBlock 4.0+)
+use FriendsOfRedaxo\MBlock\MBlock;
+
+$items = MBlock::getDataArray("REX_VALUE[1]");
+echo MBlock::show(1, $mform->show());
+```
+
+**Vollständig rückwärtskompatibel!** Bestehende Module funktionieren weiterhin ohne Änderungen:
+
+```php
+<?php
+// Weiterhin unterstützt: Legacy-Syntax (für Bestandscode)
+$items = MBlock::getDataArray("REX_VALUE[1]");
+echo MBlock::show(1, $mform->show());
+```
+
+### Migration Guide
+- **Neue Module**: Verwenden die `use FriendsOfRedaxo\MBlock\MBlock;` Syntax
+- **Bestehende Module**: Funktionieren ohne Änderungen weiter
+- **Deprecated-Warnung**: Alte Syntax wird in Version 5.0 entfernt
 
 ## Installation
 
@@ -42,9 +69,30 @@ MBlock erfordert:
 
 ## API & Datenabfrage
 
-### 🆕 MBlock 4.0 - Neue zentrale getDataArray() Methode
+### MBlock 4.0 - Neue zentrale getDataArray() Methode
 
+**Mit Namespace (empfohlen für neue Projekte):**
 ```php
+<?php
+use FriendsOfRedaxo\MBlock\MBlock;
+
+// Alle MBlock-Daten abrufen
+$allItems = MBlock::getDataArray("REX_VALUE[1]");
+
+// Nur Online-Blöcke (für Frontend) - EMPFOHLEN
+$onlineItems = MBlock::getDataArray("REX_VALUE[1]", 'online');
+
+// Nur Offline-Blöcke (für Backend-Previews)
+$offlineItems = MBlock::getDataArray("REX_VALUE[1]", 'offline');
+
+// Convenience-Methoden
+$onlineItems = MBlock::getOnlineDataArray("REX_VALUE[1]");
+$offlineItems = MBlock::getOfflineDataArray("REX_VALUE[1]");
+```
+
+**Legacy-Syntax (weiterhin unterstützt):**
+```php
+<?php
 // Alle MBlock-Daten abrufen
 $allItems = MBlock::getDataArray("REX_VALUE[1]");
 
@@ -59,9 +107,13 @@ $onlineItems = MBlock::getOnlineDataArray("REX_VALUE[1]");
 $offlineItems = MBlock::getOfflineDataArray("REX_VALUE[1]");
 ``` 
 
-### 🆕 Frontend API - Datenverarbeitung (MBlock 4.0)
+### Frontend API - Datenverarbeitung (MBlock 4.0)
 
+**Mit Namespace (empfohlen):**
 ```php
+<?php
+use FriendsOfRedaxo\MBlock\MBlock;
+
 $items = MBlock::getOnlineDataArray("REX_VALUE[1]");
 
 // Nach Feld filtern
@@ -143,7 +195,7 @@ redaxo/data/addons/mblock/templates/
 
 ## Modulbeispiele / Module examples
 
-MBlock enthält einige Modulbeispiele. Diese findest du auf der MBlock-Seite im REDAXO-Backend. An dieser Stelle möchten wir nur zwei Beispiele auflisten — mit Unterstützung durch [MForm](https://github.com/FriendsOfREDAXO/mform) und ohne —, um zu zeigen, wie MBlock funktioniert.
+MBlock enthält einige Modulbeispiele. Diese finden sich auf der MBlock-Seite im REDAXO-Backend. An dieser Stelle werden nur zwei Beispiele aufgelistet — mit Unterstützung durch [MForm](https://github.com/FriendsOfREDAXO/mform) und ohne —, um zu zeigen, wie MBlock funktioniert.
 
 _English:_ MBlock contains several module examples. You’ll find them on the MBlock page within the REDAXO backend. At this point, we want to show two examples only — one with [MForm](https://github.com/FriendsOfREDAXO/mform) support and another one without — to demonstrate how MBlock works.
 
@@ -153,7 +205,7 @@ __Input:__
 
 ```php
 <?php
-// 🎯 MBlock 4.0 - Modernisiertes Beispiel mit MForm 8
+// MBlock 4.0 - Modernisiertes Beispiel mit MForm 8
 
 use FriendsOfRedaxo\MForm;
 
@@ -172,7 +224,7 @@ $mform->addTextField("$id.0.name", array('label'=>'Name'));
 // media button
 $mform->addMediaField(1, array('label'=>'Avatar'));
 
-// 🆕 MBlock 4.0 - Online/Offline Status (hidden field für Toggle-Funktion)
+// MBlock 4.0 - Online/Offline Status (hidden field für Toggle-Funktion)
 $mform->addTextField("$id.0.mblock_offline", array(
     'type' => 'hidden',
     'value' => '0'  // 0 = online, 1 = offline
@@ -189,7 +241,7 @@ __Output:__
 
 ```php
 <?php
-// 🆕 MBlock 4.0 - Verbesserte Ausgabe
+// MBlock 4.0 - Verbesserte Ausgabe
 $items = MBlock::getOnlineDataArray("REX_VALUE[1]"); // Nur Online-Items
 
 foreach ($items as $item) {
@@ -243,7 +295,7 @@ $form = <<<EOT
     </fieldset>
 EOT;
 
-// 🆕 MBlock 4.0 mit Features
+// MBlock 4.0 mit Features
 echo MBlock::show($id, $form, array(
     'online_offline' => true,
     'copy_paste' => true
@@ -254,7 +306,7 @@ __Output:__
 
 ```php
 <?php
-// 🆕 Sicher und modern
+// Sicher und modern
 $items = MBlock::getOnlineDataArray("REX_VALUE[1]");
 
 foreach ($items as $item) {
@@ -274,16 +326,16 @@ foreach ($items as $item) {
 
 ---
 
-## 📚 Weitere Informationen
+## Weitere Informationen
 
-### 📖 Wo finde ich was?
+### Wo finde ich was?
 
 - **[Best Practices](index.php?page=mblock/best_practices)** - Professionelle Tipps und häufige Probleme
 - **[MForm Demos](index.php?page=mblock/demo/demo_mform)** - Praktische Beispiele mit MForm
 - **[HTML Demos](index.php?page=mblock/demo/demo_html)** - Beispiele ohne MForm-Abhängigkeit
 - **[API Dokumentation](index.php?page=mblock/api)** - Vollständige API-Referenz
 
-### 🔗 Externe Links
+### Externe Links
 
 - **[MForm Addon](https://github.com/FriendsOfREDAXO/mform)** - Empfohlener Form-Builder
 - **[bloecks Addon](https://github.com/FriendsOfREDAXO/bloecks)** - Moderne Drag & Drop Funktionalität  

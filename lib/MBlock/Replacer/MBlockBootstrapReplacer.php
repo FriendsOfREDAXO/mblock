@@ -5,9 +5,18 @@
  * @license MIT
  */
 
+
+
+namespace FriendsOfRedaxo\MBlock\Replacer;
+
+use FriendsOfRedaxo\MBlock\Decorator\MBlockReplacerTrait;
+use FriendsOfRedaxo\MBlock\DTO\MBlockItem;
+use FriendsOfRedaxo\MBlock\Utils\MBlockSessionHelper;
+use DOMElement;
+
 class MBlockBootstrapReplacer
 {
-    use \MBlock\Decorator\MBlockDOMTrait;
+    use MBlockReplacerTrait;
 
     /**
      * @param MBlockItem $item

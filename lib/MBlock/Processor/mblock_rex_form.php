@@ -5,6 +5,10 @@
  * @license MIT
  */
 
+
+
+namespace FriendsOfRedaxo\MBlock\Processor;
+
 class mblock_rex_form extends rex_form
 {
     /**

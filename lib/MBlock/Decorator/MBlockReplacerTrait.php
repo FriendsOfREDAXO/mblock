@@ -5,13 +5,12 @@
  * Time: 15:07
  */
 
-namespace MBlock\Decorator;
-
+namespace FriendsOfRedaxo\MBlock\Decorator;
 
 use DOMDocument;
 use DOMElement;
 
-trait MBlockDOMTrait
+trait MBlockReplacerTrait
 {
     /**
      * @param $html

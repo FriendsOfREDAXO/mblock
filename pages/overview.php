@@ -20,7 +20,7 @@ $content = '
                     <h3 class="panel-title"><i class="rex-icon fa-magic"></i> Hauptfeatures</h3>
                 </div>
                 <div class="panel-body">
-                    <h4>🎯 Bloecks Integration</h4>
+                    <h4>Bloecks Integration</h4>
                     <ul>
                         <li>Moderne <code>bloecks ^5.2.0</code> Abhängigkeit</li>
                         <li>Aktuelles Sortable.js für bessere Performance</li>
@@ -28,7 +28,7 @@ $content = '
                         <li>Entfernung veralteter jQuery UI Fallbacks</li>
                     </ul>
 
-                    <h4>📋 Erweiterte Copy & Paste Funktionalität</h4>
+                    <h4>Erweiterte Copy & Paste Funktionalität</h4>
                     <ul>
                         <li>Session/Local Storage Zwischenablage</li>
                         <li>Modultyp-Validierung verhindert Cross-Module-Paste</li>
@@ -37,7 +37,7 @@ $content = '
                         <li>Automatische Toolbar-Sichtbarkeit</li>
                     </ul>
 
-                    <h4>🌐 Online/Offline Toggle</h4>
+                    <h4>Online/Offline Toggle</h4>
                     <ul>
                         <li>Automatische <code>mblock_offline</code> Feld-Erkennung</li>
                         <li>Farbkodierte UI (grün=online, rot=offline)</li>
@@ -54,7 +54,7 @@ $content = '
                     <h3 class="panel-title"><i class="rex-icon fa-cogs"></i> Technische Verbesserungen</h3>
                 </div>
                 <div class="panel-body">
-                    <h4>🔧 JavaScript-Komponenten</h4>
+                    <h4>JavaScript-Komponenten</h4>
                     <ul>
                         <li>Bootstrap Selectpicker Reinitialisierung nach Copy/Paste</li>
                         <li>Verschachtelte bootstrap-select Wrapper-Behandlung</li>
@@ -62,7 +62,7 @@ $content = '
                         <li>Optimierte rex:ready Events</li>
                     </ul>
 
-                    <h4>📊 Entwickler-API</h4>
+                    <h4>Entwickler-API</h4>
                     <ul>
                         <li>Neue <code>MBlock::getDataArray()</code> Methode</li>
                         <li><code>getOnlineDataArray()</code> Helper</li>
@@ -71,7 +71,7 @@ $content = '
                         <li>Rückwärtskompatible API</li>
                     </ul>
 
-                    <h4>🎨 Template-System</h4>
+                    <h4>Template-System</h4>
                     <ul>
                         <li>Templates jetzt direkt im Addon</li>
                         <li>Custom Templates weiterhin in <code>data/</code></li>

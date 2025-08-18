@@ -5,9 +5,23 @@
  * @license MIT
  */
 
+
+
+namespace FriendsOfRedaxo\MBlock\Replacer;
+
+use FriendsOfRedaxo\MBlock\Decorator\MBlockReplacerTrait;
+use FriendsOfRedaxo\MBlock\Decorator\MBlockFormItemDecorator;
+use FriendsOfRedaxo\MBlock\DTO\MBlockItem;
+use FriendsOfRedaxo\MBlock\Utils\MBlockSessionHelper;
+use DOMDocument;
+use DOMElement;
+use rex;
+use rex_article;
+use rex_version;
+
 class MBlockSystemButtonReplacer
 {
-    use \MBlock\Decorator\MBlockDOMTrait;
+    use MBlockReplacerTrait;
     const REX_VERSION = '5.12.1';
 
     /**

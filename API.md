@@ -3,11 +3,30 @@
 ## Übersicht
 MBlock ermöglicht die Erstellung wiederholbarer Formularblöcke innerhalb von REDAXO-Modulen. Diese API-Dokumentation beschreibt alle verfügbaren Klassen, Methoden und Verwendungsmöglichkeiten.
 
+### Namespace-Support (Version 4.0)
+
+**Empfohlene Syntax für neue Projekte:**
+```php
+<?php
+use FriendsOfRedaxo\MBlock\MBlock;
+
+$items = MBlock::getDataArray("REX_VALUE[1]");
+echo MBlock::show(1, $mform->show());
+```
+
+**Legacy-Syntax (weiterhin unterstützt):**
+```php
+<?php
+// Funktioniert weiterhin - deprecated ab v5.0
+$items = MBlock::getDataArray("REX_VALUE[1]");
+echo MBlock::show(1, $mform->show());
+```
+
 ---
 
 ## Hauptklassen
 
-### MBlock
+### MBlock (`FriendsOfRedaxo\MBlock\MBlock`)
 Die zentrale Klasse für MBlock-Funktionalität.
 
 #### Statische Methoden

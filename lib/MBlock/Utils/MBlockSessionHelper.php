@@ -5,6 +5,10 @@
  * @license MIT
  */
 
+namespace FriendsOfRedaxo\MBlock\Utils;
+
+use rex;
+
 /**
  * Sichere Session-Verwaltung für MBlock mit REDAXO Session API
  * 

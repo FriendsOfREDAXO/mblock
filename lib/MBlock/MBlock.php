@@ -5,6 +5,37 @@
  * @license MIT
  */
 
+namespace FriendsOfRedaxo\MBlock;
+
+use FriendsOfRedaxo\MBlock\Decorator\MBlockFormItemDecorator;
+use FriendsOfRedaxo\MBlock\DTO\MBlockElement;
+use FriendsOfRedaxo\MBlock\DTO\MBlockItem;
+use FriendsOfRedaxo\MBlock\Handler\MBlockValueHandler;
+use FriendsOfRedaxo\MBlock\Parser\MBlockParser;
+use FriendsOfRedaxo\MBlock\Replacer\MBlockBootstrapReplacer;
+use FriendsOfRedaxo\MBlock\Replacer\MBlockCheckboxReplacer;
+use FriendsOfRedaxo\MBlock\Replacer\MBlockCountReplacer;
+use FriendsOfRedaxo\MBlock\Replacer\MBlockSystemButtonReplacer;
+use FriendsOfRedaxo\MBlock\Replacer\MBlockValueReplacer;
+use FriendsOfRedaxo\MBlock\Utils\MBlockSessionHelper;
+use FriendsOfRedaxo\MBlock\Utils\MBlockSettingsHelper;
+use InvalidArgumentException;
+use rex;
+use rex_addon;
+use rex_escape;
+use rex_extension;
+use rex_extension_point;
+use rex_form;
+use rex_fragment;
+use rex_get;
+use rex_getUrl;
+use rex_request;
+use rex_sql_exception;
+use rex_string;
+use rex_url;
+use rex_var;
+use rex_yform;
+
 class MBlock
 {
 

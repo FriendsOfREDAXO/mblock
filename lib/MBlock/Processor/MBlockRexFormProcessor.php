@@ -5,6 +5,15 @@
  * @license MIT
  */
 
+
+
+namespace FriendsOfRedaxo\MBlock\Processor;
+
+use FriendsOfRedaxo\MBlock\Utils\MBlockJsonHelper;
+use rex_i18n;
+use rex_sql;
+use rex_sql_exception;
+
 class MBlockRexFormProcessor
 {
     /**

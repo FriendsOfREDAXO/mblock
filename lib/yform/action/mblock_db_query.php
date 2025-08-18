@@ -1,5 +1,10 @@
 <?php
 
+namespace FriendsOfRedaxo\MBlock\YForm\Action;
+
+use rex_sql;
+use rex_yform_action_abstract;
+
 class rex_yform_action_mblock_db_query extends rex_yform_action_abstract
 {
     public function executeAction(): void

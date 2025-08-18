@@ -2,7 +2,7 @@
 
 ## Version 4.0.0 - 2025-01-18
 
-### 🚀 Major New Features
+### Major New Features
 
 #### Copy & Paste Functionality
 * **MBlock Element Clipboard**: Copy and paste blocks between different MBlock instances
@@ -32,14 +32,14 @@
 * **Modern UI**: Updated to use bloecks ^5.2.0 for consistent drag & drop
 * **Dark Mode**: Full compatibility with REDAXO dark theme
 
-### 🔧 Technical Improvements
+### Technical Improvements
 * **Minimum REDAXO Version**: Now requires REDAXO ^5.18.0
 * **Bloecks Dependency**: Added bloecks ^5.2.0 as required dependency
 * **Integrated CSS**: All styles now in main `mblock.css` file
 * **Enhanced Error Handling**: Better validation and error recovery
 * **Code Cleanup**: Removed all debug code and improved performance
 
-### 📖 Documentation
+### Documentation
 * **Comprehensive README**: Complete feature overview and API documentation
 * **Usage Examples**: Practical examples for offline toggle and copy/paste
 * **Migration Guide**: Instructions for upgrading from previous versions
