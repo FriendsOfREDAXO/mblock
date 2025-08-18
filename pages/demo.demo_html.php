@@ -16,10 +16,10 @@ $fragment->setVar('body', '<div class="alert alert-warning">
         <strong>🚀 EMPFEHLUNG: Verwenden Sie MForm 8!</strong><br>
         <p>HTML-Beispiele sind nur für Legacy-Support gedacht. Für neue Projekte wird <strong>MForm 8</strong> empfohlen:</p>
         <ul>
-            <li>✅ <strong>Typsicherheit</strong> - Automatische Validierung</li>
-            <li>✅ <strong>Wartbarkeit</strong> - Sauberer, lesbarer Code</li>
-            <li>✅ <strong>Moderne Syntax</strong> - <code>use FriendsOfRedaxo\\MForm;</code></li>
-            <li>✅ <strong>Weniger Fehler</strong> - Kein manuelles HTML</li>
+            <li><strong>Typsicherheit</strong> - Automatische Validierung</li>
+            <li><strong>Wartbarkeit</strong> - Sauberer, lesbarer Code</li>
+            <li><strong>Moderne Syntax</strong> - <code>use FriendsOfRedaxo\\MForm;</code></li>
+            <li><strong>Weniger Fehler</strong> - Kein manuelles HTML</li>
         </ul>
         <code>$mform = MForm::factory()->addTextField("1.0.title", ["label" => "Titel"]);</code>
     </div>
@@ -32,7 +32,7 @@ $fragment->setVar('title', '💡 HTML-Tipps für Legacy-Projekte', false);
 $fragment->setVar('body', '<div class="alert alert-info">
     <h5>Falls Sie HTML verwenden müssen:</h5>
     
-    <h6>✅ Wichtige Punkte beachten:</h6>
+    <h6>Wichtige Punkte beachten:</h6>
     <ul>
         <li><strong>Online/Offline Toggle:</strong> Hidden Field <code>mblock_offline</code> hinzufügen</li>
         <li><strong>Media-ID Konflikte:</strong> Eindeutige IDs zwischen MBlocks verwenden (1,2,3...)</li>

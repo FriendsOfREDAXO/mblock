@@ -31,7 +31,7 @@ $content = '
                     
                     <div class="row">
                         <div class="col-md-6">
-                            <h5>❌ Falsch - Konflikte vorprogrammiert:</h5>
+                            <h5>Falsch - Konflikte vorprogrammiert:</h5>
                             <pre><code class="php">// MBlock 1: Team-Member
 $mform1->addMediaField("2", ["label" => "Profilbild"]);
 
@@ -43,7 +43,7 @@ $mform3->addMedialistField("2", ["label" => "Bilder"]);
 $mform3->addMediaField("2", ["label" => "Titelbild"]); // ← KONFLIKT!</code></pre>
                         </div>
                         <div class="col-md-6">
-                            <h5>✅ Richtig - Eindeutige Media-IDs (1-10):</h5>
+                            <h5>Richtig - Eindeutige Media-IDs (1-10):</h5>
                             <pre><code class="php">// MBlock 1: Team-Member (Media-IDs 1,2)
 $mform1->addMediaField("1", ["label" => "Profilbild"]);
 
@@ -94,10 +94,10 @@ $mform3->addMediaField("6", ["label" => "Titelbild"]);</code></pre>
                 <div class="panel-body">
                     
                     <h5>🚀 MBlock 4.0 - Moderne Datenabfrage:</h5>
-                    <pre><code class="php">// ✅ EMPFOHLEN: Nur Online-Items laden
+                    <pre><code class="php">// EMPFOHLEN: Nur Online-Items laden
 $items = MBlock::getOnlineDataArray("REX_VALUE[1]");
 
-// ❌ LEGACY: Manuelle Filterung
+// LEGACY: Manuelle Filterung
 $data = rex_var::toArray("REX_VALUE[1]");
 $items = array_filter($data, function($item) {
     return $item["mblock_item_online"] == "1";
@@ -105,11 +105,11 @@ $items = array_filter($data, function($item) {
                     
                     <h5>🔒 Sichere Datenausgabe:</h5>
                     <pre><code class="php">foreach ($items as $item) {
-    // ✅ IMMER escapen
+    // IMMER escapen
     $title = rex_escape($item["title"] ?? "");
     $text = rex_escape($item["text"] ?? "");
     
-    // ✅ Media-Existenz prüfen
+    // Media-Existenz prüfen
     $mediaId = $item["REX_MEDIA_12"] ?? "";
     if ($mediaId && ($media = rex_media::get($mediaId))) {
         $imageUrl = rex_media_manager::getUrl(
@@ -161,14 +161,14 @@ foreach ($topItems as $item) {
     ]
 ]);</code></pre>
                     
-                    <h5>🆕 MBlock 4.0 - Online/Offline Funktionalität:</h5>
-                    <pre><code class="php">// ✅ Online/Offline Status über hidden field steuern
+                    <h5>MBlock 4.0 - Online/Offline Funktionalität:</h5>
+                    <pre><code class="php">// Online/Offline Status über hidden field steuern
 $mform->addTextField("$id.0.mblock_offline", [
     "type" => "hidden",
     "value" => "0"  // 0 = online, 1 = offline
 ]);
 
-// ✅ Im Frontend: Nur Online-Items laden  
+// Im Frontend: Nur Online-Items laden  
 $items = rex_var::toArray("REX_MBLOCK[1]");
 foreach ($items as $item) {
     // Skip offline items
@@ -184,24 +184,24 @@ foreach ($items as $item) {
                         Keine Konfiguration nötig - Funktion ist standardmäßig verfügbar.
                     </div>
                     <pre><code class="php">                    <h5>📝 Feldnamen-Konvention:</h5>
-                    <pre><code class="php">// ✅ Sprechende Feldnamen verwenden
+                    <pre><code class="php">// Sprechende Feldnamen verwenden
 $mform->addTextField("$id.0.title", ["label" => "Titel"]);
 $mform->addTextField("$id.0.subtitle", ["label" => "Untertitel"]);
 $mform->addMediaField("1", ["label" => "Hauptbild"]); // Media-ID 1-10!
 
-// ❌ Kryptische Namen vermeiden
+// Kryptische Namen vermeiden
 $mform->addTextField("$id.0.f1", ["label" => "Titel"]);
 $mform->addTextField("$id.0.f2", ["label" => "Untertitel"]);</code></pre></code></pre>
                     
                     <h5>🎨 MForm Best Practices:</h5>
-                    <pre><code class="php">// ✅ Fieldsets für bessere Struktur
+                    <pre><code class="php">// Fieldsets für bessere Struktur
 $mform->addFieldsetArea("Basis-Informationen");
 $mform->addTextField("$id.0.title", ["label" => "Titel"]);
 
 $mform->addFieldsetArea("Media & Layout");
 $mform->addMediaField("1", ["label" => "Bild", "preview" => true]); // Media-ID 1-10!
 
-// ✅ Kategorien für Media-Felder
+// Kategorien für Media-Felder
 $mform->addMediaField("2", [
     "label" => "Bild",
     "category" => "1",  // Bilder-Kategorie
@@ -361,7 +361,7 @@ foreach ($items as $index => $item) {
                         <li><strong>Lazy Loading:</strong> Bilder bei Bedarf laden</li>
                     </ul>
                     
-                    <pre><code class="php">// ✅ Performance-optimiert
+                    <pre><code class="php">// Performance-optimiert
 $items = MBlock::getOnlineDataArray("REX_VALUE[1]");
 $filteredItems = MBlock::filterByField($items, "category", "news");
 $topNews = MBlock::limitItems($filteredItems, 5);</code></pre>
@@ -376,7 +376,7 @@ $topNews = MBlock::limitItems($filteredItems, 5);</code></pre>
                         <li><strong>Meta-Daten:</strong> Aus MBlock-Daten generieren</li>
                     </ul>
                     
-                    <pre><code class="php">// ✅ SEO Schema generieren
+                    <pre><code class="php">// SEO Schema generieren
 $schema = MBlock::generateSchema($items, "Person", [
     "name" => "name",
     "jobTitle" => "position", 
@@ -396,7 +396,7 @@ echo \'&lt;/script&gt;\';</code></pre>
                         <li><strong>Lazy Images:</strong> Große Bilder optimieren</li>
                     </ul>
                     
-                    <pre><code class="php">// ✅ Responsive Media Manager
+                    <pre><code class="php">// Responsive Media Manager
 $media = rex_media::get($mediaId);
 if ($media) {
     echo \'&lt;picture&gt;\';
@@ -421,37 +421,37 @@ if ($media) {
                 <div class="col-md-3">
                     <h5>🆔 Media-IDs:</h5>
                     <ul class="list-unstyled">
-                        <li>✅ MBlock 1: IDs 1, 2</li>
-                        <li>✅ MBlock 2: IDs 3, 4</li>
-                        <li>✅ MBlock 3: IDs 5, 6</li>
-                        <li>❌ Niemals gleiche IDs!</li>
+                        <li>MBlock 1: IDs 1, 2</li>
+                        <li>MBlock 2: IDs 3, 4</li>
+                        <li>MBlock 3: IDs 5, 6</li>
+                        <li>Niemals gleiche IDs!</li>
                     </ul>
                 </div>
                 <div class="col-md-3">
                     <h5>📝 Frontend:</h5>
                     <ul class="list-unstyled">
-                        <li>✅ <code>getOnlineDataArray()</code></li>
-                        <li>✅ <code>rex_escape()</code></li>
-                        <li>✅ Media-Existenz prüfen</li>
-                        <li>✅ Performance optimieren</li>
+                        <li><code>getOnlineDataArray()</code></li>
+                        <li><code>rex_escape()</code></li>
+                        <li>Media-Existenz prüfen</li>
+                        <li>Performance optimieren</li>
                     </ul>
                 </div>
                 <div class="col-md-3">
                     <h5>⚙️ Backend:</h5>
                     <ul class="list-unstyled">
-                        <li>✅ Hidden field <code>mblock_offline</code></li>
-                        <li>✅ Copy & Paste automatisch aktiv</li>
-                        <li>✅ Min/Max Limits setzen</li>
-                        <li>✅ Sprechende Feldnamen</li>
+                        <li>Hidden field <code>mblock_offline</code></li>
+                        <li>Copy & Paste automatisch aktiv</li>
+                        <li>Min/Max Limits setzen</li>
+                        <li>Sprechende Feldnamen</li>
                     </ul>
                 </div>
                 <div class="col-md-3">
                     <h5>🐛 Debug:</h5>
                     <ul class="list-unstyled">
-                        <li>✅ REX_VALUES prüfen</li>
-                        <li>✅ Media-IDs analysieren</li>
-                        <li>✅ Browser-Konsole checken</li>
-                        <li>✅ Online-Status testen</li>
+                        <li>REX_VALUES prüfen</li>
+                        <li>Media-IDs analysieren</li>
+                        <li>Browser-Konsole checken</li>
+                        <li>Online-Status testen</li>
                     </ul>
                 </div>
             </div>

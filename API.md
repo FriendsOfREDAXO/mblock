@@ -3,7 +3,7 @@
 ## Übersicht
 MBlock ermöglicht die Erstellung wiederholbarer Formularblöcke innerhalb von REDAXO-Modulen. Diese API-Dokumentation beschreibt alle verfügbaren Klassen, Methoden und Verwendungsmöglichkeiten.
 
-### 🆕 Namespace-Support (Version 4.0)
+### Namespace-Support (Version 4.0)
 
 **Empfohlene Syntax für neue Projekte:**
 ```php

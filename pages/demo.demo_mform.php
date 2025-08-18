@@ -11,7 +11,7 @@ $fragment->setVar('title', rex_i18n::msg('mblock_info'), false);
 $fragment->setVar('body', '<div class="alert alert-info">
     <h4><i class="fa fa-lightbulb-o"></i> MBlock 4.0 mit MForm</h4>
     <p>'.rex_i18n::msg('mblock_example_description_base').'</p>
-    <p><strong>🆕 Neue Features in MBlock 4.0:</strong></p>
+    <p><strong>Neue Features in MBlock 4.0:</strong></p>
     <ul>
         <li><strong>Online/Offline Toggle:</strong> Items per hidden field <code>mblock_offline</code> steuern</li>
         <li><strong>Copy & Paste:</strong> Automatisch aktiv - keine Konfiguration nötig</li>
