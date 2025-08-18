@@ -34,10 +34,12 @@
 
 ### 🔧 Technical Improvements
 * **Minimum REDAXO Version**: Now requires REDAXO ^5.18.0
-* **Bloecks Dependency**: Added bloecks ^5.2.0 as required dependency
+* **Bloecks Dependency**: Added bloecks ^5.2.0 as required dependency  
+* **Removed Legacy Code**: Removed jQuery UI Sortable fallback code and bundled sortable files
 * **Integrated CSS**: All styles now in main `mblock.css` file
 * **Enhanced Error Handling**: Better validation and error recovery
-* **Code Cleanup**: Removed all debug code and improved performance
+* **Code Cleanup**: Removed all debug code and improved performance (157+ lines removed)
+* **Optimized Events**: Reduced rex:ready events to 1 per element (from 3)
 
 ### 📖 Documentation
 * **Comprehensive README**: Complete feature overview and API documentation
