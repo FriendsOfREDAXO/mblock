@@ -22,6 +22,36 @@
     transform: translateY(-1px);
 }
 
+/* 🎨 Dark Mode Consistency - REDAXO Dark Theme */
+body.rex-theme-dark .mblock_wrapper > div,
+html[data-bs-theme="dark"] .mblock_wrapper > div {
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 5px 15px rgba(0,0,0,.3);
+}
+
+body.rex-theme-dark .mblock_wrapper > div:hover,
+html[data-bs-theme="dark"] .mblock_wrapper > div:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    transform: translateY(-1px);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* 🎨 System Dark Mode (prefers-color-scheme) */
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) .mblock_wrapper > div {
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        background: rgba(255, 255, 255, 0.05);
+        box-shadow: 0 5px 15px rgba(0,0,0,.3);
+    }
+    
+    body.rex-has-theme:not(.rex-theme-light) .mblock_wrapper > div:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        transform: translateY(-1px);
+        border-color: rgba(255, 255, 255, 0.25);
+    }
+}
+
 /* Bloecks-Style Drag Handle */
 .mblock_wrapper span.sorthandle {
     cursor: grab;
@@ -48,6 +78,27 @@
 
 .mblock_wrapper span.sorthandle:active {
     cursor: grabbing;
+}
+
+/* 🎨 Drag Handle Dark Mode */
+body.rex-theme-dark .mblock_wrapper span.sorthandle,
+html[data-bs-theme="dark"] .mblock_wrapper span.sorthandle {
+    color: #adb5bd;
+}
+
+body.rex-theme-dark .mblock_wrapper span.sorthandle:hover,
+html[data-bs-theme="dark"] .mblock_wrapper span.sorthandle:hover {
+    color: #dee2e6;
+}
+
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) .mblock_wrapper span.sorthandle {
+        color: #adb5bd;
+    }
+    
+    body.rex-has-theme:not(.rex-theme-light) .mblock_wrapper span.sorthandle:hover {
+        color: #dee2e6;
+    }
 }
 
 .mblock_wrapper span.sorthandle::before {
@@ -228,6 +279,37 @@ div.sortable-ghost::before {
     cursor: not-allowed;
 }
 
+/* 🎨 Add Button Dark Mode */
+body.rex-theme-dark .btn.addme,
+html[data-bs-theme="dark"] .btn.addme {
+    background: #198754;
+    border-color: #198754;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+body.rex-theme-dark .btn.addme:hover:not([disabled]),
+html[data-bs-theme="dark"] .btn.addme:hover:not([disabled]) {
+    background: #146c43;
+    border-color: #13653f;
+    box-shadow: 0 4px 12px rgba(25, 135, 84, 0.4);
+    color: white;
+}
+
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) .btn.addme {
+        background: #198754;
+        border-color: #198754;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    body.rex-has-theme:not(.rex-theme-light) .btn.addme:hover:not([disabled]) {
+        background: #146c43;
+        border-color: #13653f;
+        box-shadow: 0 4px 12px rgba(25, 135, 84, 0.4);
+        color: white;
+    }
+}
+
 .btn.addme i,
 .btn.addme .rex-icon {
     margin: 0;
@@ -246,6 +328,24 @@ div.sortable-ghost::before {
     gap: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     transition: all 0.2s ease;
+}
+
+/* 🎨 Copy & Paste Toolbar Dark Mode */
+body.rex-theme-dark .mblock-copy-paste-toolbar,
+html[data-bs-theme="dark"] .mblock-copy-paste-toolbar {
+    background: linear-gradient(135deg, #343a40 0%, #495057 100%) !important;
+    border-color: #6c757d !important;
+    color: #e9ecef !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) .mblock-copy-paste-toolbar {
+        background: linear-gradient(135deg, #343a40 0%, #495057 100%) !important;
+        border-color: #6c757d !important;
+        color: #e9ecef !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
 }
 
 .mblock-copy-paste-toolbar:hover {
