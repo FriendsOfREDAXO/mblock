@@ -74,6 +74,183 @@ Convenience-Methode für Offline-Items.
 $offlineItems = MBlock::getOfflineDataArray("REX_VALUE[1]");
 ```
 
+---
+
+## Frontend-Hilfsmethoden
+
+### Filtering & Sorting
+
+##### `MBlock::filterByField($items, $field, $value, $strict = false)`
+**Neu in v4.0** - Filtert Items nach Feldwert.
+
+**Parameter:**
+- `$items` (array): MBlock-Items
+- `$field` (string): Feldname
+- `$value` (mixed): Gesuchter Wert
+- `$strict` (bool): Strikte Vergleichung (===)
+
+**Beispiele:**
+```php
+$items = MBlock::getOnlineDataArray("REX_VALUE[1]");
+
+// Filtere nach Kategorie
+$newsItems = MBlock::filterByField($items, 'category', 'news');
+
+// Filtere nach Status (strikt)
+$activeItems = MBlock::filterByField($items, 'status', '1', true);
+```
+
+##### `MBlock::sortByField($items, $field, $direction = 'asc')`
+**Neu in v4.0** - Sortiert Items nach Feldwert.
+
+**Parameter:**
+- `$items` (array): MBlock-Items
+- `$field` (string): Feldname zum Sortieren
+- `$direction` (string): 'asc' oder 'desc'
+
+**Beispiele:**
+```php
+// Sortiere nach Titel aufsteigend
+$sortedItems = MBlock::sortByField($items, 'title', 'asc');
+
+// Sortiere nach Datum absteigend
+$latestItems = MBlock::sortByField($items, 'date', 'desc');
+
+// Numerische Sortierung (automatisch erkannt)
+$priceItems = MBlock::sortByField($items, 'price', 'asc');
+```
+
+##### `MBlock::groupByField($items, $field)`
+**Neu in v4.0** - Gruppiert Items nach Feldwert.
+
+**Rückgabe:** Array `[feldwert => [items]]`
+
+**Beispiele:**
+```php
+// Gruppiere nach Kategorie
+$grouped = MBlock::groupByField($items, 'category');
+foreach($grouped as $category => $categoryItems) {
+    echo "<h2>$category</h2>";
+    foreach($categoryItems as $item) {
+        echo "<p>{$item['title']}</p>";
+    }
+}
+
+// Gruppiere nach Jahr
+$byYear = MBlock::groupByField($items, 'year');
+```
+
+##### `MBlock::limitItems($items, $limit, $offset = 0)`
+**Neu in v4.0** - Limitiert Items (für Pagination).
+
+**Beispiele:**
+```php
+// Erste 5 Items
+$topItems = MBlock::limitItems($items, 5);
+
+// Items 6-10 (Seite 2 bei 5 pro Seite)
+$page2 = MBlock::limitItems($items, 5, 5);
+
+// Pagination-Beispiel
+$itemsPerPage = 10;
+$currentPage = rex_get('page', 'int', 1);
+$offset = ($currentPage - 1) * $itemsPerPage;
+$pageItems = MBlock::limitItems($items, $itemsPerPage, $offset);
+```
+
+### SEO & Schema.org
+
+##### `MBlock::generateSchema($items, $type = 'Article', $fieldMapping = [])`
+**Neu in v4.0** - Generiert JSON-LD Schema.org Markup.
+
+**Parameter:**
+- `$items` (array): MBlock-Items
+- `$type` (string): Schema.org Type ('Article', 'Product', 'Event')
+- `$fieldMapping` (array): Custom Feld-Mappings
+
+**Standard-Mappings:**
+```php
+// Article
+'headline' => ['title', 'name', 'headline']
+'description' => ['content', 'description', 'text']
+'image' => ['REX_MEDIA_1', 'image', 'media']
+'datePublished' => ['date', 'created', 'published']
+'author' => ['author', 'creator']
+
+// Product  
+'name' => ['title', 'name', 'product_name']
+'description' => ['description', 'content']
+'image' => ['REX_MEDIA_1', 'image', 'product_image']
+'price' => ['price', 'cost']
+'brand' => ['brand', 'manufacturer']
+
+// Event
+'name' => ['title', 'name', 'event_name']
+'description' => ['description', 'content']
+'startDate' => ['start_date', 'date_start', 'begin']
+'endDate' => ['end_date', 'date_end', 'finish']
+'location' => ['location', 'venue', 'place']
+```
+
+**Beispiele:**
+```php
+// Standard Article Schema
+$newsItems = MBlock::getOnlineDataArray("REX_VALUE[1]");
+echo MBlock::generateSchema($newsItems, 'Article');
+
+// Product Schema mit Custom Mapping
+$products = MBlock::getOnlineDataArray("REX_VALUE[2]");
+$customMapping = [
+    'name' => ['product_title'],
+    'sku' => ['article_number'],
+    'offers' => ['price_field']
+];
+echo MBlock::generateSchema($products, 'Product', $customMapping);
+
+// Event Schema
+$events = MBlock::getOnlineDataArray("REX_VALUE[3]");
+echo MBlock::generateSchema($events, 'Event');
+```
+
+**Automatische URL-Generierung:**
+- REX_MEDIA-Felder werden zu vollständigen Media-URLs
+- REX_LINK-Felder werden zu vollständigen Frontend-URLs
+- Relative URLs werden zu absoluten URLs konvertiert
+
+### Kombinierte Verwendung
+
+```php
+// Komplexes Frontend-Beispiel
+$allItems = MBlock::getOnlineDataArray("REX_VALUE[1]");
+
+// 1. Nach Kategorie filtern
+$newsItems = MBlock::filterByField($allItems, 'category', 'news');
+
+// 2. Nach Datum sortieren (neueste zuerst)  
+$sortedNews = MBlock::sortByField($newsItems, 'date', 'desc');
+
+// 3. Nur erste 10 Items für Teaser
+$teaserItems = MBlock::limitItems($sortedNews, 10);
+
+// 4. Schema.org für SEO
+echo MBlock::generateSchema($teaserItems, 'Article');
+
+// 5. HTML-Ausgabe
+foreach($teaserItems as $item) {
+    echo "<article>";
+    echo "<h2>{$item['title']}</h2>";
+    echo "<p>{$item['teaser']}</p>";
+    echo "</article>";
+}
+
+// 6. Nach Jahren gruppieren für Archiv
+$groupedByYear = MBlock::groupByField($sortedNews, 'year');
+foreach($groupedByYear as $year => $yearItems) {
+    echo "<h3>$year (" . count($yearItems) . " Artikel)</h3>";
+    // ... weitere Ausgabe
+}
+```
+
 ##### `MBlock::getOnlineItems($data)` (Legacy)
 Filtert Online-Items aus vorhandenem Array.
 

@@ -464,6 +464,199 @@ class MBlock
     }
 
     /**
+     * Filtert MBlock-Items nach Feldwert
+     * @param array $items MBlock-Items
+     * @param string $field Feldname
+     * @param mixed $value Gesuchter Wert
+     * @param bool $strict Strikte Vergleichung (default: false)
+     * @return array Gefilterte Items
+     */
+    public static function filterByField($items, $field, $value, $strict = false)
+    {
+        if (!is_array($items) || empty($items)) {
+            return array();
+        }
+
+        return array_filter($items, function($item) use ($field, $value, $strict) {
+            if (!isset($item[$field])) {
+                return false;
+            }
+            
+            return $strict ? $item[$field] === $value : $item[$field] == $value;
+        });
+    }
+
+    /**
+     * Sortiert MBlock-Items nach Feldwert
+     * @param array $items MBlock-Items
+     * @param string $field Feldname zum Sortieren
+     * @param string $direction 'asc' oder 'desc' (default: 'asc')
+     * @return array Sortierte Items
+     */
+    public static function sortByField($items, $field, $direction = 'asc')
+    {
+        if (!is_array($items) || empty($items)) {
+            return $items;
+        }
+
+        $direction = strtolower($direction);
+        
+        usort($items, function($a, $b) use ($field, $direction) {
+            $valueA = isset($a[$field]) ? $a[$field] : '';
+            $valueB = isset($b[$field]) ? $b[$field] : '';
+            
+            // Numerische Sortierung wenn beide Werte numerisch sind
+            if (is_numeric($valueA) && is_numeric($valueB)) {
+                $result = ($valueA < $valueB) ? -1 : (($valueA > $valueB) ? 1 : 0);
+            } else {
+                $result = strcasecmp($valueA, $valueB);
+            }
+            
+            return $direction === 'desc' ? -$result : $result;
+        });
+
+        return $items;
+    }
+
+    /**
+     * Gruppiert MBlock-Items nach Feldwert
+     * @param array $items MBlock-Items
+     * @param string $field Feldname zum Gruppieren
+     * @return array Gruppierte Items [feldwert => [items]]
+     */
+    public static function groupByField($items, $field)
+    {
+        if (!is_array($items) || empty($items)) {
+            return array();
+        }
+
+        $groups = array();
+        
+        foreach ($items as $item) {
+            $groupKey = isset($item[$field]) ? $item[$field] : 'undefined';
+            
+            if (!isset($groups[$groupKey])) {
+                $groups[$groupKey] = array();
+            }
+            
+            $groups[$groupKey][] = $item;
+        }
+
+        return $groups;
+    }
+
+    /**
+     * Limitiert MBlock-Items (für Pagination)
+     * @param array $items MBlock-Items
+     * @param int $limit Maximale Anzahl Items
+     * @param int $offset Start-Position (default: 0)
+     * @return array Limitierte Items
+     */
+    public static function limitItems($items, $limit, $offset = 0)
+    {
+        if (!is_array($items) || empty($items)) {
+            return array();
+        }
+
+        return array_slice($items, $offset, $limit);
+    }
+
+    /**
+     * Generiert JSON-LD Schema.org Markup für MBlock-Items
+     * @param array $items MBlock-Items
+     * @param string $type Schema.org Type (z.B. 'Article', 'Product', 'Event')
+     * @param array $fieldMapping Mapping von MBlock-Feldern zu Schema-Properties
+     * @return string JSON-LD Schema Markup
+     */
+    public static function generateSchema($items, $type = 'Article', $fieldMapping = array())
+    {
+        if (!is_array($items) || empty($items)) {
+            return '';
+        }
+
+        // Standard Feld-Mappings
+        $defaultMappings = array(
+            'Article' => array(
+                'headline' => array('title', 'name', 'headline'),
+                'description' => array('content', 'description', 'text'),
+                'image' => array('REX_MEDIA_1', 'image', 'media'),
+                'datePublished' => array('date', 'created', 'published'),
+                'author' => array('author', 'creator')
+            ),
+            'Product' => array(
+                'name' => array('title', 'name', 'product_name'),
+                'description' => array('description', 'content'),
+                'image' => array('REX_MEDIA_1', 'image', 'product_image'),
+                'price' => array('price', 'cost'),
+                'brand' => array('brand', 'manufacturer')
+            ),
+            'Event' => array(
+                'name' => array('title', 'name', 'event_name'),
+                'description' => array('description', 'content'),
+                'startDate' => array('start_date', 'date_start', 'begin'),
+                'endDate' => array('end_date', 'date_end', 'finish'),
+                'location' => array('location', 'venue', 'place')
+            )
+        );
+
+        $mapping = array_merge($defaultMappings[$type] ?? array(), $fieldMapping);
+        $schemaItems = array();
+
+        foreach ($items as $item) {
+            $schemaItem = array(
+                '@type' => $type
+            );
+
+            foreach ($mapping as $schemaProp => $possibleFields) {
+                $possibleFields = is_array($possibleFields) ? $possibleFields : array($possibleFields);
+                
+                foreach ($possibleFields as $field) {
+                    if (isset($item[$field]) && !empty($item[$field])) {
+                        $value = $item[$field];
+                        
+                        // Spezielle Behandlung für Media-Felder
+                        if (strpos($field, 'REX_MEDIA') !== false && $schemaProp === 'image') {
+                            $value = rex_url::media($value);
+                            if (!preg_match('#^https?://#', $value)) {
+                                $value = rex_url::frontend($value);
+                            }
+                        }
+                        
+                        // Spezielle Behandlung für Links
+                        if (strpos($field, 'REX_LINK') !== false) {
+                            $linkId = (int)$value;
+                            if ($linkId > 0) {
+                                $value = rex_getUrl($linkId);
+                                if (!preg_match('#^https?://#', $value)) {
+                                    $value = rex_url::frontend($value);
+                                }
+                            }
+                        }
+                        
+                        $schemaItem[$schemaProp] = $value;
+                        break; // Erstes gefundenes Feld verwenden
+                    }
+                }
+            }
+
+            if (count($schemaItem) > 1) { // Nur hinzufügen wenn mehr als nur @type vorhanden
+                $schemaItems[] = $schemaItem;
+            }
+        }
+
+        if (empty($schemaItems)) {
+            return '';
+        }
+
+        $schema = array(
+            '@context' => 'https://schema.org',
+            '@graph' => $schemaItems
+        );
+
+        return '<script type="application/ld+json">' . json_encode($schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . '</script>';
+    }
+
+    /**
      * Sichere Reset-Methode mit verbesserter Speicherverwaltung
      * @author Joachim Doerr
      */
