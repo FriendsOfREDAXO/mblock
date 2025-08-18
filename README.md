@@ -1,4 +1,4 @@
-MBlock
+REDAXO AddOn :: MBlock
 ======
 
 Mit MBlock ist es möglich, innerhalb eines Moduls beliebig viele Datenblöcke zu erzeugen. Diese können dann einfach per Button oder Drag & Drop sortiert werden. Die erweiterte Version bietet Copy & Paste Funktionalität und einen Offline/Online Toggle für einzelne Blöcke.
@@ -11,13 +11,13 @@ _English:_ MBlock lets you create an unlimited number of data blocks within a si
 
 ### Grundfunktionen / Core Features
 
-- **Beliebig viele Datenblöcke** pro Modul erstellen
-- **Drag & Drop Sortierung** mit bloecks addon (^5.2.0)
-- **Minimale/Maximale Anzahl** von Blöcken definierbar
-- **Collapsed/Expanded Darstellung** für bessere Übersicht
-- **MForm Integration** für professionelle Formulare
-- **Template System** mit Prioritätsladung
-- **Mehrsprachigkeit** (DE/EN)
+[x] **Beliebig viele Datenblöcke** pro Modul erstellen
+[x] **Drag & Drop Sortierung** mit bloecks addon (^5.2.0)
+[x] **Minimale/Maximale Anzahl** von Blöcken definierbar
+[x] **Collapsed/Expanded Darstellung** für bessere Übersicht
+[x] **MForm Integration** für professionelle Formulare
+[x] **Template System** mit Prioritätsladung
+[x] **Mehrsprachigkeit** (DE/EN)
 
 ### Erweiterte Funktionen / Advanced Features (MBlock 4.0)
 
@@ -31,7 +31,7 @@ _English:_ MBlock lets you create an unlimited number of data blocks within a si
 
 ## Namespace Migration (Version 4.0)
 
-**MBlock 4.0 führt Namespaces ein!** Für neue Projekte wird die Verwendung des Namespace empfohlen:
+** 🙋‍♂️ MBlock 4.0 führt Namespaces ein!** Für neue Projekte wird die Verwendung des Namespace empfohlen:
 
 ```php
 <?php
@@ -326,20 +326,22 @@ foreach ($items as $item) {
 
 ---
 
-## Weitere Informationen
+## Author
 
-### Wo finde ich was?
+**Friends Of REDAXO**
 
-- **[Best Practices](index.php?page=mblock/best_practices)** - Professionelle Tipps und häufige Probleme
-- **[MForm Demos](index.php?page=mblock/demo/demo_mform)** - Praktische Beispiele mit MForm
-- **[HTML Demos](index.php?page=mblock/demo/demo_html)** - Beispiele ohne MForm-Abhängigkeit
-- **[API Dokumentation](index.php?page=mblock/api)** - Vollständige API-Referenz
+* [REDAXO](http://www.redaxo.org)
+* [FriendsOfREDAXO](https://github.com/FriendsOfREDAXO)
 
-### Externe Links
 
-- **[MForm Addon](https://github.com/FriendsOfREDAXO/mform)** - Empfohlener Form-Builder
-- **[bloecks Addon](https://github.com/FriendsOfREDAXO/bloecks)** - Moderne Drag & Drop Funktionalität  
-- **[GitHub Repository](https://github.com/FriendsOfREDAXO/mblock)** - Source Code und Issues
-- **[REDAXO Community](https://redaxo.org/community/)** - Hilfe und Diskussionen
+## Credits
+
+**Project Leads**
+
+* [Joachim Dörr](https://github.com/joachimdoerr)  
+* [Thomas Skerbis](https://github.com/skerbis)  
+
+
+
 
 
