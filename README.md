@@ -17,17 +17,17 @@ _English:_ MBlock lets you create an unlimited number of data blocks within a si
 - [x] **Collapsed/Expanded Darstellung** für bessere Übersicht
 - [x] **MForm Integration** für professionelle Formulare
 - [x] **Template System** mit Prioritätsladung
-- [ x ] **Mehrsprachigkeit** (DE/EN)
+- [x] **Mehrsprachigkeit** (DE/EN)
 
 ### Erweiterte Funktionen / Advanced Features (MBlock 4.0)
 
-- **Online/Offline Toggle** - Blöcke aktivieren/deaktivieren ohne löschen
-- **Copy & Paste** - Komfortable Duplizierung von Inhalten
-- **Frontend API Methoden** - `filterByField()`, `sortByField()`, `groupByField()`
-- **Schema.org Support** - SEO-optimierte JSON-LD Generierung
-- **Erweiterte Datenabfrage** - Online/Offline/All Modi
-- **Template-Priorität** - Custom templates überschreiben defaults
-- **Media-ID Konflikt-Schutz** - Bessere Warnung bei ID-Überschneidungen
+- [x] **Online/Offline Toggle** - Blöcke aktivieren/deaktivieren ohne löschen
+- [x] **Copy & Paste** - Komfortable Duplizierung von Inhalten
+- [x] **Frontend API Methoden** - `filterByField()`, `sortByField()`, `groupByField()`
+- [x] **Schema.org Support** - SEO-optimierte JSON-LD Generierung
+- [x] **Erweiterte Datenabfrage** - Online/Offline/All Modi
+- [x] **Template-Priorität** - Custom templates überschreiben defaults
+- [x] **Media-ID Konflikt-Schutz** - Bessere Warnung bei ID-Überschneidungen
 
 ## Namespace Migration (Version 4.0)
 
