@@ -9,6 +9,9 @@
 
 namespace FriendsOfRedaxo\MBlock\Utils;
 
+use rex_file;
+use rex_path;
+
 class MBlockThemeHelper
 {
     /**

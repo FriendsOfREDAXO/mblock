@@ -9,6 +9,10 @@
 
 namespace FriendsOfRedaxo\MBlock\Replacer;
 
+use rex;
+use rex_article;
+use rex_version;
+
 class MBlockSystemButtonReplacer
 {
     use \MBlock\Decorator\MBlockDOMTrait;

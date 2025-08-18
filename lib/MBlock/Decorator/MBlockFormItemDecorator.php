@@ -9,6 +9,8 @@
 
 namespace FriendsOfRedaxo\MBlock\Decorator;
 
+use rex_escape;
+
 class MBlockFormItemDecorator
 {
     use \MBlock\Decorator\MBlockDOMTrait;

@@ -9,6 +9,9 @@
 
 namespace FriendsOfRedaxo\MBlock\Utils;
 
+use rex_addon;
+use rex_i18n;
+
 class MBlockSettingsHelper
 {
     /**

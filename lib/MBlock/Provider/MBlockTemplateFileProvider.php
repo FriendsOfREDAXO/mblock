@@ -9,6 +9,9 @@
 
 namespace FriendsOfRedaxo\MBlock\Provider;
 
+use rex_addon;
+use rex_path;
+
 class MBlockTemplateFileProvider
 {
     const DEFAULT_THEME = 'default_theme';
