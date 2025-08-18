@@ -10,6 +10,7 @@
 
 namespace FriendsOfRedaxo\MBlock\Handler;
 
+use FriendsOfRedaxo\MBlock\Utils\MBlockJsonHelper;
 use rex;
 use rex_addon;
 use rex_get;
@@ -98,7 +99,7 @@ class MBlockValueHandler
                     // Robuste JSON-Dekodierung mit MBlockJsonHelper
                     $valueString = (string) $result['value'][$i];
                     if (!empty($valueString)) {
-                        $jsonResult = Utils\MBlockJsonHelper::decodeFromHtml($valueString, true, false);
+                        $jsonResult = MBlockJsonHelper::decodeFromHtml($valueString, true, false);
                         
                         // Nur gültige Arrays als Ergebnis verwenden
                         if (is_array($jsonResult) && !empty($jsonResult)) {
@@ -158,7 +159,7 @@ class MBlockValueHandler
             
             if (array_key_exists($fullColumnName, $row)) {
                 $jsonString = $row[$fullColumnName];
-                $jsonResult = Utils\MBlockJsonHelper::decodeFromHtml($jsonString, true, false);
+                $jsonResult = MBlockJsonHelper::decodeFromHtml($jsonString, true, false);
 
                 if (!is_null($attrType) && is_array($jsonResult) && array_key_exists($attrType, $jsonResult)) {
                     $jsonResult = $jsonResult[$attrType];
