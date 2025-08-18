@@ -1,5 +1,49 @@
 # MBlock - REDAXO Addon für Modul-Input-Blöcke
 
+## Version 4.0.0 - 2025-01-18
+
+### 🚀 Major New Features
+
+#### Copy & Paste Functionality
+* **MBlock Element Clipboard**: Copy and paste blocks between different MBlock instances
+* **Session/Local Storage**: Persistent clipboard data survives page reloads
+* **Module Type Validation**: Paste only works within the same module type
+* **Visual Feedback**: Copy button shows confirmation animation
+* **Smart UI**: Paste buttons automatically enable/disable based on clipboard state
+* **Toolbar Management**: Clear clipboard toolbar only appears when clipboard contains data
+
+#### Offline/Online Toggle System
+* **Automatic Field Detection**: System automatically detects `mblock_offline` fields
+* **Visual Status Indicators**: Color-coded buttons (Green = Online, Red = Offline)
+* **Template Integration**: New template tags `<mblock:offline_class/>` and `<mblock:offline_button/>`
+* **CSS Styling**: Offline blocks get reduced opacity and visual distinction
+* **Data Filtering API**: New methods to filter MBlock data by online/offline status
+
+#### Enhanced API Methods
+* **`MBlock::getDataArray()`**: Central method combining `rex_var::toArray()` and filtering
+* **`MBlock::getOnlineDataArray()`**: Direct access to online-only items
+* **`MBlock::getOfflineDataArray()`**: Direct access to offline-only items
+* **Legacy Support**: Existing filter methods maintained for backward compatibility
+
+#### Internationalization & UX
+* **Multi-language Support**: Extended language files for German and English
+* **Template Translation**: New `{{language_key}}` syntax in templates
+* **Enhanced Parser**: `MBlockParser` supports automatic language placeholder replacement
+* **Modern UI**: Updated to use bloecks ^5.2.0 for consistent drag & drop
+* **Dark Mode**: Full compatibility with REDAXO dark theme
+
+### 🔧 Technical Improvements
+* **Minimum REDAXO Version**: Now requires REDAXO ^5.18.0
+* **Bloecks Dependency**: Added bloecks ^5.2.0 as required dependency
+* **Integrated CSS**: All styles now in main `mblock.css` file
+* **Enhanced Error Handling**: Better validation and error recovery
+* **Code Cleanup**: Removed all debug code and improved performance
+
+### 📖 Documentation
+* **Comprehensive README**: Complete feature overview and API documentation
+* **Usage Examples**: Practical examples for offline toggle and copy/paste
+* **Migration Guide**: Instructions for upgrading from previous versions
+
 ### Version 3.4.0 - 3.4.3
 * rex_version::compare fixed for REDAXO >= 5.12
 * dark-mode support for REDAXO >= 5.13

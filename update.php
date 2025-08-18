@@ -1,6 +1,6 @@
 <?php
 /**
- * @author mail[at]joachim-doerr[dot]com Joachim Doerr
+ * @author https://github.com/FriendsOfREDAXO
  * @package redaxo5
  * @license MIT
  */
@@ -19,8 +19,43 @@ if (!$this->hasConfig('mblock_delete_confirm')) {
     $this->setConfig('mblock_delete_confirm', 1);
 }
 
-// copy data directory
-rex_dir::copy($this->getPath('data'), $this->getDataPath());
+// MBlock 4.0 - Template System Update
+// Löscht alte Default-Templates aus dem data/ Ordner
+$dataTemplatesPath = $this->getDataPath('templates/');
+
+if (is_dir($dataTemplatesPath)) {
+    // Liste der Default-Templates die gelöscht werden sollen
+    $defaultTemplates = [
+        'copy_theme',
+        'default_theme', 
+    ];
+    
+    $deletedCount = 0;
+    foreach ($defaultTemplates as $templateName) {
+        $templatePath = $dataTemplatesPath . $templateName;
+        
+        if (is_dir($templatePath)) {
+            // Rekursiv löschen
+            rex_dir::delete($templatePath);
+            $deletedCount++;
+        }
+    }
+    
+    if ($deletedCount > 0) {
+        // Prüfen ob templates Ordner leer ist
+        $remainingFiles = glob($dataTemplatesPath . '*');
+        if (empty($remainingFiles)) {
+            // Leeren templates Ordner auch löschen
+            rmdir($dataTemplatesPath);
+        }
+    }
+}
+
+// copy data directory (für neue Installationen)
+if (!is_dir($this->getDataPath())) {
+    rex_dir::copy($this->getPath('data'), $this->getDataPath());
+}
+
 // delete all assets
 rex_dir::deleteFiles($this->getAssetsPath(), true);
 // copy assets

@@ -55,6 +55,9 @@ function mblock_cleanup_events(element, namespace = '.mblock') {
 
 $(document).on('rex:ready', function (e, container) {
     try {
+        // Initialize clipboard system
+        MBlockClipboard.init();
+        
         if (container && typeof container.find === 'function') {
             container.find(mblock).each(function () {
                 const $element = $(this);
@@ -116,7 +119,19 @@ function mblock_init(element) {
                 element.addClass('hide_removeadded').addClass('hide_sorthandle');
             }
         }
+        
         mblock_add_plus(element);
+        
+        // Initialize toolbar handlers
+        mblock_init_toolbar(element);
+        
+        // Initialize online/offline states for existing items
+        try {
+            MBlockOnlineToggle.initializeStates(element);
+        } catch (initError) {
+            console.warn('MBlock: Fehler beim Initialisieren der Online/Offline-States:', initError);
+        }
+        
         return true;
     } catch (error) {
         console.error('MBlock: Fehler in mblock_init:', error);
@@ -219,33 +234,166 @@ function mblock_remove(element) {
 
 function mblock_sort_it(element) {
     try {
-        if (!element || !element.length || typeof element.mblock_sortable !== 'function') {
-            console.warn('MBlock: Sortable nicht verfügbar für Element');
+        if (!element || !element.length || !element.get || !element.get(0)) {
+            console.warn('MBlock: Ungültiges Element für mblock_sort_it');
             return false;
         }
 
-        element.mblock_sortable({
-            handle: '.sorthandle',
-            animation: 150,
-            onEnd: function (event) {
+        const domElement = element.get(0);
+        
+        // Check if element is still in the DOM
+        if (!document.contains(domElement)) {
+            console.warn('MBlock: Element nicht mehr im DOM');
+            return false;
+        }
+
+        // Moderne Sortable.js API (von bloecks)
+        if (typeof Sortable !== 'undefined' && Sortable.create) {
+            // Destroy existing sortable if it exists - with better error handling
+            try {
+                if (domElement._sortable) {
+                    if (typeof domElement._sortable.destroy === 'function') {
+                        domElement._sortable.destroy();
+                    }
+                    domElement._sortable = null;
+                }
+            } catch (destroyError) {
+                console.warn('MBlock: Fehler beim Zerstören der vorhandenen Sortable-Instanz:', destroyError);
+                domElement._sortable = null;
+            }
+            
+            // Add safety delay before creating new instance
+            setTimeout(() => {
                 try {
-                    if (event && event.item) {
+                    const sortableInstance = Sortable.create(domElement, {
+                        handle: '.sorthandle',
+                        animation: 150,
+                        ghostClass: 'sortable-ghost',
+                        chosenClass: 'mblock-sortable-chosen',
+                        dragClass: 'mblock-dragging',
+                        fallbackTolerance: 3,
+                        forceFallback: false,
+                        onStart: function (evt) {
+                            try {
+                                document.body.classList.add('mblock-drag-active');
+                                if (evt.item) {
+                                    evt.item.classList.add('mblock-dragging');
+                                }
+                            } catch (error) {
+                                console.error('MBlock: Fehler in sortable onStart:', error);
+                            }
+                        },
+                        onEnd: function (evt) {
+                            try {
+                                document.body.classList.remove('mblock-drag-active');
+                                if (evt.item) {
+                                    evt.item.classList.remove('mblock-dragging');
+                                    // Add flash effect
+                                    evt.item.classList.add('mblock-dropped-flash');
+                                    setTimeout(() => {
+                                        evt.item.classList.remove('mblock-dropped-flash');
+                                    }, 600);
+                                }
+                                
+                                // Reindex and update
+                                mblock_reindex(element);
+                                mblock_remove(element);
+                                
+                                // Trigger event
+                                let iClone = $(evt.item);
+                                if (iClone.length) {
+                                    iClone.trigger('mblock:change', [iClone]);
+                                }
+                            } catch (error) {
+                                console.error('MBlock: Fehler in sortable onEnd:', error);
+                            }
+                        },
+                        onError: function (evt) {
+                            console.error('MBlock: Sortable Fehler:', evt);
+                        }
+                    });
+                    
+                    // Store sortable instance for later destruction
+                    domElement._sortable = sortableInstance;
+                    
+                } catch (createError) {
+                    console.error('MBlock: Fehler beim Erstellen der Sortable-Instanz:', createError);
+                    // Fallback to jQuery UI if available
+                    mblock_sort_it_jquery_fallback(element);
+                }
+            }, 10);
+            
+            return true;
+            
+        } 
+        // Fallback für jQuery UI Sortable (Legacy-Support)
+        else {
+            return mblock_sort_it_jquery_fallback(element);
+        }
+        
+    } catch (error) {
+        console.error('MBlock: Fehler in mblock_sort_it:', error);
+        return mblock_sort_it_jquery_fallback(element);
+    }
+}
+
+// Separate jQuery UI Sortable fallback function
+function mblock_sort_it_jquery_fallback(element) {
+    try {
+        if (typeof element.sortable === 'function') {
+            // Destroy existing jQuery UI sortable if it exists
+            try {
+                if (element.hasClass('ui-sortable')) {
+                    element.sortable('destroy');
+                }
+            } catch (destroyError) {
+                console.warn('MBlock: Fehler beim Zerstören der jQuery UI Sortable-Instanz:', destroyError);
+            }
+
+            element.sortable({
+                handle: '.sorthandle',
+                placeholder: 'sortable-placeholder',
+                tolerance: 'pointer',
+                start: function (event, ui) {
+                    try {
+                        document.body.classList.add('mblock-drag-active');
+                        if (ui.item) {
+                            ui.item.addClass('mblock-dragging');
+                        }
+                    } catch (error) {
+                        console.error('MBlock: Fehler in jQuery UI sortable start:', error);
+                    }
+                },
+                update: function (event, ui) {
+                    try {
+                        document.body.classList.remove('mblock-drag-active');
+                        if (ui.item) {
+                            ui.item.removeClass('mblock-dragging');
+                            ui.item.addClass('mblock-dropped-flash');
+                            setTimeout(() => {
+                                ui.item.removeClass('mblock-dropped-flash');
+                            }, 600);
+                        }
+                        
                         mblock_reindex(element);
                         mblock_remove(element);
                         // trigger event
-                        let iClone = $(event.item);
+                        let iClone = ui.item;
                         if (iClone.length) {
                             iClone.trigger('mblock:change', [iClone]);
                         }
+                    } catch (error) {
+                        console.error('MBlock: Fehler in jQuery UI sortable update:', error);
                     }
-                } catch (error) {
-                    console.error('MBlock: Fehler in sortable onEnd:', error);
                 }
-            }
-        });
-        return true;
+            });
+            return true;
+        } else {
+            console.error('MBlock: Weder Sortable.js noch jQuery UI Sortable gefunden');
+            return false;
+        }
     } catch (error) {
-        console.error('MBlock: Fehler in mblock_sort_it:', error);
+        console.error('MBlock: Fehler in jQuery UI fallback:', error);
         return false;
     }
 }
@@ -537,8 +685,26 @@ function mblock_add_item(element, item) {
         element.prepend(iClone);
 
     } else if (item.parent().hasClass(element.attr('class'))) {
-        // unset sortable
-        element.mblock_sortable("destroy");
+        // Destroy sortable before manipulation with better error handling
+        try {
+            const domElement = element.get(0);
+            if (domElement && domElement._sortable && typeof domElement._sortable.destroy === 'function') {
+                domElement._sortable.destroy();
+                domElement._sortable = null;
+            }
+        } catch (sortableError) {
+            console.warn('MBlock: Sortable destroy error in add_item:', sortableError);
+        }
+        
+        // jQuery UI Sortable Fallback
+        try {
+            if (typeof element.sortable === 'function' && element.hasClass('ui-sortable')) {
+                element.sortable("destroy");
+            }
+        } catch (jqueryError) {
+            console.warn('MBlock: jQuery UI sortable destroy error in add_item:', jqueryError);
+        }
+        
         // add clone
         item.after(iClone);
         // set count
@@ -550,15 +716,40 @@ function mblock_add_item(element, item) {
     // reinit first
     mblock_init_sort(element);
     
+    // trigger rex:ready event only on the new item for component initialization
+    // We handle selectpicker manually below, so we only need this single event
+    iClone.trigger('rex:ready', [iClone]);
+    
+    // specific component reinitialization
+    setTimeout(function() {
+        // Initialize selectpicker with REDAXO core method for new items
+        if (typeof $.fn.selectpicker === 'function') {
+            var selects = iClone.find('select.selectpicker');
+            if (selects.length) {
+                selects.selectpicker({
+                    noneSelectedText: '—'
+                }).on('rendered.bs.select', function () {
+                    $(this).parent().removeClass('bs3-has-addon');
+                });
+                selects.selectpicker('refresh');
+            }
+        }
+        
+        // reinitialize other common components
+        if (typeof $.fn.chosen === 'function') {
+            iClone.find('select.chosen').chosen();
+        }
+        
+        // trigger change events to update any dependent elements
+        iClone.find('input, select, textarea').trigger('change');
+    }, 50);
+    
     // scroll to item with slight delay to ensure DOM is ready
     setTimeout(function() {
         if (iClone && iClone.length && iClone.is(':visible')) {
             mblock_scroll(element, iClone);
         }
     }, 100);
-    
-    // trigger rex ready
-    iClone.trigger('rex:ready', [iClone]);
 }
 
 function mblock_set_unique_id(item, input_delete) {
@@ -630,13 +821,24 @@ function mblock_remove_item(element, item) {
         const elementClass = element.attr('class');
         
         if (itemParent.length && elementClass && itemParent.hasClass(elementClass)) {
-            // Sichere Sortable-Deaktivierung
+            // Sichere Sortable-Deaktivierung (für beide Sortable-Typen)
             try {
-                if (typeof element.mblock_sortable === 'function') {
-                    element.mblock_sortable("destroy"); // Fixed typo: "destory" -> "destroy"
+                const domElement = element.get(0);
+                if (domElement && domElement._sortable && typeof domElement._sortable.destroy === 'function') {
+                    domElement._sortable.destroy();
+                    domElement._sortable = null;
                 }
             } catch (sortableError) {
-                console.warn('MBlock: Sortable destroy fehlgeschlagen:', sortableError);
+                console.warn('MBlock: Sortable destroy error in remove_item:', sortableError);
+            }
+            
+            // jQuery UI Sortable Fallback
+            try {
+                if (typeof element.sortable === 'function' && element.hasClass('ui-sortable')) {
+                    element.sortable("destroy");
+                }
+            } catch (jqueryError) {
+                console.warn('MBlock: jQuery UI sortable destroy error in remove_item:', jqueryError);
             }
 
             // set prev item
@@ -673,6 +875,1219 @@ function mblock_remove_item(element, item) {
     } catch (error) {
         console.error('MBlock: Fehler in mblock_remove_item:', error);
         return false;
+    }
+}
+
+// Copy & Paste Funktionalität mit Session/Local Storage
+var MBlockClipboard = {
+    data: null,
+    storageKey: 'mblock_clipboard',
+    useSessionStorage: true, // true = Session Storage, false = Local Storage
+    
+    // Initialize clipboard from storage
+    init: function() {
+        console.log('MBlock: Clipboard wird initialisiert...');
+        try {
+            const loaded = this.loadFromStorage();
+            console.log('MBlock: Clipboard initialisiert, Daten geladen:', loaded);
+            if (this.data) {
+                console.log('MBlock: Verfügbare Clipboard-Daten:', this.data);
+            }
+        } catch (error) {
+            console.warn('MBlock: Fehler beim Initialisieren des Clipboards:', error);
+        }
+    },
+    
+    // Get storage object (sessionStorage or localStorage)
+    getStorage: function() {
+        try {
+            return this.useSessionStorage ? sessionStorage : localStorage;
+        } catch (error) {
+            console.warn('MBlock: Storage nicht verfügbar:', error);
+            return null;
+        }
+    },
+    
+    // Save clipboard data to storage
+    saveToStorage: function() {
+        try {
+            const storage = this.getStorage();
+            if (storage && this.data) {
+                storage.setItem(this.storageKey, JSON.stringify({
+                    ...this.data,
+                    // Add metadata
+                    savedAt: new Date().toISOString(),
+                    sessionId: this.getSessionId()
+                }));
+                console.log('MBlock: Clipboard-Daten in Storage gespeichert');
+                return true;
+            }
+        } catch (error) {
+            console.warn('MBlock: Fehler beim Speichern in Storage:', error);
+        }
+        return false;
+    },
+    
+    // Load clipboard data from storage
+    loadFromStorage: function() {
+        try {
+            const storage = this.getStorage();
+            if (storage) {
+                const stored = storage.getItem(this.storageKey);
+                if (stored) {
+                    const parsedData = JSON.parse(stored);
+                    
+                    // Check if data is still valid (max 24 hours for localStorage)
+                    if (!this.useSessionStorage && parsedData.savedAt) {
+                        const savedDate = new Date(parsedData.savedAt);
+                        const now = new Date();
+                        const hoursDiff = (now - savedDate) / (1000 * 60 * 60);
+                        
+                        if (hoursDiff > 24) {
+                            console.log('MBlock: Clipboard-Daten zu alt, werden gelöscht');
+                            this.clearStorage();
+                            return false;
+                        }
+                    }
+                    
+                    this.data = parsedData;
+                    this.updatePasteButtons();
+                    console.log('MBlock: Clipboard-Daten aus Storage geladen');
+                    return true;
+                }
+            }
+        } catch (error) {
+            console.warn('MBlock: Fehler beim Laden aus Storage:', error);
+            this.clearStorage(); // Clear corrupted storage
+        }
+        return false;
+    },
+    
+    // Clear storage
+    clearStorage: function() {
+        try {
+            const storage = this.getStorage();
+            if (storage) {
+                storage.removeItem(this.storageKey);
+                console.log('MBlock: Clipboard-Storage geleert');
+            }
+        } catch (error) {
+            console.warn('MBlock: Fehler beim Leeren des Storages:', error);
+        }
+    },
+    
+    // Generate simple session ID
+    getSessionId: function() {
+        if (!this._sessionId) {
+            this._sessionId = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+        }
+        return this._sessionId;
+    },
+    
+    // Toggle between session and local storage
+    toggleStorageMode: function() {
+        const oldData = this.data;
+        this.clearStorage(); // Clear current storage
+        
+        this.useSessionStorage = !this.useSessionStorage;
+        
+        if (oldData) {
+            this.data = oldData;
+            this.saveToStorage(); // Save to new storage
+        }
+        
+        console.log('MBlock: Storage-Modus gewechselt zu:', this.useSessionStorage ? 'Session' : 'Local');
+        return this.useSessionStorage;
+    },
+    
+    // Show warning when trying to paste between different module types
+    showModuleTypeMismatchWarning: function(currentType, clipboardType) {
+        try {
+            // Create temporary warning message
+            const warningHtml = `
+                <div class="alert alert-warning mblock-type-warning" style="margin: 10px 0; position: relative; z-index: 1000;">
+                    <strong>Achtung:</strong> Das kopierte Element stammt aus einem anderen Modul-Typ. 
+                    Das Einfügen ist nicht möglich.<br>
+                    <small>Aktueller Typ: <code>${currentType}</code> | Zwischenablage: <code>${clipboardType}</code></small>
+                    <button type="button" class="close" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: none; font-size: 18px;" onclick="$(this).parent().fadeOut()">&times;</button>
+                </div>
+            `;
+            
+            // Find best place to show warning
+            const targetElement = $('.mblock_wrapper').first();
+            if (targetElement.length) {
+                // Remove any existing warnings
+                $('.mblock-type-warning').remove();
+                
+                // Add new warning
+                targetElement.prepend(warningHtml);
+                
+                // Auto-hide after 5 seconds
+                setTimeout(function() {
+                    $('.mblock-type-warning').fadeOut('slow');
+                }, 5000);
+                
+                console.log('MBlock: Modultyp-Warnung angezeigt');
+            } else {
+                // Fallback to browser alert
+                alert('Das kopierte Element stammt aus einem anderen Modul und kann hier nicht eingefügt werden.');
+            }
+            
+        } catch (error) {
+            console.error('MBlock: Fehler beim Anzeigen der Modultyp-Warnung:', error);
+            // Fallback to browser alert
+            alert('Das kopierte Element kann hier nicht eingefügt werden (anderer Modul-Typ).');
+        }
+    },
+
+    // Get module type/name from wrapper or form context
+    getModuleType: function(wrapper) {
+        try {
+            // Try to find module identifier from various sources
+            
+            // 1. Check for data attributes on wrapper
+            let moduleType = wrapper.attr('data-module-type') || wrapper.attr('data-module-name');
+            if (moduleType) {
+                return moduleType;
+            }
+            
+            // 2. Check for hidden input with module name
+            const moduleInput = wrapper.find('input[name*="module_id"], input[name*="module_name"]').first();
+            if (moduleInput.length) {
+                moduleType = moduleInput.val();
+                if (moduleType) {
+                    return moduleType;
+                }
+            }
+            
+            // 3. Check for form action or parent context
+            const form = wrapper.closest('form');
+            if (form.length) {
+                const action = form.attr('action') || '';
+                const moduleMatch = action.match(/module_id=(\d+)/);
+                if (moduleMatch) {
+                    return 'module_' + moduleMatch[1];
+                }
+            }
+            
+            // 4. Check for unique class or id patterns on wrapper
+            const classes = wrapper.attr('class') || '';
+            const classMatch = classes.match(/mblock-module-(\w+)/);
+            if (classMatch) {
+                return classMatch[1];
+            }
+            
+            // 5. Fallback: use closest identifying parent
+            const parentWithId = wrapper.closest('[id]');
+            if (parentWithId.length) {
+                const id = parentWithId.attr('id');
+                if (id.includes('module')) {
+                    return id;
+                }
+            }
+            
+            // 6. Last resort: use URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const moduleId = urlParams.get('module_id') || urlParams.get('article_id');
+            if (moduleId) {
+                return 'context_' + moduleId;
+            }
+            
+            // Default fallback
+            return 'unknown_module';
+            
+        } catch (error) {
+            console.warn('MBlock: Fehler beim Ermitteln des Modultyps:', error);
+            return 'unknown_module';
+        }
+    },
+
+    copy: function(element, item) {
+        console.log('MBlock: Copy-Funktion aufgerufen', { element, item });
+        
+        try {
+            if (!item || !item.length) {
+                console.warn('MBlock: Kein Item zum Kopieren gefunden');
+                return false;
+            }
+            
+            console.log('MBlock: Item für Kopiervorgang gefunden:', item);
+            
+            // Get module type from the closest mblock wrapper
+            const wrapper = item.closest('.mblock_wrapper');
+            const moduleType = this.getModuleType(wrapper);
+            
+            console.log('MBlock: Modultyp erkannt:', moduleType);
+            
+            // Clone item completely
+            const clonedItem = item.clone(true, true);
+            
+            // Convert selectpicker elements back to plain select elements for clean copying
+            this.convertSelectpickerToPlainSelect(clonedItem);
+            
+            // Capture comprehensive form data
+            const formData = this.captureComplexFormData(item);
+            
+            console.log('MBlock: Formulardaten erfasst:', formData);
+            
+            // Store in clipboard with metadata and form values
+            this.data = {
+                html: clonedItem.prop('outerHTML'),
+                formData: formData,
+                moduleType: moduleType, // Store module type
+                timestamp: Date.now(),
+                source: element.attr('class') || 'mblock_wrapper'
+            };
+            
+            console.log('MBlock: Daten in Zwischenablage gespeichert:', this.data);
+            
+            // Visual feedback
+            this.showCopiedState(item);
+            
+            // Save to storage
+            const saved = this.saveToStorage();
+            console.log('MBlock: In Storage gespeichert:', saved);
+            
+            // Update paste button states
+            this.updatePasteButtons();
+            
+            console.log('MBlock: Item wurde in die Zwischenablage kopiert und gespeichert', {
+                moduleType: moduleType,
+                formData: formData,
+                complexElements: Object.keys(formData).length,
+                storage: this.useSessionStorage ? 'Session' : 'Local'
+            });
+            return true;
+            
+        } catch (error) {
+            console.error('MBlock: Fehler beim Kopieren:', error);
+            return false;
+        }
+    },
+    
+    captureComplexFormData: function(item) {
+        const formData = {};
+        
+        try {
+            // Regular form elements
+            item.find('input, textarea, select').each(function() {
+                const $el = $(this);
+                const name = $el.attr('name') || $el.attr('id');
+                
+                if (name) {
+                    if ($el.is(':checkbox') || $el.is(':radio')) {
+                        formData[name] = {
+                            type: 'checkbox_radio',
+                            value: $el.val(),
+                            checked: $el.prop('checked'),
+                            defaultValue: $el.attr('value')
+                        };
+                    } else if ($el.is('select')) {
+                        const selectedOptions = [];
+                        $el.find('option:selected').each(function() {
+                            selectedOptions.push($(this).val());
+                        });
+                        formData[name] = {
+                            type: 'select',
+                            value: $el.val(),
+                            selectedOptions: selectedOptions,
+                            html: $el.html()
+                        };
+                    } else {
+                        formData[name] = {
+                            type: 'input',
+                            value: $el.val(),
+                            placeholder: $el.attr('placeholder')
+                        };
+                    }
+                }
+            });
+            
+            // CKEditor content (CKE5)
+            item.find('.cke5-editor').each(function() {
+                const $editor = $(this);
+                const name = $editor.attr('name');
+                if (name) {
+                    // Try to get CKEditor content
+                    let content = $editor.val();
+                    
+                    // Check if there's a CKEditor instance
+                    const editorId = $editor.attr('id');
+                    if (editorId && window.CKEDITOR && window.CKEDITOR.instances[editorId]) {
+                        content = window.CKEDITOR.instances[editorId].getData();
+                    }
+                    
+                    formData[name] = {
+                        type: 'ckeditor',
+                        value: content,
+                        config: {
+                            lang: $editor.attr('data-lang'),
+                            profile: $editor.attr('data-profile')
+                        }
+                    };
+                }
+            });
+            
+            // REX Media widgets
+            item.find('.rex-js-widget-media').each(function() {
+                const $widget = $(this);
+                const $input = $widget.find('input[id^="REX_MEDIA_"]');
+                
+                if ($input.length) {
+                    const name = $input.attr('name');
+                    const mediaId = $input.attr('id');
+                    
+                    formData[name || mediaId] = {
+                        type: 'rex_media',
+                        value: $input.val(),
+                        mediaId: mediaId,
+                        preview: $widget.find('.rex-js-media-preview').html()
+                    };
+                }
+            });
+            
+            // REX Link widgets  
+            item.find('.rex-js-widget-customlink').each(function() {
+                const $widget = $(this);
+                const $hiddenInput = $widget.find('input[type="hidden"]');
+                const $nameInput = $widget.find('input[readonly]');
+                
+                if ($hiddenInput.length) {
+                    const name = $hiddenInput.attr('name');
+                    
+                    formData[name] = {
+                        type: 'rex_link',
+                        value: $hiddenInput.val(),
+                        displayText: $nameInput.length ? $nameInput.val() : '',
+                        dataId: $widget.attr('data-id'),
+                        dataClang: $widget.attr('data-clang')
+                    };
+                }
+            });
+            
+            // Bootstrap Select elements
+            item.find('.bootstrap-select select').each(function() {
+                const $select = $(this);
+                const name = $select.attr('name');
+                
+                if (name) {
+                    formData[name + '_bootstrap'] = {
+                        type: 'bootstrap_select',
+                        value: $select.val(),
+                        selectedText: $select.find('option:selected').text(),
+                        title: $select.closest('.bootstrap-select').find('.filter-option-inner-inner').text()
+                    };
+                }
+            });
+            
+            // Tab states
+            item.find('.nav-tabs .active a').each(function(index) {
+                const $tab = $(this);
+                const href = $tab.attr('href');
+                
+                if (href) {
+                    formData['active_tab_' + index] = {
+                        type: 'active_tab',
+                        href: href,
+                        text: $tab.text()
+                    };
+                }
+            });
+            
+            // Collapse states
+            item.find('.collapse.in, .collapse.show').each(function(index) {
+                const $collapse = $(this);
+                const id = $collapse.attr('id');
+                
+                if (id) {
+                    formData['collapse_state_' + id] = {
+                        type: 'collapse_state',
+                        isOpen: true
+                    };
+                }
+            });
+            
+            return formData;
+            
+        } catch (error) {
+            console.error('MBlock: Fehler beim Erfassen der Formulardaten:', error);
+            return formData;
+        }
+    },
+    
+    paste: function(element, afterItem) {
+        try {
+            // Load fresh data from storage in case it was updated in another tab
+            this.loadFromStorage();
+            
+            if (!this.data) {
+                console.warn('MBlock: Keine Daten in der Zwischenablage');
+                return false;
+            }
+            
+            // Check module type compatibility
+            const currentWrapper = element.closest('.mblock_wrapper');
+            const currentModuleType = this.getModuleType(currentWrapper);
+            const clipboardModuleType = this.data.moduleType || 'unknown_module';
+            
+            console.log('MBlock: Modultyp-Prüfung:', {
+                current: currentModuleType,
+                clipboard: clipboardModuleType
+            });
+            
+            if (currentModuleType !== clipboardModuleType) {
+                console.warn('MBlock: Modultyp stimmt nicht überein. Paste abgebrochen.', {
+                    current: currentModuleType,
+                    clipboard: clipboardModuleType
+                });
+                
+                // Show user feedback
+                this.showModuleTypeMismatchWarning(currentModuleType, clipboardModuleType);
+                return false;
+            }
+            
+            console.log('MBlock: Modultyp stimmt überein - Paste wird fortgesetzt');
+            
+            // Create element from clipboard
+            const pastedItem = $(this.data.html);
+            
+            // Clean up IDs and names to avoid conflicts
+            this.cleanupPastedItem(pastedItem);
+            
+            // Restore form values from clipboard with enhanced data restoration
+            if (this.data.formData) {
+                this.restoreComplexFormData(pastedItem, this.data.formData);
+            }
+            
+            // Insert item
+            if (afterItem && afterItem.length) {
+                // Destroy sortable before manipulation with better error handling
+                try {
+                    const domElement = element.get(0);
+                    if (domElement && domElement._sortable && typeof domElement._sortable.destroy === 'function') {
+                        domElement._sortable.destroy();
+                        domElement._sortable = null;
+                    }
+                } catch (sortableError) {
+                    console.warn('MBlock: Sortable destroy error in paste:', sortableError);
+                }
+                
+                // jQuery UI Sortable Fallback
+                try {
+                    if (typeof element.sortable === 'function' && element.hasClass('ui-sortable')) {
+                        element.sortable("destroy");
+                    }
+                } catch (jqueryError) {
+                    console.warn('MBlock: jQuery UI sortable destroy error in paste:', jqueryError);
+                }
+                
+                afterItem.after(pastedItem);
+            } else {
+                element.prepend(pastedItem);
+            }
+            
+            // Add unique ids
+            mblock_set_unique_id(pastedItem, true);
+            
+            // Reinitialize sortable
+            mblock_init_sort(element);
+            
+            // Trigger rex:ready event only on the pasted item for component initialization
+            // We handle selectpicker manually below, so we only need this single event
+            pastedItem.trigger('rex:ready', [pastedItem]);
+            
+            // Specific component reinitialization
+            setTimeout(function() {
+                // Initialize selectpicker with REDAXO core method for elements marked during copy
+                if (typeof $.fn.selectpicker === 'function') {
+                    var selects = pastedItem.find('select.mblock-needs-selectpicker');
+                    if (selects.length) {
+                        console.log('MBlock: Initializing selectpicker for pasted elements:', selects.length);
+                        
+                        // Remove marker class and add proper selectpicker class
+                        selects.removeClass('mblock-needs-selectpicker').addClass('selectpicker');
+                        
+                        // Initialize with REDAXO settings
+                        selects.selectpicker({
+                            noneSelectedText: '—'
+                        }).on('rendered.bs.select', function () {
+                            $(this).parent().removeClass('bs3-has-addon');
+                        });
+                        selects.selectpicker('refresh');
+                    }
+                }
+                
+                // Reinitialize other common components
+                if (typeof $.fn.chosen === 'function') {
+                    pastedItem.find('select.chosen').chosen();
+                }
+                
+                // Trigger change events to update any dependent elements
+                pastedItem.find('input, select, textarea').trigger('change');
+            }, 50);
+            
+            // Scroll to pasted item
+            setTimeout(function() {
+                if (pastedItem && pastedItem.length && pastedItem.is(':visible')) {
+                    mblock_scroll(element, pastedItem);
+                }
+            }, 100);
+            
+            console.log('MBlock: Item wurde aus der Zwischenablage eingefügt');
+            return true;
+            
+        } catch (error) {
+            console.error('MBlock: Fehler beim Einfügen:', error);
+            return false;
+        }
+    },
+    
+    cleanupPastedItem: function(item) {
+        try {
+            console.log('MBlock: Bereinige eingefügtes Item');
+            
+            // Remove mblock-specific data attributes
+            item.removeAttr('data-mblock_index');
+            
+            // Clean form elements
+            item.find('input, textarea, select').each(function() {
+                const $el = $(this);
+                const name = $el.attr('name');
+                if (name && name.indexOf('mblock_new_') === -1) {
+                    $el.attr('name', 'mblock_new_' + name);
+                    console.log('MBlock: Name geändert:', name, '→', 'mblock_new_' + name);
+                }
+                
+                // DON'T clear values here - they will be restored later by restoreComplexFormData
+                // Only clear specific input types that should always be empty
+                const inputType = $el.attr('type');
+                if (inputType === 'file') {
+                    $el.val(''); // File inputs should always be cleared
+                }
+                
+                // Keep unique values for unique fields
+                if ($el.attr('data-unique') && !$el.val()) {
+                    // Only generate unique value if field is empty
+                    const unique_id = Math.random().toString(16).slice(2);
+                    $el.val(unique_id);
+                }
+            });
+            
+            // Clean IDs that might cause conflicts
+            item.find('[id]').each(function() {
+                const $el = $(this);
+                const id = $el.attr('id');
+                if (id && !id.match(/^REX_/)) {
+                    $el.removeAttr('id');
+                    console.log('MBlock: ID entfernt:', id);
+                }
+            });
+            
+        } catch (error) {
+            console.error('MBlock: Fehler beim Bereinigen des eingefügten Items:', error);
+        }
+    },
+
+    // Smart field matching for REDAXO's dynamic field names
+    findFieldBySmartMatching: function(container, originalName) {
+        // Try exact match first
+        let $field = container.find(`[name="${originalName}"]`);
+        if ($field.length) return $field;
+        
+        // Try with mblock_new_ prefix
+        $field = container.find(`[name="mblock_new_${originalName}"]`);
+        if ($field.length) return $field;
+        
+        // For REDAXO field names like REX_INPUT_VALUE[1][0][fieldname], 
+        // extract the field base and try to match by pattern
+        if (originalName.includes('REX_INPUT_VALUE') || originalName.includes('REX_LINK')) {
+            const patterns = this.extractREDAXOFieldPatterns(originalName);
+            
+            for (const pattern of patterns) {
+                $field = container.find(`[name*="${pattern}"]`);
+                if ($field.length) {
+                    console.log(`MBlock: Field "${originalName}" matched with pattern "${pattern}"`);
+                    return $field;
+                }
+            }
+        }
+        
+        // Fallback: try partial name match
+        const nameBase = originalName.replace(/^mblock_new_/, '');
+        $field = container.find(`[name*="${nameBase}"]`);
+        
+        return $field;
+    },
+
+    // Extract patterns from REDAXO field names for matching
+    extractREDAXOFieldPatterns: function(fieldName) {
+        const patterns = [];
+        
+        // REX_INPUT_VALUE[1][0][fieldname] -> ["fieldname", "[fieldname]"]
+        const inputValueMatch = fieldName.match(/REX_INPUT_VALUE\[.*?\]\[.*?\]\[(.+?)\]/);
+        if (inputValueMatch) {
+            patterns.push(inputValueMatch[1]); // fieldname
+            patterns.push(`[${inputValueMatch[1]}]`); // [fieldname]
+        }
+        
+        // REX_LINK_11001_NAME -> ["REX_LINK", "_NAME"]  
+        const linkMatch = fieldName.match(/REX_LINK_(\d+)(_\w+)?/);
+        if (linkMatch) {
+            patterns.push('REX_LINK');
+            if (linkMatch[2]) {
+                patterns.push(linkMatch[2]);
+            }
+        }
+        
+        // REX_MEDIA_1_NAME -> ["REX_MEDIA", "_NAME"]
+        const mediaMatch = fieldName.match(/REX_MEDIA_(\d+)(_\w+)?/);
+        if (mediaMatch) {
+            patterns.push('REX_MEDIA');
+            if (mediaMatch[2]) {
+                patterns.push(mediaMatch[2]);
+            }
+        }
+        
+        return patterns;
+    },
+
+    // Enhanced form data restoration with smarter field matching
+    restoreComplexFormData: function(pastedItem, formData) {
+        try {
+            console.log('MBlock: Stelle Formulardaten wieder her:', formData);
+            
+            Object.keys(formData).forEach(originalName => {
+                const fieldData = formData[originalName];
+                
+                if (!fieldData || typeof fieldData !== 'object') return;
+                
+                let $field = this.findFieldBySmartMatching(pastedItem, originalName);
+                
+                console.log(`MBlock: Suche Feld "${originalName}":`, $field.length, 'gefunden');
+                
+                if (!$field.length) {
+                    // Only warn for significant fields, not bootstrap/metadata fields
+                    if (!originalName.includes('_bootstrap') && !originalName.includes('active_tab')) {
+                        console.warn(`MBlock: Feld "${originalName}" nicht gefunden`);
+                    }
+                    return;
+                }
+                
+                // Handle different field types
+                switch (fieldData.type) {
+                    case 'checkbox_radio':
+                        console.log('MBlock: Setze Checkbox/Radio:', originalName, fieldData.value, fieldData.checked);
+                        $field.val(fieldData.value);
+                        $field.prop('checked', fieldData.checked);
+                        if (fieldData.defaultValue) {
+                            $field.attr('value', fieldData.defaultValue);
+                        }
+                        break;
+                        
+                    case 'select':
+                        console.log('MBlock: Setze Select:', originalName, fieldData.value);
+                        // Restore select HTML if needed
+                        if (fieldData.html) {
+                            $field.html(fieldData.html);
+                        }
+                        $field.val(fieldData.value);
+                        
+                        // Handle multi-select
+                        if (fieldData.selectedOptions && fieldData.selectedOptions.length > 0) {
+                            fieldData.selectedOptions.forEach(optionValue => {
+                                $field.find(`option[value="${optionValue}"]`).prop('selected', true);
+                            });
+                        }
+                        break;
+                        
+                    case 'bootstrap_select':
+                        console.log('MBlock: Setze Bootstrap Select:', originalName, fieldData.value);
+                        $field.val(fieldData.value);
+                        // Trigger bootstrap-select refresh if available
+                        if (typeof $field.selectpicker === 'function') {
+                            setTimeout(() => {
+                                $field.selectpicker('refresh');
+                                $field.selectpicker('val', fieldData.value);
+                            }, 100);
+                        }
+                        break;
+                        
+                    case 'ckeditor':
+                        console.log('MBlock: Setze CKEditor:', originalName, fieldData.value ? 'mit Inhalt' : 'leer');
+                        if (fieldData.value) {
+                            $field.val(fieldData.value);
+                            
+                            // If CKEditor instance exists, set data
+                            const editorId = $field.attr('id');
+                            if (editorId && window.CKEDITOR && window.CKEDITOR.instances[editorId]) {
+                                setTimeout(() => {
+                                    window.CKEDITOR.instances[editorId].setData(fieldData.value);
+                                }, 200);
+                            }
+                        }
+                        break;
+                        
+                    case 'rex_media':
+                        console.log('MBlock: Setze REX Media:', originalName, fieldData.value);
+                        if (fieldData.value) {
+                            $field.val(fieldData.value);
+                            
+                            // Restore preview if available
+                            if (fieldData.preview) {
+                                const $preview = $field.closest('.rex-js-widget-media').find('.rex-js-media-preview');
+                                if ($preview.length) {
+                                    $preview.html(fieldData.preview);
+                                    if (fieldData.value) {
+                                        $preview.show();
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                        
+                    case 'rex_link':
+                        console.log('MBlock: Setze REX Link:', originalName, fieldData.value);
+                        $field.val(fieldData.value);
+                        
+                        // Restore display text
+                        if (fieldData.displayText) {
+                            const $displayInput = $field.siblings('input[readonly]');
+                            if ($displayInput.length) {
+                                $displayInput.val(fieldData.displayText);
+                            }
+                        }
+                        
+                        // Restore widget data attributes
+                        const $widget = $field.closest('.rex-js-widget-customlink');
+                        if ($widget.length) {
+                            if (fieldData.dataId) {
+                                $widget.attr('data-id', fieldData.dataId);
+                            }
+                            if (fieldData.dataClang) {
+                                $widget.attr('data-clang', fieldData.dataClang);
+                            }
+                        }
+                        break;
+                        
+                    case 'active_tab':
+                        console.log('MBlock: Setze aktiven Tab:', fieldData.href);
+                        // Restore active tab states
+                        if (fieldData.href) {
+                            setTimeout(() => {
+                                const $tab = pastedItem.find(`a[href="${fieldData.href}"]`);
+                                if ($tab.length) {
+                                    $tab.tab('show');
+                                }
+                            }, 300);
+                        }
+                        break;
+                        
+                    case 'collapse_state':
+                        console.log('MBlock: Setze Collapse-Status für:', originalName);
+                        // Restore collapse states
+                        if (fieldData.isOpen) {
+                            const collapseId = originalName.replace('collapse_state_', '');
+                            setTimeout(() => {
+                                const $collapse = pastedItem.find(`#${collapseId}`);
+                                if ($collapse.length) {
+                                    $collapse.collapse('show');
+                                }
+                            }, 400);
+                        }
+                        break;
+                        
+                    case 'input':
+                    default:
+                        console.log('MBlock: Setze Input:', originalName, fieldData.value);
+                        // Handle regular inputs and textareas
+                        if (fieldData.value !== undefined) {
+                            $field.val(fieldData.value);
+                            
+                            // Restore placeholder if available
+                            if (fieldData.placeholder) {
+                                $field.attr('placeholder', fieldData.placeholder);
+                            }
+                        }
+                        break;
+                }
+            });
+            
+            console.log('MBlock: Komplexe Formulardaten wiederhergestellt');
+            
+        } catch (error) {
+            console.error('MBlock: Fehler beim Wiederherstellen komplexer Formulardaten:', error);
+        }
+    },
+    
+    showCopiedState: function(item) {
+        const $copyBtn = item.find('.mblock-copy-btn');
+        if ($copyBtn.length) {
+            $copyBtn.addClass('is-copied');
+            setTimeout(() => {
+                $copyBtn.removeClass('is-copied');
+            }, 1500);
+        }
+    },
+    
+    updatePasteButtons: function() {
+        const hasData = !!this.data;
+        
+        // Update paste buttons
+        $('.mblock-paste-btn').toggleClass('disabled', !hasData).prop('disabled', !hasData);
+        
+        // Update toolbar visibility
+        const toolbar = $('.mblock-copy-paste-toolbar');
+        if (hasData) {
+            toolbar.show();
+        } else {
+            toolbar.hide();
+        }
+        
+        // Update button text with storage info  
+        const storageInfo = this.useSessionStorage ? 'Session' : 'Local';
+        $('.mblock-paste-btn[title]').attr('title', 
+            hasData ? `Paste element (${storageInfo})` : 'No data in clipboard');
+    },
+
+    // Convert selectpicker elements back to plain select elements
+    convertSelectpickerToPlainSelect: function(container) {
+        try {
+            console.log('MBlock: Converting selectpicker to plain select elements');
+            
+            // Find all select elements that have selectpicker class or are inside bootstrap-select wrappers
+            const $selectElements = container.find('select.selectpicker, .bootstrap-select select');
+            
+            $selectElements.each(function() {
+                const $select = $(this);
+                console.log('MBlock: Processing select element:', $select);
+                
+                // Store current value
+                const selectedValue = $select.val();
+                const selectHtml = $select.prop('outerHTML');
+                
+                // Create clean select element
+                const $cleanSelect = $select.clone();
+                
+                // Remove ALL selectpicker and bootstrap-select related classes and attributes
+                $cleanSelect.removeClass('selectpicker bs-select-hidden');
+                $cleanSelect.removeAttr('data-live-search data-live-search-placeholder tabindex aria-describedby');
+                $cleanSelect.removeData(); // Remove all data attributes
+                $cleanSelect.css('display', ''); // Reset any inline styles
+                
+                // Add marker class for later initialization
+                $cleanSelect.addClass('mblock-needs-selectpicker');
+                
+                // Restore selected value
+                $cleanSelect.val(selectedValue);
+                
+                // Find the outermost bootstrap-select wrapper(s) around this select
+                const $bootstrapWrappers = $select.parents('.bootstrap-select');
+                
+                if ($bootstrapWrappers.length > 0) {
+                    // Replace the outermost wrapper with our clean select
+                    const $outermostWrapper = $bootstrapWrappers.last();
+                    console.log('MBlock: Replacing bootstrap-select wrapper with clean select');
+                    $outermostWrapper.replaceWith($cleanSelect);
+                } else {
+                    // If no wrapper, just replace the select itself
+                    console.log('MBlock: Replacing standalone selectpicker with clean select');
+                    $select.replaceWith($cleanSelect);
+                }
+            });
+            
+            // Clean up any remaining empty bootstrap-select containers
+            container.find('.bootstrap-select').each(function() {
+                const $wrapper = $(this);
+                if (!$wrapper.find('select').length) {
+                    console.log('MBlock: Removing empty bootstrap-select wrapper');
+                    $wrapper.remove();
+                }
+            });
+            
+            console.log('MBlock: Selectpicker conversion complete');
+            
+        } catch (error) {
+            console.error('MBlock: Error converting selectpicker to plain select:', error);
+        }
+    },
+    
+    clear: function() {
+        this.data = null;
+        this.clearStorage();
+        this.updatePasteButtons();
+        console.log('MBlock: Zwischenablage geleert');
+    },
+    
+    // Get clipboard info for debugging
+    getInfo: function() {
+        return {
+            hasData: !!this.data,
+            storageMode: this.useSessionStorage ? 'Session' : 'Local',
+            timestamp: this.data ? this.data.timestamp : null,
+            savedAt: this.data ? this.data.savedAt : null,
+            itemCount: this.data && this.data.formData ? Object.keys(this.data.formData).length : 0
+        };
+    },
+    
+    // Debug function to check clipboard status
+    debug: function() {
+        console.log('=== MBlock Clipboard Debug ===');
+        console.log('Clipboard Data:', this.data);
+        console.log('Storage Mode:', this.useSessionStorage ? 'Session' : 'Local');
+        console.log('Storage Content:', this.getStorage() ? this.getStorage().getItem(this.storageKey) : 'Not available');
+        console.log('Info:', this.getInfo());
+        console.log('==============================');
+    }
+};
+
+// Online/Offline Toggle Funktionalität
+var MBlockOnlineToggle = {
+    
+    toggle: function(element, item) {
+        try {
+            if (!item || !item.length) {
+                console.warn('MBlock: Kein Item für Online/Offline Toggle gefunden');
+                return false;
+            }
+            
+            const isOnline = !item.hasClass('mblock-offline');
+            const $toggleBtn = item.find('.mblock-online-toggle');
+            const $icon = $toggleBtn.find('i');
+            
+            if (isOnline) {
+                // Set to offline
+                item.addClass('mblock-offline');
+                $toggleBtn.removeClass('btn-online').addClass('btn-offline')
+                    .attr('title', 'Set online');
+                
+                // Change icon
+                if ($icon.length) {
+                    $icon.removeClass('rex-icon-online').addClass('rex-icon-offline');
+                } else {
+                    $toggleBtn.html('<i class="rex-icon rex-icon-offline"></i>');
+                }
+                
+                // Add hidden input to store offline state
+                this.setOfflineState(item, true);
+                
+                console.log('MBlock: Item gesetzt auf OFFLINE');
+                
+            } else {
+                // Set to online
+                item.removeClass('mblock-offline');
+                $toggleBtn.removeClass('btn-offline').addClass('btn-online')
+                    .attr('title', 'Set offline');
+                
+                // Change icon
+                if ($icon.length) {
+                    $icon.removeClass('rex-icon-offline').addClass('rex-icon-online');
+                } else {
+                    $toggleBtn.html('<i class="rex-icon rex-icon-online"></i>');
+                }
+                
+                // Remove offline state
+                this.setOfflineState(item, false);
+                
+                console.log('MBlock: Item gesetzt auf ONLINE');
+            }
+            
+            return true;
+            
+        } catch (error) {
+            console.error('MBlock: Fehler beim Online/Offline Toggle:', error);
+            return false;
+        }
+    },
+    
+    setOfflineState: function(item, isOffline) {
+        try {
+            // Look for existing mblock_offline input (must be defined in template)
+            const $offlineInput = item.find('input[name*="mblock_offline"]');
+            
+            if ($offlineInput.length) {
+                // Simply set the value - field already exists in template
+                $offlineInput.val(isOffline ? '1' : '0');
+                console.log('MBlock: Set offline input value to:', isOffline ? '1' : '0');
+            } else {
+                console.warn('MBlock: No mblock_offline input found - must be defined in template for this functionality');
+            }
+            
+            console.log('MBlock: Offline state set to:', isOffline, 'for item index:', item.attr('data-mblock_index'));
+            
+        } catch (error) {
+            console.error('MBlock: Fehler beim Setzen des Offline-Status:', error);
+        }
+    },
+    
+    initializeStates: function(element) {
+        try {
+            console.log('MBlock: Initialisiere Online/Offline-Zustände für Element:', element);
+            
+            // Initialize toggle buttons based on existing offline states
+            element.find('> div.sortitem').each(function(index) {
+                const $item = $(this);
+                const itemIndex = $item.attr('data-mblock_index') || index;
+                
+                // Look for offline input with multiple strategies
+                let $offlineInput = $item.find('input[name*="mblock_offline"]');
+                
+                // Fallback: try different name patterns
+                if (!$offlineInput.length) {
+                    $offlineInput = $item.find('input[name*="_offline"]');
+                }
+                if (!$offlineInput.length) {
+                    $offlineInput = $item.find('input[value="1"][type="hidden"]');
+                }
+                
+                const $toggleBtn = $item.find('.mblock-online-toggle');
+                const $icon = $toggleBtn.find('i');
+                
+                console.log('MBlock: Item ' + itemIndex + ' check:', {
+                    item: $item.length,
+                    offlineInput: $offlineInput.length,
+                    inputValue: $offlineInput.length > 0 ? $offlineInput.val() : 'no input',
+                    inputName: $offlineInput.length > 0 ? $offlineInput.attr('name') : 'no name',
+                    toggleBtn: $toggleBtn.length,
+                    hasIcon: $icon.length
+                });
+                
+                if ($toggleBtn.length) {
+                    const isOffline = $offlineInput.length && ($offlineInput.val() === '1' || $offlineInput.val() === 1);
+                    
+                    if (isOffline) {
+                        // Item is offline
+                        console.log('MBlock: Setting item ' + itemIndex + ' to OFFLINE state');
+                        $item.addClass('mblock-offline');
+                        $toggleBtn.removeClass('btn-online').addClass('btn-offline')
+                            .attr('title', 'Set online');
+                        
+                        if ($icon.length) {
+                            $icon.removeClass('rex-icon-online').addClass('rex-icon-offline');
+                        } else {
+                            $toggleBtn.html('<i class="rex-icon rex-icon-offline"></i>');
+                        }
+                    } else {
+                        // Item is online (value is 0, empty, or input doesn't exist)
+                        console.log('MBlock: Setting item ' + itemIndex + ' to ONLINE state');
+                        $item.removeClass('mblock-offline');
+                        $toggleBtn.removeClass('btn-offline').addClass('btn-online')
+                            .attr('title', 'Set offline');
+                        
+                        if ($icon.length) {
+                            $icon.removeClass('rex-icon-offline').addClass('rex-icon-online');
+                        } else {
+                            $toggleBtn.html('<i class="rex-icon rex-icon-online"></i>');
+                        }
+                    }
+                }
+            });
+            
+            console.log('MBlock: Online/Offline-Zustände initialisiert');
+            
+        } catch (error) {
+            console.error('MBlock: Fehler beim Initialisieren der Online/Offline-States:', error);
+        }
+    },
+
+    // New method for auto-detected offline toggle buttons
+    toggleAutoDetected: function(element, item, button) {
+        try {
+            if (!item || !item.length || !button || !button.length) {
+                console.warn('MBlock: Kein Item oder Button für Auto-Detected Toggle gefunden');
+                return false;
+            }
+            
+            // Get current offline status from button data attribute
+            const currentIsOffline = button.attr('data-offline') === '1';
+            const newIsOffline = !currentIsOffline;
+            
+            // Find the corresponding mblock_offline input field
+            const $offlineInput = item.find('input[name*="mblock_offline"]');
+            
+            if (!$offlineInput.length) {
+                console.warn('MBlock: No mblock_offline input field found in item');
+                return false;
+            }
+            
+            // Update the input value
+            $offlineInput.val(newIsOffline ? '1' : '0');
+            
+            // Update button appearance with improved colors
+            const buttonClass = newIsOffline ? 'btn-danger' : 'btn-success'; // Red for offline, green for online
+            const iconClass = newIsOffline ? 'rex-icon-offline' : 'rex-icon-online';
+            const buttonTitle = newIsOffline ? 'Set online' : 'Set offline';
+            const buttonText = newIsOffline ? 'Offline' : 'Online';
+            
+            // Update button attributes and classes
+            button.removeClass('btn-default btn-warning btn-success btn-danger')
+                  .addClass(buttonClass)
+                  .attr('title', buttonTitle)
+                  .attr('data-offline', newIsOffline ? '1' : '0');
+            
+            // Update icon and text
+            const $icon = button.find('i');
+            if ($icon.length) {
+                $icon.removeClass('rex-icon-online rex-icon-offline')
+                     .addClass(iconClass);
+            }
+            
+            // Update button text
+            const textContent = button.html().replace(/Offline|Online/, buttonText);
+            button.html(textContent);
+            
+            // Update item CSS class
+            if (newIsOffline) {
+                item.addClass('mblock-offline');
+            } else {
+                item.removeClass('mblock-offline');
+            }
+            
+            console.log('MBlock: Auto-detected toggle - Set to:', newIsOffline ? 'OFFLINE' : 'ONLINE', 
+                       'Input value:', $offlineInput.val());
+                       
+            return true;
+            
+        } catch (error) {
+            console.error('MBlock: Fehler beim Auto-Detected Toggle:', error);
+            return false;
+        }
+    }
+};
+
+// Toolbar Initialisierung
+function mblock_init_toolbar(element) {
+    try {
+        // Paste Button in Toolbar
+        element.find('.mblock-copy-paste-toolbar .mblock-paste-btn')
+            .off('click.mblock')
+            .on('click.mblock', function (e) {
+                e.preventDefault();
+                try {
+                    const $this = $(this);
+                    if (!$this.hasClass('disabled') && !$this.prop('disabled')) {
+                        MBlockClipboard.paste(element, false); // false = am Anfang einfügen
+                    }
+                } catch (error) {
+                    console.error('MBlock: Fehler in toolbar paste click handler:', error);
+                }
+                return false;
+            });
+
+        // Clear Clipboard Button
+        element.find('.mblock-copy-paste-toolbar .mblock-clear-clipboard')
+            .off('click.mblock')
+            .on('click.mblock', function (e) {
+                e.preventDefault();
+                try {
+                    MBlockClipboard.clear();
+                } catch (error) {
+                    console.error('MBlock: Fehler in clear clipboard click handler:', error);
+                }
+                return false;
+            });
+            
+    } catch (error) {
+        console.error('MBlock: Fehler in mblock_init_toolbar:', error);
     }
 }
 
@@ -747,11 +2162,15 @@ function mblock_scroll(element, item) {
 }
 
 function mblock_add(element) {
+    console.log('MBlock: mblock_add aufgerufen für Element:', element);
     try {
         if (!element || !element.length) {
+            console.warn('MBlock: Ungültiges Element bei mblock_add');
             return false;
         }
 
+        console.log('MBlock: Binde Event-Handler für Buttons...');
+        
         // Sichere Event-Bindung mit Namespace für bessere Memory-Management
         element.find('> div.sortitem .addme')
             .off('click.mblock')
@@ -818,6 +2237,80 @@ function mblock_add(element) {
                 return false;
             });
 
+        // Copy Button Handler
+        const copyButtons = element.find('> div.sortitem .mblock-copy-btn');
+        console.log('MBlock: Gefundene Copy-Buttons:', copyButtons.length, copyButtons);
+        
+        copyButtons
+            .off('click.mblock')
+            .on('click.mblock', function (e) {
+                e.preventDefault();
+                console.log('MBlock: Copy-Button geklickt', this);
+                try {
+                    const $this = $(this);
+                    const $item = $this.closest('div[class^="sortitem"]');
+                    console.log('MBlock: Gefundenes Item für Copy:', $item);
+                    MBlockClipboard.copy(element, $item);
+                } catch (error) {
+                    console.error('MBlock: Fehler in copy click handler:', error);
+                }
+                return false;
+            });
+
+        // Paste Button Handler
+        element.find('> div.sortitem .mblock-paste-btn')
+            .off('click.mblock')
+            .on('click.mblock', function (e) {
+                e.preventDefault();
+                try {
+                    const $this = $(this);
+                    if (!$this.hasClass('disabled') && !$this.prop('disabled')) {
+                        const $item = $this.closest('div[class^="sortitem"]');
+                        MBlockClipboard.paste(element, $item);
+                    }
+                } catch (error) {
+                    console.error('MBlock: Fehler in paste click handler:', error);
+                }
+                return false;
+            });
+
+        // Online/Offline Toggle Handler (old system)
+        element.find('> div.sortitem .mblock-online-toggle')
+            .off('click.mblock')
+            .on('click.mblock', function (e) {
+                e.preventDefault();
+                try {
+                    const $this = $(this);
+                    const $item = $this.closest('div[class^="sortitem"]');
+                    MBlockOnlineToggle.toggle(element, $item);
+                } catch (error) {
+                    console.error('MBlock: Fehler in online/offline toggle handler:', error);
+                }
+                return false;
+            });
+
+        // New Auto-Detected Online/Offline Toggle Handler
+        element.find('> div.sortitem .mblock-offline-toggle-btn')
+            .off('click.mblock')
+            .on('click.mblock', function (e) {
+                e.preventDefault();
+                try {
+                    const $this = $(this);
+                    const $item = $this.closest('div[class^="sortitem"]');
+                    MBlockOnlineToggle.toggleAutoDetected(element, $item, $this);
+                } catch (error) {
+                    console.error('MBlock: Fehler in auto-detected toggle handler:', error);
+                }
+                return false;
+            });
+
+        // Initialize paste button states
+        MBlockClipboard.updatePasteButtons();
+        
+        // Initialize online/offline states
+        MBlockOnlineToggle.initializeStates(element);
+
+            
         return true;
     } catch (error) {
         console.error('MBlock: Fehler in mblock_add:', error);

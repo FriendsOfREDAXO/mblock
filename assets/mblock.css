@@ -1,55 +1,157 @@
+/* MBlock Wrapper - Bloecks-Style Design */
 .mblock_wrapper {
     margin: auto;
-    padding: 0
+    padding: 0;
+    list-style: none;
+    position: relative;
 }
 
 .mblock_wrapper > div {
     border: 1px solid rgba(100, 100, 100, 0.20);
     background: rgba(255, 255, 255, 0.09);
     margin: 0 0 10px 0;
-    padding: 40px 15px 20px 25px;
+    padding: 40px 15px 20px 30px;
     position: relative;
     box-shadow: 0 5px 15px rgba(0,0,0,.08);
+    border-radius: 4px;
+    transition: all 0.2s ease;
 }
 
+.mblock_wrapper > div:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    transform: translateY(-1px);
+}
+
+/* Bloecks-Style Drag Handle */
 .mblock_wrapper span.sorthandle {
-    cursor: move;
+    cursor: grab;
     position: absolute;
-    opacity: .5;
-    top: 5px;
-    bottom: 5px;
-    left: 4px;
-    width: 8px;
-    border-left: dotted 2px #ccc; 
+    top: 8px;
+    left: 8px;
+    opacity: 0.6;
+    color: #6c757d;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: -2px;
+    transition: all 0.2s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    line-height: 1;
 }
 
 .mblock_wrapper span.sorthandle:hover {
-    opacity: .8
+    opacity: 1;
+    color: #495057;
+    cursor: grab;
 }
 
+.mblock_wrapper span.sorthandle:active {
+    cursor: grabbing;
+}
+
+.mblock_wrapper span.sorthandle::before {
+    content: "⋮⋮";
+}
+
+/* Drag handle positioning for no-remove case */
+.mblock_wrapper.hide_removeadded > div {
+    padding-top: 15px;
+}
+
+.mblock_wrapper.hide_sorthandle > div {
+    padding-left: 15px;
+}
+
+.mblock_wrapper.hide_sorthandle span.sorthandle {
+    display: none;
+}
+
+/* Modern Sortable Ghost (Bloecks-Style) */
 div.sortable-ghost {
-    border: 1px dashed #CCC;
-    opacity: .4
+    opacity: 0.6;
+    background: rgba(248, 249, 250, 0.9);
+    border: 2px dashed #007bff;
+    border-radius: 4px;
+    padding: 8px;
+    margin: 4px 0;
+    transform: none !important;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Animated border effect for ghost */
+div.sortable-ghost::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg, 
+        transparent, 
+        rgba(0, 123, 255, 0.1), 
+        transparent
+    );
+    animation: mblockGhostShimmer 2s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes mblockGhostShimmer {
+    0% { left: -100%; }
+    50% { left: 100%; }
+    100% { left: 100%; }
 }
 
 .mblock_wrapper span.removeadded {
     position: absolute;
-    right: 0px;
-    top: 0px;
+    right: 8px;
+    top: 8px;
     z-index: 1;
-    padding: 5px;
+    padding: 0;
+    display: flex;
+    gap: 4px;
+    align-items: center;
 }
 
 .mblock_wrapper span.removeadded .btn {
     cursor: pointer;
+    padding: 4px 6px;
+    font-size: 12px;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+    background: #f8f9fa;
+    color: #495057;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    min-height: 28px;
+}
+
+.mblock_wrapper span.removeadded .btn:hover:not([disabled]) {
+    background: #e9ecef;
+    border-color: #adb5bd;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .mblock_wrapper span.removeadded .btn[disabled] {
     cursor: default;
+    opacity: 0.5;
+    background: #f8f9fa;
+    color: #6c757d;
+    transform: none !important;
+    box-shadow: none !important;
 }
 
 .mblock_wrapper span.removeadded .btn .rex-icon {
     margin: 0 !important;
+    font-size: 14px;
 }
 
 .mblock_wrapper > div:after, .mblock_wrapper > div:before {
@@ -88,56 +190,444 @@ div.sortable-ghost {
     padding-top: 15px;
 }
 
-/* Copy & Paste Funktionalität */
+/* Add Button (Bloecks-Style) */
+.btn.addme {
+    background: #28a745;
+    border-color: #28a745;
+    color: white;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+    padding: 8px 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+}
+
+.btn.addme:hover:not([disabled]) {
+    background: #218838;
+    border-color: #1e7e34;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+.btn.addme:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(40, 167, 69, 0.4);
+}
+
+.btn.addme[disabled] {
+    background: #6c757d;
+    border-color: #6c757d;
+    opacity: 0.5;
+    transform: none !important;
+    box-shadow: none !important;
+    cursor: not-allowed;
+}
+
+.btn.addme i,
+.btn.addme .rex-icon {
+    margin: 0;
+}
+
+/* Copy & Paste Functionality (Enhanced Bloecks-Style) */
 .mblock-copy-paste-toolbar {
     margin-bottom: 10px !important;
-    padding: 8px 12px !important;
-    background: #f8f9fa !important;
+    padding: 10px 15px !important;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
     border: 1px solid #dee2e6 !important;
-    border-radius: 4px !important;
+    border-radius: 6px !important;
     display: flex;
     align-items: center;
     justify-content: flex-start;
     gap: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: all 0.2s ease;
+}
+
+.mblock-copy-paste-toolbar:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transform: translateY(-1px);
 }
 
 .mblock-copy-paste-toolbar .btn {
     margin: 0 !important;
     font-size: 12px;
-    padding: 4px 8px;
+    padding: 6px 12px;
     line-height: 1.4;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
 }
 
-.mblock-copy-btn:hover {
-    background-color: #e9ecef;
-    border-color: #adb5bd;
+.mblock-copy-btn:hover:not(.disabled) {
+    background-color: #007bff;
+    border-color: #0056b3;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
 }
 
 .mblock-paste-btn:hover:not(.disabled) {
-    background-color: #e9ecef;
-    border-color: #adb5bd;
+    background-color: #28a745;
+    border-color: #1e7e34;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(40, 167, 69, 0.3);
 }
 
 .mblock-paste-btn.disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
 }
 
-/* Dark Mode Support für Copy & Paste */
-body.rex-theme-dark .mblock-copy-paste-toolbar {
-    background: #2d3436 !important;
+/* Dark Mode Support (Bloecks-Style) */
+body.rex-theme-dark .mblock_wrapper > div,
+html[data-bs-theme="dark"] .mblock_wrapper > div {
+    background: rgba(52, 58, 64, 0.9);
+    border-color: #495057;
+    color: #e9ecef;
+}
+
+body.rex-theme-dark .mblock_wrapper > div:hover,
+html[data-bs-theme="dark"] .mblock_wrapper > div:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    background: rgba(52, 58, 64, 0.95);
+}
+
+body.rex-theme-dark .mblock_wrapper span.sorthandle,
+html[data-bs-theme="dark"] .mblock_wrapper span.sorthandle {
+    color: #adb5bd;
+}
+
+body.rex-theme-dark .mblock_wrapper span.sorthandle:hover,
+html[data-bs-theme="dark"] .mblock_wrapper span.sorthandle:hover {
+    color: #e9ecef;
+}
+
+/* Dark mode ghost */
+body.rex-theme-dark div.sortable-ghost,
+html[data-bs-theme="dark"] div.sortable-ghost {
+    background: rgba(52, 58, 64, 0.9);
+    border-color: #17a2b8;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+body.rex-theme-dark div.sortable-ghost::before,
+html[data-bs-theme="dark"] div.sortable-ghost::before {
+    background: linear-gradient(
+        90deg, 
+        transparent, 
+        rgba(23, 162, 184, 0.15), 
+        transparent
+    );
+}
+
+/* Dark mode chosen */
+body.rex-theme-dark .mblock-sortable-chosen,
+html[data-bs-theme="dark"] .mblock-sortable-chosen {
+    background: rgba(33, 37, 41, 0.95);
+    border-color: #20c997;
+    color: rgba(255, 255, 255, 0.9);
+    box-shadow: 
+        0 0 0 4px rgba(32, 201, 151, 0.15),
+        0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+body.rex-theme-dark .mblock-sortable-chosen::after,
+html[data-bs-theme="dark"] .mblock-sortable-chosen::after {
+    border-color: rgba(32, 201, 151, 0.4);
+}
+
+/* Dark mode buttons */
+body.rex-theme-dark .mblock_wrapper span.removeadded .btn,
+html[data-bs-theme="dark"] .mblock_wrapper span.removeadded .btn {
+    background: #495057;
+    border-color: #6c757d;
+    color: #e9ecef;
+}
+
+body.rex-theme-dark .mblock_wrapper span.removeadded .btn:hover:not([disabled]),
+html[data-bs-theme="dark"] .mblock_wrapper span.removeadded .btn:hover:not([disabled]) {
+    background: #6c757d;
+    border-color: #adb5bd;
+}
+
+body.rex-theme-dark .mblock-copy-paste-toolbar,
+html[data-bs-theme="dark"] .mblock-copy-paste-toolbar {
+    background: linear-gradient(135deg, #2d3436 0%, #636e72 100%) !important;
     border-color: #636e72 !important;
     color: #ddd;
 }
 
-body.rex-theme-dark .mblock-copy-btn:hover {
-    background-color: #636e72;
-    border-color: #74b9ff;
+body.rex-theme-dark .mblock-copy-btn:hover:not(.disabled),
+html[data-bs-theme="dark"] .mblock-copy-btn:hover:not(.disabled) {
+    background-color: #74b9ff;
+    border-color: #0984e3;
 }
 
-body.rex-theme-dark .mblock-paste-btn:hover:not(.disabled) {
-    background-color: #636e72;
-    border-color: #74b9ff;
+body.rex-theme-dark .mblock-paste-btn:hover:not(.disabled),
+html[data-bs-theme="dark"] .mblock-paste-btn:hover:not(.disabled) {
+    background-color: #00b894;
+    border-color: #00a085;
 }
 
+/* System dark mode preference */
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) .mblock_wrapper > div {
+        background: rgba(52, 58, 64, 0.9);
+        border-color: #495057;
+        color: #e9ecef;
+    }
+    
+    body.rex-has-theme:not(.rex-theme-light) .mblock_wrapper > div:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        background: rgba(52, 58, 64, 0.95);
+    }
+    
+    body.rex-has-theme:not(.rex-theme-light) .mblock_wrapper span.sorthandle {
+        color: #adb5bd;
+    }
+    
+    body.rex-has-theme:not(.rex-theme-light) .mblock_wrapper span.sorthandle:hover {
+        color: #e9ecef;
+    }
+    
+    body.rex-has-theme:not(.rex-theme-light) div.sortable-ghost {
+        background: rgba(52, 58, 64, 0.9);
+        border-color: #17a2b8;
+        color: rgba(255, 255, 255, 0.9);
+    }
+    
+    body.rex-has-theme:not(.rex-theme-light) div.sortable-ghost::before {
+        background: linear-gradient(
+            90deg, 
+            transparent, 
+            rgba(23, 162, 184, 0.15), 
+            transparent
+        );
+    }
+    
+    body.rex-has-theme:not(.rex-theme-light) .mblock-sortable-chosen {
+        background: rgba(33, 37, 41, 0.95);
+        border-color: #20c997;
+        color: rgba(255, 255, 255, 0.9);
+        box-shadow: 
+            0 0 0 4px rgba(32, 201, 151, 0.15),
+            0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+    
+    body.rex-has-theme:not(.rex-theme-light) .mblock-sortable-chosen::after {
+        border-color: rgba(32, 201, 151, 0.4);
+    }
+}
 
+/* Online/Offline Toggle Funktionalität */
+.mblock-online-toggle {
+    /* Remove absolute positioning to fix hover effect */
+    position: relative;
+    z-index: 5;
+    transition: all 0.2s ease;
+}
+
+.mblock-online-toggle:hover {
+    /* Prevent movement on hover */
+    transform: none !important;
+}
+
+.mblock-online-toggle .btn {
+    padding: 4px 8px;
+    font-size: 11px;
+    border-radius: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+    border: none;
+    min-width: 60px;
+    cursor: pointer;
+}
+
+.mblock-online-toggle .btn-online {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+}
+
+.mblock-online-toggle .btn-online:hover {
+    background: linear-gradient(135deg, #218838, #17a085);
+    /* Remove translateY to prevent movement */
+    transform: none;
+    box-shadow: 0 3px 8px rgba(40, 167, 69, 0.4);
+}
+
+.mblock-online-toggle .btn-offline {
+    background: linear-gradient(135deg, #6c757d, #495057);
+    color: white;
+    box-shadow: 0 2px 4px rgba(108, 117, 125, 0.3);
+}
+
+.mblock-online-toggle .btn-offline:hover {
+    background: linear-gradient(135deg, #5a6268, #343a40);
+    /* Remove translateY to prevent movement */
+    transform: none;
+    box-shadow: 0 3px 8px rgba(108, 117, 125, 0.4);
+}
+
+/* Offline State Styling */
+.mblock_wrapper > div.mblock-offline {
+    opacity: 0.6;
+    background: rgba(248, 249, 250, 0.5);
+    border-style: dashed;
+    border-color: #6c757d;
+    position: relative;
+}
+
+.mblock_wrapper > div.mblock-offline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 8px,
+        rgba(108, 117, 125, 0.1) 8px,
+        rgba(108, 117, 125, 0.1) 16px
+    );
+    pointer-events: none;
+    border-radius: 4px;
+}
+
+.mblock_wrapper > div.mblock-offline .mblock_wrapper > * {
+    opacity: 0.7;
+}
+
+/* Dark mode offline styling */
+body.rex-theme-dark .mblock_wrapper > div.mblock-offline,
+html[data-bs-theme="dark"] .mblock_wrapper > div.mblock-offline {
+    background: rgba(52, 58, 64, 0.3);
+    border-color: #adb5bd;
+}
+
+body.rex-theme-dark .mblock_wrapper > div.mblock-offline::before,
+html[data-bs-theme="dark"] .mblock_wrapper > div.mblock-offline::before {
+    background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 8px,
+        rgba(173, 181, 189, 0.1) 8px,
+        rgba(173, 181, 189, 0.1) 16px
+    );
+}
+
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) .mblock_wrapper > div.mblock-offline {
+        background: rgba(52, 58, 64, 0.3);
+        border-color: #adb5bd;
+    }
+    
+    body.rex-has-theme:not(.rex-theme-light) .mblock_wrapper > div.mblock-offline::before {
+        background: repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 8px,
+            rgba(173, 181, 189, 0.1) 8px,
+            rgba(173, 181, 189, 0.1) 16px
+        );
+    }
+}
+
+/* Offline Toggle Button Styles (Override Default Button Styles) */
+.mblock_wrapper span.removeadded .btn.mblock-offline-toggle-btn.btn-success {
+    background: #28a745 !important;
+    border-color: #28a745 !important;
+    color: #fff !important;
+}
+
+.mblock_wrapper span.removeadded .btn.mblock-offline-toggle-btn.btn-success:hover {
+    background: #218838 !important;
+    border-color: #1e7e34 !important;
+    color: #fff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(40, 167, 69, 0.3);
+}
+
+.mblock_wrapper span.removeadded .btn.mblock-offline-toggle-btn.btn-danger {
+    background: #dc3545 !important;
+    border-color: #dc3545 !important;
+    color: #fff !important;
+}
+
+.mblock_wrapper span.removeadded .btn.mblock-offline-toggle-btn.btn-danger:hover {
+    background: #c82333 !important;
+    border-color: #bd2130 !important;
+    color: #fff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(220, 53, 69, 0.3);
+}
+
+/* Dark Mode Support für Offline Toggle Buttons */
+body.rex-theme-dark .mblock_wrapper span.removeadded .btn.mblock-offline-toggle-btn.btn-success,
+html[data-bs-theme="dark"] .mblock_wrapper span.removeadded .btn.mblock-offline-toggle-btn.btn-success {
+    background: #198754 !important;
+    border-color: #198754 !important;
+    color: #fff !important;
+}
+
+body.rex-theme-dark .mblock_wrapper span.removeadded .btn.mblock-offline-toggle-btn.btn-success:hover,
+html[data-bs-theme="dark"] .mblock_wrapper span.removeadded .btn.mblock-offline-toggle-btn.btn-success:hover {
+    background: #146c43 !important;
+    border-color: #13653f !important;
+    box-shadow: 0 2px 6px rgba(25, 135, 84, 0.4);
+}
+
+body.rex-theme-dark .mblock_wrapper span.removeadded .btn.mblock-offline-toggle-btn.btn-danger,
+html[data-bs-theme="dark"] .mblock_wrapper span.removeadded .btn.mblock-offline-toggle-btn.btn-danger {
+    background: #bb2d3b !important;
+    border-color: #bb2d3b !important;
+    color: #fff !important;
+}
+
+body.rex-theme-dark .mblock_wrapper span.removeadded .btn.mblock-offline-toggle-btn.btn-danger:hover,
+html[data-bs-theme="dark"] .mblock_wrapper span.removeadded .btn.mblock-offline-toggle-btn.btn-danger:hover {
+    background: #a02831 !important;
+    border-color: #962025 !important;
+    box-shadow: 0 2px 6px rgba(187, 45, 59, 0.4);
+}
+
+/* System Dark Mode für Offline Toggle Buttons */
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) .mblock_wrapper span.removeadded .btn.mblock-offline-toggle-btn.btn-success {
+        background: #198754 !important;
+        border-color: #198754 !important;
+        color: #fff !important;
+    }
+    
+    body.rex-has-theme:not(.rex-theme-light) .mblock_wrapper span.removeadded .btn.mblock-offline-toggle-btn.btn-success:hover {
+        background: #146c43 !important;
+        border-color: #13653f !important;
+        box-shadow: 0 2px 6px rgba(25, 135, 84, 0.4);
+    }
+    
+    body.rex-has-theme:not(.rex-theme-light) .mblock_wrapper span.removeadded .btn.mblock-offline-toggle-btn.btn-danger {
+        background: #bb2d3b !important;
+        border-color: #bb2d3b !important;
+        color: #fff !important;
+    }
+    
+    body.rex-has-theme:not(.rex-theme-light) .mblock_wrapper span.removeadded .btn.mblock-offline-toggle-btn.btn-danger:hover {
+        background: #a02831 !important;
+        border-color: #962025 !important;
+        box-shadow: 0 2px 6px rgba(187, 45, 59, 0.4);
+    }
+}

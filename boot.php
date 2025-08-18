@@ -5,7 +5,6 @@
  * @license MIT
  */
 
-
 if (rex::isBackend() && is_object(rex::getUser())) {
 
     // check theme css exists
@@ -31,12 +30,22 @@ if (rex::isBackend() && is_object(rex::getUser())) {
             return $params->getSubject();
     });
 
-    // assets
-    rex_view::addJsFile($this->getAssetsUrl('mblock_sortable.min.js'));
+    // Use Sortable.js from bloecks addon if available, otherwise fallback to bundled version
+    $bloecksAddon = rex_addon::get('bloecks');
+    if ($bloecksAddon && $bloecksAddon->isAvailable()) {
+        // Use bloecks Sortable.js
+        rex_view::addJsFile($bloecksAddon->getAssetsUrl('js/sortable.min.js'));
+        // Add bloecks CSS for consistent styling
+        rex_view::addCssFile($bloecksAddon->getAssetsUrl('css/bloecks.css'));
+    } else {
+        // Fallback to bundled sortable
+        rex_view::addJsFile($this->getAssetsUrl('mblock_sortable.min.js'));
+    }
+
+    // Always add our own assets
     rex_view::addJsFile($this->getAssetsUrl('mblock_smooth_scroll.min.js'));
     rex_view::addJsFile($this->getAssetsUrl('mblock.js'));
     rex_view::addCssFile($this->getAssetsUrl('mblock.css'));
-
 }
 
 // Sichere Session-Reset mit optimiertem MBlockSessionHelper

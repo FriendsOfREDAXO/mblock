@@ -1,4 +1,6 @@
 mblock_title = MBlock
+mblock_help = Help
+mblock_configuration = Configuration
 
 mblock_overview = Overview
 mblock_config_save = Save settings
@@ -16,6 +18,7 @@ mblock_example_base_teammember_example = Team members
 mblock_example_base_link_example = Link and linklist
 mblock_example_base_media_example = Media and medialist
 mblock_example_base_defaults_example = Misc form elements
+mblock_example_base_cardgrid_example = Cardgrid with tabs (advanced)
 
 mblock_example_html_teammember_example = Team members
 mblock_example_html_link_example = Link and linklist
@@ -47,3 +50,11 @@ mblock_rexform_demo = RexForm MBlock demo
 rex_form_mblock_demo_entries = Demo entries
 rex_form_mblock_demo_entries_add = Add demo entry
 rex_form_mblock_demo_entries_edit = Edit demo entry
+
+# Clipboard functionality
+mblock_copy_element = Copy element
+mblock_paste_element = Paste element
+mblock_copy_element = Copy element
+mblock_paste_element = Paste element
+mblock_clear_clipboard = Clear clipboard
+mblock_clipboard_empty = Clipboard is empty
