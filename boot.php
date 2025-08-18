@@ -30,16 +30,13 @@ if (rex::isBackend() && is_object(rex::getUser())) {
             return $params->getSubject();
     });
 
-    // Use Sortable.js from bloecks addon if available, otherwise fallback to bundled version
+    // Use Sortable.js from bloecks addon (required dependency ^5.2.0)
     $bloecksAddon = rex_addon::get('bloecks');
     if ($bloecksAddon && $bloecksAddon->isAvailable()) {
         // Use bloecks Sortable.js
         rex_view::addJsFile($bloecksAddon->getAssetsUrl('js/sortable.min.js'));
-        // Add bloecks CSS for consistent styling
+        // Add bloecks CSS for consistent styling  
         rex_view::addCssFile($bloecksAddon->getAssetsUrl('css/bloecks.css'));
-    } else {
-        // Fallback to bundled sortable
-        rex_view::addJsFile($this->getAssetsUrl('mblock_sortable.min.js'));
     }
 
     // Always add our own assets

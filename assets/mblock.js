@@ -318,82 +318,19 @@ function mblock_sort_it(element) {
                     
                 } catch (createError) {
                     console.error('MBlock: Fehler beim Erstellen der Sortable-Instanz:', createError);
-                    // Fallback to jQuery UI if available
-                    mblock_sort_it_jquery_fallback(element);
+                    return false;
                 }
             }, 10);
             
             return true;
             
-        } 
-        // Fallback für jQuery UI Sortable (Legacy-Support)
-        else {
-            return mblock_sort_it_jquery_fallback(element);
+        } else {
+            console.error('MBlock: Sortable.js von bloecks addon ist erforderlich');
+            return false;
         }
         
     } catch (error) {
         console.error('MBlock: Fehler in mblock_sort_it:', error);
-        return mblock_sort_it_jquery_fallback(element);
-    }
-}
-
-// Separate jQuery UI Sortable fallback function
-function mblock_sort_it_jquery_fallback(element) {
-    try {
-        if (typeof element.sortable === 'function') {
-            // Destroy existing jQuery UI sortable if it exists
-            try {
-                if (element.hasClass('ui-sortable')) {
-                    element.sortable('destroy');
-                }
-            } catch (destroyError) {
-                console.warn('MBlock: Fehler beim Zerstören der jQuery UI Sortable-Instanz:', destroyError);
-            }
-
-            element.sortable({
-                handle: '.sorthandle',
-                placeholder: 'sortable-placeholder',
-                tolerance: 'pointer',
-                start: function (event, ui) {
-                    try {
-                        document.body.classList.add('mblock-drag-active');
-                        if (ui.item) {
-                            ui.item.addClass('mblock-dragging');
-                        }
-                    } catch (error) {
-                        console.error('MBlock: Fehler in jQuery UI sortable start:', error);
-                    }
-                },
-                update: function (event, ui) {
-                    try {
-                        document.body.classList.remove('mblock-drag-active');
-                        if (ui.item) {
-                            ui.item.removeClass('mblock-dragging');
-                            ui.item.addClass('mblock-dropped-flash');
-                            setTimeout(() => {
-                                ui.item.removeClass('mblock-dropped-flash');
-                            }, 600);
-                        }
-                        
-                        mblock_reindex(element);
-                        mblock_remove(element);
-                        // trigger event
-                        let iClone = ui.item;
-                        if (iClone.length) {
-                            iClone.trigger('mblock:change', [iClone]);
-                        }
-                    } catch (error) {
-                        console.error('MBlock: Fehler in jQuery UI sortable update:', error);
-                    }
-                }
-            });
-            return true;
-        } else {
-            console.error('MBlock: Weder Sortable.js noch jQuery UI Sortable gefunden');
-            return false;
-        }
-    } catch (error) {
-        console.error('MBlock: Fehler in jQuery UI fallback:', error);
         return false;
     }
 }
@@ -696,15 +633,6 @@ function mblock_add_item(element, item) {
             console.warn('MBlock: Sortable destroy error in add_item:', sortableError);
         }
         
-        // jQuery UI Sortable Fallback
-        try {
-            if (typeof element.sortable === 'function' && element.hasClass('ui-sortable')) {
-                element.sortable("destroy");
-            }
-        } catch (jqueryError) {
-            console.warn('MBlock: jQuery UI sortable destroy error in add_item:', jqueryError);
-        }
-        
         // add clone
         item.after(iClone);
         // set count
@@ -830,15 +758,6 @@ function mblock_remove_item(element, item) {
                 }
             } catch (sortableError) {
                 console.warn('MBlock: Sortable destroy error in remove_item:', sortableError);
-            }
-            
-            // jQuery UI Sortable Fallback
-            try {
-                if (typeof element.sortable === 'function' && element.hasClass('ui-sortable')) {
-                    element.sortable("destroy");
-                }
-            } catch (jqueryError) {
-                console.warn('MBlock: jQuery UI sortable destroy error in remove_item:', jqueryError);
             }
 
             // set prev item
@@ -1331,15 +1250,6 @@ var MBlockClipboard = {
                     }
                 } catch (sortableError) {
                     console.warn('MBlock: Sortable destroy error in paste:', sortableError);
-                }
-                
-                // jQuery UI Sortable Fallback
-                try {
-                    if (typeof element.sortable === 'function' && element.hasClass('ui-sortable')) {
-                        element.sortable("destroy");
-                    }
-                } catch (jqueryError) {
-                    console.warn('MBlock: jQuery UI sortable destroy error in paste:', jqueryError);
                 }
                 
                 afterItem.after(pastedItem);
