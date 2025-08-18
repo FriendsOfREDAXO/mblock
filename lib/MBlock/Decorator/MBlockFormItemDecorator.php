@@ -9,11 +9,15 @@
 
 namespace FriendsOfRedaxo\MBlock\Decorator;
 
+use FriendsOfRedaxo\MBlock\DTO\MBlockItem;
+use FriendsOfRedaxo\MBlock\Utils\MBlockJsonHelper;
+use DOMDocument;
+use DOMElement;
 use rex_escape;
 
 class MBlockFormItemDecorator
 {
-    use \MBlock\Decorator\MBlockDOMTrait;
+    use MBlockReplacerTrait;
 
     /**
      * @param MBlockItem $item

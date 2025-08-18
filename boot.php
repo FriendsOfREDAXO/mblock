@@ -5,6 +5,8 @@
  * @license MIT
  */
 
+
+
 if (rex::isBackend() && is_object(rex::getUser())) {
 
     // check theme css exists

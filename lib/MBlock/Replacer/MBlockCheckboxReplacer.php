@@ -9,9 +9,13 @@
 
 namespace FriendsOfRedaxo\MBlock\Replacer;
 
+use FriendsOfRedaxo\MBlock\Decorator\MBlockReplacerTrait;
+use FriendsOfRedaxo\MBlock\DTO\MBlockItem;
+use DOMElement;
+
 class MBlockCheckboxReplacer
 {
-    use \MBlock\Decorator\MBlockDOMTrait;
+    use MBlockReplacerTrait;
 
     /**
      * @param MBlockItem $item
