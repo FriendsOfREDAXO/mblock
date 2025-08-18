@@ -241,6 +241,7 @@ __Output:__
 
 ```php
 <?php
+use FriendsOfRedaxo\MBlock\MBlock;
 // MBlock 4.0 - Verbesserte Ausgabe
 $items = MBlock::getOnlineDataArray("REX_VALUE[1]"); // Nur Online-Items
 
@@ -274,7 +275,7 @@ __Input:__
 
 ```php
 <?php
-
+use FriendsOfRedaxo\MBlock\MBlock;
 // base ID
 $id = 1;
 
@@ -306,6 +307,7 @@ __Output:__
 
 ```php
 <?php
+use FriendsOfRedaxo\MBlock\MBlock;
 // Sicher und modern
 $items = MBlock::getOnlineDataArray("REX_VALUE[1]");
 
