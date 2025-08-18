@@ -10,14 +10,15 @@ page:
     perm: mblock[]
     icon: rex-icon fa-train
     subpages:
-        overview: { title: translate:configuration}
+        overview: { title: 'MBlock 4.0' }
         demo:
             title: translate:demo_base
             subpages:
                 demo_mform: { title: translate:demo_mform }
                 demo_html: { title: translate:demo_html }
         api: { title: 'API', subPath: API.md }
-        help: { title: 'translate:help', subPath: README.md, itemClass: 'pull-right' }
+        help: { title: 'translate:help', subPath: README.md }
+        settings: { title: translate:configuration, itemClass: 'pull-right' }
 
 requires:
     redaxo: ^5.18.0
