@@ -9,6 +9,8 @@
 
 namespace FriendsOfRedaxo\MBlock\Replacer;
 
+use FriendsOfRedaxo\MBlock\DTO\MBlockItem;
+
 class MBlockCountReplacer
 {
     /**

@@ -9,13 +9,16 @@
 
 namespace FriendsOfRedaxo\MBlock\Replacer;
 
+use FriendsOfRedaxo\MBlock\DTO\MBlockItem;
+use FriendsOfRedaxo\MBlock\Utils\MBlockSessionHelper;
+use FriendsOfRedaxo\MBlock\Decorator\MBlockFormItemDecorator;
 use rex;
 use rex_article;
 use rex_version;
 
 class MBlockSystemButtonReplacer
 {
-    use \MBlock\Decorator\MBlockDOMTrait;
+    use \FriendsOfRedaxo\MBlock\Decorator\MBlockDOMTrait;
     const REX_VERSION = '5.12.1';
 
     /**

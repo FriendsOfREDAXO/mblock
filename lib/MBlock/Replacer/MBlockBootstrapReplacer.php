@@ -9,9 +9,11 @@
 
 namespace FriendsOfRedaxo\MBlock\Replacer;
 
+use FriendsOfRedaxo\MBlock\DTO\MBlockItem;
+
 class MBlockBootstrapReplacer
 {
-    use \MBlock\Decorator\MBlockDOMTrait;
+    use \FriendsOfRedaxo\MBlock\Decorator\MBlockDOMTrait;
 
     /**
      * @param MBlockItem $item

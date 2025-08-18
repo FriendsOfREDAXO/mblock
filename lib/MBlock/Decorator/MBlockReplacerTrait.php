@@ -9,9 +9,6 @@
 
 namespace FriendsOfRedaxo\MBlock\Decorator;
 
-namespace MBlock\Decorator;
-
-
 use DOMDocument;
 use DOMElement;
 
