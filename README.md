@@ -225,10 +225,7 @@ $mform->addTextField("$id.0.name", array('label'=>'Name'));
 $mform->addMediaField(1, array('label'=>'Avatar'));
 
 // MBlock 4.0 - Online/Offline Status (hidden field für Toggle-Funktion)
-$mform->addTextField("$id.0.mblock_offline", array(
-    'type' => 'hidden',
-    'value' => '0'  // 0 = online, 1 = offline
-));
+$mform->addHiddenField("$id.0.mblock_offline", '0');
 
 // MBlock anzeigen (Copy & Paste ist automatisch aktiv)
 echo MBlock::show($id, $mform->show(), array(
