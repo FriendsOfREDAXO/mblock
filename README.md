@@ -151,4 +151,52 @@ dump(rex_var::toArray("REX_VALUE[1]"));
 echo '</pre>';
 ```
 
+### Example 3: Offline/Online Toggle with MForm
+
+__Input:__
+
+```php
+<?php
+
+// base ID
+$id = 1;
+
+// init mform
+$mform = new MForm();
+
+// fieldset
+$mform->addFieldsetArea('Content Block');
+
+// content fields
+$mform->addTextField("$id.0.title", array('label'=>'Title'));
+$mform->addTextAreaField("$id.0.content", array('label'=>'Content'));
+
+// Add offline toggle checkbox (enables offline/online functionality)
+$mform->addCheckboxField("$id.0.mblock_offline", array('1'=>'Draft/Offline'), array('label'=>'Status'));
+
+// parse form
+echo MBlock::show($id, $mform->show());
+```
+
+__Output (with filtering):__
+
+```php
+<?php
+
+// Get all items
+$allItems = MBlock::getDataArray("REX_VALUE[1]");
+
+// Get only online items (for frontend display)
+$onlineItems = MBlock::getOnlineDataArray("REX_VALUE[1]");
+
+// Get only offline items (for backend previews)
+$offlineItems = MBlock::getOfflineDataArray("REX_VALUE[1]");
+
+// Display online items
+foreach ($onlineItems as $item) {
+    echo '<h3>' . $item['title'] . '</h3>';
+    echo '<p>' . $item['content'] . '</p>';
+}
+```
+
 
