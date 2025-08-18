@@ -10,8 +10,7 @@ page:
     perm: mblock[]
     icon: rex-icon fa-train
     subpages:
-        overview: { title: translate:overview }
-        config: { title: translate:configuration }
+        overview: { title: translate:configuration}
         demo:
             title: translate:demo_base
             subpages:

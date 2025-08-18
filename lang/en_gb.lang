@@ -1,4 +1,6 @@
 mblock_title = MBlock
+mblock_help = Help
+mblock_configuration = Configuration
 
 mblock_overview = Overview
 mblock_config_save = Save settings
@@ -16,6 +18,7 @@ mblock_example_base_teammember_example = Team members
 mblock_example_base_link_example = Link and linklist
 mblock_example_base_media_example = Media and medialist
 mblock_example_base_defaults_example = Misc form elements
+mblock_example_base_cardgrid_example = Cardgrid with tabs (advanced)
 
 mblock_example_html_teammember_example = Team members
 mblock_example_html_link_example = Link and linklist

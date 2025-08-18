@@ -4,7 +4,6 @@
  */
 
 // Titel der Seite anzeigen
-echo rex_view::title(rex_i18n::msg('mblock_title') . ': ' . rex_i18n::msg('mblock_configuration'));
 
 // Konfigurationsformular
 $form = rex_config_form::factory('mblock');
@@ -52,12 +51,13 @@ echo $fragment->parse('core/page/section.php');
 $fragment = new rex_fragment();
 $fragment->setVar('title', 'Theme-Einstellungen', false);
 $fragment->setVar('body', '
-<p>MBlock unterstützt individuelle Themes. Standard-Theme-Dateien befinden sich in:</p>
-<ul>
-<li><code>data/templates/default_theme/</code></li>
-<li><code>templates/default_theme/</code></li>
-</ul>
-<p>Eigene Theme-Dateien können in <code>data/templates/</code> abgelegt werden.</p>
+<p>MBlock unterstützt individuelle Themes mit automatischer Prioritätsverwaltung:</p>
+<h4>Template-Priorität (in dieser Reihenfolge):</h4>
+<ol>
+<li><code>redaxo/data/addons/mblock/templates/custom_theme/</code> <strong>(Custom Templates - höchste Priorität)</strong></li>
+<li><code>redaxo/src/addons/mblock/templates/default_theme/</code> <em>(Addon Default Templates)</em></li>
+</ol>
+<p><strong>Empfehlung:</strong> Eigene Templates immer im <code>data/</code> Ordner ablegen. Diese überschreiben automatisch die Default Templates.</p>
 ', false);
 
 echo $fragment->parse('core/page/section.php');

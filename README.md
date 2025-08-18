@@ -51,6 +51,33 @@ $onlineItems = MBlock::getOnlineItems($data);
 $offlineItems = MBlock::getOfflineItems($data);
 ```
 
+## Templates & Themes
+
+### Template-System
+MBlock verwendet ein flexibles Template-System mit automatischer Prioritätsverwaltung:
+
+**Template-Priorität (in dieser Reihenfolge):**
+1. **Custom Templates** (höchste Priorität): `redaxo/data/addons/mblock/templates/custom_theme/`
+2. **Default Templates** (Fallback): `redaxo/src/addons/mblock/templates/default_theme/`
+
+### Eigene Templates erstellen
+Eigene Templates sollten immer im `data/` Ordner abgelegt werden:
+
+```bash
+redaxo/data/addons/mblock/templates/
+├── my_custom_theme/
+│   ├── mblock_wrapper.ini    # Container für alle Items
+│   ├── mblock_element.ini    # Template für einzelne Items
+│   └── theme.css            # CSS-Styling (optional)
+```
+
+### Template-Dateien
+- **mblock_wrapper.ini**: Container für alle MBlock-Items
+- **mblock_element.ini**: Template für einzelne MBlock-Items  
+- **theme.css**: Styling für das Theme (optional)
+
+**Wichtig:** Custom Templates überschreiben automatisch die Default Templates mit dem gleichen Namen.
+
 ## Modulbeispiele / Module examples
 
 MBlock enthält einige Modulbeispiele. Diese findest du auf der MBlock-Seite im REDAXO-Backend. An dieser Stelle möchten wir nur zwei Beispiele auflisten — mit Unterstützung durch [MForm](https://github.com/FriendsOfREDAXO/mform) und ohne —, um zu zeigen, wie MBlock funktioniert.
