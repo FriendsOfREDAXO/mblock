@@ -232,6 +232,9 @@ class MBlock
      */
     private static function createOutput(MBlockItem $item, $count, $theme = null)
     {
+        // Debug: Check if createOutput is called
+        file_put_contents('/tmp/mblock_debug.log', 'createOutput called for count: ' . $count . ' at ' . date('Y-m-d H:i:s') . "\n", FILE_APPEND);
+        
         $item->setForm(MBlockSystemButtonReplacer::replaceSystemButtons($item, $count));
         $item->setForm(MBlockCountReplacer::replaceCountKeys($item, $count));
         $item->setForm(MBlockBootstrapReplacer::replaceTabIds($item, $count));
@@ -255,6 +258,9 @@ class MBlock
         $element->setForm($item->getForm())
             ->setIndex($count);
 
+        // Detect offline field and set offline properties
+        self::setOfflineProperties($element, $item);
+
         // parse element to output
         $output = MBlockParser::parseElement($element, 'element', $theme);
 
@@ -266,6 +272,195 @@ class MBlock
         }
 
         return $output;
+    }
+
+    /**
+     * Setzt die Offline-Properties für ein Element basierend auf dem mblock_offline Feld
+     * @param MBlockElement $element Das MBlock Element
+     * @param MBlockItem $item Das MBlock Item
+     * @author Joachim Doerr
+     */
+    private static function setOfflineProperties(MBlockElement $element, MBlockItem $item)
+    {
+        $form = $item->getForm();
+        
+        // Check if form contains mblock_offline field
+        $hasOfflineField = (strpos($form, 'name="mblock_offline"') !== false || 
+                           strpos($form, "name='mblock_offline'") !== false ||
+                           preg_match('/name=.*mblock_offline.*\[/', $form));
+        
+        if ($hasOfflineField) {
+            // Get the current value of mblock_offline field
+            $isOffline = false;
+            
+            // Method 1: Try to extract from the HTML form value attribute
+            if (preg_match('/name="[^"]*mblock_offline[^"]*"\s+value="([^"]*)"/', $form, $matches)) {
+                $isOffline = ($matches[1] == '1');
+            } else {
+                // Method 2: Try to get from result data (backup)
+                $result = $item->getResult();
+                if ($result && is_array($result)) {
+                    foreach ($result as $resultItem) {
+                        if (is_array($resultItem) && isset($resultItem['mblock_offline'])) {
+                            $isOffline = ($resultItem['mblock_offline'] == '1' || 
+                                         $resultItem['mblock_offline'] === '1' || 
+                                         $resultItem['mblock_offline'] === true);
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            // Set CSS class based on offline status
+            $element->setOfflineClass($isOffline ? ' mblock-offline' : '');
+            
+            // Set offline button HTML with color coding
+            if ($isOffline) {
+                $offlineButtonClass = 'btn-danger'; // Red for offline
+                $offlineButtonIcon = 'rex-icon-offline';
+                $offlineButtonTitle = 'Set online';
+                $offlineButtonText = 'Offline';
+            } else {
+                $offlineButtonClass = 'btn-success'; // Green for online
+                $offlineButtonIcon = 'rex-icon-online';
+                $offlineButtonTitle = 'Set offline';
+                $offlineButtonText = 'Online';
+            }
+            
+            $offlineButton = '<div class="btn-group btn-group-xs">
+                <button type="button" class="btn ' . $offlineButtonClass . ' mblock-offline-toggle-btn" 
+                        title="' . $offlineButtonTitle . '" data-offline="' . ($isOffline ? '1' : '0') . '">
+                    <i class="rex-icon ' . $offlineButtonIcon . '"></i> ' . $offlineButtonText . '
+                </button>
+            </div>';
+            
+            $element->setOfflineButton($offlineButton);
+        } else {
+            // No offline field found - set empty values
+            $element->setOfflineClass('');
+            $element->setOfflineButton('');
+        }
+    }
+
+    /**
+     * Zentrale Methode zum Abrufen von MBlock-Daten mit optionaler Filterung
+     * @param string $rexValue REX_VALUE String (z.B. "REX_VALUE[1]")
+     * @param string $filter 'all', 'online', 'offline' (default: 'all')
+     * @param string $offlineField Name des Offline-Feldes (default: 'mblock_offline')
+     * @return array Verarbeitete und gefilterte MBlock-Daten
+     * @author Joachim Doerr
+     */
+    public static function getDataArray($rexValue, $filter = 'all', $offlineField = 'mblock_offline')
+    {
+        // Input-Validierung
+        if (empty($rexValue) || !is_string($rexValue)) {
+            return array();
+        }
+        
+        // rex_var::toArray() ausführen
+        $data = rex_var::toArray($rexValue);
+        
+        if (!is_array($data) || empty($data)) {
+            return array();
+        }
+        
+        // Wenn kein Filter gewünscht, alle Daten zurückgeben
+        if ($filter === 'all') {
+            return $data;
+        }
+        
+        // Daten filtern
+        return self::filterByStatus($data, $filter, $offlineField);
+    }
+
+    /**
+     * Filtert MBlock-Daten basierend auf Offline-Status
+     * @param array $data MBlock-Daten (normalerweise von rex_var::toArray("REX_VALUE[1]"))
+     * @param string $filter 'online', 'offline' oder 'all' (default: 'all')
+     * @param string $offlineField Name des Offline-Feldes (default: 'mblock_offline')
+     * @return array Gefilterte Daten
+     * @author Joachim Doerr
+     */
+    public static function filterByStatus($data, $filter = 'all', $offlineField = 'mblock_offline')
+    {
+        if (!is_array($data) || empty($data)) {
+            return array();
+        }
+        
+        if ($filter === 'all') {
+            return $data;
+        }
+        
+        $result = array();
+        $filterOffline = ($filter === 'offline');
+        
+        foreach ($data as $index => $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+            
+            $isOffline = false;
+            if (isset($item[$offlineField])) {
+                $offlineValue = $item[$offlineField];
+                $isOffline = ($offlineValue == '1' || $offlineValue === true || $offlineValue === 'true');
+            }
+            
+            // Wenn wir offline Items wollen und dieses offline ist, oder
+            // wenn wir online Items wollen und dieses online ist
+            if ($filterOffline === $isOffline) {
+                $result[$index] = $item;
+            }
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Convenience-Methode für Online-Items mit automatischer rex_var Verarbeitung
+     * @param string $rexValue REX_VALUE String (z.B. "REX_VALUE[1]")
+     * @param string $offlineField Name des Offline-Feldes (default: 'mblock_offline')
+     * @return array Nur Online-Items
+     * @author Joachim Doerr
+     */
+    public static function getOnlineDataArray($rexValue, $offlineField = 'mblock_offline')
+    {
+        return self::getDataArray($rexValue, 'online', $offlineField);
+    }
+    
+    /**
+     * Convenience-Methode für Offline-Items mit automatischer rex_var Verarbeitung
+     * @param string $rexValue REX_VALUE String (z.B. "REX_VALUE[1]")
+     * @param string $offlineField Name des Offline-Feldes (default: 'mblock_offline')
+     * @return array Nur Offline-Items
+     * @author Joachim Doerr
+     */
+    public static function getOfflineDataArray($rexValue, $offlineField = 'mblock_offline')
+    {
+        return self::getDataArray($rexValue, 'offline', $offlineField);
+    }
+
+    /**
+     * Convenience-Methode für Online-Items
+     * @param array $data MBlock-Daten
+     * @param string $offlineField Name des Offline-Feldes (default: 'mblock_offline')
+     * @return array Nur Online-Items
+     * @author Joachim Doerr
+     */
+    public static function getOnlineItems($data, $offlineField = 'mblock_offline')
+    {
+        return self::filterByStatus($data, 'online', $offlineField);
+    }
+    
+    /**
+     * Convenience-Methode für Offline-Items
+     * @param array $data MBlock-Daten
+     * @param string $offlineField Name des Offline-Feldes (default: 'mblock_offline')
+     * @return array Nur Offline-Items
+     * @author Joachim Doerr
+     */
+    public static function getOfflineItems($data, $offlineField = 'mblock_offline')
+    {
+        return self::filterByStatus($data, 'offline', $offlineField);
     }
 
     /**

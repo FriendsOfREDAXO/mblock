@@ -30,6 +30,16 @@ class MBlockElement
     public $index;
 
     /**
+     * @var string
+     */
+    public $offline_class;
+
+    /**
+     * @var string
+     */
+    public $offline_button;
+
+    /**
      * @return mixed
      * @author Joachim Doerr
      */
@@ -86,6 +96,26 @@ class MBlockElement
     public function setIndex($index)
     {
         $this->index = $index;
+        return $this;
+    }
+
+    /**
+     * @param string $offline_class
+     * @return $this
+     */
+    public function setOfflineClass($offline_class)
+    {
+        $this->offline_class = $offline_class;
+        return $this;
+    }
+
+    /**
+     * @param string $offline_button
+     * @return $this
+     */
+    public function setOfflineButton($offline_button)
+    {
+        $this->offline_button = $offline_button;
         return $this;
     }
 
