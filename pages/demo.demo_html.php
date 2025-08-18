@@ -57,5 +57,5 @@ echo $fragment->parse('core/page/section.php');
 // parse demo fragment
 $fragment = new rex_fragment();
 $fragment->setVar('title', rex_i18n::msg('mblock_demo_html') . ' - Legacy-Beispiele', false);
-$fragment->setVar('body', MBlockPageHelper::exchangeExamples('html'), false);
+$fragment->setVar('body', \FriendsOfRedaxo\MBlock\Utils\MBlockPageHelper::exchangeExamples('html'), false);
 echo $fragment->parse('core/page/section.php');

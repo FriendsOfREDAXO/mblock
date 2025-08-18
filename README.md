@@ -29,6 +29,33 @@ _English:_ MBlock lets you create an unlimited number of data blocks within a si
 - 🆕 **Template-Priorität** - Custom templates überschreiben defaults
 - 🆕 **Media-ID Konflikt-Schutz** - Bessere Warnung bei ID-Überschneidungen
 
+## ⚡ Namespace Migration (Version 4.0)
+
+**MBlock 4.0 führt Namespaces ein!** Für neue Projekte wird die Verwendung des Namespace empfohlen:
+
+```php
+<?php
+// 🆕 Empfohlen: Neue Namespace-Syntax (MBlock 4.0+)
+use FriendsOfRedaxo\MBlock\MBlock;
+
+$items = MBlock::getDataArray("REX_VALUE[1]");
+echo MBlock::show(1, $mform->show());
+```
+
+**Vollständig rückwärtskompatibel!** Bestehende Module funktionieren weiterhin ohne Änderungen:
+
+```php
+<?php
+// ✅ Weiterhin unterstützt: Legacy-Syntax (für Bestandscode)
+$items = MBlock::getDataArray("REX_VALUE[1]");
+echo MBlock::show(1, $mform->show());
+```
+
+### Migration Guide
+- **Neue Module**: Verwenden Sie `use FriendsOfRedaxo\MBlock\MBlock;`
+- **Bestehende Module**: Funktionieren ohne Änderungen weiter
+- **Deprecated-Warnung**: Alte Syntax wird in Version 5.0 entfernt
+
 ## Installation
 
 MBlock erfordert:
@@ -44,7 +71,28 @@ MBlock erfordert:
 
 ### 🆕 MBlock 4.0 - Neue zentrale getDataArray() Methode
 
+**Mit Namespace (empfohlen für neue Projekte):**
 ```php
+<?php
+use FriendsOfRedaxo\MBlock\MBlock;
+
+// Alle MBlock-Daten abrufen
+$allItems = MBlock::getDataArray("REX_VALUE[1]");
+
+// Nur Online-Blöcke (für Frontend) - EMPFOHLEN
+$onlineItems = MBlock::getDataArray("REX_VALUE[1]", 'online');
+
+// Nur Offline-Blöcke (für Backend-Previews)
+$offlineItems = MBlock::getDataArray("REX_VALUE[1]", 'offline');
+
+// Convenience-Methoden
+$onlineItems = MBlock::getOnlineDataArray("REX_VALUE[1]");
+$offlineItems = MBlock::getOfflineDataArray("REX_VALUE[1]");
+```
+
+**Legacy-Syntax (weiterhin unterstützt):**
+```php
+<?php
 // Alle MBlock-Daten abrufen
 $allItems = MBlock::getDataArray("REX_VALUE[1]");
 
@@ -61,7 +109,11 @@ $offlineItems = MBlock::getOfflineDataArray("REX_VALUE[1]");
 
 ### 🆕 Frontend API - Datenverarbeitung (MBlock 4.0)
 
+**Mit Namespace (empfohlen):**
 ```php
+<?php
+use FriendsOfRedaxo\MBlock\MBlock;
+
 $items = MBlock::getOnlineDataArray("REX_VALUE[1]");
 
 // Nach Feld filtern

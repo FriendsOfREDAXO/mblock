@@ -9,6 +9,9 @@
 
 namespace FriendsOfRedaxo\MBlock\Processor;
 
+use rex_sql;
+use rex_sql_exception;
+
 class MBlockRexFormProcessor
 {
     /**

@@ -9,6 +9,10 @@
 
 namespace FriendsOfRedaxo\MBlock\Parser;
 
+use FriendsOfRedaxo\MBlock\DTO\MBlockElement;
+use FriendsOfRedaxo\MBlock\Provider\MBlockTemplateFileProvider;
+use rex_i18n;
+
 class MBlockParser
 {
     /**
