@@ -1,5 +1,5 @@
 package: mblock
-version: 3.5.0
+version: 4.0.0
 name: MBlock
 author: Friends Of REDAXO
 supportpage: https://github.com/FriendsOfREDAXO/mblock
@@ -11,16 +11,18 @@ page:
     icon: rex-icon fa-train
     subpages:
         overview: { title: translate:overview }
+        config: { title: translate:configuration }
         demo:
             title: translate:demo_base
             subpages:
                 demo_mform: { title: translate:demo_mform }
                 demo_html: { title: translate:demo_html }
-        rexform_demo: { title: translate:rexform_demo }
+        api: { title: 'API', subPath: API.md }
+        help: { title: 'translate:help', subPath: README.md, itemClass: 'pull-right' }
 
 requires:
     redaxo: ^5.18.0
     packages:
         bloecks: '^5.2.0'
-    php:
-        extensions: [xml]
+
+           

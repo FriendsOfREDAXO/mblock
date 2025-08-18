@@ -1,6 +1,6 @@
 # MBlock - REDAXO Addon für Modul-Input-Blöcke
 
-## Version 3.5.0 - 2025-01-18
+## Version 4.0.0 - 2025-01-18
 
 ### 🚀 Major New Features
 

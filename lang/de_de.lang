@@ -5,6 +5,15 @@ mblock_config_save = Einstellungen speichern
 
 mblock_config_label_template = Theme für MBlock Sort-Fields
 mblock_config_saved = Einstellungen wurden gespeichert
+mblock_theme = Theme
+mblock_theme_default = Standard Theme
+mblock_theme_custom = Benutzerdefiniert
+mblock_smooth_scroll = Smooth Scroll
+mblock_nested_support = Verschachtelte Blöcke
+mblock_copy_paste = Copy & Paste
+mblock_offline_toggle = Offline Toggle
+mblock_enabled = Aktiviert
+mblock_disabled = Deaktiviert
 mblock_config = Konfiguration
 
 mblock_demo = Beispielsammlung
@@ -16,6 +25,7 @@ mblock_example_base_teammember_example = Teammitglieder
 mblock_example_base_link_example = Link und Linklist
 mblock_example_base_media_example = Media und Medialist
 mblock_example_base_defaults_example = Diverse Formularelemente
+mblock_example_base_cardgrid_example = Cardgrid mit Tabs (erweitert)
 
 mblock_example_html_teammember_example = Teammitglieder
 mblock_example_html_link_example = Link und Linklist
