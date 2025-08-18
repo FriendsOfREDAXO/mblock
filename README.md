@@ -11,7 +11,23 @@ _English:_ MBlock lets you create an unlimited number of data blocks within a si
 
 ### 🎯 Grundfunktionen / Core Features
 
-### 🚀 Erweiterte Funktionen / Advanced Features (v3.5.0+)
+- ✅ **Beliebig viele Datenblöcke** pro Modul erstellen
+- ✅ **Drag & Drop Sortierung** mit bloecks addon (^5.2.0)
+- ✅ **Minimale/Maximale Anzahl** von Blöcken definierbar
+- ✅ **Collapsed/Expanded Darstellung** für bessere Übersicht
+- ✅ **MForm Integration** für professionelle Formulare
+- ✅ **Template System** mit Prioritätsladung
+- ✅ **Mehrsprachigkeit** (DE/EN)
+
+### 🚀 Erweiterte Funktionen / Advanced Features (MBlock 4.0)
+
+- 🆕 **Online/Offline Toggle** - Blöcke aktivieren/deaktivieren ohne löschen
+- 🆕 **Copy & Paste** - Komfortable Duplizierung von Inhalten
+- 🆕 **Frontend API Methoden** - `filterByField()`, `sortByField()`, `groupByField()`
+- 🆕 **Schema.org Support** - SEO-optimierte JSON-LD Generierung
+- 🆕 **Erweiterte Datenabfrage** - Online/Offline/All Modi
+- 🆕 **Template-Priorität** - Custom templates überschreiben defaults
+- 🆕 **Media-ID Konflikt-Schutz** - Bessere Warnung bei ID-Überschneidungen
 
 ## Installation
 
@@ -26,13 +42,13 @@ MBlock erfordert:
 
 ## API & Datenabfrage
 
-### Neue zentrale getDataArray() Methode
+### 🆕 MBlock 4.0 - Neue zentrale getDataArray() Methode
 
 ```php
 // Alle MBlock-Daten abrufen
 $allItems = MBlock::getDataArray("REX_VALUE[1]");
 
-// Nur Online-Blöcke (für Frontend)
+// Nur Online-Blöcke (für Frontend) - EMPFOHLEN
 $onlineItems = MBlock::getDataArray("REX_VALUE[1]", 'online');
 
 // Nur Offline-Blöcke (für Backend-Previews)
@@ -43,10 +59,57 @@ $onlineItems = MBlock::getOnlineDataArray("REX_VALUE[1]");
 $offlineItems = MBlock::getOfflineDataArray("REX_VALUE[1]");
 ``` 
 
+### 🆕 Frontend API - Datenverarbeitung (MBlock 4.0)
+
+```php
+$items = MBlock::getOnlineDataArray("REX_VALUE[1]");
+
+// Nach Feld filtern
+$newsItems = MBlock::filterByField($items, 'category', 'news');
+$activeItems = MBlock::filterByField($items, 'status', 'active');
+
+// Nach Feld sortieren
+$sortedByName = MBlock::sortByField($items, 'name', 'ASC');
+$sortedByDate = MBlock::sortByField($items, 'date', 'DESC', 'date');
+$sortedByPrice = MBlock::sortByField($items, 'price', 'DESC', 'numeric');
+
+// Nach Feld gruppieren
+$grouped = MBlock::groupByField($items, 'category');
+foreach ($grouped as $category => $categoryItems) {
+    echo "<h2>" . rex_escape($category) . "</h2>";
+    foreach ($categoryItems as $item) {
+        echo "<p>" . rex_escape($item['title']) . "</p>";
+    }
+}
+
+// Anzahl begrenzen (Pagination)
+$topItems = MBlock::limitItems($items, 5);
+$nextItems = MBlock::limitItems($items, 5, 5);
+
+// SEO Schema.org JSON-LD generieren
+$schema = MBlock::generateSchema($items, 'Person', [
+    'name' => 'name',
+    'jobTitle' => 'position',
+    'image' => 'photo',
+    'email' => 'email'
+]);
+echo '<script type="application/ld+json">' . json_encode($schema) . '</script>';
+```
+
 ### Legacy Array-Filterung (falls Array schon vorhanden)
 
 ```php
 $data = rex_var::toArray("REX_VALUE[1]");
+
+// Online/Offline Check (MBlock 4.0)
+foreach ($data as $item) {
+    if (MBlock::isOnline($item)) {
+        // Item ist online
+        echo rex_escape($item['title']);
+    }
+}
+
+// Legacy-Methoden (deprecated, bitte getDataArray() verwenden)
 $onlineItems = MBlock::getOnlineItems($data);
 $offlineItems = MBlock::getOfflineItems($data);
 ```
@@ -90,34 +153,67 @@ __Input:__
 
 ```php
 <?php
+// 🎯 MBlock 4.0 - Modernisiertes Beispiel mit MForm 8
+
+use FriendsOfRedaxo\MForm;
 
 // base ID
 $id = 1;
 
-// init mform
-$mform = new MForm();
+// init mform mit moderner MForm 8 Syntax
+$mform = MForm::factory();
 
 // fieldset
 $mform->addFieldsetArea('Team member');
 
 // textinput
-$mform->addTextField("$id.0.name", array('label'=>'Name')); // use string for x.0 json values
+$mform->addTextField("$id.0.name", array('label'=>'Name'));
 
 // media button
-$mform->addMediaField(1, array('label'=>'Avatar')); // mblock will auto set the media file as json value
+$mform->addMediaField(1, array('label'=>'Avatar'));
 
-// parse form
-echo MBlock::show($id, $mform->show(), array('min'=>2,'max'=>4)); // add settings min and max
+// 🆕 MBlock 4.0 - Online/Offline Status (hidden field für Toggle-Funktion)
+$mform->addTextField("$id.0.mblock_offline", array(
+    'type' => 'hidden',
+    'value' => '0'  // 0 = online, 1 = offline
+));
+
+// MBlock anzeigen (Copy & Paste ist automatisch aktiv)
+echo MBlock::show($id, $mform->show(), array(
+    'min' => 2,
+    'max' => 4
+));
 ```
 
 __Output:__
 
 ```php
 <?php
+// 🆕 MBlock 4.0 - Verbesserte Ausgabe
+$items = MBlock::getOnlineDataArray("REX_VALUE[1]"); // Nur Online-Items
 
-echo '<pre>';
-dump(rex_var::toArray("REX_VALUE[1]")); // the Mediafield Values are in the "REX_MEDIA_n" Keys in the Array, REX_MEDIA[n] is not used
-echo '</pre>';
+foreach ($items as $item) {
+    $name = rex_escape($item['name'] ?? '');
+    $mediaId = $item['REX_MEDIA_1'] ?? '';
+    
+    echo '<div class="team-member">';
+    if ($name) {
+        echo '<h3>' . $name . '</h3>';
+    }
+    if ($mediaId) {
+        $media = rex_media::get($mediaId);
+        if ($media) {
+            echo '<img src="' . rex_media_manager::getUrl('rex_media_medium', $media->getFileName()) . '" 
+                       alt="' . rex_escape($media->getTitle()) . '" class="img-responsive" />';
+        }
+    }
+    echo '</div>';
+}
+
+// Debug (nur während Entwicklung)
+// echo '<pre>';
+// dump(MBlock::getDataArray("REX_VALUE[1]")); // Alle Items inkl. Offline
+// echo '</pre>';
 ```
 
 ### Example 2: team members (without [MForm](https://github.com/FriendsOfREDAXO/mform))
@@ -147,18 +243,51 @@ $form = <<<EOT
     </fieldset>
 EOT;
 
-// parse form
-echo MBlock::show($id, $form);
+// 🆕 MBlock 4.0 mit Features
+echo MBlock::show($id, $form, array(
+    'online_offline' => true,
+    'copy_paste' => true
+));
 ```
 
 __Output:__
 
 ```php
 <?php
+// 🆕 Sicher und modern
+$items = MBlock::getOnlineDataArray("REX_VALUE[1]");
 
-echo '<pre>';
-dump(rex_var::toArray("REX_VALUE[1]"));
-echo '</pre>';
+foreach ($items as $item) {
+    $name = rex_escape($item['name'] ?? '');
+    $mediaId = $item['REX_MEDIA_1'] ?? '';
+    
+    echo '<div class="team-member">';
+    echo '<h3>' . $name . '</h3>';
+    
+    if ($mediaId && ($media = rex_media::get($mediaId))) {
+        echo '<img src="' . rex_media_manager::getUrl('rex_media_small', $media->getFileName()) . '" 
+                   alt="' . rex_escape($media->getTitle()) . '" />';
+    }
+    echo '</div>';
+}
 ```
+
+---
+
+## 📚 Weitere Informationen
+
+### 📖 Wo finde ich was?
+
+- **[Best Practices](index.php?page=mblock/best_practices)** - Professionelle Tipps und häufige Probleme
+- **[MForm Demos](index.php?page=mblock/demo/demo_mform)** - Praktische Beispiele mit MForm
+- **[HTML Demos](index.php?page=mblock/demo/demo_html)** - Beispiele ohne MForm-Abhängigkeit
+- **[API Dokumentation](index.php?page=mblock/api)** - Vollständige API-Referenz
+
+### 🔗 Externe Links
+
+- **[MForm Addon](https://github.com/FriendsOfREDAXO/mform)** - Empfohlener Form-Builder
+- **[bloecks Addon](https://github.com/FriendsOfREDAXO/bloecks)** - Moderne Drag & Drop Funktionalität  
+- **[GitHub Repository](https://github.com/FriendsOfREDAXO/mblock)** - Source Code und Issues
+- **[REDAXO Community](https://redaxo.org/community/)** - Hilfe und Diskussionen
 
 
