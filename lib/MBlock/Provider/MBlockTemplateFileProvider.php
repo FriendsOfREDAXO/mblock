@@ -1,6 +1,6 @@
 <?php
 /**
- * @author mail[at]joachim-doerr[dot]com Joachim Doerr
+ * @author https://github.com/FriendsOfREDAXO
  * @package redaxo5
  * @license MIT
  */
