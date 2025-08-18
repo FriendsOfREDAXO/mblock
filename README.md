@@ -11,13 +11,13 @@ _English:_ MBlock lets you create an unlimited number of data blocks within a si
 
 ### Grundfunktionen / Core Features
 
-[x] **Beliebig viele Datenblöcke** pro Modul erstellen
-[x] **Drag & Drop Sortierung** mit bloecks addon (^5.2.0)
-[x] **Minimale/Maximale Anzahl** von Blöcken definierbar
-[x] **Collapsed/Expanded Darstellung** für bessere Übersicht
-[x] **MForm Integration** für professionelle Formulare
-[x] **Template System** mit Prioritätsladung
-[x] **Mehrsprachigkeit** (DE/EN)
+- [x] **Beliebig viele Datenblöcke** pro Modul erstellen
+- [x] **Drag & Drop Sortierung** mit bloecks addon (^5.2.0)
+- [x] **Minimale/Maximale Anzahl** von Blöcken definierbar
+- [x] **Collapsed/Expanded Darstellung** für bessere Übersicht
+- [x] **MForm Integration** für professionelle Formulare
+- [x] **Template System** mit Prioritätsladung
+- [ x ] **Mehrsprachigkeit** (DE/EN)
 
 ### Erweiterte Funktionen / Advanced Features (MBlock 4.0)
 
