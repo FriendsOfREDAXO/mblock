@@ -5,6 +5,25 @@
  * @license MIT
  */
 
+namespace FriendsOfRedaxo\MBlock;
+
+use InvalidArgumentException;
+use rex;
+use rex_addon;
+use rex_escape;
+use rex_extension;
+use rex_extension_point;
+use rex_form;
+use rex_fragment;
+use rex_get;
+use rex_getUrl;
+use rex_request;
+use rex_sql_exception;
+use rex_string;
+use rex_url;
+use rex_var;
+use rex_yform;
+
 class MBlock
 {
 
@@ -30,7 +49,7 @@ class MBlock
     public function __construct()
     {
         // Sichere Session-Initialisierung mit MBlockSessionHelper
-        MBlockSessionHelper::initializeSession();
+        Utils\MBlockSessionHelper::initializeSession();
     }
 
     /**
@@ -58,11 +77,11 @@ class MBlock
 
         $plain = false;
         // Sichere Session-Counter-Verwaltung mit MBlockSessionHelper
-        MBlockSessionHelper::incrementCount();
+        Utils\MBlockSessionHelper::incrementCount();
 
         if (is_integer($id) or is_numeric($id)) {
             // load rex value by id
-            self::$result = MBlockValueHandler::loadRexVars();
+            self::$result = Handler\MBlockValueHandler::loadRexVars();
 
             if ($form instanceof MForm) {
                 $form = $form->show();
@@ -79,7 +98,7 @@ class MBlock
                         self::$result['value'][$id] = $post[$settings['type_key']];
                     }
                     if (sizeof($table) > 3) {
-                        self::$result = MBlockValueHandler::loadFromTable($table);
+                        self::$result = Handler\MBlockValueHandler::loadFromTable($table);
                     }
                 } else {
                     self::$result = rex_request::post($table[1]);
@@ -116,7 +135,7 @@ class MBlock
             } else {
                 // is table::column
                 $table = explode('::', $id);
-                self::$result = MBlockValueHandler::loadFromTable($table, rex_request::get('id', 'int', 0));
+                self::$result = Handler\MBlockValueHandler::loadFromTable($table, rex_request::get('id', 'int', 0));
 
                 if (sizeof($table) > 2) {
                     $id = $table[0] . '::' . $table[1];
@@ -131,7 +150,7 @@ class MBlock
         }
 
         // crate plain element
-        $plainItem = new MBlockItem();
+        $plainItem = new DTO\MBlockItem();
         $plainItem->setId(0)
             ->setValueId($id)
             ->setResult(array())
@@ -148,7 +167,7 @@ class MBlock
                 // Validierung der Schlüssel
                 if (is_numeric($jId) && is_array($values)) {
                     // init item
-                    self::$items[$jId] = new MBlockItem;
+                    self::$items[$jId] = new DTO\MBlockItem;
                     self::$items[$jId]->setId($jId)
                         ->setValueId($id)
                         ->setResult($values)
@@ -169,7 +188,7 @@ class MBlock
         if (!self::$items && (!isset($settings['initial_hidden']) or $settings['initial_hidden'] != 1)) {
             // set plain item for add
             $plain = true;
-            self::$items[0] = new MBlockItem();
+            self::$items[0] = new DTO\MBlockItem();
             self::$items[0]->setId(0)
                 ->setValueId($id)
                 ->setResult(array())
@@ -178,7 +197,7 @@ class MBlock
 
 
         // foreach rex value json items
-        /** @var MBlockItem $item */
+        /** @var DTO\MBlockItem $item */
         foreach (static::$items as $count => $item) {
             static::$output[] = self::createOutput($item, ($count + 1), $theme);
         }
@@ -188,12 +207,12 @@ class MBlock
         $plainItem = rex_escape(self::createOutput($plainItem, 0, $theme));
 
         // wrap parsed form items
-        $wrapper = new MBlockElement();
+        $wrapper = new DTO\MBlockElement();
         $wrapper->setOutput(implode('', static::$output))
-            ->setSettings(MBlockSettingsHelper::getSettings(array_merge($settings, ['mblock-plain-sortitem' => $plainItem, 'mblock-single-add' => $addItem])));
+            ->setSettings(Utils\MBlockSettingsHelper::getSettings(array_merge($settings, ['mblock-plain-sortitem' => $plainItem, 'mblock-single-add' => $addItem])));
 
         // return wrapped from elements
-        $output = MBlockParser::parseElement($wrapper, 'wrapper', $theme);
+        $output = Parser\MBlockParser::parseElement($wrapper, 'wrapper', $theme);
 
 
         if (($plain && array_key_exists('disable_null_view', $settings) && $settings['disable_null_view'] == true) and rex_request::get('function', 'string') != 'add') {
@@ -224,37 +243,37 @@ class MBlock
     }
 
     /**
-     * @param MBlockItem $item
+     * @param DTO\MBlockItem $item
      * @param $count
      * @param null $theme
      * @return mixed
      * @author Joachim Doerr
      */
-    private static function createOutput(MBlockItem $item, $count, $theme = null)
+    private static function createOutput(DTO\MBlockItem $item, $count, $theme = null)
     {
         // Debug: Check if createOutput is called
         file_put_contents('/tmp/mblock_debug.log', 'createOutput called for count: ' . $count . ' at ' . date('Y-m-d H:i:s') . "\n", FILE_APPEND);
         
-        $item->setForm(MBlockSystemButtonReplacer::replaceSystemButtons($item, $count));
-        $item->setForm(MBlockCountReplacer::replaceCountKeys($item, $count));
-        $item->setForm(MBlockBootstrapReplacer::replaceTabIds($item, $count));
-        $item->setForm(MBlockBootstrapReplacer::replaceCollapseIds($item, $count));
+        $item->setForm(Replacer\MBlockSystemButtonReplacer::replaceSystemButtons($item, $count));
+        $item->setForm(Replacer\MBlockCountReplacer::replaceCountKeys($item, $count));
+        $item->setForm(Replacer\MBlockBootstrapReplacer::replaceTabIds($item, $count));
+        $item->setForm(Replacer\MBlockBootstrapReplacer::replaceCollapseIds($item, $count));
 
         // decorate item form
         if ($item->getResult()) {
-            $item->setForm(MBlockFormItemDecorator::decorateFormItem($item));
+            $item->setForm(Decorator\MBlockFormItemDecorator::decorateFormItem($item));
             // custom link hidden to text
-            $item->setForm(MBlockSystemButtonReplacer::replaceCustomLinkText($item));
+            $item->setForm(Replacer\MBlockSystemButtonReplacer::replaceCustomLinkText($item));
         } else {
             // no result set values to empty!
-            $item->setForm(MBlockValueReplacer::replaceValueSetEmpty($item));
+            $item->setForm(Replacer\MBlockValueReplacer::replaceValueSetEmpty($item));
         }
 
         // set only checkbox block holder
-        $item->setForm(MBlockCheckboxReplacer::replaceCheckboxesBlockHolder($item, $count));
+        $item->setForm(Replacer\MBlockCheckboxReplacer::replaceCheckboxesBlockHolder($item, $count));
 
         // parse form item
-        $element = new MBlockElement();
+        $element = new DTO\MBlockElement();
         $element->setForm($item->getForm())
             ->setIndex($count);
 
@@ -262,7 +281,7 @@ class MBlock
         self::setOfflineProperties($element, $item);
 
         // parse element to output
-        $output = MBlockParser::parseElement($element, 'element', $theme);
+        $output = Parser\MBlockParser::parseElement($element, 'element', $theme);
 
         // fix & error
         foreach ($item->getResult() as $result) {
@@ -276,11 +295,11 @@ class MBlock
 
     /**
      * Setzt die Offline-Properties für ein Element basierend auf dem mblock_offline Feld
-     * @param MBlockElement $element Das MBlock Element
-     * @param MBlockItem $item Das MBlock Item
+     * @param DTO\MBlockElement $element Das MBlock Element
+     * @param DTO\MBlockItem $item Das MBlock Item
      * @author Joachim Doerr
      */
-    private static function setOfflineProperties(MBlockElement $element, MBlockItem $item)
+    private static function setOfflineProperties(DTO\MBlockElement $element, DTO\MBlockItem $item)
     {
         $form = $item->getForm();
         

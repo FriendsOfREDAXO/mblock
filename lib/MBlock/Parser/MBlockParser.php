@@ -5,6 +5,10 @@
  * @license MIT
  */
 
+
+
+namespace FriendsOfRedaxo\MBlock\Parser;
+
 class MBlockParser
 {
     /**

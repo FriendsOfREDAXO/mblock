@@ -5,6 +5,10 @@
  * @license MIT
  */
 
+
+
+namespace FriendsOfRedaxo\MBlock\Decorator;
+
 class MBlockFormItemDecorator
 {
     use \MBlock\Decorator\MBlockDOMTrait;

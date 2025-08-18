@@ -5,6 +5,10 @@
  * @license MIT
  */
 
+
+
+namespace FriendsOfRedaxo\MBlock\Provider;
+
 class MBlockTemplateFileProvider
 {
     const DEFAULT_THEME = 'default_theme';

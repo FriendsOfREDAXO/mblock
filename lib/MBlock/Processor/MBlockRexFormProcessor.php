@@ -5,6 +5,10 @@
  * @license MIT
  */
 
+
+
+namespace FriendsOfRedaxo\MBlock\Processor;
+
 class MBlockRexFormProcessor
 {
     /**
@@ -69,7 +73,7 @@ class MBlockRexFormProcessor
 
         if (is_array($result) && sizeof($result) > 0)
             foreach ($result as $row => $value)
-                if (MBlockJsonHelper::isValid($value)) {
+                if (Utils\MBlockJsonHelper::isValid($value)) {
                     $newRow = explode('.', $row);
                     $rows[] = array_pop($newRow);
                 }
@@ -77,7 +81,7 @@ class MBlockRexFormProcessor
         if (isset($post[$form->getName()]))
             foreach ($post[$form->getName()] as $row => $field)
                 if (is_array($field))
-                    $updateValues[$row] = MBlockJsonHelper::encodeMBlockData($field);
+                    $updateValues[$row] = Utils\MBlockJsonHelper::encodeMBlockData($field);
 
         // is row not in update list?
         if (sizeof($rows) > 0)

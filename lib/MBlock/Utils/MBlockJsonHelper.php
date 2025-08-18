@@ -5,6 +5,10 @@
  * @license MIT
  */
 
+
+
+namespace FriendsOfRedaxo\MBlock\Utils;
+
 /**
  * Robuste JSON-Verarbeitung für MBlock mit umfassendem Error-Handling
  * 

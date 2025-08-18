@@ -5,6 +5,10 @@
  * @license MIT
  */
 
+
+
+namespace FriendsOfRedaxo\MBlock\Replacer;
+
 class MBlockBootstrapReplacer
 {
     use \MBlock\Decorator\MBlockDOMTrait;

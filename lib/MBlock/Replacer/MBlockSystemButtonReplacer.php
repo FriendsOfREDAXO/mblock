@@ -5,6 +5,10 @@
  * @license MIT
  */
 
+
+
+namespace FriendsOfRedaxo\MBlock\Replacer;
+
 class MBlockSystemButtonReplacer
 {
     use \MBlock\Decorator\MBlockDOMTrait;

@@ -5,6 +5,10 @@
  * Time: 15:07
  */
 
+
+
+namespace FriendsOfRedaxo\MBlock\Decorator;
+
 namespace MBlock\Decorator;
 
 
