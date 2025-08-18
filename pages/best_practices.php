@@ -163,10 +163,7 @@ foreach ($topItems as $item) {
                     
                     <h5>MBlock 4.0 - Online/Offline Funktionalität:</h5>
                     <pre><code class="php">// Online/Offline Status über hidden field steuern
-$mform->addTextField("$id.0.mblock_offline", [
-    "type" => "hidden",
-    "value" => "0"  // 0 = online, 1 = offline
-]);
+$mform->->addHiddenField("$id.0.mblock_offline", '0');
 
 // Im Frontend: Nur Online-Items laden  
 $items = rex_var::toArray("REX_MBLOCK[1]");
