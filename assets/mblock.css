@@ -561,12 +561,23 @@ html[data-bs-theme="dark"] .mblock-paste-btn:hover:not(.disabled) {
     white-space: nowrap;
     box-sizing: border-box; /* Ensure padding is included in width */
     overflow: hidden; /* Hide text overflow if needed */
+    gap: 3px; /* Space between icon and text */
 }
 
 .mblock-online-toggle .btn .rex-icon {
-    margin-right: 4px; /* Add space between icon and text */
-    margin-left: 0;
+    margin: 0 !important; /* Remove all margins, gap handles spacing */
+    padding: 0 !important; /* Remove padding too */
     font-size: 12px;
+}
+
+/* Additional override for any icon in toggle buttons */
+.mblock_wrapper span.removeadded .btn .rex-icon,
+.mblock-online-toggle .btn .rex-icon,
+.mblock_wrapper .btn .rex-icon {
+    margin: 0 !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+    padding: 0 !important;
 }
 
 .mblock-online-toggle .btn-online {
@@ -673,6 +684,13 @@ html[data-bs-theme="dark"] .mblock_wrapper > div.mblock-offline::before {
     font-size: 10px !important;
     box-sizing: border-box !important;
     overflow: hidden !important;
+    gap: 3px !important; /* Space between icon and text */
+}
+
+.mblock_wrapper span.removeadded .btn.mblock-offline-toggle-btn.btn-success .rex-icon {
+    margin: 0 !important; /* Force remove all margins */
+    padding: 0 !important;
+    font-size: 12px;
 }
 
 .mblock_wrapper span.removeadded .btn.mblock-offline-toggle-btn.btn-success:hover {
@@ -694,6 +712,13 @@ html[data-bs-theme="dark"] .mblock_wrapper > div.mblock-offline::before {
     font-size: 10px !important;
     box-sizing: border-box !important;
     overflow: hidden !important;
+    gap: 3px !important; /* Space between icon and text */
+}
+
+.mblock_wrapper span.removeadded .btn.mblock-offline-toggle-btn.btn-danger .rex-icon {
+    margin: 0 !important; /* Force remove all margins */
+    padding: 0 !important;
+    font-size: 12px;
 }
 
 .mblock_wrapper span.removeadded .btn.mblock-offline-toggle-btn.btn-danger:hover {
