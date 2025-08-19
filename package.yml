@@ -1,5 +1,5 @@
 package: mblock
-version: 4.0.0
+version: 4.1.0-dev
 name: MBlock
 author: Friends Of REDAXO
 supportpage: https://github.com/FriendsOfREDAXO/mblock
@@ -25,3 +25,9 @@ requires:
     redaxo: ^5.18.0
     packages:
         bloecks: '^5.2.0'
+
+# Default addon configuration
+default_config:
+    mblock_copy_paste: true
+    mblock_scroll: true
+    mblock_delete_confirm: true

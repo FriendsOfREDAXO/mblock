@@ -18,6 +18,10 @@ if (!$this->hasConfig('mblock_scroll')) {
 if (!$this->hasConfig('mblock_delete_confirm')) {
     $this->setConfig('mblock_delete_confirm', 1);
 }
+// MBlock 4.0 - Copy/Paste Feature - Default aktiviert für neue und bestehende Installationen
+if (!$this->hasConfig('mblock_copy_paste')) {
+    $this->setConfig('mblock_copy_paste', 1); // Default: aktiviert
+}
 
 // MBlock 4.0 - Template System Update
 // Löscht alte Default-Templates aus dem data/ Ordner

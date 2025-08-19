@@ -131,10 +131,40 @@ function mblock_cleanup_events(element, namespace = '.mblock') {
     }
 }
 
+/**
+ * Prüft ob Copy/Paste in der Konfiguration aktiviert ist
+ * @returns {boolean} True wenn aktiviert
+ */
+function checkCopyPasteEnabled() {
+    try {
+        // Method 1: Check data attribute on any mblock_wrapper
+        const $wrapper = $(mblock).first();
+        if ($wrapper.length) {
+            const copyPasteAttr = $wrapper.attr('data-copy_paste');
+            if (copyPasteAttr !== undefined) {
+                return (copyPasteAttr === '1' || copyPasteAttr === 'true' || copyPasteAttr === true);
+            }
+        }
+        
+        // Method 2: Check for presence of copy/paste buttons in DOM
+        const hasCopyButtons = $('.mblock-copy-btn').length > 0;
+        const hasToolbar = $('.mblock-copy-paste-toolbar').length > 0;
+        
+        return hasCopyButtons || hasToolbar;
+        
+    } catch (error) {
+        console.warn('MBlock: Fehler beim Prüfen der Copy/Paste-Konfiguration:', error);
+        return true; // Default: aktiviert bei Fehlern
+    }
+}
+
 $(document).on('rex:ready', function (e, container) {
     try {
-        // Initialize clipboard system
-        MBlockClipboard.init();
+        // Initialize clipboard system only if copy/paste is enabled
+        const isCopyPasteEnabled = checkCopyPasteEnabled();
+        if (isCopyPasteEnabled) {
+            MBlockClipboard.init();
+        }
         
         if (container && typeof container.find === 'function') {
             container.find(mblock).each(function () {
@@ -2026,6 +2056,11 @@ var MBlockOnlineToggle = {
 // Toolbar Initialisierung
 function mblock_init_toolbar(element) {
     try {
+        // Nur initialisieren wenn Copy/Paste aktiviert ist
+        if (!checkCopyPasteEnabled()) {
+            return;
+        }
+        
         // Paste Button in Toolbar
         element.find('.mblock-copy-paste-toolbar .mblock-paste-btn')
             .off('click.mblock')
@@ -2204,39 +2239,45 @@ function mblock_add(element) {
                 return false;
             });
 
-        // Copy Button Handler
+        // Copy Button Handler - nur wenn aktiviert
         const copyButtons = element.find('> div.sortitem .mblock-copy-btn');
         
-        copyButtons
-            .off('click.mblock')
-            .on('click.mblock', function (e) {
-                e.preventDefault();
-                try {
-                    const $this = $(this);
-                    const $item = $this.closest('div[class^="sortitem"]');
-                    MBlockClipboard.copy(element, $item);
-                } catch (error) {
-                    console.error('MBlock: Fehler in copy click handler:', error);
-                }
-                return false;
-            });
-
-        // Paste Button Handler
-        element.find('> div.sortitem .mblock-paste-btn')
-            .off('click.mblock')
-            .on('click.mblock', function (e) {
-                e.preventDefault();
-                try {
-                    const $this = $(this);
-                    if (!$this.hasClass('disabled') && !$this.prop('disabled')) {
+        if (copyButtons.length > 0 && checkCopyPasteEnabled()) {
+            copyButtons
+                .off('click.mblock')
+                .on('click.mblock', function (e) {
+                    e.preventDefault();
+                    try {
+                        const $this = $(this);
                         const $item = $this.closest('div[class^="sortitem"]');
-                        MBlockClipboard.paste(element, $item);
+                        MBlockClipboard.copy(element, $item);
+                    } catch (error) {
+                        console.error('MBlock: Fehler in copy click handler:', error);
                     }
-                } catch (error) {
-                    console.error('MBlock: Fehler in paste click handler:', error);
-                }
-                return false;
-            });
+                    return false;
+                });
+        }
+
+        // Paste Button Handler - nur wenn aktiviert
+        const pasteButtons = element.find('> div.sortitem .mblock-paste-btn');
+        
+        if (pasteButtons.length > 0 && checkCopyPasteEnabled()) {
+            pasteButtons
+                .off('click.mblock')
+                .on('click.mblock', function (e) {
+                    e.preventDefault();
+                    try {
+                        const $this = $(this);
+                        if (!$this.hasClass('disabled') && !$this.prop('disabled')) {
+                            const $item = $this.closest('div[class^="sortitem"]');
+                            MBlockClipboard.paste(element, $item);
+                        }
+                    } catch (error) {
+                        console.error('MBlock: Fehler in paste click handler:', error);
+                    }
+                    return false;
+                });
+        }
 
         // Online/Offline Toggle Handler (old system)
         element.find('> div.sortitem .mblock-online-toggle')
@@ -2268,8 +2309,10 @@ function mblock_add(element) {
                 return false;
             });
 
-        // Initialize paste button states
-        MBlockClipboard.updatePasteButtons();
+        // Initialize paste button states - nur wenn Copy/Paste aktiviert ist
+        if (checkCopyPasteEnabled()) {
+            MBlockClipboard.updatePasteButtons();
+        }
         
         // Initialize online/offline states
         MBlockOnlineToggle.initializeStates(element);

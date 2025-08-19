@@ -10,6 +10,7 @@ $config = rex_post('config', array(
     array('mblock_scroll', 'boolean'),
     array('mblock_delete', 'boolean'),
     array('mblock_delete_confirm', 'boolean'),
+    array('mblock_copy_paste', 'boolean'),
     array('submit', 'boolean')
 ));
 
@@ -33,6 +34,7 @@ if ($config['submit']) {
     $this->setConfig('mblock_delete', $config['mblock_delete']);
     $this->setConfig('mblock_scroll', $config['mblock_scroll']);
     $this->setConfig('mblock_delete_confirm', $config['mblock_delete_confirm']);
+    $this->setConfig('mblock_copy_paste', $config['mblock_copy_paste']);
     $form .= rex_view::info(rex_i18n::msg('mblock_config_saved'));
 }
 
@@ -81,6 +83,29 @@ $select->setName('config[mblock_delete_confirm]');
 $select->addOption(rex_i18n::msg('mblock_not_delete_confirm'), 0);
 $select->addOption(rex_i18n::msg('mblock_ok_delete_confirm'), 1);
 $select->setSelected($this->getConfig('mblock_delete_confirm'));
+$elements['field'] = $select->get();
+$formElements[] = $elements;
+// parse select element
+$fragment = new rex_fragment();
+$fragment->setVar('elements', $formElements, false);
+$form .= $fragment->parse('core/form/form.php');
+
+// Copy/Paste configuration
+$formElements = array();
+$elements = array();
+$elements['label'] = '
+  <label for="rex-mblock-config-copy-paste">' . rex_i18n::msg('mblock_copy_paste') . '</label>
+';
+// create select
+$select = new rex_select;
+$select->setId('rex-mblock-config-copy-paste');
+$select->setSize(1);
+$select->setAttribute('class', 'form-control');
+$select->setName('config[mblock_copy_paste]');
+// add options
+$select->addOption(rex_i18n::msg('mblock_disabled'), 0);
+$select->addOption(rex_i18n::msg('mblock_enabled'), 1);
+$select->setSelected($this->getConfig('mblock_copy_paste', 1)); // Default: enabled
 $elements['field'] = $select->get();
 $formElements[] = $elements;
 // parse select element

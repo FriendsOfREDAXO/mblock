@@ -1069,3 +1069,113 @@ html[data-bs-theme="dark"] .mblock_wrapper > div.mblock-copy-glow {
         background: rgba(13, 110, 253, 0.05) !important;
     }
 }
+
+/* ======================================================================
+   🎛️ Copy/Paste Konfiguration Styles
+   ====================================================================== */
+
+/* Wrapper für Copy/Paste-Funktionalität wenn deaktiviert */
+.mblock_wrapper[data-copy_paste="0"] .mblock-copy-paste-toolbar,
+.mblock_wrapper[data-copy_paste="false"] .mblock-copy-paste-toolbar {
+    display: none !important;
+}
+
+.mblock_wrapper[data-copy_paste="0"] .mblock-copy-btn,
+.mblock_wrapper[data-copy_paste="0"] .mblock-paste-btn,
+.mblock_wrapper[data-copy_paste="false"] .mblock-copy-btn,
+.mblock_wrapper[data-copy_paste="false"] .mblock-paste-btn {
+    display: none !important;
+}
+
+/* Copy/Paste Buttons Enhanced Styling */
+.mblock-copy-btn,
+.mblock-paste-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Copy Button erfolgreich Animation */
+.mblock-copy-btn.is-copied {
+    background-color: var(--mblock-success-background, #28a745) !important;
+    border-color: var(--mblock-success-border, #28a745) !important;
+    color: white !important;
+    transform: scale(0.95);
+    transition: all 0.15s ease;
+}
+
+.mblock-copy-btn.is-copied::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+    opacity: 1;
+    animation: checkmarkFadeIn 0.3s ease;
+}
+
+@keyframes checkmarkFadeIn {
+    0% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(0.5); 
+    }
+    100% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1); 
+    }
+}
+
+/* Paste Button deaktiviert Zustand verbessern */
+.mblock-paste-btn:disabled,
+.mblock-paste-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: var(--mblock-control-background-disabled) !important;
+    border-color: var(--mblock-control-border) !important;
+    color: var(--mblock-control-color-disabled) !important;
+}
+
+/* Copy/Paste Toolbar verbessertes Styling */
+.mblock-copy-paste-toolbar {
+    margin-bottom: 15px;
+    padding: 8px 12px;
+    background: var(--mblock-toolbar-background, rgba(248, 249, 250, 0.8));
+    border: 1px solid var(--mblock-toolbar-border, #dee2e6);
+    border-radius: var(--mblock-border-radius);
+    backdrop-filter: blur(4px);
+}
+
+.mblock-copy-paste-toolbar .btn-group {
+    margin-right: 8px;
+}
+
+.mblock-copy-paste-toolbar .btn-group:last-child {
+    margin-right: 0;
+}
+
+/* Responsive Verhalten für kleine Bildschirme */
+@media (max-width: 768px) {
+    .mblock-copy-paste-toolbar {
+        padding: 6px 8px;
+        margin-bottom: 10px;
+    }
+    
+    .mblock-copy-paste-toolbar .btn {
+        font-size: 11px;
+        padding: 3px 5px;
+    }
+}
+
+/* Dark Mode für Copy/Paste Komponenten */
+body.rex-theme-dark .mblock-copy-paste-toolbar,
+html[data-bs-theme="dark"] .mblock-copy-paste-toolbar {
+    --mblock-toolbar-background: rgba(33, 37, 41, 0.8);
+    --mblock-toolbar-border: rgba(255, 255, 255, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) .mblock-copy-paste-toolbar {
+        --mblock-toolbar-background: rgba(33, 37, 41, 0.8);
+        --mblock-toolbar-border: rgba(255, 255, 255, 0.1);
+    }
+}
