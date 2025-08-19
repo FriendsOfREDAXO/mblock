@@ -490,9 +490,11 @@ function mblock_update_rex_ids($element, sindex, mblock_count, eindex) {
             }
         }
 
-        // INPUT-Elemente (REX_LINKLIST, REX_MEDIALIST)
+        // INPUT-Elemente (REX_MEDIA, REX_LINKLIST, REX_MEDIALIST)
         if (nodeName === 'INPUT' && 
-            (elementId.indexOf('REX_LINKLIST_') >= 0 || elementId.indexOf('REX_MEDIALIST_') >= 0)) {
+            (elementId.indexOf('REX_MEDIA_') >= 0 || 
+             elementId.indexOf('REX_LINKLIST_') >= 0 || 
+             elementId.indexOf('REX_MEDIALIST_') >= 0)) {
             
             const parentEindex = $element.parent().data('eindex') || eindex;
             const newId = elementId.replace(/\d+/, sindex + mblock_count + '00' + parentEindex);
