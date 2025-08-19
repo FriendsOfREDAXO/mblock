@@ -145,10 +145,6 @@
     color: var(--mblock-text-color);
 }
 
-.mblock_wrapper > div:hover {
-    box-shadow: var(--mblock-shadow-hover);
-    transform: var(--mblock-transform-hover);
-}
 
 /* 🎨 Dark Mode Consistency - REDAXO Dark Theme + Bootstrap 5 */
 body.rex-theme-dark .mblock_wrapper,
