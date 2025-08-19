@@ -54,6 +54,7 @@ rex_form_mblock_demo_entries_add = Add demo entry
 rex_form_mblock_demo_entries_edit = Edit demo entry
 
 # Clipboard functionality
+mblock_add_element = Add new element
 mblock_copy_element = Copy element
 mblock_paste_element = Paste element
 mblock_copy_element = Copy element

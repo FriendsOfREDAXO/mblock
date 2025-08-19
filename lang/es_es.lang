@@ -50,6 +50,7 @@ rex_form_mblock_demo_entries_add = Agregue una entrada de demostración
 rex_form_mblock_demo_entries_edit = Editar una entrada de demostración
 
 # Clipboard functionality
+mblock_add_element = Agregar nuevo elemento
 mblock_copy_element = Copiar elemento
 mblock_paste_element = Pegar elemento
 mblock_clear_clipboard = Limpiar portapapeles

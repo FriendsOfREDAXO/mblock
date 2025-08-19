@@ -45,6 +45,7 @@ mblock_delete_confirm_label = Confirmação antes da exclusão
 mblock_delete_confirm = Deletar o bloco?
 
 # Clipboard functionality
+mblock_add_element = Adicionar novo elemento
 mblock_copy_element = Copiar elemento
 mblock_paste_element = Colar elemento
 mblock_clear_clipboard = Limpar área de transferência

@@ -190,6 +190,7 @@ div.sortable-ghost::before {
     border-color: #adb5bd;
     transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    color: #495057; /* Explicit text color for light mode */
 }
 
 .mblock_wrapper span.removeadded .btn[disabled] {
@@ -532,28 +533,40 @@ html[data-bs-theme="dark"] .mblock-paste-btn:hover:not(.disabled) {
 
 /* Online/Offline Toggle Funktionalität */
 .mblock-online-toggle {
-    /* Remove absolute positioning to fix hover effect */
     position: relative;
     z-index: 5;
     transition: all 0.2s ease;
 }
 
 .mblock-online-toggle:hover {
-    /* Prevent movement on hover */
     transform: none !important;
 }
 
 .mblock-online-toggle .btn {
-    padding: 4px 8px;
-    font-size: 11px;
+    padding: 4px 8px !important; /* Reduced padding to fit in 70px */
+    font-size: 10px !important; /* Smaller font to fit better */
     border-radius: 12px;
     font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px; /* Reduced letter spacing */
     transition: all 0.2s ease;
     border: none;
-    min-width: 60px;
+    width: 70px !important; /* Force exact width */
+    min-width: 70px !important; /* Ensure minimum */
+    max-width: 70px !important; /* Ensure maximum */
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    box-sizing: border-box; /* Ensure padding is included in width */
+    overflow: hidden; /* Hide text overflow if needed */
+}
+
+.mblock-online-toggle .btn .rex-icon {
+    margin-right: 4px; /* Add space between icon and text */
+    margin-left: 0;
+    font-size: 12px;
 }
 
 .mblock-online-toggle .btn-online {
@@ -653,6 +666,13 @@ html[data-bs-theme="dark"] .mblock_wrapper > div.mblock-offline::before {
     background: #28a745 !important;
     border-color: #28a745 !important;
     color: #fff !important;
+    width: 70px !important;
+    min-width: 70px !important;
+    max-width: 70px !important;
+    padding: 4px 8px !important;
+    font-size: 10px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
 }
 
 .mblock_wrapper span.removeadded .btn.mblock-offline-toggle-btn.btn-success:hover {
@@ -667,6 +687,13 @@ html[data-bs-theme="dark"] .mblock_wrapper > div.mblock-offline::before {
     background: #dc3545 !important;
     border-color: #dc3545 !important;
     color: #fff !important;
+    width: 70px !important;
+    min-width: 70px !important;
+    max-width: 70px !important;
+    padding: 4px 8px !important;
+    font-size: 10px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
 }
 
 .mblock_wrapper span.removeadded .btn.mblock-offline-toggle-btn.btn-danger:hover {
