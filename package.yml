@@ -1,5 +1,5 @@
 package: mblock
-version: 4.0.0-beta5
+version: 4.0.0-beta6
 name: MBlock
 author: Friends Of REDAXO
 supportpage: https://github.com/FriendsOfREDAXO/mblock
@@ -25,5 +25,3 @@ requires:
     redaxo: ^5.18.0
     packages:
         bloecks: '^5.2.0'
-
-           
