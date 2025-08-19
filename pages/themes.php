@@ -6,8 +6,6 @@
  * @since 4.0.0
  */
 
-echo rex_view::title('MBlock Theme System');
-
 $content = '
 <div class="row">
     <div class="col-lg-12">
@@ -35,6 +33,10 @@ $content = '
     /* Toggle Button Breite anpassen */
     --mblock-toggle-width: 80px;
 }</code></pre>
+
+                <div class="alert alert-success">
+                    <strong>✅ Dark Mode Ready:</strong> MBlock 4.0 unterstützt automatisch REDAXO Dark Theme, Bootstrap 5 Dark Mode und System Dark Mode (prefers-color-scheme)!
+                </div>
 
                 <div class="alert alert-info">
                     <strong>💡 Tipp:</strong> Fügen Sie Ihr CSS nach dem MBlock CSS ein, damit Ihre Variablen Vorrang haben.
@@ -94,6 +96,21 @@ $content = '
                             <td><code>--mblock-margin</code></td>
                             <td>0 0 10px 0</td>
                             <td>Block Außenabstand</td>
+                        </tr>
+                        <tr>
+                            <td><code>--mblock-transition</code></td>
+                            <td>all 0.2s ease</td>
+                            <td>Block Transition-Effekt</td>
+                        </tr>
+                        <tr>
+                            <td><code>--mblock-transform-hover</code></td>
+                            <td>translateY(-1px)</td>
+                            <td>Block Transform beim Hover</td>
+                        </tr>
+                        <tr>
+                            <td><code>--mblock-text-color</code></td>
+                            <td>inherit</td>
+                            <td>Block Textfarbe</td>
                         </tr>
                     </tbody>
                 </table>
@@ -199,7 +216,78 @@ $content = '
             </div>
         </div>
     </div>
-    
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-header">
+                <div class="panel-title">🌙 Dark Mode Variablen</div>
+            </div>
+            <div class="panel-body">
+                <p>MBlock 4.0 unterstützt automatisch drei Dark Mode Systeme:</p>
+                <ul>
+                    <li><strong>REDAXO Dark Theme:</strong> <code>body.rex-theme-dark</code></li>
+                    <li><strong>Bootstrap 5 Dark Mode:</strong> <code>html[data-bs-theme="dark"]</code></li>
+                    <li><strong>System Dark Mode:</strong> <code>@media (prefers-color-scheme: dark)</code> mit <code>body:not(.rex-theme-light)</code></li>
+                </ul>
+                
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Variable</th>
+                            <th>Standard</th>
+                            <th>Beschreibung</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>--mblock-dark-background</code></td>
+                            <td>rgba(255, 255, 255, 0.05)</td>
+                            <td>Dark Mode Hintergrund</td>
+                        </tr>
+                        <tr>
+                            <td><code>--mblock-dark-border-color</code></td>
+                            <td>rgba(255, 255, 255, 0.15)</td>
+                            <td>Dark Mode Rahmenfarbe</td>
+                        </tr>
+                        <tr>
+                            <td><code>--mblock-dark-shadow</code></td>
+                            <td>0 5px 15px rgba(0,0,0,.3)</td>
+                            <td>Dark Mode Schatten</td>
+                        </tr>
+                        <tr>
+                            <td><code>--mblock-dark-text-color</code></td>
+                            <td>#e9ecef</td>
+                            <td>Dark Mode Textfarbe</td>
+                        </tr>
+                        <tr>
+                            <td><code>--mblock-dark-drag-color</code></td>
+                            <td>#adb5bd</td>
+                            <td>Dark Mode Drag Handle</td>
+                        </tr>
+                        <tr>
+                            <td><code>--mblock-dark-control-background</code></td>
+                            <td>#495057</td>
+                            <td>Dark Mode Control Buttons</td>
+                        </tr>
+                        <tr>
+                            <td><code>--mblock-dark-add-background</code></td>
+                            <td>#198754</td>
+                            <td>Dark Mode Add Button</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="alert alert-info">
+                    <strong>💡 Custom Dark Mode:</strong> Sie können eigene Dark Mode Variablen definieren, die automatisch aktiviert werden.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
     <div class="col-lg-6">
         <div class="panel panel-default">
             <div class="panel-header">
@@ -451,6 +539,38 @@ $content = '
 --mblock-copy-glow-color-mid: rgba(0, 123, 255, 0.25);
 --mblock-copy-glow-shadow: 0 0 25px rgba(0, 123, 255, 0.4);</code></pre>
                 </details>
+                
+                <h4>🌙 Dark Mode Anpassung</h4>
+                <p>Erstellen Sie eigene Dark Mode Themes mit den Dark Mode Variablen:</p>
+                
+                <pre><code>/* Custom Purple Dark Theme */
+:root {
+    /* Light Mode Überschreibungen */
+    --mblock-add-background: #9c27b0;
+    --mblock-add-background-hover: #7b1fa2;
+    
+    /* Dark Mode Überschreibungen */
+    --mblock-dark-background: rgba(156, 39, 176, 0.08);
+    --mblock-dark-border-color: rgba(156, 39, 176, 0.3);
+    --mblock-dark-add-background: #ab47bc;
+    --mblock-dark-add-background-hover: #8e24aa;
+}
+
+/* Automatische Dark Mode Aktivierung */
+body.rex-theme-dark .mblock_wrapper,
+html[data-bs-theme="dark"] .mblock_wrapper {
+    /* Verwendet automatisch die --mblock-dark-* Variablen */
+}
+
+@media (prefers-color-scheme: dark) {
+    body:not(.rex-theme-light) .mblock_wrapper {
+        /* System Dark Mode Support */
+    }
+}</code></pre>
+
+                <div class="alert alert-success">
+                    <strong>✅ Automatisch:</strong> Dark Mode Variablen werden automatisch in allen unterstützten Dark Mode Kontexten angewendet!
+                </div>
                 
                 <div class="alert alert-warning mt-3">
                     <strong>⚠️ Hinweis:</strong> Das Theme System ist ab MBlock 4.0 verfügbar. Stellen Sie sicher, dass Sie die aktuelle Version verwenden.

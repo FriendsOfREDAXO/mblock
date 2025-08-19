@@ -1,3 +1,130 @@
+/* 🎨 MBlock Theme Variables - Customizable Design System
+ * ========================================================
+ * Diese CSS-Variablen ermöglichen einfache Theme-Anpassungen.
+ * Überschreiben Sie diese Variablen in Ihrem eigenen CSS für Custom Themes.
+ */
+:root {
+    /* === Block Container === */
+    --mblock-border-color: rgba(100, 100, 100, 0.20);
+    --mblock-background: rgba(255, 255, 255, 0.09);
+    --mblock-shadow: 0 5px 15px rgba(0,0,0,.08);
+    --mblock-shadow-hover: 0 2px 8px rgba(0,0,0,0.12);
+    --mblock-border-radius: 4px;
+    --mblock-padding: 40px 15px 20px 30px;
+    --mblock-margin: 0 0 10px 0;
+    --mblock-transition: all 0.2s ease;
+    --mblock-transform-hover: translateY(-1px);
+    --mblock-text-color: inherit;
+    
+    /* === Drag Handle === */
+    --mblock-drag-color: #6c757d;
+    --mblock-drag-color-hover: #495057;
+    --mblock-drag-opacity: 0.6;
+    --mblock-drag-opacity-hover: 1;
+    --mblock-drag-font-size: 14px;
+    --mblock-drag-position-top: 8px;
+    --mblock-drag-position-left: 8px;
+    --mblock-drag-letter-spacing: -2px;
+    
+    /* === Buttons Base === */
+    --mblock-button-border-radius: 4px;
+    --mblock-button-font-size: 12px;
+    --mblock-button-padding: 4px 6px;
+    --mblock-button-min-size: 28px;
+    --mblock-button-transition: all 0.2s ease;
+    --mblock-button-shadow-hover: 0 2px 4px rgba(0,0,0,0.1);
+    --mblock-button-transform-hover: translateY(-1px);
+    
+    /* === Control Buttons (Copy, Remove, etc.) === */
+    --mblock-control-background: #f8f9fa;
+    --mblock-control-border: #dee2e6;
+    --mblock-control-color: #495057;
+    --mblock-control-background-hover: #e9ecef;
+    --mblock-control-border-hover: #adb5bd;
+    --mblock-control-background-disabled: #f8f9fa;
+    --mblock-control-color-disabled: #6c757d;
+    
+    /* === Add Button === */
+    --mblock-add-background: #28a745;
+    --mblock-add-border: #28a745;
+    --mblock-add-color: white;
+    --mblock-add-background-hover: #218838;
+    --mblock-add-border-hover: #1e7e34;
+    --mblock-add-shadow-hover: 0 4px 12px rgba(40, 167, 69, 0.3);
+    --mblock-add-transform-hover: translateY(-2px);
+    --mblock-add-padding: 8px 16px;
+    --mblock-add-gap: 6px;
+    
+    /* === Online/Offline Toggle === */
+    --mblock-toggle-width: 70px;
+    --mblock-toggle-padding: 4px 8px;
+    --mblock-toggle-font-size: 10px;
+    --mblock-toggle-border-radius: 12px;
+    --mblock-toggle-letter-spacing: 0.3px;
+    --mblock-toggle-gap: 3px;
+    
+    /* Online State */
+    --mblock-online-background: linear-gradient(135deg, #28a745, #20c997);
+    --mblock-online-color: white;
+    --mblock-online-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+    --mblock-online-background-hover: linear-gradient(135deg, #218838, #17a085);
+    --mblock-online-shadow-hover: 0 3px 8px rgba(40, 167, 69, 0.4);
+    
+    /* Offline State */
+    --mblock-offline-background: linear-gradient(135deg, #6c757d, #495057);
+    --mblock-offline-color: white;
+    --mblock-offline-shadow: 0 2px 4px rgba(108, 117, 125, 0.3);
+    --mblock-offline-background-hover: linear-gradient(135deg, #5a6268, #343a40);
+    --mblock-offline-shadow-hover: 0 3px 8px rgba(108, 117, 125, 0.4);
+    
+    /* Offline Block State */
+    --mblock-offline-block-opacity: 0.6;
+    --mblock-offline-block-background: rgba(248, 249, 250, 0.5);
+    --mblock-offline-block-border: #6c757d;
+    --mblock-offline-pattern: repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(108, 117, 125, 0.1) 8px, rgba(108, 117, 125, 0.1) 16px);
+    
+    /* === Copy & Paste Toolbar === */
+    --mblock-toolbar-background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    --mblock-toolbar-border: #dee2e6;
+    --mblock-toolbar-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    --mblock-toolbar-shadow-hover: 0 4px 8px rgba(0,0,0,0.1);
+    --mblock-toolbar-padding: 10px 15px;
+    --mblock-toolbar-margin: 10px;
+    --mblock-toolbar-border-radius: 6px;
+    --mblock-toolbar-gap: 8px;
+    
+    /* === Sortable Ghost === */
+    --mblock-ghost-opacity: 0.6;
+    --mblock-ghost-background: rgba(248, 249, 250, 0.9);
+    --mblock-ghost-border: 2px dashed #007bff;
+    --mblock-ghost-padding: 8px;
+    --mblock-ghost-margin: 4px 0;
+    --mblock-ghost-shimmer: linear-gradient(90deg, transparent, rgba(0, 123, 255, 0.1), transparent);
+    
+    /* === Dark Mode Variables === */
+    --mblock-dark-border-color: rgba(255, 255, 255, 0.15);
+    --mblock-dark-background: rgba(255, 255, 255, 0.05);
+    --mblock-dark-shadow: 0 5px 15px rgba(0,0,0,.3);
+    --mblock-dark-shadow-hover: 0 2px 8px rgba(0,0,0,0.4);
+    --mblock-dark-border-color-hover: rgba(255, 255, 255, 0.25);
+    --mblock-dark-text-color: #e9ecef;
+    
+    --mblock-dark-drag-color: #adb5bd;
+    --mblock-dark-drag-color-hover: #dee2e6;
+    
+    --mblock-dark-control-background: #495057;
+    --mblock-dark-control-border: #6c757d;
+    --mblock-dark-control-color: #e9ecef;
+    --mblock-dark-control-background-hover: #6c757d;
+    --mblock-dark-control-border-hover: #adb5bd;
+    
+    --mblock-dark-add-background: #198754;
+    --mblock-dark-add-border: #198754;
+    --mblock-dark-add-background-hover: #146c43;
+    --mblock-dark-add-border-hover: #13653f;
+    --mblock-dark-add-shadow-hover: 0 4px 12px rgba(25, 135, 84, 0.4);
+}
+
 /* MBlock Wrapper - Bloecks-Style Design */
 .mblock_wrapper {
     margin: auto;
@@ -7,48 +134,126 @@
 }
 
 .mblock_wrapper > div {
-    border: 1px solid rgba(100, 100, 100, 0.20);
-    background: rgba(255, 255, 255, 0.09);
-    margin: 0 0 10px 0;
-    padding: 40px 15px 20px 30px;
+    border: 1px solid var(--mblock-border-color);
+    background: var(--mblock-background);
+    margin: var(--mblock-margin);
+    padding: var(--mblock-padding);
     position: relative;
-    box-shadow: 0 5px 15px rgba(0,0,0,.08);
-    border-radius: 4px;
-    transition: all 0.2s ease;
+    box-shadow: var(--mblock-shadow);
+    border-radius: var(--mblock-border-radius);
+    transition: var(--mblock-transition);
+    color: var(--mblock-text-color);
 }
 
 .mblock_wrapper > div:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-    transform: translateY(-1px);
+    box-shadow: var(--mblock-shadow-hover);
+    transform: var(--mblock-transform-hover);
 }
 
-/* 🎨 Dark Mode Consistency - REDAXO Dark Theme */
+/* 🎨 Dark Mode Consistency - REDAXO Dark Theme + Bootstrap 5 */
+body.rex-theme-dark .mblock_wrapper,
+html[data-bs-theme="dark"] .mblock_wrapper {
+    background: var(--mblock-dark-background);
+    color: var(--mblock-dark-text-color);
+}
+
 body.rex-theme-dark .mblock_wrapper > div,
 html[data-bs-theme="dark"] .mblock_wrapper > div {
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    background: rgba(255, 255, 255, 0.05);
-    box-shadow: 0 5px 15px rgba(0,0,0,.3);
+    border-color: var(--mblock-dark-border-color);
+    background: var(--mblock-dark-background);
+    box-shadow: var(--mblock-dark-shadow);
+    color: var(--mblock-dark-text-color);
 }
 
 body.rex-theme-dark .mblock_wrapper > div:hover,
 html[data-bs-theme="dark"] .mblock_wrapper > div:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-    transform: translateY(-1px);
-    border-color: rgba(255, 255, 255, 0.25);
+    box-shadow: var(--mblock-dark-shadow-hover);
+    border-color: var(--mblock-dark-border-color-hover);
+}
+
+body.rex-theme-dark .mblock_wrapper span.sorthandle,
+html[data-bs-theme="dark"] .mblock_wrapper span.sorthandle {
+    color: var(--mblock-dark-drag-color);
+}
+
+body.rex-theme-dark .mblock_wrapper span.sorthandle:hover,
+html[data-bs-theme="dark"] .mblock_wrapper span.sorthandle:hover {
+    color: var(--mblock-dark-drag-color-hover);
+}
+
+body.rex-theme-dark .mblock_wrapper span.removeadded .btn,
+html[data-bs-theme="dark"] .mblock_wrapper span.removeadded .btn {
+    background: var(--mblock-dark-control-background);
+    border-color: var(--mblock-dark-control-border);
+    color: var(--mblock-dark-control-color);
+}
+
+body.rex-theme-dark .mblock_wrapper span.removeadded .btn:hover:not([disabled]),
+html[data-bs-theme="dark"] .mblock_wrapper span.removeadded .btn:hover:not([disabled]) {
+    background: var(--mblock-dark-control-background-hover);
+    border-color: var(--mblock-dark-control-border-hover);
+}
+
+body.rex-theme-dark .btn.addme,
+html[data-bs-theme="dark"] .btn.addme {
+    background: var(--mblock-dark-add-background);
+    border-color: var(--mblock-dark-add-border);
+}
+
+body.rex-theme-dark .btn.addme:hover:not([disabled]),
+html[data-bs-theme="dark"] .btn.addme:hover:not([disabled]) {
+    background: var(--mblock-dark-add-background-hover);
+    border-color: var(--mblock-dark-add-border-hover);
+    box-shadow: var(--mblock-dark-add-shadow-hover);
 }
 
 /* 🎨 System Dark Mode (prefers-color-scheme) */
 @media (prefers-color-scheme: dark) {
-    body.rex-has-theme:not(.rex-theme-light) .mblock_wrapper > div {
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        background: rgba(255, 255, 255, 0.05);
-        box-shadow: 0 5px 15px rgba(0,0,0,.3);
+    body:not(.rex-theme-light) .mblock_wrapper {
+        background: var(--mblock-dark-background);
+        color: var(--mblock-dark-text-color);
+    }
+
+    body:not(.rex-theme-light) .mblock_wrapper > div {
+        border-color: var(--mblock-dark-border-color);
+        background: var(--mblock-dark-background);
+        box-shadow: var(--mblock-dark-shadow);
+        color: var(--mblock-dark-text-color);
     }
     
-    body.rex-has-theme:not(.rex-theme-light) .mblock_wrapper > div:hover {
-        box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-        transform: translateY(-1px);
-        border-color: rgba(255, 255, 255, 0.25);
+    body:not(.rex-theme-light) .mblock_wrapper > div:hover {
+        box-shadow: var(--mblock-dark-shadow-hover);
+        border-color: var(--mblock-dark-border-color-hover);
+    }
+
+    body:not(.rex-theme-light) .mblock_wrapper span.sorthandle {
+        color: var(--mblock-dark-drag-color);
+    }
+
+    body:not(.rex-theme-light) .mblock_wrapper span.sorthandle:hover {
+        color: var(--mblock-dark-drag-color-hover);
+    }
+
+    body:not(.rex-theme-light) .mblock_wrapper span.removeadded .btn {
+        background: var(--mblock-dark-control-background);
+        border-color: var(--mblock-dark-control-border);
+        color: var(--mblock-dark-control-color);
+    }
+
+    body:not(.rex-theme-light) .mblock_wrapper span.removeadded .btn:hover:not([disabled]) {
+        background: var(--mblock-dark-control-background-hover);
+        border-color: var(--mblock-dark-control-border-hover);
+    }
+
+    body:not(.rex-theme-light) .btn.addme {
+        background: var(--mblock-dark-add-background);
+        border-color: var(--mblock-dark-add-border);
+    }
+
+    body:not(.rex-theme-light) .btn.addme:hover:not([disabled]) {
+        background: var(--mblock-dark-add-background-hover);
+        border-color: var(--mblock-dark-add-border-hover);
+        box-shadow: var(--mblock-dark-add-shadow-hover);
     }
 }
 
@@ -56,14 +261,14 @@ html[data-bs-theme="dark"] .mblock_wrapper > div:hover {
 .mblock_wrapper span.sorthandle {
     cursor: grab;
     position: absolute;
-    top: 8px;
-    left: 8px;
-    opacity: 0.6;
-    color: #6c757d;
-    font-size: 14px;
+    top: var(--mblock-drag-position-top);
+    left: var(--mblock-drag-position-left);
+    opacity: var(--mblock-drag-opacity);
+    color: var(--mblock-drag-color);
+    font-size: var(--mblock-drag-font-size);
     font-weight: bold;
-    letter-spacing: -2px;
-    transition: all 0.2s ease;
+    letter-spacing: var(--mblock-drag-letter-spacing);
+    transition: var(--mblock-transition);
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -71,34 +276,13 @@ html[data-bs-theme="dark"] .mblock_wrapper > div:hover {
 }
 
 .mblock_wrapper span.sorthandle:hover {
-    opacity: 1;
-    color: #495057;
+    opacity: var(--mblock-drag-opacity-hover);
+    color: var(--mblock-drag-color-hover);
     cursor: grab;
 }
 
 .mblock_wrapper span.sorthandle:active {
     cursor: grabbing;
-}
-
-/* 🎨 Drag Handle Dark Mode */
-body.rex-theme-dark .mblock_wrapper span.sorthandle,
-html[data-bs-theme="dark"] .mblock_wrapper span.sorthandle {
-    color: #adb5bd;
-}
-
-body.rex-theme-dark .mblock_wrapper span.sorthandle:hover,
-html[data-bs-theme="dark"] .mblock_wrapper span.sorthandle:hover {
-    color: #dee2e6;
-}
-
-@media (prefers-color-scheme: dark) {
-    body.rex-has-theme:not(.rex-theme-light) .mblock_wrapper span.sorthandle {
-        color: #adb5bd;
-    }
-    
-    body.rex-has-theme:not(.rex-theme-light) .mblock_wrapper span.sorthandle:hover {
-        color: #dee2e6;
-    }
 }
 
 .mblock_wrapper span.sorthandle::before {
@@ -171,33 +355,33 @@ div.sortable-ghost::before {
 
 .mblock_wrapper span.removeadded .btn {
     cursor: pointer;
-    padding: 4px 6px;
-    font-size: 12px;
-    border-radius: 4px;
-    border: 1px solid #dee2e6;
-    background: #f8f9fa;
-    color: #495057;
-    transition: all 0.2s ease;
+    padding: var(--mblock-button-padding);
+    font-size: var(--mblock-button-font-size);
+    border-radius: var(--mblock-button-border-radius);
+    border: 1px solid var(--mblock-control-border);
+    background: var(--mblock-control-background);
+    color: var(--mblock-control-color);
+    transition: var(--mblock-button-transition);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 28px;
-    min-height: 28px;
+    min-width: var(--mblock-button-min-size);
+    min-height: var(--mblock-button-min-size);
 }
 
 .mblock_wrapper span.removeadded .btn:hover:not([disabled]) {
-    background: #e9ecef;
-    border-color: #adb5bd;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    color: #495057; /* Explicit text color for light mode */
+    background: var(--mblock-control-background-hover);
+    border-color: var(--mblock-control-border-hover);
+    transform: var(--mblock-button-transform-hover);
+    box-shadow: var(--mblock-button-shadow-hover);
+    color: var(--mblock-control-color);
 }
 
 .mblock_wrapper span.removeadded .btn[disabled] {
     cursor: default;
     opacity: 0.5;
-    background: #f8f9fa;
-    color: #6c757d;
+    background: var(--mblock-control-background-disabled);
+    color: var(--mblock-control-color-disabled);
     transform: none !important;
     box-shadow: none !important;
 }
@@ -245,25 +429,25 @@ div.sortable-ghost::before {
 
 /* Add Button (Bloecks-Style) */
 .btn.addme {
-    background: #28a745;
-    border-color: #28a745;
-    color: white;
+    background: var(--mblock-add-background);
+    border-color: var(--mblock-add-border);
+    color: var(--mblock-add-color);
     font-weight: 500;
-    transition: all 0.2s ease;
-    border-radius: 4px;
-    padding: 8px 16px;
+    transition: var(--mblock-button-transition);
+    border-radius: var(--mblock-button-border-radius);
+    padding: var(--mblock-add-padding);
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--mblock-add-gap);
     text-decoration: none;
 }
 
 .btn.addme:hover:not([disabled]) {
-    background: #218838;
-    border-color: #1e7e34;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-    color: white;
+    background: var(--mblock-add-background-hover);
+    border-color: var(--mblock-add-border-hover);
+    transform: var(--mblock-add-transform-hover);
+    box-shadow: var(--mblock-add-shadow-hover);
+    color: var(--mblock-add-color);
     text-decoration: none;
 }
 
@@ -281,36 +465,7 @@ div.sortable-ghost::before {
     cursor: not-allowed;
 }
 
-/* 🎨 Add Button Dark Mode */
-body.rex-theme-dark .btn.addme,
-html[data-bs-theme="dark"] .btn.addme {
-    background: #198754;
-    border-color: #198754;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-body.rex-theme-dark .btn.addme:hover:not([disabled]),
-html[data-bs-theme="dark"] .btn.addme:hover:not([disabled]) {
-    background: #146c43;
-    border-color: #13653f;
-    box-shadow: 0 4px 12px rgba(25, 135, 84, 0.4);
-    color: white;
-}
-
-@media (prefers-color-scheme: dark) {
-    body.rex-has-theme:not(.rex-theme-light) .btn.addme {
-        background: #198754;
-        border-color: #198754;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-    
-    body.rex-has-theme:not(.rex-theme-light) .btn.addme:hover:not([disabled]) {
-        background: #146c43;
-        border-color: #13653f;
-        box-shadow: 0 4px 12px rgba(25, 135, 84, 0.4);
-        color: white;
-    }
-}
+/* === Toggle Button Styles === */
 
 .btn.addme i,
 .btn.addme .rex-icon {

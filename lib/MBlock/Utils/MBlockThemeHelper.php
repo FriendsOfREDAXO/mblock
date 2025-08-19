@@ -1,104 +1,167 @@
 <?php
 /**
- * @author mail[at]joachim-doerr[dot]com Joachim Doerr
- * @package redaxo5
- * @license MIT
+ * MBlock Theme Helper
+ * 
+ * @package redaxo\mblock
+ * @author Friends Of REDAXO
+ * @since 4.0.0
  */
-
-
 
 namespace FriendsOfRedaxo\MBlock\Utils;
 
-use rex_file;
-use rex_path;
+use rex;
+use rex_addon;
+use rex_view;
 
 class MBlockThemeHelper
 {
     /**
+     * Get available themes information
+     * 
      * @return array
      */
     public static function getThemesInformation()
     {
-        $themeInfo = array();
-        $path = implode('/', array('templates'));
-        foreach (scandir(rex_path::addonData('mblock', $path)) as $item) {
-            if ($item == '.' or $item == '..') {
-                continue;
-            }
-            $path = implode('/', array('templates', $item));
-            if (is_dir(rex_path::addonData('mblock', $path))) {
-                $dirName = explode('_', $item);
-                $themeInfo[$item] = array(
-                    'theme_name' => $dirName[0],
-                    'theme_screen_name' => ucwords(str_replace('_', ' ', $item)),
-                    'theme_path' => $item
-                );
-                foreach (scandir(rex_path::addonData('mblock', $path)) as $file) {
-                    if (pathinfo($file, PATHINFO_EXTENSION) == 'css') {
-                        $path = implode('/', array('templates', $item, $file));
-                        $themeInfo[$item]['theme_css_data'][] = rex_path::addonData('mblock', $path);
-
-                        if (file_exists(rex_path::addonAssets('mblock', $path))) {
-                            $themeInfo[$item]['theme_css_assets'][] = array(
-                                'full_path' => rex_path::addonAssets('mblock', $path),
-                                'path' => $path
-                            );
-                        }
-                    }
-                }
-            }
-        }
-        // return theme info array
-        return $themeInfo;
+        $themes = [];
+        
+        // Standard Theme
+        $themes[] = [
+            'theme_path' => 'default',
+            'theme_screen_name' => 'Standard Theme',
+            'theme_description' => 'Das klassische MBlock Design mit CSS Custom Properties',
+            'theme_version' => '4.0.0'
+        ];
+        
+        // Glass Morphing Theme
+        $themes[] = [
+            'theme_path' => 'glass',
+            'theme_screen_name' => 'Glass Morphing',
+            'theme_description' => 'Modernes Glasmorphismus Design mit Backdrop-Filter',
+            'theme_version' => '4.0.0'
+        ];
+        
+        return $themes;
     }
-
+    
     /**
-     * @author Joachim Doerr
+     * Get current theme
+     * 
+     * @return string
      */
-    public static function copyThemeCssToAssets()
+    public static function getCurrentTheme()
     {
-        // copy all theme css files to assets folder
-        foreach (self::getThemesInformation() as $theme) {
-            if (array_key_exists('theme_css_data', $theme)) {
-                #rex_file::copy($theme, );
-                foreach ($theme['theme_css_data'] as $css) {
-                    rex_file::copy($css, rex_path::addonAssets('mblock', implode('/', array('templates', $theme['theme_path'], pathinfo($css, PATHINFO_BASENAME)))));
-                }
-            }
+        $addon = rex_addon::get('mblock');
+        return $addon->getConfig('mblock_theme', 'default');
+    }
+    
+    /**
+     * Get theme CSS file path
+     * 
+     * @param string $theme
+     * @return string
+     */
+    public static function getThemeCssPath($theme = null)
+    {
+        if ($theme === null) {
+            $theme = self::getCurrentTheme();
+        }
+        
+        $addon = rex_addon::get('mblock');
+        $assetsPath = $addon->getAssetsPath();
+        
+        switch ($theme) {
+            case 'glass':
+                return $assetsPath . 'mblock_theme_glass.css';
+            case 'default':
+            default:
+                return $assetsPath . 'mblock.css';
         }
     }
-
+    
     /**
-     * @param $theme
-     * @return array
-     * @author Joachim Doerr
+     * Get theme CSS URL
+     * 
+     * @param string $theme
+     * @return string
      */
-    public static function getCssAssets($theme)
+    public static function getThemeCssUrl($theme = null)
     {
-        $themeInfo = self::getThemesInformation();
-        $cssList = array();
-        if (array_key_exists($theme, $themeInfo) && array_key_exists('theme_css_assets', $themeInfo[$theme])) {
-            foreach ($themeInfo[$theme]['theme_css_assets'] as $css) {
-                $cssList[] = $css['path'];
-            }
+        if ($theme === null) {
+            $theme = self::getCurrentTheme();
         }
-        return $cssList;
+        
+        $addon = rex_addon::get('mblock');
+        $assetsUrl = $addon->getAssetsUrl();
+        
+        switch ($theme) {
+            case 'glass':
+                return $assetsUrl . 'mblock_theme_glass.css';
+            case 'default':
+            default:
+                return $assetsUrl . 'mblock.css';
+        }
     }
-
+    
     /**
-     * @param $theme
-     * @author Joachim Doerr
+     * Include current theme CSS
      */
-    public static function themeBootCheck($theme)
+    public static function includeThemeCSS()
     {
-        $themeInfo = self::getThemesInformation();
-        if (array_key_exists($theme, $themeInfo)
-            && (
-                !array_key_exists('theme_css_assets', $themeInfo[$theme])
-                && array_key_exists('theme_css_data', $themeInfo[$theme])
-            )
-        ) {
-            self::copyThemeCssToAssets();
+        $theme = self::getCurrentTheme();
+        $cssUrl = self::getThemeCssUrl($theme);
+        
+        // Include CSS in backend
+        if (rex::isBackend()) {
+            rex_view::addCssFile($cssUrl);
         }
+    }
+    
+    /**
+     * Get theme preview HTML
+     * 
+     * @param string $theme
+     * @return string
+     */
+    public static function getThemePreview($theme)
+    {
+        $preview = '<div class="mblock-theme-preview" data-theme="' . $theme . '">';
+        
+        switch ($theme) {
+            case 'glass':
+                $preview .= '
+                    <div class="mblock-preview-block glass-effect">
+                        <div class="mblock-preview-drag">⋮⋮</div>
+                        <div class="mblock-preview-content">
+                            <div class="mblock-preview-field"></div>
+                            <div class="mblock-preview-field"></div>
+                        </div>
+                        <div class="mblock-preview-buttons">
+                            <span class="btn-preview glass-btn">+</span>
+                            <span class="btn-preview glass-btn">×</span>
+                        </div>
+                    </div>
+                ';
+                break;
+            case 'default':
+            default:
+                $preview .= '
+                    <div class="mblock-preview-block default-effect">
+                        <div class="mblock-preview-drag">⋮⋮</div>
+                        <div class="mblock-preview-content">
+                            <div class="mblock-preview-field"></div>
+                            <div class="mblock-preview-field"></div>
+                        </div>
+                        <div class="mblock-preview-buttons">
+                            <span class="btn-preview default-btn">+</span>
+                            <span class="btn-preview default-btn">×</span>
+                        </div>
+                    </div>
+                ';
+                break;
+        }
+        
+        $preview .= '</div>';
+        
+        return $preview;
     }
 }

@@ -193,6 +193,115 @@ redaxo/data/addons/mblock/templates/
 
 **Wichtig:** Custom Templates überschreiben automatisch die Default Templates mit dem gleichen Namen.
 
+## CSS Customizing
+
+### CSS Custom Properties System (MBlock 4.0)
+MBlock 4.0 verwendet ein modernes CSS Custom Properties System mit über 120 Variablen für maximale Anpassbarkeit. Das System unterstützt automatisch Dark Mode durch REDAXO Themes, Bootstrap 5 Dark Mode und `prefers-color-scheme`.
+
+### Eigenes Styling erstellen
+Du kannst das MBlock-Design vollständig durch Überschreiben der CSS-Variablen anpassen:
+
+```css
+/* Eigene CSS-Datei: assets/css/custom-mblock.css */
+
+:root {
+    /* === FARB-ANPASSUNGEN === */
+    --mblock-primary-color: #your-brand-color;
+    --mblock-accent-color: #your-accent-color;
+    --mblock-background-color: #f8f9fa;
+    --mblock-border-color: #dee2e6;
+    
+    /* === BUTTON-STYLING === */
+    --mblock-btn-primary-bg: #007bff;
+    --mblock-btn-primary-border: #007bff;
+    --mblock-btn-primary-hover-bg: #0056b3;
+    
+    /* === DRAG & DROP === */
+    --mblock-draggable-handle-bg: #6c757d;
+    --mblock-draggable-handle-hover: #495057;
+    --mblock-sort-placeholder-bg: rgba(0, 123, 255, 0.1);
+    
+    /* === SPACING & LAYOUT === */
+    --mblock-item-spacing: 20px;
+    --mblock-border-radius: 8px;
+    --mblock-box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    
+    /* === TYPOGRAPHY === */
+    --mblock-font-size: 14px;
+    --mblock-font-weight: 400;
+    --mblock-line-height: 1.5;
+}
+
+/* Dark Mode Überschreibungen */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --mblock-background-color: #212529;
+        --mblock-border-color: #495057;
+        --mblock-text-color: #fff;
+    }
+}
+
+/* REDAXO Dark Mode Support */
+body.rex-theme-dark {
+    --mblock-background-color: #1e1e1e !important;
+    --mblock-border-color: #404040 !important;
+    --mblock-text-color: #ffffff !important;
+}
+```
+
+### Vollständige Variablen-Liste
+MBlock bietet über 120 CSS Custom Properties für:
+
+**Grundfarben:** `--mblock-primary-color`, `--mblock-accent-color`, `--mblock-background-color`  
+**Buttons:** `--mblock-btn-*-bg`, `--mblock-btn-*-border`, `--mblock-btn-*-hover-*`  
+**Drag & Drop:** `--mblock-draggable-*`, `--mblock-sort-*`  
+**Layout:** `--mblock-*-spacing`, `--mblock-border-radius`, `--mblock-box-shadow`  
+**Zustände:** `--mblock-offline-*`, `--mblock-hover-*`, `--mblock-focus-*`  
+**Responsive:** `--mblock-mobile-*`, `--mblock-tablet-*`  
+
+### Dark Mode Integration
+Das CSS Custom Properties System unterstützt automatisch:
+
+- **REDAXO Themes** (`body.rex-theme-dark`)
+- **Bootstrap 5 Dark Mode** (`[data-bs-theme="dark"]`) 
+- **Browser Preference** (`@media (prefers-color-scheme: dark)`)
+
+```css
+/* Beispiel: Vollständige Dark Mode Anpassung */
+body.rex-theme-dark,
+[data-bs-theme="dark"] {
+    --mblock-background-color: #1a1a1a !important;
+    --mblock-item-bg: #2d2d2d !important;
+    --mblock-border-color: #404040 !important;
+    --mblock-text-color: #ffffff !important;
+    --mblock-btn-primary-bg: #0d6efd !important;
+    --mblock-draggable-handle-bg: #6c757d !important;
+}
+```
+
+### CSS in REDAXO einbinden
+Eigene CSS-Dateien können in REDAXO über verschiedene Wege eingebunden werden:
+
+**Template Integration:**
+```php
+// In Template-Datei
+rex_view::addCssFile($this->getAssetsUrl('css/custom-mblock.css'));
+```
+
+**Project AddOn:**
+```php
+// In boot.php des Project AddOns
+if (rex::isBackend()) {
+    rex_view::addCssFile(rex_url::addonAssets('project', 'custom-mblock.css'));
+}
+```
+
+**Direkte Einbindung:**
+```html
+<!-- In HTML-Template -->
+<link rel="stylesheet" href="<?= rex_url::assets('css/custom-mblock.css') ?>">
+```
+
 ## Modulbeispiele / Module examples
 
 MBlock enthält einige Modulbeispiele. Diese finden sich auf der MBlock-Seite im REDAXO-Backend. An dieser Stelle werden nur zwei Beispiele aufgelistet — mit Unterstützung durch [MForm](https://github.com/FriendsOfREDAXO/mform) und ohne —, um zu zeigen, wie MBlock funktioniert.
