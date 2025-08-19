@@ -32,21 +32,47 @@ if (rex::isBackend() && is_object(rex::getUser())) {
             return $params->getSubject();
     });
 
-    // Use Sortable.js from bloecks addon if available, otherwise fallback to bundled version
+    // Use Sortable.js from bloecks addon (required dependency)
     $bloecksAddon = rex_addon::get('bloecks');
     if ($bloecksAddon && $bloecksAddon->isAvailable()) {
         // Use bloecks Sortable.js
         rex_view::addJsFile($bloecksAddon->getAssetsUrl('js/sortable.min.js'));
         // Add bloecks CSS for consistent styling
         rex_view::addCssFile($bloecksAddon->getAssetsUrl('css/bloecks.css'));
-    } else {
-        // Fallback to bundled sortable
-        rex_view::addJsFile($this->getAssetsUrl('mblock_sortable.min.js'));
     }
+    // Note: bloecks Addon is required for MBlock functionality
 
+    // 🔧 Development/Production Asset Management
+    // 
+    // Options:
+    // - 'auto'  : Auto-detect based on environment (recommended)
+    // - 'dev'   : Always use mblock.js (development/debugging)  
+    // - 'prod'  : Always use mblock.min.js (production/performance)
+    //
+    $assetMode = 'auto'; // Change this to 'dev' or 'prod' to override
+    
+    // Auto-detection logic
+    if ($assetMode === 'auto') {
+        // Use minified in production, development version otherwise
+        $isProduction = (
+            !rex::isDebugMode() &&                    // Debug mode disabled
+            !rex_addon::get('debug')->isAvailable()   // Debug addon not active
+        );
+        $useMinified = $isProduction;
+    } else {
+        $useMinified = ($assetMode === 'prod');
+    }
+    
+    $jsFile = $useMinified ? 'mblock.min.js' : 'mblock.js';
+    $debugInfo = $useMinified ? 'Production (minified)' : 'Development (source)';
+    
+    // Add debug comment for developers
+    if (rex::isDebugMode()) {
+        rex_view::setJsProperty('mblock_asset_mode', $debugInfo);
+    }
+    
     // Always add our own assets
-    rex_view::addJsFile($this->getAssetsUrl('mblock_smooth_scroll.min.js'));
-    rex_view::addJsFile($this->getAssetsUrl('mblock.js'));
+    rex_view::addJsFile($this->getAssetsUrl($jsFile));
     rex_view::addCssFile($this->getAssetsUrl('mblock.css'));
 }
 

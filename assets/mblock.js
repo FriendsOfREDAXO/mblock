@@ -71,33 +71,16 @@ $(document).on('rex:ready', function (e, container) {
                 }
             });
         } else {
-            // Fallback: Wenn kein Container, alle MBlock-Elemente initialisieren
+            // Initialize all MBlock elements
             $(mblock).each(function () {
                 const $element = $(this);
                 if ($element.length) {
-                    try {
-                        mblock_init($element);
-                    } catch (initError) {
-                        console.error('MBlock: Fehler beim Initialisieren (Fallback):', initError);
-                    }
+                    mblock_init($element);
                 }
             });
         }
     } catch (error) {
-        console.error('MBlock: Kritischer Fehler bei rex:ready:', error);
-        
-        // Emergency-Fallback: Versuche zumindest eine Basic-Initialisierung
-        try {
-            $(mblock).each(function () {
-                const $element = $(this);
-                if ($element.length && !$element.data('mblock_run')) {
-                    console.warn('MBlock: Notfall-Initialisierung für Element');
-                    $element.data('mblock_run', 1);
-                }
-            });
-        } catch (emergencyError) {
-            console.error('MBlock: Notfall-Initialisierung fehlgeschlagen:', emergencyError);
-        }
+        console.error('MBlock: Fehler bei rex:ready:', error);
     }
 });
 
@@ -121,16 +104,8 @@ function mblock_init(element) {
         }
         
         mblock_add_plus(element);
-        
-        // Initialize toolbar handlers
         mblock_init_toolbar(element);
-        
-        // Initialize online/offline states for existing items
-        try {
-            MBlockOnlineToggle.initializeStates(element);
-        } catch (initError) {
-            console.warn('MBlock: Fehler beim Initialisieren der Online/Offline-States:', initError);
-        }
+        MBlockOnlineToggle.initializeStates(element);
         
         return true;
     } catch (error) {
@@ -247,7 +222,7 @@ function mblock_sort_it(element) {
             return false;
         }
 
-        // Moderne Sortable.js API (von bloecks)
+        // Sortable.js API (from bloecks addon - required)
         if (typeof Sortable !== 'undefined' && Sortable.create) {
             // Destroy existing sortable if it exists - with better error handling
             try {
@@ -271,8 +246,6 @@ function mblock_sort_it(element) {
                         ghostClass: 'sortable-ghost',
                         chosenClass: 'mblock-sortable-chosen',
                         dragClass: 'mblock-dragging',
-                        fallbackTolerance: 3,
-                        forceFallback: false,
                         onStart: function (evt) {
                             try {
                                 document.body.classList.add('mblock-drag-active');
@@ -318,82 +291,19 @@ function mblock_sort_it(element) {
                     
                 } catch (createError) {
                     console.error('MBlock: Fehler beim Erstellen der Sortable-Instanz:', createError);
-                    // Fallback to jQuery UI if available
-                    mblock_sort_it_jquery_fallback(element);
+                    return false;
                 }
             }, 10);
             
             return true;
             
-        } 
-        // Fallback für jQuery UI Sortable (Legacy-Support)
-        else {
-            return mblock_sort_it_jquery_fallback(element);
+        } else {
+            console.error('MBlock: Sortable.js (bloecks Addon) ist erforderlich aber nicht verfügbar');
+            return false;
         }
         
     } catch (error) {
         console.error('MBlock: Fehler in mblock_sort_it:', error);
-        return mblock_sort_it_jquery_fallback(element);
-    }
-}
-
-// Separate jQuery UI Sortable fallback function
-function mblock_sort_it_jquery_fallback(element) {
-    try {
-        if (typeof element.sortable === 'function') {
-            // Destroy existing jQuery UI sortable if it exists
-            try {
-                if (element.hasClass('ui-sortable')) {
-                    element.sortable('destroy');
-                }
-            } catch (destroyError) {
-                console.warn('MBlock: Fehler beim Zerstören der jQuery UI Sortable-Instanz:', destroyError);
-            }
-
-            element.sortable({
-                handle: '.sorthandle',
-                placeholder: 'sortable-placeholder',
-                tolerance: 'pointer',
-                start: function (event, ui) {
-                    try {
-                        document.body.classList.add('mblock-drag-active');
-                        if (ui.item) {
-                            ui.item.addClass('mblock-dragging');
-                        }
-                    } catch (error) {
-                        console.error('MBlock: Fehler in jQuery UI sortable start:', error);
-                    }
-                },
-                update: function (event, ui) {
-                    try {
-                        document.body.classList.remove('mblock-drag-active');
-                        if (ui.item) {
-                            ui.item.removeClass('mblock-dragging');
-                            ui.item.addClass('mblock-dropped-flash');
-                            setTimeout(() => {
-                                ui.item.removeClass('mblock-dropped-flash');
-                            }, 600);
-                        }
-                        
-                        mblock_reindex(element);
-                        mblock_remove(element);
-                        // trigger event
-                        let iClone = ui.item;
-                        if (iClone.length) {
-                            iClone.trigger('mblock:change', [iClone]);
-                        }
-                    } catch (error) {
-                        console.error('MBlock: Fehler in jQuery UI sortable update:', error);
-                    }
-                }
-            });
-            return true;
-        } else {
-            console.error('MBlock: Weder Sortable.js noch jQuery UI Sortable gefunden');
-            return false;
-        }
-    } catch (error) {
-        console.error('MBlock: Fehler in jQuery UI fallback:', error);
         return false;
     }
 }
@@ -696,15 +606,6 @@ function mblock_add_item(element, item) {
             console.warn('MBlock: Sortable destroy error in add_item:', sortableError);
         }
         
-        // jQuery UI Sortable Fallback
-        try {
-            if (typeof element.sortable === 'function' && element.hasClass('ui-sortable')) {
-                element.sortable("destroy");
-            }
-        } catch (jqueryError) {
-            console.warn('MBlock: jQuery UI sortable destroy error in add_item:', jqueryError);
-        }
-        
         // add clone
         item.after(iClone);
         // set count
@@ -831,15 +732,6 @@ function mblock_remove_item(element, item) {
             } catch (sortableError) {
                 console.warn('MBlock: Sortable destroy error in remove_item:', sortableError);
             }
-            
-            // jQuery UI Sortable Fallback
-            try {
-                if (typeof element.sortable === 'function' && element.hasClass('ui-sortable')) {
-                    element.sortable("destroy");
-                }
-            } catch (jqueryError) {
-                console.warn('MBlock: jQuery UI sortable destroy error in remove_item:', jqueryError);
-            }
 
             // set prev item
             let prevItem = item.prev();
@@ -886,12 +778,9 @@ var MBlockClipboard = {
     
     // Initialize clipboard from storage
     init: function() {
-        // // console.log('MBlock: Clipboard wird initialisiert...');
         try {
             const loaded = this.loadFromStorage();
-            // // console.log('MBlock: Clipboard initialisiert, Daten geladen:', loaded);
             if (this.data) {
-                // // console.log('MBlock: Verfügbare Clipboard-Daten:', this.data);
             }
         } catch (error) {
             console.warn('MBlock: Fehler beim Initialisieren des Clipboards:', error);
@@ -919,7 +808,6 @@ var MBlockClipboard = {
                     savedAt: new Date().toISOString(),
                     sessionId: this.getSessionId()
                 }));
-                // // console.log('MBlock: Clipboard-Daten in Storage gespeichert');
                 return true;
             }
         } catch (error) {
@@ -944,7 +832,6 @@ var MBlockClipboard = {
                         const hoursDiff = (now - savedDate) / (1000 * 60 * 60);
                         
                         if (hoursDiff > 24) {
-                            // // console.log('MBlock: Clipboard-Daten zu alt, werden gelöscht');
                             this.clearStorage();
                             return false;
                         }
@@ -952,7 +839,6 @@ var MBlockClipboard = {
                     
                     this.data = parsedData;
                     this.updatePasteButtons();
-                    // // console.log('MBlock: Clipboard-Daten aus Storage geladen');
                     return true;
                 }
             }
@@ -969,7 +855,6 @@ var MBlockClipboard = {
             const storage = this.getStorage();
             if (storage) {
                 storage.removeItem(this.storageKey);
-                // // console.log('MBlock: Clipboard-Storage geleert');
             }
         } catch (error) {
             console.warn('MBlock: Fehler beim Leeren des Storages:', error);
@@ -996,7 +881,6 @@ var MBlockClipboard = {
             this.saveToStorage(); // Save to new storage
         }
         
-        // // console.log('MBlock: Storage-Modus gewechselt zu:', this.useSessionStorage ? 'Session' : 'Local');
         return this.useSessionStorage;
     },
     
@@ -1027,7 +911,6 @@ var MBlockClipboard = {
                     $('.mblock-type-warning').fadeOut('slow');
                 }, 5000);
                 
-                // // console.log('MBlock: Modultyp-Warnung angezeigt');
             } else {
                 // Fallback to browser alert
                 alert('Das kopierte Element stammt aus einem anderen Modul und kann hier nicht eingefügt werden.');
@@ -1043,17 +926,14 @@ var MBlockClipboard = {
     // Get module type/name from wrapper or form context
     getModuleType: function(wrapper) {
         try {
-            // // console.log('MBlock: getModuleType für Wrapper:', wrapper);
             
             // 1. Check form for hidden input with module_id (REDAXO standard!)
             const form = wrapper.closest('form');
             if (form.length) {
                 const moduleInput = form.find('input[name="module_id"]').first();
-                // // console.log('MBlock: Hidden input module_id im Formular gefunden:', moduleInput.length > 0 ? moduleInput.val() : 'nicht gefunden');
                 if (moduleInput.length) {
                     const moduleId = moduleInput.val();
                     if (moduleId) {
-                        // // console.log('MBlock: Verwende Modul-ID aus hidden input:', moduleId);
                         return 'module_' + moduleId;
                     }
                 }
@@ -1061,11 +941,9 @@ var MBlockClipboard = {
             
             // 2. Fallback: Check in wrapper for other patterns
             const moduleInputWrapper = wrapper.find('input[name="module_id"]').first();
-            // // console.log('MBlock: Hidden input module_id im Wrapper gefunden:', moduleInputWrapper.length > 0 ? moduleInputWrapper.val() : 'nicht gefunden');
             if (moduleInputWrapper.length) {
                 const moduleId = moduleInputWrapper.val();
                 if (moduleId) {
-                    // // console.log('MBlock: Verwende Modul-ID aus wrapper hidden input:', moduleId);
                     return 'module_' + moduleId;
                 }
             }
@@ -1075,7 +953,6 @@ var MBlockClipboard = {
             if (moduleInputFallback.length) {
                 const moduleType = moduleInputFallback.val();
                 if (moduleType) {
-                    // // console.log('MBlock: Verwende Modul-ID aus fallback input:', moduleType);
                     return 'module_' + moduleType;
                 }
             }
@@ -1085,7 +962,6 @@ var MBlockClipboard = {
                 const action = form.attr('action') || '';
                 const moduleMatch = action.match(/module_id=(\d+)/);
                 if (moduleMatch) {
-                    // // console.log('MBlock: Verwende Modul-ID aus form action:', moduleMatch[1]);
                     return 'module_' + moduleMatch[1];
                 }
             }
@@ -1094,7 +970,6 @@ var MBlockClipboard = {
             const classes = wrapper.attr('class') || '';
             const classMatch = classes.match(/mblock-module-(\w+)/);
             if (classMatch) {
-                // // console.log('MBlock: Verwende Modul-ID aus CSS-Klasse:', classMatch[1]);
                 return classMatch[1];
             }
             
@@ -1103,7 +978,6 @@ var MBlockClipboard = {
             if (parentWithId.length) {
                 const id = parentWithId.attr('id');
                 if (id.includes('module')) {
-                    // // console.log('MBlock: Verwende Parent-Element ID:', id);
                     return id;
                 }
             }
@@ -1112,7 +986,6 @@ var MBlockClipboard = {
             const urlParams = new URLSearchParams(window.location.search);
             const moduleId = urlParams.get('module_id') || urlParams.get('article_id');
             if (moduleId) {
-                // // console.log('MBlock: FALLBACK - verwende URL Parameter (nur gleicher Artikel):', moduleId);
                 return 'context_' + moduleId;
             }
             
@@ -1127,7 +1000,6 @@ var MBlockClipboard = {
     },
 
     copy: function(element, item) {
-        // // console.log('MBlock: Copy-Funktion aufgerufen', { element, item });
         
         try {
             if (!item || !item.length) {
@@ -1135,13 +1007,11 @@ var MBlockClipboard = {
                 return false;
             }
             
-            // // console.log('MBlock: Item für Kopiervorgang gefunden:', item);
             
             // Get module type from the closest mblock wrapper
             const wrapper = item.closest('.mblock_wrapper');
             const moduleType = this.getModuleType(wrapper);
             
-            // // console.log('MBlock: Modultyp erkannt:', moduleType);
             
             // Clone item completely
             const clonedItem = item.clone(true, true);
@@ -1152,7 +1022,6 @@ var MBlockClipboard = {
             // Capture comprehensive form data
             const formData = this.captureComplexFormData(item);
             
-            // // console.log('MBlock: Formulardaten erfasst:', formData);
             
             // Store in clipboard with metadata and form values
             this.data = {
@@ -1163,19 +1032,16 @@ var MBlockClipboard = {
                 source: element.attr('class') || 'mblock_wrapper'
             };
             
-            // // console.log('MBlock: Daten in Zwischenablage gespeichert:', this.data);
             
             // Visual feedback
             this.showCopiedState(item);
             
             // Save to storage
             const saved = this.saveToStorage();
-            // // console.log('MBlock: In Storage gespeichert:', saved);
             
             // Update paste button states
             this.updatePasteButtons();
             
-            // console.log('MBlock: Item wurde in die Zwischenablage kopiert und gespeichert', {
             //     moduleType: moduleType,
             //     formData: formData,
             //     complexElements: Object.keys(formData).length,
@@ -1354,11 +1220,6 @@ var MBlockClipboard = {
             const currentModuleType = this.getModuleType(currentWrapper);
             const clipboardModuleType = this.data.moduleType || 'unknown_module';
             
-            // console.log('MBlock: Modultyp-Prüfung:', {
-            //     current: currentModuleType,
-            //     clipboard: clipboardModuleType
-            // });
-            
             if (currentModuleType !== clipboardModuleType) {
                 console.warn('MBlock: Modultyp stimmt nicht überein. Paste abgebrochen.', {
                     current: currentModuleType,
@@ -1370,7 +1231,6 @@ var MBlockClipboard = {
                 return false;
             }
             
-            // // console.log('MBlock: Modultyp stimmt überein - Paste wird fortgesetzt');
             
             // Create element from clipboard
             const pastedItem = $(this.data.html);
@@ -1396,15 +1256,6 @@ var MBlockClipboard = {
                     console.warn('MBlock: Sortable destroy error in paste:', sortableError);
                 }
                 
-                // jQuery UI Sortable Fallback
-                try {
-                    if (typeof element.sortable === 'function' && element.hasClass('ui-sortable')) {
-                        element.sortable("destroy");
-                    }
-                } catch (jqueryError) {
-                    console.warn('MBlock: jQuery UI sortable destroy error in paste:', jqueryError);
-                }
-                
                 afterItem.after(pastedItem);
             } else {
                 element.prepend(pastedItem);
@@ -1426,7 +1277,6 @@ var MBlockClipboard = {
                 if (typeof $.fn.selectpicker === 'function') {
                     var selects = pastedItem.find('select.mblock-needs-selectpicker');
                     if (selects.length) {
-                        // // console.log('MBlock: Initializing selectpicker for pasted elements:', selects.length);
                         
                         // Remove marker class and add proper selectpicker class
                         selects.removeClass('mblock-needs-selectpicker').addClass('selectpicker');
@@ -1453,11 +1303,22 @@ var MBlockClipboard = {
             // Scroll to pasted item
             setTimeout(function() {
                 if (pastedItem && pastedItem.length && pastedItem.is(':visible')) {
-                    mblock_scroll(element, pastedItem);
+                    mblock_smooth_scroll_to_element(pastedItem[0]);
                 }
             }, 100);
             
-            // // console.log('MBlock: Item wurde aus der Zwischenablage eingefügt');
+            // ✨ Add glow effect to pasted item
+            setTimeout(function() {
+                if (pastedItem && pastedItem.length && pastedItem.is(':visible')) {
+                    pastedItem.addClass('mblock-paste-glow');
+                    
+                    // Remove glow class after animation completes
+                    setTimeout(function() {
+                        pastedItem.removeClass('mblock-paste-glow');
+                    }, 1200); // Match animation duration
+                }
+            }, 150);
+            
             return true;
             
         } catch (error) {
@@ -1468,7 +1329,6 @@ var MBlockClipboard = {
     
     cleanupPastedItem: function(item) {
         try {
-            // // console.log('MBlock: Bereinige eingefügtes Item');
             
             // Remove mblock-specific data attributes
             item.removeAttr('data-mblock_index');
@@ -1479,7 +1339,6 @@ var MBlockClipboard = {
                 const name = $el.attr('name');
                 if (name && name.indexOf('mblock_new_') === -1) {
                     $el.attr('name', 'mblock_new_' + name);
-                    // console.log('MBlock: Name geändert:', name, '→', 'mblock_new_' + name);
                 }
                 
                 // DON'T clear values here - they will be restored later by restoreComplexFormData
@@ -1503,7 +1362,6 @@ var MBlockClipboard = {
                 const id = $el.attr('id');
                 if (id && !id.match(/^REX_/)) {
                     $el.removeAttr('id');
-                    // console.log('MBlock: ID entfernt:', id);
                 }
             });
             
@@ -1530,7 +1388,6 @@ var MBlockClipboard = {
             for (const pattern of patterns) {
                 $field = container.find(`[name*="${pattern}"]`);
                 if ($field.length) {
-                    // console.log(`MBlock: Field "${originalName}" matched with pattern "${pattern}"`);
                     return $field;
                 }
             }
@@ -1578,7 +1435,6 @@ var MBlockClipboard = {
     // Enhanced form data restoration with smarter field matching
     restoreComplexFormData: function(pastedItem, formData) {
         try {
-            // // console.log('MBlock: Stelle Formulardaten wieder her:', formData);
             
             Object.keys(formData).forEach(originalName => {
                 const fieldData = formData[originalName];
@@ -1587,7 +1443,6 @@ var MBlockClipboard = {
                 
                 let $field = this.findFieldBySmartMatching(pastedItem, originalName);
                 
-                // console.log(`MBlock: Suche Feld "${originalName}":`, $field.length, 'gefunden');
                 
                 if (!$field.length) {
                     // Only warn for significant fields, not bootstrap/metadata fields
@@ -1600,7 +1455,6 @@ var MBlockClipboard = {
                 // Handle different field types
                 switch (fieldData.type) {
                     case 'checkbox_radio':
-                        // console.log('MBlock: Setze Checkbox/Radio:', originalName, fieldData.value, fieldData.checked);
                         $field.val(fieldData.value);
                         $field.prop('checked', fieldData.checked);
                         if (fieldData.defaultValue) {
@@ -1609,7 +1463,6 @@ var MBlockClipboard = {
                         break;
                         
                     case 'select':
-                        // console.log('MBlock: Setze Select:', originalName, fieldData.value);
                         // Restore select HTML if needed
                         if (fieldData.html) {
                             $field.html(fieldData.html);
@@ -1625,7 +1478,6 @@ var MBlockClipboard = {
                         break;
                         
                     case 'bootstrap_select':
-                        // console.log('MBlock: Setze Bootstrap Select:', originalName, fieldData.value);
                         $field.val(fieldData.value);
                         // Trigger bootstrap-select refresh if available
                         if (typeof $field.selectpicker === 'function') {
@@ -1637,7 +1489,6 @@ var MBlockClipboard = {
                         break;
                         
                     case 'ckeditor':
-                        // console.log('MBlock: Setze CKEditor:', originalName, fieldData.value ? 'mit Inhalt' : 'leer');
                         if (fieldData.value) {
                             $field.val(fieldData.value);
                             
@@ -1652,7 +1503,6 @@ var MBlockClipboard = {
                         break;
                         
                     case 'rex_media':
-                        // console.log('MBlock: Setze REX Media:', originalName, fieldData.value);
                         if (fieldData.value) {
                             $field.val(fieldData.value);
                             
@@ -1670,7 +1520,6 @@ var MBlockClipboard = {
                         break;
                         
                     case 'rex_link':
-                        // console.log('MBlock: Setze REX Link:', originalName, fieldData.value);
                         $field.val(fieldData.value);
                         
                         // Restore display text
@@ -1694,7 +1543,6 @@ var MBlockClipboard = {
                         break;
                         
                     case 'active_tab':
-                        // console.log('MBlock: Setze aktiven Tab:', fieldData.href);
                         // Restore active tab states
                         if (fieldData.href) {
                             setTimeout(() => {
@@ -1707,7 +1555,6 @@ var MBlockClipboard = {
                         break;
                         
                     case 'collapse_state':
-                        // console.log('MBlock: Setze Collapse-Status für:', originalName);
                         // Restore collapse states
                         if (fieldData.isOpen) {
                             const collapseId = originalName.replace('collapse_state_', '');
@@ -1722,7 +1569,6 @@ var MBlockClipboard = {
                         
                     case 'input':
                     default:
-                        // console.log('MBlock: Setze Input:', originalName, fieldData.value);
                         // Handle regular inputs and textareas
                         if (fieldData.value !== undefined) {
                             $field.val(fieldData.value);
@@ -1736,7 +1582,6 @@ var MBlockClipboard = {
                 }
             });
             
-            // console.log('MBlock: Komplexe Formulardaten wiederhergestellt');
             
         } catch (error) {
             console.error('MBlock: Fehler beim Wiederherstellen komplexer Formulardaten:', error);
@@ -1744,19 +1589,27 @@ var MBlockClipboard = {
     },
     
     showCopiedState: function(item) {
+        // Visual feedback for the entire copied block with blue glow effect
+        item.addClass('mblock-copy-glow');
+        
+        // Auto-remove the glow effect after animation completes
+        setTimeout(() => {
+            item.removeClass('mblock-copy-glow');
+        }, 1000);
+        
+        // Optional: Also give feedback to the copy button if it exists
         const $copyBtn = item.find('.mblock-copy-btn');
         if ($copyBtn.length) {
             $copyBtn.addClass('is-copied');
             setTimeout(() => {
                 $copyBtn.removeClass('is-copied');
-            }, 1500);
+            }, 1000);
         }
     },
     
     updatePasteButtons: function() {
         const hasData = !!this.data;
         
-        // // console.log('MBlock: updatePasteButtons aufgerufen, hasData:', hasData);
         
         if (hasData) {
             // Prüfe Modulkompatibilität für alle sichtbaren MBlock-Wrapper
@@ -1765,12 +1618,6 @@ var MBlockClipboard = {
                 const currentModuleType = this.getModuleType($wrapper);
                 const clipboardModuleType = this.data.moduleType || 'unknown_module';
                 
-                // console.log('MBlock: Modulkompatibilität prüfen für Wrapper:', {
-                //     current: currentModuleType,
-                //     clipboard: clipboardModuleType,
-                //     compatible: currentModuleType === clipboardModuleType
-                // });
-                
                 // Finde Paste-Buttons in diesem Wrapper
                 const $pasteButtons = $wrapper.find('.mblock-paste-btn');
                 
@@ -1778,12 +1625,10 @@ var MBlockClipboard = {
                     // Module kompatibel - Buttons aktivieren
                     $pasteButtons.removeClass('disabled').prop('disabled', false);
                     $pasteButtons.attr('title', 'Paste element (Module kompatibel)');
-                    // // console.log('MBlock: Paste-Buttons für kompatibles Modul aktiviert:', currentModuleType);
                 } else {
                     // Module nicht kompatibel - Buttons deaktivieren
                     $pasteButtons.addClass('disabled').prop('disabled', true);
                     $pasteButtons.attr('title', `Cannot paste: Different module type (Current: ${currentModuleType}, Clipboard: ${clipboardModuleType})`);
-                    // // console.log('MBlock: Paste-Buttons für inkompatibles Modul deaktiviert:', currentModuleType, 'vs', clipboardModuleType);
                 }
             });
         } else {
@@ -1802,20 +1647,17 @@ var MBlockClipboard = {
         
         // Update button text with storage info  
         const storageInfo = this.useSessionStorage ? 'Session' : 'Local';
-        // // console.log('MBlock: Paste buttons updated, storage info:', storageInfo);
     },
 
     // Convert selectpicker elements back to plain select elements
     convertSelectpickerToPlainSelect: function(container) {
         try {
-            // // console.log('MBlock: Converting selectpicker to plain select elements');
             
             // Find all select elements that have selectpicker class or are inside bootstrap-select wrappers
             const $selectElements = container.find('select.selectpicker, .bootstrap-select select');
             
             $selectElements.each(function() {
                 const $select = $(this);
-                // // console.log('MBlock: Processing select element:', $select);
                 
                 // Store current value
                 const selectedValue = $select.val();
@@ -1842,11 +1684,9 @@ var MBlockClipboard = {
                 if ($bootstrapWrappers.length > 0) {
                     // Replace the outermost wrapper with our clean select
                     const $outermostWrapper = $bootstrapWrappers.last();
-                    // // console.log('MBlock: Replacing bootstrap-select wrapper with clean select');
                     $outermostWrapper.replaceWith($cleanSelect);
                 } else {
                     // If no wrapper, just replace the select itself
-                    // // console.log('MBlock: Replacing standalone selectpicker with clean select');
                     $select.replaceWith($cleanSelect);
                 }
             });
@@ -1855,12 +1695,10 @@ var MBlockClipboard = {
             container.find('.bootstrap-select').each(function() {
                 const $wrapper = $(this);
                 if (!$wrapper.find('select').length) {
-                    // // console.log('MBlock: Removing empty bootstrap-select wrapper');
                     $wrapper.remove();
                 }
             });
             
-            // // console.log('MBlock: Selectpicker conversion complete');
             
         } catch (error) {
             console.error('MBlock: Error converting selectpicker to plain select:', error);
@@ -1871,7 +1709,6 @@ var MBlockClipboard = {
         this.data = null;
         this.clearStorage();
         this.updatePasteButtons();
-        // console.log('MBlock: Zwischenablage geleert');
     },
     
     // Get clipboard info for debugging
@@ -1883,16 +1720,6 @@ var MBlockClipboard = {
             savedAt: this.data ? this.data.savedAt : null,
             itemCount: this.data && this.data.formData ? Object.keys(this.data.formData).length : 0
         };
-    },
-    
-    // Debug function to check clipboard status
-    debug: function() {
-        // console.log('=== MBlock Clipboard Debug ===');
-        // console.log('Clipboard Data:', this.data);
-        // console.log('Storage Mode:', this.useSessionStorage ? 'Session' : 'Local');
-        // console.log('Storage Content:', this.getStorage() ? this.getStorage().getItem(this.storageKey) : 'Not available');
-        // console.log('Info:', this.getInfo());
-        // console.log('==============================');
     }
 };
 
@@ -1926,7 +1753,6 @@ var MBlockOnlineToggle = {
                 // Add hidden input to store offline state
                 this.setOfflineState(item, true);
                 
-                // console.log('MBlock: Item gesetzt auf OFFLINE');
                 
             } else {
                 // Set to online
@@ -1944,7 +1770,6 @@ var MBlockOnlineToggle = {
                 // Remove offline state
                 this.setOfflineState(item, false);
                 
-                // console.log('MBlock: Item gesetzt auf ONLINE');
             }
             
             return true;
@@ -1963,12 +1788,10 @@ var MBlockOnlineToggle = {
             if ($offlineInput.length) {
                 // Simply set the value - field already exists in template
                 $offlineInput.val(isOffline ? '1' : '0');
-                // console.log('MBlock: Set offline input value to:', isOffline ? '1' : '0');
             } else {
                 console.warn('MBlock: No mblock_offline input found - must be defined in template for this functionality');
             }
             
-            // console.log('MBlock: Offline state set to:', isOffline, 'for item index:', item.attr('data-mblock_index'));
             
         } catch (error) {
             console.error('MBlock: Fehler beim Setzen des Offline-Status:', error);
@@ -1977,7 +1800,6 @@ var MBlockOnlineToggle = {
     
     initializeStates: function(element) {
         try {
-            // console.log('MBlock: Initialisiere Online/Offline-Zustände für Element:', element);
             
             // Initialize toggle buttons based on existing offline states
             element.find('> div.sortitem').each(function(index) {
@@ -1998,7 +1820,6 @@ var MBlockOnlineToggle = {
                 const $toggleBtn = $item.find('.mblock-online-toggle');
                 const $icon = $toggleBtn.find('i');
                 
-                // console.log('MBlock: Item ' + itemIndex + ' check:', {
                 //     item: $item.length,
                 //     offlineInput: $offlineInput.length,
                 //     inputValue: $offlineInput.length > 0 ? $offlineInput.val() : 'no input',
@@ -2012,7 +1833,6 @@ var MBlockOnlineToggle = {
                     
                     if (isOffline) {
                         // Item is offline
-                        // console.log('MBlock: Setting item ' + itemIndex + ' to OFFLINE state');
                         $item.addClass('mblock-offline');
                         $toggleBtn.removeClass('btn-online').addClass('btn-offline')
                             .attr('title', 'Set online');
@@ -2024,7 +1844,6 @@ var MBlockOnlineToggle = {
                         }
                     } else {
                         // Item is online (value is 0, empty, or input doesn't exist)
-                        // console.log('MBlock: Setting item ' + itemIndex + ' to ONLINE state');
                         $item.removeClass('mblock-offline');
                         $toggleBtn.removeClass('btn-offline').addClass('btn-online')
                             .attr('title', 'Set offline');
@@ -2038,7 +1857,6 @@ var MBlockOnlineToggle = {
                 }
             });
             
-            // console.log('MBlock: Online/Offline-Zustände initialisiert');
             
         } catch (error) {
             console.error('MBlock: Fehler beim Initialisieren der Online/Offline-States:', error);
@@ -2098,7 +1916,6 @@ var MBlockOnlineToggle = {
                 item.removeClass('mblock-offline');
             }
             
-            // console.log('MBlock: Auto-detected toggle - Set to:', newIsOffline ? 'OFFLINE' : 'ONLINE', 
             //            'Input value:', $offlineInput.val());
                        
             return true;
@@ -2218,14 +2035,12 @@ function mblock_scroll(element, item) {
 }
 
 function mblock_add(element) {
-    // console.log('MBlock: mblock_add aufgerufen für Element:', element);
     try {
         if (!element || !element.length) {
             console.warn('MBlock: Ungültiges Element bei mblock_add');
             return false;
         }
 
-        // console.log('MBlock: Binde Event-Handler für Buttons...');
         
         // Sichere Event-Bindung mit Namespace für bessere Memory-Management
         element.find('> div.sortitem .addme')
@@ -2295,17 +2110,14 @@ function mblock_add(element) {
 
         // Copy Button Handler
         const copyButtons = element.find('> div.sortitem .mblock-copy-btn');
-        // console.log('MBlock: Gefundene Copy-Buttons:', copyButtons.length, copyButtons);
         
         copyButtons
             .off('click.mblock')
             .on('click.mblock', function (e) {
                 e.preventDefault();
-                // console.log('MBlock: Copy-Button geklickt', this);
                 try {
                     const $this = $(this);
                     const $item = $this.closest('div[class^="sortitem"]');
-                    // console.log('MBlock: Gefundenes Item für Copy:', $item);
                     MBlockClipboard.copy(element, $item);
                 } catch (error) {
                     console.error('MBlock: Fehler in copy click handler:', error);
@@ -2371,5 +2183,48 @@ function mblock_add(element) {
     } catch (error) {
         console.error('MBlock: Fehler in mblock_add:', error);
         return false;
+    }
+}
+
+// ✨ Modern Vanilla JavaScript Smooth Scroll Solution
+function mblock_smooth_scroll_to_element(element, options = {}) {
+    if (!element) return;
+    
+    const config = {
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'nearest',
+        offset: -20, // Extra offset from top
+        ...options
+    };
+    
+    try {
+        // Modern approach with scrollIntoView
+        if ('scrollIntoView' in element) {
+            // Calculate position with offset
+            const elementRect = element.getBoundingClientRect();
+            const absoluteElementTop = elementRect.top + window.pageYOffset;
+            const scrollToPosition = absoluteElementTop + config.offset;
+            
+            // Smooth scroll to calculated position
+            window.scrollTo({
+                top: Math.max(0, scrollToPosition),
+                behavior: config.behavior
+            });
+        } else {
+            // Fallback for very old browsers
+            element.scrollIntoView({
+                behavior: config.behavior,
+                block: config.block,
+                inline: config.inline
+            });
+        }
+    } catch (error) {
+        // Ultimate fallback
+        try {
+            element.scrollIntoView();
+        } catch (fallbackError) {
+            console.warn('MBlock: Smooth scroll nicht verfügbar:', fallbackError);
+        }
     }
 }

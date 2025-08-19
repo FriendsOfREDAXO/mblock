@@ -162,11 +162,12 @@ foreach ($topItems as $item) {
 ]);</code></pre>
                     
                     <h5>MBlock 4.0 - Online/Offline Funktionalität:</h5>
-                    <pre><code class="php">// Online/Offline Status über hidden field steuern
-$mform->->addHiddenField("$id.0.mblock_offline", '0');
+                    <pre><code>// Online/Offline Status über hidden field steuern
+\$fieldName = \$id . \'.0.mblock_offline\';
+\$mform->addHiddenField(\$fieldName, \'0\');
 
 // Im Frontend: Nur Online-Items laden  
-$items = rex_var::toArray("REX_MBLOCK[1]");
+\$items = rex_var::toArray("REX_MBLOCK[1]");
 foreach ($items as $item) {
     // Skip offline items
     if (!empty($item["mblock_offline"]) && $item["mblock_offline"] == "1") {
@@ -471,6 +472,21 @@ if ($media) {
 .mblock-best-practices .table th {
     background-color: #f8f9fa;
     font-weight: 600;
+    color: #333;
+}
+
+/* Dark Mode Support für Tabellen */
+body.rex-theme-dark .mblock-best-practices .table th,
+html[data-bs-theme="dark"] .mblock-best-practices .table th {
+    background-color: #495057;
+    color: #fff;
+}
+
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) .mblock-best-practices .table th {
+        background-color: #495057;
+        color: #fff;
+    }
 }
 
 .mblock-best-practices .alert h5 {

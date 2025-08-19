@@ -731,3 +731,137 @@ html[data-bs-theme="dark"] .mblock_wrapper span.removeadded .btn.mblock-offline-
         box-shadow: 0 2px 6px rgba(187, 45, 59, 0.4);
     }
 }
+
+/* ✨ Paste Glow Effect - Elegant Visual Feedback */
+@keyframes mblockPasteGlow {
+    0% {
+        box-shadow: 
+            0 0 0 0 rgba(40, 167, 69, 0.8),
+            0 5px 15px rgba(0,0,0,.08);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 
+            0 0 0 15px rgba(40, 167, 69, 0.2),
+            0 0 30px rgba(40, 167, 69, 0.4),
+            0 8px 25px rgba(0,0,0,.15);
+        transform: scale(1.02);
+    }
+    100% {
+        box-shadow: 
+            0 0 0 0 rgba(40, 167, 69, 0),
+            0 5px 15px rgba(0,0,0,.08);
+        transform: scale(1);
+    }
+}
+
+.mblock_wrapper > div.mblock-paste-glow {
+    animation: mblockPasteGlow 1.2s ease-out;
+    border-color: rgba(40, 167, 69, 0.6) !important;
+    background: rgba(40, 167, 69, 0.03) !important;
+}
+
+/* 🎨 Dark Mode Paste Glow */
+@keyframes mblockPasteGlowDark {
+    0% {
+        box-shadow: 
+            0 0 0 0 rgba(25, 135, 84, 0.9),
+            0 5px 15px rgba(0,0,0,.3);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 
+            0 0 0 15px rgba(25, 135, 84, 0.3),
+            0 0 30px rgba(25, 135, 84, 0.5),
+            0 8px 25px rgba(0,0,0,.4);
+        transform: scale(1.02);
+    }
+    100% {
+        box-shadow: 
+            0 0 0 0 rgba(25, 135, 84, 0),
+            0 5px 15px rgba(0,0,0,.3);
+        transform: scale(1);
+    }
+}
+
+body.rex-theme-dark .mblock_wrapper > div.mblock-paste-glow,
+html[data-bs-theme="dark"] .mblock_wrapper > div.mblock-paste-glow {
+    animation: mblockPasteGlowDark 1.2s ease-out;
+    border-color: rgba(25, 135, 84, 0.7) !important;
+    background: rgba(25, 135, 84, 0.05) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) .mblock_wrapper > div.mblock-paste-glow {
+        animation: mblockPasteGlowDark 1.2s ease-out;
+        border-color: rgba(25, 135, 84, 0.7) !important;
+        background: rgba(25, 135, 84, 0.05) !important;
+    }
+}
+
+/* 🎨 Copy Glow Effect - Light Mode */
+@keyframes mblockCopyGlow {
+    0% {
+        box-shadow: 
+            0 0 0 0 rgba(0, 123, 255, 0.8),
+            0 5px 15px rgba(0,0,0,.08);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 
+            0 0 0 12px rgba(0, 123, 255, 0.25),
+            0 0 25px rgba(0, 123, 255, 0.4),
+            0 8px 20px rgba(0,0,0,.12);
+        transform: scale(1.015);
+    }
+    100% {
+        box-shadow: 
+            0 0 0 0 rgba(0, 123, 255, 0),
+            0 5px 15px rgba(0,0,0,.08);
+        transform: scale(1);
+    }
+}
+
+.mblock_wrapper > div.mblock-copy-glow {
+    animation: mblockCopyGlow 1.0s ease-out;
+    border-color: rgba(0, 123, 255, 0.5) !important;
+    background: rgba(0, 123, 255, 0.03) !important;
+}
+
+/* 🎨 Dark Mode Copy Glow */
+@keyframes mblockCopyGlowDark {
+    0% {
+        box-shadow: 
+            0 0 0 0 rgba(13, 110, 253, 0.9),
+            0 5px 15px rgba(0,0,0,.3);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 
+            0 0 0 12px rgba(13, 110, 253, 0.3),
+            0 0 25px rgba(13, 110, 253, 0.5),
+            0 8px 20px rgba(0,0,0,.4);
+        transform: scale(1.015);
+    }
+    100% {
+        box-shadow: 
+            0 0 0 0 rgba(13, 110, 253, 0),
+            0 5px 15px rgba(0,0,0,.3);
+        transform: scale(1);
+    }
+}
+
+body.rex-theme-dark .mblock_wrapper > div.mblock-copy-glow,
+html[data-bs-theme="dark"] .mblock_wrapper > div.mblock-copy-glow {
+    animation: mblockCopyGlowDark 1.0s ease-out;
+    border-color: rgba(13, 110, 253, 0.6) !important;
+    background: rgba(13, 110, 253, 0.05) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) .mblock_wrapper > div.mblock-copy-glow {
+        animation: mblockCopyGlowDark 1.0s ease-out;
+        border-color: rgba(13, 110, 253, 0.6) !important;
+        background: rgba(13, 110, 253, 0.05) !important;
+    }
+}
