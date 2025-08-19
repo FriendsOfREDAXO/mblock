@@ -16,7 +16,7 @@ page:
             subpages:
                 demo_mform: { title: translate:demo_mform }
                 demo_html: { title: translate:demo_html }
-        best_practices: { title: 'Best Practices' }
+        best_practices: { title: 'translate:mblock_best_practices' }
         api: { title: 'API', subPath: API.md }
         help: { title: 'translate:help', subPath: README.md }
         settings: { title: translate:configuration, itemClass: 'pull-right' }

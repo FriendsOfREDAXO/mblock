@@ -1,6 +1,7 @@
 mblock_title = MBlock
 mblock_help = Hilfe
 mblock_configuration = Konfiguration
+mblock_best_practices = Best Practices
 
 mblock_overview = Übersicht
 mblock_config_save = Einstellungen speichern

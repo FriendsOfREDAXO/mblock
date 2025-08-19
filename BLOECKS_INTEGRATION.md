@@ -92,9 +92,9 @@ function mblock_smooth_scroll_to_element(element, options = {}) {
 ## 🚀 Performance Vorteile
 
 ### Aktuelle Größen
-- **mblock.js:** 85.74 KB (Entwicklung)
-- **mblock.min.js:** 30.56 KB (Produktion) 
-- **Komprimierung:** 64.36% Ersparnis
+- **mblock.js:** 88.51 KB (Entwicklung)
+- **mblock.min.js:** 31.98 KB (Produktion) 
+- **Komprimierung:** 63.86% Ersparnis
 
 ### Mit vollständiger bloecks Integration
 - **Geschätzte Ersparnis:** ~15-20% zusätzlich
