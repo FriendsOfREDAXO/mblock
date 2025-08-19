@@ -1,9 +1,87 @@
 /**
  * Created by joachimdoerr on 30.07.16.
  * Enhanced with robust error handling and memory management
+ * Integrated with bloecks ^5.2.0 for enhanced functionality
  */
 
 let mblock = '.mblock_wrapper';
+
+// 🔧 Helper function for improved error/warning feedback using bloecks
+function mblock_show_message(message, type = 'warning', duration = 5000) {
+    // Try to use bloecks toast system first
+    if (typeof BLOECKS !== 'undefined' && BLOECKS.showToast) {
+        BLOECKS.showToast(message, type, duration);
+    } else {
+        // Fallback to console
+        if (type === 'error') {
+            console.error('MBlock:', message);
+        } else {
+            console.warn('MBlock:', message);
+        }
+    }
+}
+
+// 🌍 Helper function to get translated text for toast messages
+function mblock_get_text(key, fallback = '') {
+    // Primary: Use server-provided translations (via boot.php)
+    if (typeof rex !== 'undefined' && rex.mblock_i18n && rex.mblock_i18n[key.replace('mblock_toast_', '')]) {
+        return rex.mblock_i18n[key.replace('mblock_toast_', '')];
+    }
+    
+    // Secondary: Try rex_i18n if available
+    if (typeof rex !== 'undefined' && rex.i18n) {
+        const text = rex.i18n.msg(key);
+        return text !== key ? text : fallback; // Return fallback if key not found
+    }
+    
+    // Fallback to simple translations if rex is not available
+    const translations = {
+        'mblock_toast_copy_success': {
+            'de': 'Block erfolgreich kopiert!',
+            'en': 'Block copied successfully!',
+            'es': '¡Bloque copiado con éxito!',
+            'pt': 'Bloco copiado com sucesso!',
+            'sv': 'Block kopierat framgångsrikt!',
+            'nl': 'Blok succesvol gekopieerd!'
+        },
+        'mblock_toast_paste_success': {
+            'de': 'Block erfolgreich eingefügt!',
+            'en': 'Block pasted successfully!',
+            'es': '¡Bloque pegado con éxito!',
+            'pt': 'Bloco colado com sucesso!',
+            'sv': 'Block inklistrat framgångsrikt!',
+            'nl': 'Blok succesvol geplakt!'
+        },
+        'mblock_toast_clipboard_empty': {
+            'de': 'Keine Daten in der Zwischenablage',
+            'en': 'No data in clipboard',
+            'es': 'No hay datos en el portapapeles',
+            'pt': 'Nenhum dado na área de transferência',
+            'sv': 'Inga data i urklipp',
+            'nl': 'Geen gegevens in klembord'
+        },
+        'mblock_toast_module_type_mismatch': {
+            'de': 'Modultyp stimmt nicht überein',
+            'en': 'Module type mismatch',
+            'es': 'No coincide el tipo de módulo',
+            'pt': 'Tipo de módulo não corresponde',
+            'sv': 'Modultyp matchar inte',
+            'nl': 'Moduletype komt niet overeen'
+        }
+    };
+    
+    // Get browser language or default to German
+    const lang = (navigator.language || 'de').substring(0, 2);
+    const langData = translations[key];
+    
+    if (langData && langData[lang]) {
+        return langData[lang];
+    } else if (langData && langData['de']) {
+        return langData['de']; // Fallback to German
+    }
+    
+    return fallback;
+}
 
 /**
  * Utility-Funktion zur sicheren jQuery-Element-Validierung
@@ -1212,6 +1290,8 @@ var MBlockClipboard = {
             
             if (!this.data) {
                 console.warn('MBlock: Keine Daten in der Zwischenablage');
+                const message = '❌ ' + mblock_get_text('mblock_toast_clipboard_empty', 'Keine Daten in der Zwischenablage');
+                mblock_show_message(message, 'warning', 3000);
                 return false;
             }
             
@@ -1225,6 +1305,8 @@ var MBlockClipboard = {
                     current: currentModuleType,
                     clipboard: clipboardModuleType
                 });
+                const message = '⚠️ ' + mblock_get_text('mblock_toast_module_type_mismatch', 'Modultyp stimmt nicht überein') + ': ' + clipboardModuleType + ' ≠ ' + currentModuleType;
+                mblock_show_message(message, 'error', 4000);
                 
                 // Show user feedback
                 this.showModuleTypeMismatchWarning(currentModuleType, clipboardModuleType);
@@ -1311,6 +1393,12 @@ var MBlockClipboard = {
             setTimeout(function() {
                 if (pastedItem && pastedItem.length && pastedItem.is(':visible')) {
                     pastedItem.addClass('mblock-paste-glow');
+                    
+                    // Use bloecks Toast System for success feedback
+                    if (typeof BLOECKS !== 'undefined' && BLOECKS.showToast) {
+                        const message = '✅ ' + mblock_get_text('mblock_toast_paste_success', 'Block erfolgreich eingefügt!');
+                        BLOECKS.showToast(message, 'success', 4000);
+                    }
                     
                     // Remove glow class after animation completes
                     setTimeout(function() {
@@ -1596,6 +1684,12 @@ var MBlockClipboard = {
         setTimeout(() => {
             item.removeClass('mblock-copy-glow');
         }, 1000);
+        
+        // Use bloecks Toast System for additional feedback
+        if (typeof BLOECKS !== 'undefined' && BLOECKS.showToast) {
+            const message = '📋 ' + mblock_get_text('mblock_toast_copy_success', 'Block erfolgreich kopiert!');
+            BLOECKS.showToast(message, 'success', 3000);
+        }
         
         // Optional: Also give feedback to the copy button if it exists
         const $copyBtn = item.find('.mblock-copy-btn');
@@ -2186,9 +2280,19 @@ function mblock_add(element) {
     }
 }
 
-// ✨ Modern Vanilla JavaScript Smooth Scroll Solution
+// ✨ Modern Smooth Scroll - Use bloecks if available, fallback to vanilla
 function mblock_smooth_scroll_to_element(element, options = {}) {
     if (!element) return;
+    
+    // Try to use bloecks smooth scroll system first
+    if (typeof BLOECKS !== 'undefined' && typeof BLOECKS.scrollToSlice === 'function') {
+        try {
+            BLOECKS.scrollToSlice(element);
+            return;
+        } catch (error) {
+            console.warn('MBlock: Bloecks scroll failed, using fallback:', error);
+        }
+    }
     
     const config = {
         behavior: 'smooth',

@@ -74,6 +74,14 @@ if (rex::isBackend() && is_object(rex::getUser())) {
     // Always add our own assets
     rex_view::addJsFile($this->getAssetsUrl($jsFile));
     rex_view::addCssFile($this->getAssetsUrl('mblock.css'));
+    
+    // 🌍 Make toast message translations available to frontend
+    rex_view::setJsProperty('mblock_i18n', [
+        'copy_success' => $this->i18n('mblock_toast_copy_success'),
+        'paste_success' => $this->i18n('mblock_toast_paste_success'), 
+        'clipboard_empty' => $this->i18n('mblock_toast_clipboard_empty'),
+        'module_type_mismatch' => $this->i18n('mblock_toast_module_type_mismatch')
+    ]);
 }
 
 // Sichere Session-Reset mit optimiertem MBlockSessionHelper

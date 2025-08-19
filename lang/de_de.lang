@@ -69,3 +69,9 @@ mblock_copy_element = Element kopieren
 mblock_paste_element = Element einfügen
 mblock_clear_clipboard = Zwischenablage leeren
 mblock_clipboard_empty = Zwischenablage ist leer
+
+# Toast messages
+mblock_toast_copy_success = Block erfolgreich kopiert!
+mblock_toast_paste_success = Block erfolgreich eingefügt!
+mblock_toast_clipboard_empty = Keine Daten in der Zwischenablage
+mblock_toast_module_type_mismatch = Modultyp stimmt nicht überein

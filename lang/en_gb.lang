@@ -59,3 +59,9 @@ mblock_copy_element = Copy element
 mblock_paste_element = Paste element
 mblock_clear_clipboard = Clear clipboard
 mblock_clipboard_empty = Clipboard is empty
+
+# Toast messages
+mblock_toast_copy_success = Block copied successfully!
+mblock_toast_paste_success = Block pasted successfully!
+mblock_toast_clipboard_empty = No data in clipboard
+mblock_toast_module_type_mismatch = Module type mismatch

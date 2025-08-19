@@ -47,3 +47,15 @@ mblock_rexform_demo = RexForm MBlock-demo
 rex_form_mblock_demo_entries = Demo-items
 rex_form_mblock_demo_entries_add = Demo-item toevoegen
 rex_form_mblock_demo_entries_edit = Demo-invoer bewerken
+
+# Clipboard functionality
+mblock_copy_element = Element kopiëren
+mblock_paste_element = Element plakken
+mblock_clear_clipboard = Klembord wissen
+mblock_clipboard_empty = Klembord is leeg
+
+# Toast messages
+mblock_toast_copy_success = Blok succesvol gekopieerd!
+mblock_toast_paste_success = Blok succesvol geplakt!
+mblock_toast_clipboard_empty = Geen gegevens in klembord
+mblock_toast_module_type_mismatch = Moduletype komt niet overeen

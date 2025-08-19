@@ -47,3 +47,15 @@ mblock_rexform_demo = Demostración de RexForm MBlock
 rex_form_mblock_demo_entries = Entradas de demostración
 rex_form_mblock_demo_entries_add = Agregue una entrada de demostración
 rex_form_mblock_demo_entries_edit = Editar una entrada de demostración
+
+# Clipboard functionality
+mblock_copy_element = Copiar elemento
+mblock_paste_element = Pegar elemento
+mblock_clear_clipboard = Limpiar portapapeles
+mblock_clipboard_empty = El portapapeles está vacío
+
+# Toast messages
+mblock_toast_copy_success = ¡Bloque copiado con éxito!
+mblock_toast_paste_success = ¡Bloque pegado con éxito!
+mblock_toast_clipboard_empty = No hay datos en el portapapeles
+mblock_toast_module_type_mismatch = No coincide el tipo de módulo

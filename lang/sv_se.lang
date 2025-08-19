@@ -47,3 +47,15 @@ mblock_rexform_demo = RexForm MBlock demo
 rex_form_mblock_demo_entries = Demo inlägg
 rex_form_mblock_demo_entries_add = Tillfoga demo inlägg
 rex_form_mblock_demo_entries_edit = Redigera demo inlägg
+
+# Clipboard functionality
+mblock_copy_element = Kopiera element
+mblock_paste_element = Klistra in element
+mblock_clear_clipboard = Rensa urklipp
+mblock_clipboard_empty = Urklipp är tomt
+
+# Toast messages
+mblock_toast_copy_success = Block kopierat framgångsrikt!
+mblock_toast_paste_success = Block inklistrat framgångsrikt!
+mblock_toast_clipboard_empty = Inga data i urklipp
+mblock_toast_module_type_mismatch = Modultyp matchar inte

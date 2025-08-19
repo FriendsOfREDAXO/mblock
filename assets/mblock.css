@@ -118,7 +118,8 @@ html[data-bs-theme="dark"] .mblock_wrapper span.sorthandle:hover {
     display: none;
 }
 
-/* Modern Sortable Ghost (Bloecks-Style) */
+/* Modern Sortable Ghost (Bloecks-Style) 
+ * 💡 Diese Styles könnten in Zukunft durch bloecks CSS ersetzt werden */
 div.sortable-ghost {
     opacity: 0.6;
     background: rgba(248, 249, 250, 0.9);
