@@ -150,11 +150,7 @@ foreach ($topItems as $item) {
     // Basis-Einstellungen
     "min" => 1,                    // Mindestens 1 Item
     "max" => 10,                   // Maximal 10 Items
-    
-    // UI-Einstellungen
-    "collapsed" => false,          // Items eingeklappt starten
-    "sortable" => true,            // Drag & Drop Sortierung
-    
+       
     // Erweiterte Optionen
     "settings" => [
         "mediapool_token_check" => false // Token-Check für Media-IDs 1-10
