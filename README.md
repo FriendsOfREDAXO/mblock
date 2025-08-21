@@ -178,41 +178,9 @@ Die Template-Auswahl erfolgt über die **MBlock-Einstellungen**:
 3. **Klicke "Speichern"** - Das CSS wird automatisch kopiert
 4. **Das Template ist sofort aktiv**
 
-### Verfügbare Templates
-MBlock enthält standardmäßig folgende professionelle Templates:
-
-#### **REDAXO Blue** (Standard)
-- **Design**: Klassisches REDAXO-Design in professionellem Blau
-- **Zielgruppe**: Corporate Websites, Business-Anwendungen
-- **Features**: Clean Design, optimale Lesbarkeit, REDAXO-konform
-
-#### **REDAXO Orange**
-- **Design**: Warmes Pastell-Orange Design mit sanften Farbverläufen  
-- **Zielgruppe**: Kreative Projekte, moderne Websites
-- **Features**: Freundliche Farbgebung, moderne Gradients
-
-#### **AKG Skin** 
-- **Design**: Nostalgie-Theme im REDAXO 4 Look mit grün/blauen Akzenten
-- **Zielgruppe**: Klassische REDAXO-Nutzer, Retro-Liebhaber
-- **Features**: Verdana-Font, klassische Farben, bewährtes Design
-
-#### **Modern Theme**
-- **Design**: Material Design mit starken Schatten und abgerundeten Ecken
-- **Zielgruppe**: Moderne Web-Apps, Dashboard-Anwendungen  
-- **Features**: 16px Border-Radius, Box-Shadows, CKE5-optimiert
-
-#### **Retro 8-Bit**
-- **Design**: Gaming-inspiriertes Design mit Pixel-Ästhetik
-- **Zielgruppe**: Gaming-Websites, kreative Projekte
-- **Features**: VT323-Font, ASCII-Art, Retro-Terminologie
-
-#### **Glassmorphism**
-- **Design**: Moderne Glasoptik mit Blur-Effekten und Transparenz
-- **Zielgruppe**: Premium-Websites, moderne UI/UX
-- **Features**: backdrop-filter, Inter-Font, frosted glass effects
 
 ### Dark Mode Support
-**Alle Templates** unterstützen automatisch Dark Mode:
+**Die mitgelieferten Templates** unterstützen Dark Mode:
 
 - **REDAXO Theme Detection** (`body.rex-theme-dark`)
 - **Browser Preference** (`@media (prefers-color-scheme: dark)`)
@@ -231,64 +199,6 @@ redaxo/data/addons/mblock/templates/
 ```
 
 **Wichtig:** Die CSS-Datei muss den **gleichen Namen wie der Template-Ordner** haben!
-
-**Template-Konfiguration (`template.ini`):**
-```ini
-[template]
-name = "Mein Custom Theme"
-description = "Beschreibung des Themes"
-author = "Dein Name"
-version = "1.0"
-```
-
-**Custom Theme CSS (`my_custom_theme.css`):**
-```css
-/* Dein Custom Theme Styling - Dateiname muss mit Ordnername übereinstimmen! */
-.mblock-wrapper {
-    /* Deine Anpassungen */
-}
-```
-
-### Template-Management
-Das Template-System bietet automatisches Management:
-
-- **CSS-Kopierung**: Templates werden automatisch nach `assets/addons/mblock/` kopiert
-- **Performance**: Nur aktive Templates werden geladen
-- **Cleanup**: Nicht verwendete Template-CSS wird automatisch entfernt
-- **Versionierung**: Template-Updates werden erkannt und aktualisiert
-
-## CSS Anpassungen
-
-### Template-CSS Anpassung
-Das gewählte Template kann über eigene CSS-Dateien erweitert oder angepasst werden. Das Template-System kopiert die CSS automatisch nach `assets/addons/mblock/` und lädt sie für optimale Performance.
-
-### Eigene CSS-Erweiterungen
-Um ein vorhandenes Template anzupassen, erstelle eine eigene CSS-Datei:
-
-```css
-/* assets/css/mblock-custom.css */
-
-/* Template-spezifische Anpassungen */
-.mblock-wrapper {
-    border: 2px solid #your-color;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.mblock-item {
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-}
-
-/* Button-Anpassungen */
-.mblock-wrapper .btn-outline-secondary {
-    border-color: #your-brand-color;
-    color: #your-brand-color;
-}
-
-.mblock-wrapper .btn-outline-secondary:hover {
-    background-color: #your-brand-color;
-    border-color: #your-brand-color;
-}
-```
 
 
 ## Modulbeispiele / Module examples
