@@ -1,0 +1,401 @@
+/* Modern Theme CSS for MBlock */
+/* Modernes Theme mit runden Ecken und Hover-Effekten */
+
+.mblock_wrapper {
+    border: 1px solid #e3f2fd !important;
+    border-radius: 16px !important;  /* Von 8px auf 16px */
+    background: #f8fbff !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;  /* Stärkerer Schatten */
+    padding: 12px !important;  /* Etwas mehr Padding */
+    margin: 10px 0 !important;
+}
+
+.mblock_wrapper .mblock_item,
+.mblock_wrapper > div {
+    margin: 8px 0 !important;
+    padding: 16px !important;  /* Von 12px auf 16px */
+    border: 1px solid #bbdefb !important;
+    border-radius: 12px !important;  /* Von 6px auf 12px */
+    background: white !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08) !important;  /* Sanfter Grundschatten */
+    transition: all 0.3s ease !important;
+}
+
+.mblock_wrapper .mblock_item:hover,
+.mblock_wrapper > div:hover {
+    border-color: #2196f3 !important;
+    box-shadow: 0 6px 20px rgba(33, 150, 243, 0.25) !important;  /* Viel stärkerer Hover-Schatten */
+    transform: translateY(-2px) !important;  /* Leichte Elevation */
+}
+
+.mblock_wrapper .btn {
+    border-radius: 8px !important;  /* Von 4px auf 8px */
+    font-size: 12px !important;
+    padding: 6px 10px !important;  /* Etwas mehr Padding */
+    margin: 2px !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;  /* Schatten für Buttons */
+    transition: all 0.3s ease !important;
+}
+
+.mblock_wrapper .btn-success {
+    background: linear-gradient(135deg, #4caf50, #45a049) !important;
+    border-color: #45a049 !important;
+}
+
+.mblock_wrapper .btn-danger {
+    background: linear-gradient(135deg, #f44336, #da190b) !important;
+    border-color: #da190b !important;
+}
+
+.mblock_wrapper .btn-info {
+    background: linear-gradient(135deg, #2196f3, #0b7dda) !important;
+    border-color: #0b7dda !important;
+}
+
+.mblock_wrapper span.mblock_adder,
+.mblock_wrapper .mblock_add {
+    text-align: center !important;
+    padding: 20px !important;  /* Von 16px auf 20px */
+    border: 2px dashed #2196f3 !important;
+    border-radius: 16px !important;  /* Von 6px auf 16px */
+    background: #e3f2fd !important;
+    margin: 12px 0 !important;  /* Etwas mehr Abstand */
+    box-shadow: 0 3px 8px rgba(33, 150, 243, 0.12) !important;  /* Sanfter Schatten */
+    transition: all 0.3s ease !important;
+}
+
+.mblock_wrapper span.mblock_adder:hover,
+.mblock_wrapper .mblock_add:hover {
+    background: #bbdefb !important;
+    border-color: #1976d2 !important;
+    box-shadow: 0 6px 16px rgba(33, 150, 243, 0.2) !important;  /* Stärkerer Hover-Schatten */
+    transform: translateY(-1px) !important;  /* Leichte Elevation */
+}
+
+.mblock_wrapper span.mblock_adder .btn,
+.mblock_wrapper .mblock_add .btn {
+    background: linear-gradient(135deg, #2196f3, #1976d2) !important;
+    border-color: #1976d2 !important;
+    color: white !important;
+    font-weight: bold !important;
+    padding: 10px 20px !important;  /* Von 8px 16px auf 10px 20px */
+    border-radius: 12px !important;  /* Von 6px auf 12px */
+    box-shadow: 0 3px 6px rgba(33, 150, 243, 0.3) !important;  /* Schatten für Add-Button */
+    transition: all 0.3s ease !important;
+}
+
+/* === DARK MODE SUPPORT === */
+/* REDAXO Dark Theme Support */
+body.rex-theme-dark .mblock_wrapper {
+    border-color: #1976d2 !important;
+    background: #1a1f2e !important;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3) !important;  /* Stärkerer Dark Mode Schatten */
+}
+
+body.rex-theme-dark .mblock_wrapper .mblock_item,
+body.rex-theme-dark .mblock_wrapper > div {
+    border-color: #1565c0 !important;
+    background: #252a3a !important;
+    color: #e9ecef !important;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2) !important;  /* Dark Mode Schatten */
+}
+
+body.rex-theme-dark .mblock_wrapper .mblock_item:hover,
+body.rex-theme-dark .mblock_wrapper > div:hover {
+    border-color: #2196f3 !important;
+    box-shadow: 0 8px 25px rgba(33, 150, 243, 0.4) !important;  /* Noch stärkerer Dark Mode Hover */
+    transform: translateY(-2px) !important;
+}
+
+body.rex-theme-dark .mblock_wrapper .btn-success {
+    background: linear-gradient(135deg, #2196f3, #1976d2) !important;
+    border-color: #1976d2 !important;
+}
+
+body.rex-theme-dark .mblock_wrapper .btn-danger {
+    background: linear-gradient(135deg, #f44336, #d32f2f) !important;
+    border-color: #d32f2f !important;
+}
+
+body.rex-theme-dark .mblock_wrapper .btn-info {
+    background: linear-gradient(135deg, #2196f3, #1976d2) !important;
+    border-color: #1976d2 !important;
+}
+
+body.rex-theme-dark .mblock_wrapper span.mblock_adder,
+body.rex-theme-dark .mblock_wrapper .mblock_add {
+    border-color: #1976d2 !important;
+    background: #1e2533 !important;
+    color: #e9ecef !important;
+}
+
+body.rex-theme-dark .mblock_wrapper span.mblock_adder:hover,
+body.rex-theme-dark .mblock_wrapper .mblock_add:hover {
+    background: #242940 !important;
+    border-color: #2196f3 !important;
+}
+
+body.rex-theme-dark .mblock_wrapper span.mblock_adder .btn,
+body.rex-theme-dark .mblock_wrapper .mblock_add .btn {
+    background: linear-gradient(135deg, #2196f3, #1976d2) !important;
+    border-color: #1976d2 !important;
+}
+
+/* Auto Dark Mode (System Preference) */
+@media (prefers-color-scheme: dark) {
+    .mblock_wrapper {
+        border-color: #1976d2 !important;
+        background: #1a1f2e !important;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3) !important;
+    }
+
+    .mblock_wrapper .mblock_item,
+    .mblock_wrapper > div {
+        border-color: #1565c0 !important;
+        background: #252a3a !important;
+        color: #e9ecef !important;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.2) !important;
+    }
+
+    .mblock_wrapper .mblock_item:hover,
+    .mblock_wrapper > div:hover {
+        border-color: #2196f3 !important;
+        box-shadow: 0 8px 25px rgba(33, 150, 243, 0.4) !important;
+        transform: translateY(-2px) !important;
+    }
+
+    .mblock_wrapper .btn-success {
+        background: linear-gradient(135deg, #2196f3, #1976d2) !important;
+        border-color: #1976d2 !important;
+    }
+
+    .mblock_wrapper .btn-danger {
+        background: linear-gradient(135deg, #f44336, #d32f2f) !important;
+        border-color: #d32f2f !important;
+    }
+
+    .mblock_wrapper .btn-info {
+        background: linear-gradient(135deg, #2196f3, #1976d2) !important;
+        border-color: #1976d2 !important;
+    }
+
+    .mblock_wrapper span.mblock_adder,
+    .mblock_wrapper .mblock_add {
+        border-color: #1976d2 !important;
+        background: #1e2533 !important;
+        color: #e9ecef !important;
+    }
+
+    .mblock_wrapper span.mblock_adder:hover,
+    .mblock_wrapper .mblock_add:hover {
+        background: #242940 !important;
+        border-color: #2196f3 !important;
+    }
+
+    .mblock_wrapper span.mblock_adder .btn,
+    .mblock_wrapper .mblock_add .btn {
+        background: linear-gradient(135deg, #2196f3, #1976d2) !important;
+        border-color: #1976d2 !important;
+    }
+}
+
+/* === CKE5 EDITOR STYLES === */
+/* Modern Theme für CKEditor 5 innerhalb von MBlocks */
+/* Spezifischere Selektoren um Tabellenfunktionalität nicht zu stören */
+
+.mblock_wrapper .ck-editor.ck-editor__main,
+.mblock_wrapper .ck.ck-editor {
+    border-radius: 12px !important;
+    /* overflow: hidden entfernt für Dropdown-Sichtbarkeit */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
+    border: 1px solid #e0e0e0 !important;
+    overflow: visible !important;
+}
+
+.mblock_wrapper .ck-editor__top .ck-sticky-panel {
+    border-bottom: 1px solid #e3f2fd !important;
+    background: linear-gradient(135deg, #f8fbff, #f0f8ff) !important;
+}
+
+.mblock_wrapper .ck-toolbar.ck-toolbar_grouping {
+    border-radius: 12px 12px 0 0 !important;
+    border: none !important;
+    background: linear-gradient(135deg, #f8fbff, #f0f8ff) !important;
+    padding: 12px 16px !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+}
+
+/* Nur Haupttoolbar-Buttons, nicht Tabellen-UI */
+.mblock_wrapper .ck-toolbar.ck-toolbar_grouping .ck-button:not(.ck-table-cell-properties-button) {
+    border-radius: 8px !important;
+    margin: 3px !important;
+    padding: 6px 8px !important;
+    transition: all 0.2s ease !important;
+    border: 1px solid transparent !important;
+    background: rgba(255,255,255,0.7) !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+}
+
+.mblock_wrapper .ck-toolbar.ck-toolbar_grouping .ck-button:not(.ck-table-cell-properties-button):hover {
+    background: rgba(33, 150, 243, 0.1) !important;
+    border-color: rgba(33, 150, 243, 0.3) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 4px rgba(33, 150, 243, 0.15) !important;
+}
+
+.mblock_wrapper .ck-toolbar.ck-toolbar_grouping .ck-button.ck-on:not(.ck-table-cell-properties-button) {
+    background: linear-gradient(135deg, #2196f3, #1976d2) !important;
+    color: white !important;
+    border-color: #1976d2 !important;
+    box-shadow: 0 2px 6px rgba(33, 150, 243, 0.4) !important;
+}
+
+/* Schönere Trennlinien */
+.mblock_wrapper .ck-toolbar .ck-toolbar__separator {
+    background: linear-gradient(to bottom, transparent, #ddd, transparent) !important;
+    margin: 4px 8px !important;
+    width: 1px !important;
+    height: 24px !important;
+}
+
+/* Dropdown-Buttons speziell stylen */
+.mblock_wrapper .ck-toolbar.ck-toolbar_grouping .ck-dropdown__button {
+    background: rgba(255,255,255,0.8) !important;
+    border-radius: 8px !important;
+    padding: 6px 12px !important;
+    border: 1px solid rgba(0,0,0,0.1) !important;
+}
+
+.mblock_wrapper .ck-toolbar.ck-toolbar_grouping .ck-dropdown__button:hover {
+    background: rgba(33, 150, 243, 0.1) !important;
+    border-color: rgba(33, 150, 243, 0.3) !important;
+    box-shadow: 0 2px 4px rgba(33, 150, 243, 0.15) !important;
+}
+
+.mblock_wrapper .ck-content.ck-editor__editable {
+    border-radius: 0 0 12px 12px !important;
+    border: none !important;
+    padding: 16px !important;
+    background: white !important;
+    min-height: 120px !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+}
+
+.mblock_wrapper .ck-content.ck-editor__editable:focus {
+    box-shadow: inset 0 0 0 2px rgba(33, 150, 243, 0.2) !important;
+}
+
+/* CKE5 Dropdown Menus - aber nicht Tabellen-Popups */
+.mblock_wrapper .ck-dropdown__panel:not(.ck-table-properties-form) {
+    border-radius: 8px !important;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15) !important;
+    border: 1px solid #e3f2fd !important;
+}
+
+.mblock_wrapper .ck-list__item:not(.ck-table-properties-form *) {
+    border-radius: 4px !important;
+    margin: 2px 4px !important;
+}
+
+.mblock_wrapper .ck-list__item:not(.ck-table-properties-form *):hover {
+    background: rgba(33, 150, 243, 0.1) !important;
+}
+
+/* === CKE5 DARK MODE SUPPORT === */
+body.rex-theme-dark .mblock_wrapper .ck-editor__top .ck-sticky-panel {
+    border-bottom-color: #1565c0 !important;
+    background: linear-gradient(135deg, #252a3a, #1e2533) !important;
+}
+
+body.rex-theme-dark .mblock_wrapper .ck-toolbar.ck-toolbar_grouping {
+    background: linear-gradient(135deg, #252a3a, #1e2533) !important;
+}
+
+body.rex-theme-dark .mblock_wrapper .ck-toolbar.ck-toolbar_grouping .ck-button:not(.ck-table-cell-properties-button) {
+    color: #e9ecef !important;
+}
+
+body.rex-theme-dark .mblock_wrapper .ck-toolbar.ck-toolbar_grouping .ck-button:not(.ck-table-cell-properties-button):hover {
+    background: rgba(33, 150, 243, 0.2) !important;
+    border-color: #2196f3 !important;
+}
+
+body.rex-theme-dark .mblock_wrapper .ck-toolbar.ck-toolbar_grouping .ck-button.ck-on:not(.ck-table-cell-properties-button) {
+    background: linear-gradient(135deg, #2196f3, #1976d2) !important;
+    color: white !important;
+}
+
+body.rex-theme-dark .mblock_wrapper .ck-content.ck-editor__editable {
+    background: #2a2f3f !important;
+    color: #e9ecef !important;
+    border-color: #1565c0 !important;
+}
+
+body.rex-theme-dark .mblock_wrapper .ck-content.ck-editor__editable:focus {
+    box-shadow: inset 0 0 0 2px rgba(33, 150, 243, 0.3) !important;
+}
+
+body.rex-theme-dark .mblock_wrapper .ck-dropdown__panel:not(.ck-table-properties-form) {
+    background: #2a2f3f !important;
+    border-color: #1565c0 !important;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3) !important;
+}
+
+body.rex-theme-dark .mblock_wrapper .ck-list__item:not(.ck-table-properties-form *) {
+    color: #e9ecef !important;
+}
+
+body.rex-theme-dark .mblock_wrapper .ck-list__item:not(.ck-table-properties-form *):hover {
+    background: rgba(33, 150, 243, 0.2) !important;
+}
+
+/* Auto Dark Mode für CKE5 */
+@media (prefers-color-scheme: dark) {
+    .mblock_wrapper .ck-editor__top .ck-sticky-panel {
+        border-bottom-color: #1565c0 !important;
+        background: linear-gradient(135deg, #252a3a, #1e2533) !important;
+    }
+
+    .mblock_wrapper .ck-toolbar.ck-toolbar_grouping {
+        background: linear-gradient(135deg, #252a3a, #1e2533) !important;
+    }
+
+    .mblock_wrapper .ck-toolbar.ck-toolbar_grouping .ck-button:not(.ck-table-cell-properties-button) {
+        color: #e9ecef !important;
+    }
+
+    .mblock_wrapper .ck-toolbar.ck-toolbar_grouping .ck-button:not(.ck-table-cell-properties-button):hover {
+        background: rgba(33, 150, 243, 0.2) !important;
+        border-color: #2196f3 !important;
+    }
+
+    .mblock_wrapper .ck-toolbar.ck-toolbar_grouping .ck-button.ck-on:not(.ck-table-cell-properties-button) {
+        background: linear-gradient(135deg, #2196f3, #1976d2) !important;
+        color: white !important;
+    }
+
+    .mblock_wrapper .ck-content.ck-editor__editable {
+        background: #2a2f3f !important;
+        color: #e9ecef !important;
+        border-color: #1565c0 !important;
+    }
+
+    .mblock_wrapper .ck-content.ck-editor__editable:focus {
+        box-shadow: inset 0 0 0 2px rgba(33, 150, 243, 0.3) !important;
+    }
+
+    .mblock_wrapper .ck-dropdown__panel:not(.ck-table-properties-form) {
+        background: #2a2f3f !important;
+        border-color: #1565c0 !important;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3) !important;
+    }
+
+    .mblock_wrapper .ck-list__item:not(.ck-table-properties-form *) {
+        color: #e9ecef !important;
+    }
+
+    .mblock_wrapper .ck-list__item:not(.ck-table-properties-form *):hover {
+        background: rgba(33, 150, 243, 0.2) !important;
+    }
+}

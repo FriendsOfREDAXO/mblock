@@ -5,12 +5,16 @@
  * @license MIT
  */
 
+use FriendsOfRedaxo\MBlock\Utils\TemplateManager;
+use FriendsOfRedaxo\MBlock\Provider\TemplateProvider;
+
 // rex request
 $config = rex_post('config', array(
     array('mblock_scroll', 'boolean'),
     array('mblock_delete', 'boolean'),
     array('mblock_delete_confirm', 'boolean'),
     array('mblock_copy_paste', 'boolean'),
+    array('mblock_theme', 'string'),
     array('submit', 'boolean')
 ));
 
@@ -30,12 +34,53 @@ $form = '';
 
 // if submit set config
 if ($config['submit']) {
+    // Handle template selection and CSS copying
+    $templateChanged = false;
+    $currentTemplate = $this->getConfig('mblock_theme', 'default_theme');
+    
+    if (isset($config['mblock_theme']) && $config['mblock_theme'] !== $currentTemplate) {
+        // Validate template exists
+        if (!TemplateProvider::templateExists($config['mblock_theme'])) {
+            $form .= rex_view::error('Template "' . htmlspecialchars($config['mblock_theme']) . '" nicht gefunden. Bitte überprüfen Sie, ob alle benötigten Dateien vorhanden sind.');
+        } else {
+            $templateChanged = true;
+            
+            // Remove old template CSS if it exists
+            if ($currentTemplate !== 'default_theme') {
+                TemplateManager::removeTemplateCSS($currentTemplate);
+            }
+            
+            // Set new template
+            $this->setConfig('mblock_theme', $config['mblock_theme']);
+            
+            // Handle CSS for new template
+            if ($config['mblock_theme'] === 'default_theme') {
+                // Clean up all template CSS files when switching to default
+                $removedCount = TemplateManager::cleanupAllTemplateCSS();
+                if ($removedCount > 0) {
+                    $form .= rex_view::info('Template-CSS Dateien wurden aufgeräumt (' . $removedCount . ' Dateien entfernt).');
+                }
+            } else {
+                // Copy new template CSS if it exists (always overwrite)
+                if (TemplateManager::hasTemplateCSS($config['mblock_theme'])) {
+                    if (TemplateManager::copyTemplateCSS($config['mblock_theme'])) {
+                        $form .= rex_view::success(rex_i18n::msg('mblock_theme_css_copied'));
+                    } else {
+                        $form .= rex_view::warning('Template-CSS konnte nicht kopiert werden.');
+                    }
+                }
+            }
+        }
+    }
+    
     // show is saved field
     $this->setConfig('mblock_delete', $config['mblock_delete']);
     $this->setConfig('mblock_scroll', $config['mblock_scroll']);
     $this->setConfig('mblock_delete_confirm', $config['mblock_delete_confirm']);
     $this->setConfig('mblock_copy_paste', $config['mblock_copy_paste']);
-    $form .= rex_view::info(rex_i18n::msg('mblock_config_saved'));
+    
+    $saveMessage = $templateChanged ? rex_i18n::msg('mblock_theme_saved') : rex_i18n::msg('mblock_config_saved');
+    $form .= rex_view::info($saveMessage);
 }
 
 // open form
@@ -108,6 +153,38 @@ $select->addOption(rex_i18n::msg('mblock_enabled'), 1);
 $select->setSelected($this->getConfig('mblock_copy_paste', 1)); // Default: enabled
 $elements['field'] = $select->get();
 $formElements[] = $elements;
+// parse select element
+$fragment = new rex_fragment();
+$fragment->setVar('elements', $formElements, false);
+$form .= $fragment->parse('core/form/form.php');
+
+// Template selection
+$formElements = array();
+$elements = array();
+$elements['label'] = '
+  <label for="rex-mblock-config-template">' . rex_i18n::msg('mblock_theme_label') . '</label>
+';
+
+// Get available templates
+$availableTemplates = TemplateManager::getAvailableTemplates();
+
+// create select
+$select = new rex_select;
+$select->setId('rex-mblock-config-template');
+$select->setSize(1);
+$select->setAttribute('class', 'form-control');
+$select->setName('config[mblock_theme]');
+
+// add options
+foreach ($availableTemplates as $key => $label) {
+    $select->addOption($label, $key);
+}
+$select->setSelected($this->getConfig('mblock_theme', 'default_theme'));
+
+$elements['field'] = $select->get();
+$elements['note'] = '<div class="help-block small">' . rex_i18n::msg('mblock_theme_info') . '</div>';
+$formElements[] = $elements;
+
 // parse select element
 $fragment = new rex_fragment();
 $fragment->setVar('elements', $formElements, false);

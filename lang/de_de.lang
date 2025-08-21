@@ -77,3 +77,10 @@ mblock_toast_copy_success = Block erfolgreich kopiert!
 mblock_toast_paste_success = Block erfolgreich eingefügt!
 mblock_toast_clipboard_empty = Keine Daten in der Zwischenablage
 mblock_toast_module_type_mismatch = Modultyp stimmt nicht überein
+
+# Template selection
+mblock_theme_label = Template-Auswahl
+mblock_theme_default = Standard Template
+mblock_theme_info = Hier können Sie ein eigenes mblock-Template auswählen. Legen Sie dazu einen Ordner in <code>data/templates/</code> an. Jedes Template kann eine eigene CSS-Datei mit dem Prefix des Template-Namens enthalten (z.B. <code>mytemplate.css</code>). Diese wird bei Auswahl automatisch nach <code>assets/</code> kopiert und nach der Standard-CSS geladen, sodass Sie Defaults überschreiben können. Das Default-Template bleibt immer verfügbar.
+mblock_theme_css_copied = Template-CSS wurde erfolgreich kopiert
+mblock_theme_saved = Template-Auswahl wurde gespeichert

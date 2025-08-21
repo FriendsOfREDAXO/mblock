@@ -29,13 +29,13 @@ class MBlockTemplateFileProvider
     public static function loadTemplate($templateType, $subPath = '', $theme = NULL, $stop = false)
     {
         if (is_null($theme)) {
-            $theme = rex_addon::get('mblock')->getConfig('mblock_theme');
+            $theme = rex_addon::get('mblock')->getConfig('mblock_theme', self::DEFAULT_THEME);
         }
 
         $file = "mblock_$templateType.ini"; // create file name
 
         // 1. First check for custom templates in data folder
-        $dataPath = rex_path::addonData('mblock', sprintf(self::THEME_PATH . $subPath, $theme));
+        $dataPath = rex_path::addonData('mblock', 'templates/' . $theme . '/' . $subPath);
         
         // 2. Fallback to addon templates folder
         $addonPath = rex_path::addon('mblock', sprintf(self::THEME_PATH . $subPath, $theme));
@@ -74,7 +74,7 @@ class MBlockTemplateFileProvider
         }
 
         return [
-            'custom' => rex_path::addonData('mblock', sprintf(self::THEME_PATH, $theme)),
+            'custom' => rex_path::addonData('mblock', 'templates/' . $theme . '/'),
             'default' => rex_path::addon('mblock', sprintf(self::THEME_PATH, $theme))
         ];
     }

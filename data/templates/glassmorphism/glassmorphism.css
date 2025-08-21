@@ -1,0 +1,382 @@
+/* 🥂 GLASSMORPHISM THEME for MBlock 🥂 */
+/* Modern frosted glass design with blur effects */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+    --glass-primary: rgba(255, 255, 255, 0.25);
+    --glass-secondary: rgba(255, 255, 255, 0.18);
+    --glass-accent: rgba(99, 102, 241, 0.8);
+    --glass-success: rgba(16, 185, 129, 0.8);
+    --glass-danger: rgba(239, 68, 68, 0.8);
+    --glass-warning: rgba(245, 158, 11, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.18);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    --glass-backdrop: blur(4px);
+    --glass-text: rgba(255, 255, 255, 0.9);
+    --glass-text-secondary: rgba(255, 255, 255, 0.7);
+}
+
+/* === GLASSMORPHISM CONTAINER === */
+.mblock_wrapper.glassmorphism-container {
+    background: var(--glass-primary) !important;
+    backdrop-filter: var(--glass-backdrop) !important;
+    -webkit-backdrop-filter: var(--glass-backdrop) !important;
+    border-radius: 20px !important;
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: var(--glass-shadow) !important;
+    padding: 24px !important;
+    margin: 20px 0 !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    position: relative !important;
+    overflow: visible !important;
+}
+
+.mblock_wrapper.glassmorphism-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+    border-radius: 20px;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* === GLASSMORPHISM HEADER === */
+.glassmorphism-header {
+    text-align: center !important;
+    margin-bottom: 24px !important;
+    padding-bottom: 16px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.glassmorphism-title {
+    color: var(--glass-text) !important;
+    font-size: 24px !important;
+    font-weight: 600 !important;
+    margin-bottom: 4px !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+}
+
+.glassmorphism-subtitle {
+    color: var(--glass-text-secondary) !important;
+    font-size: 14px !important;
+    font-weight: 300 !important;
+    opacity: 0.8 !important;
+}
+
+/* === GLASSMORPHISM BLOCKS === */
+.glassmorphism-block {
+    background: var(--glass-secondary) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    border-radius: 16px !important;
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.2) !important;
+    margin: 16px 0 !important;
+    overflow: visible !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.glassmorphism-block:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px 0 rgba(31, 38, 135, 0.3) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.glassmorphism-block-header {
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(10px) !important;
+    padding: 16px 20px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.glassmorphism-block-title {
+    color: var(--glass-text) !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+.glassmorphism-icon {
+    font-size: 18px !important;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)) !important;
+}
+
+.glassmorphism-controls {
+    display: flex !important;
+    gap: 8px !important;
+}
+
+.glassmorphism-block-content {
+    padding: 20px !important;
+}
+
+.glassmorphism-inner {
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(2px) !important;
+    border-radius: 12px !important;
+    padding: 16px !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* === GLASSMORPHISM BUTTONS === */
+.mblock_wrapper .btn,
+.mblock_wrapper button {
+    font-family: 'Inter', sans-serif !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    padding: 8px 16px !important;
+    margin: 4px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    cursor: pointer !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
+}
+
+/* Add Buttons - Success Glass */
+.mblock_wrapper .btn-default,
+.mblock_wrapper .addme,
+.mblock_wrapper .btn-success {
+    background: var(--glass-success) !important;
+    border-color: rgba(16, 185, 129, 0.3) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px 0 rgba(16, 185, 129, 0.2) !important;
+}
+
+.mblock_wrapper .btn-default:hover,
+.mblock_wrapper .addme:hover,
+.mblock_wrapper .btn-success:hover {
+    background: rgba(16, 185, 129, 0.9) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px 0 rgba(16, 185, 129, 0.3) !important;
+}
+
+/* Delete Buttons - Danger Glass */
+.mblock_wrapper .btn-delete,
+.mblock_wrapper .removeme,
+.mblock_wrapper .btn-danger {
+    background: var(--glass-danger) !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px 0 rgba(239, 68, 68, 0.2) !important;
+}
+
+.mblock_wrapper .btn-delete:hover,
+.mblock_wrapper .removeme:hover,
+.mblock_wrapper .btn-danger:hover {
+    background: rgba(239, 68, 68, 0.9) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px 0 rgba(239, 68, 68, 0.3) !important;
+}
+
+/* Info Buttons - Primary Glass */
+.mblock_wrapper .btn-info {
+    background: var(--glass-accent) !important;
+    border-color: rgba(99, 102, 241, 0.3) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px 0 rgba(99, 102, 241, 0.2) !important;
+}
+
+.mblock_wrapper .btn-info:hover {
+    background: rgba(99, 102, 241, 0.9) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px 0 rgba(99, 102, 241, 0.3) !important;
+}
+
+/* Warning Buttons - Warning Glass */
+.mblock_wrapper .btn-warning {
+    background: var(--glass-warning) !important;
+    border-color: rgba(245, 158, 11, 0.3) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px 0 rgba(245, 158, 11, 0.2) !important;
+}
+
+.mblock_wrapper .btn-warning:hover {
+    background: rgba(245, 158, 11, 0.9) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px 0 rgba(245, 158, 11, 0.3) !important;
+}
+
+/* Disabled Buttons */
+.mblock_wrapper .btn:disabled,
+.mblock_wrapper button:disabled {
+    background: rgba(0, 0, 0, 0.1) !important;
+    border-color: rgba(0, 0, 0, 0.15) !important;
+    color: rgba(0, 0, 0, 0.4) !important;
+    backdrop-filter: blur(2px) !important;
+    box-shadow: none !important;
+    transform: none !important;
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+}
+
+/* === ADD ZONE === */
+.glassmorphism-add-zone {
+    text-align: center !important;
+    padding: 24px !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(6px) !important;
+    border-radius: 16px !important;
+    border: 2px dashed rgba(255, 255, 255, 0.2) !important;
+    margin: 20px 0 !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.glassmorphism-add-zone:hover {
+    background: rgba(255, 255, 255, 0.12) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 20px 0 rgba(31, 38, 135, 0.15) !important;
+}
+
+.glassmorphism-add-text {
+    color: var(--glass-text) !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    margin-bottom: 12px !important;
+    opacity: 0.8 !important;
+}
+
+/* === CKE5 EDITOR GLASSMORPHISM === */
+/* Nur dezenter Rahmen, alles andere Standard */
+.mblock_wrapper .ck-editor {
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 0 !important;
+}
+
+/* CKE5 Button Padding Fix - damit sie nicht über den Rahmen ragen */
+.mblock_wrapper .ck-button {
+    margin: 0 !important;
+    padding: 4px 8px !important;
+}
+
+.mblock_wrapper .ck-list-item-button {
+    padding: 6px 12px !important;
+    margin: 1px 0 !important;
+}
+
+/* CKE5 Dropdowns - z-index fix für Glassmorphism */
+.mblock_wrapper .ck-dropdown__panel {
+    z-index: 99999 !important;
+    position: absolute !important;
+}
+
+.mblock_wrapper .ck-balloon-panel {
+    z-index: 99999 !important;
+}
+
+.mblock_wrapper .ck-tooltip {
+    z-index: 100000 !important;
+}
+
+.ck-body .ck {
+    z-index: 99999 !important;
+}
+
+.ck-body .ck-dropdown__panel {
+    z-index: 99999 !important;
+}
+
+/* Fix für Input Groups im Glassmorphism Theme */
+.mblock_wrapper .input-group .form-control {
+    position: static !important;
+}
+
+.mblock_wrapper .input-group {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* === DARK MODE SUPPORT === */
+/* Glassmorphism works best with darker backgrounds */
+body.rex-theme-dark .glassmorphism-container {
+    --glass-primary: rgba(255, 255, 255, 0.1);
+    --glass-secondary: rgba(255, 255, 255, 0.08);
+    --glass-backdrop: blur(8px);
+}
+
+body.rex-theme-dark .mblock_wrapper.glassmorphism-container {
+    background: var(--glass-primary) !important;
+    backdrop-filter: var(--glass-backdrop) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.rex-theme-dark .mblock_wrapper .btn:disabled,
+body.rex-theme-dark .mblock_wrapper button:disabled {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: rgba(255, 255, 255, 0.3) !important;
+    backdrop-filter: blur(2px) !important;
+    box-shadow: none !important;
+    transform: none !important;
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+}
+
+@media (prefers-color-scheme: dark) {
+    .mblock_wrapper .btn:disabled,
+    .mblock_wrapper button:disabled {
+        background: rgba(255, 255, 255, 0.08) !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+        color: rgba(255, 255, 255, 0.3) !important;
+        backdrop-filter: blur(2px) !important;
+        box-shadow: none !important;
+        transform: none !important;
+        opacity: 0.5 !important;
+        cursor: not-allowed !important;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --glass-primary: rgba(255, 255, 255, 0.1);
+        --glass-secondary: rgba(255, 255, 255, 0.08);
+        --glass-backdrop: blur(8px);
+    }
+    
+    .mblock_wrapper.glassmorphism-container {
+        background: var(--glass-primary) !important;
+        backdrop-filter: var(--glass-backdrop) !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    .glassmorphism-block {
+        background: var(--glass-secondary) !important;
+        backdrop-filter: blur(12px) !important;
+    }
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+    .mblock_wrapper.glassmorphism-container {
+        padding: 16px !important;
+        border-radius: 16px !important;
+    }
+    
+    .glassmorphism-title {
+        font-size: 20px !important;
+    }
+    
+    .glassmorphism-block-header {
+        flex-direction: column !important;
+        gap: 12px !important;
+        align-items: flex-start !important;
+    }
+    
+    .glassmorphism-controls {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+}

@@ -165,141 +165,131 @@ $onlineItems = MBlock::getOnlineItems($data);
 $offlineItems = MBlock::getOfflineItems($data);
 ```
 
-## Templates & Themes
+## Templates & Theming
 
-### Template-System
-MBlock verwendet ein flexibles Template-System mit automatischer Prioritätsverwaltung:
+### Template-System mit Dropdown-Auswahl
+MBlock bietet ein modernes Template-System mit grafischer Auswahl über ein Dropdown-Menü in den AddOn-Einstellungen. Das System kopiert automatisch die CSS-Dateien in den `assets/` Ordner und sorgt für optimale Performance.
 
-**Template-Priorität (in dieser Reihenfolge):**
-1. **Custom Templates** (höchste Priorität): `redaxo/data/addons/mblock/templates/custom_theme/`
-2. **Default Templates** (Fallback): `redaxo/src/addons/mblock/templates/default_theme/`
+### Template-Auswahl
+Die Template-Auswahl erfolgt über die **MBlock-Einstellungen**:
 
-### Eigene Templates erstellen
-Eigene Templates sollten immer im `data/` Ordner abgelegt werden:
+1. **Gehe zu** `Addons > MBlock > Einstellungen`
+2. **Wähle ein Template** aus der Dropdown-Liste
+3. **Klicke "Speichern"** - Das CSS wird automatisch kopiert
+4. **Das Template ist sofort aktiv**
+
+### Verfügbare Templates
+MBlock enthält standardmäßig folgende professionelle Templates:
+
+#### **REDAXO Blue** (Standard)
+- **Design**: Klassisches REDAXO-Design in professionellem Blau
+- **Zielgruppe**: Corporate Websites, Business-Anwendungen
+- **Features**: Clean Design, optimale Lesbarkeit, REDAXO-konform
+
+#### **REDAXO Orange**
+- **Design**: Warmes Pastell-Orange Design mit sanften Farbverläufen  
+- **Zielgruppe**: Kreative Projekte, moderne Websites
+- **Features**: Freundliche Farbgebung, moderne Gradients
+
+#### **AKG Skin** 
+- **Design**: Nostalgie-Theme im REDAXO 4 Look mit grün/blauen Akzenten
+- **Zielgruppe**: Klassische REDAXO-Nutzer, Retro-Liebhaber
+- **Features**: Verdana-Font, klassische Farben, bewährtes Design
+
+#### **Modern Theme**
+- **Design**: Material Design mit starken Schatten und abgerundeten Ecken
+- **Zielgruppe**: Moderne Web-Apps, Dashboard-Anwendungen  
+- **Features**: 16px Border-Radius, Box-Shadows, CKE5-optimiert
+
+#### **Retro 8-Bit**
+- **Design**: Gaming-inspiriertes Design mit Pixel-Ästhetik
+- **Zielgruppe**: Gaming-Websites, kreative Projekte
+- **Features**: VT323-Font, ASCII-Art, Retro-Terminologie
+
+#### **Glassmorphism**
+- **Design**: Moderne Glasoptik mit Blur-Effekten und Transparenz
+- **Zielgruppe**: Premium-Websites, moderne UI/UX
+- **Features**: backdrop-filter, Inter-Font, frosted glass effects
+
+### Dark Mode Support
+**Alle Templates** unterstützen automatisch Dark Mode:
+
+- **REDAXO Theme Detection** (`body.rex-theme-dark`)
+- **Browser Preference** (`@media (prefers-color-scheme: dark)`)
+- **Bootstrap 5 Dark Mode** (`[data-bs-theme="dark"]`)
+
+### Custom Templates erstellen
+Eigene Templates können im `data/` Ordner erstellt werden:
 
 ```bash
 redaxo/data/addons/mblock/templates/
 ├── my_custom_theme/
-│   ├── mblock_wrapper.ini    # Container für alle Items
-│   ├── mblock_element.ini    # Template für einzelne Items
-│   └── theme.css            # CSS-Styling (optional)
+│   ├── template.ini           # Template-Konfiguration
+│   ├── mblock_wrapper.ini     # HTML-Wrapper für alle Items
+│   ├── mblock_element.ini     # HTML-Template für einzelne Items
+│   └── my_custom_theme.css    # Template-Styling (gleicher Name wie Ordner!)
 ```
 
-### Template-Dateien
-- **mblock_wrapper.ini**: Container für alle MBlock-Items
-- **mblock_element.ini**: Template für einzelne MBlock-Items  
-- **theme.css**: Styling für das Theme (optional)
+**Wichtig:** Die CSS-Datei muss den **gleichen Namen wie der Template-Ordner** haben!
 
-**Wichtig:** Custom Templates überschreiben automatisch die Default Templates mit dem gleichen Namen.
+**Template-Konfiguration (`template.ini`):**
+```ini
+[template]
+name = "Mein Custom Theme"
+description = "Beschreibung des Themes"
+author = "Dein Name"
+version = "1.0"
+```
 
-## CSS Customizing
+**Custom Theme CSS (`my_custom_theme.css`):**
+```css
+/* Dein Custom Theme Styling - Dateiname muss mit Ordnername übereinstimmen! */
+.mblock-wrapper {
+    /* Deine Anpassungen */
+}
+```
 
-### CSS Custom Properties System (MBlock 4.0)
-MBlock 4.0 verwendet ein modernes CSS Custom Properties System mit über 120 Variablen für maximale Anpassbarkeit. Das System unterstützt automatisch Dark Mode durch REDAXO Themes, Bootstrap 5 Dark Mode und `prefers-color-scheme`.
+### Template-Management
+Das Template-System bietet automatisches Management:
 
-### Eigenes Styling erstellen
-Du kannst das MBlock-Design vollständig durch Überschreiben der CSS-Variablen anpassen:
+- **CSS-Kopierung**: Templates werden automatisch nach `assets/addons/mblock/` kopiert
+- **Performance**: Nur aktive Templates werden geladen
+- **Cleanup**: Nicht verwendete Template-CSS wird automatisch entfernt
+- **Versionierung**: Template-Updates werden erkannt und aktualisiert
+
+## CSS Anpassungen
+
+### Template-CSS Anpassung
+Das gewählte Template kann über eigene CSS-Dateien erweitert oder angepasst werden. Das Template-System kopiert die CSS automatisch nach `assets/addons/mblock/` und lädt sie für optimale Performance.
+
+### Eigene CSS-Erweiterungen
+Um ein vorhandenes Template anzupassen, erstelle eine eigene CSS-Datei:
 
 ```css
-/* Eigene CSS-Datei: assets/css/custom-mblock.css */
+/* assets/css/mblock-custom.css */
 
-:root {
-    /* === FARB-ANPASSUNGEN === */
-    --mblock-primary-color: #your-brand-color;
-    --mblock-accent-color: #your-accent-color;
-    --mblock-background-color: #f8f9fa;
-    --mblock-border-color: #dee2e6;
-    
-    /* === BUTTON-STYLING === */
-    --mblock-btn-primary-bg: #007bff;
-    --mblock-btn-primary-border: #007bff;
-    --mblock-btn-primary-hover-bg: #0056b3;
-    
-    /* === DRAG & DROP === */
-    --mblock-draggable-handle-bg: #6c757d;
-    --mblock-draggable-handle-hover: #495057;
-    --mblock-sort-placeholder-bg: rgba(0, 123, 255, 0.1);
-    
-    /* === SPACING & LAYOUT === */
-    --mblock-item-spacing: 20px;
-    --mblock-border-radius: 8px;
-    --mblock-box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    
-    /* === TYPOGRAPHY === */
-    --mblock-font-size: 14px;
-    --mblock-font-weight: 400;
-    --mblock-line-height: 1.5;
+/* Template-spezifische Anpassungen */
+.mblock-wrapper {
+    border: 2px solid #your-color;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-/* Dark Mode Überschreibungen */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --mblock-background-color: #212529;
-        --mblock-border-color: #495057;
-        --mblock-text-color: #fff;
-    }
+.mblock-item {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 }
 
-/* REDAXO Dark Mode Support */
-body.rex-theme-dark {
-    --mblock-background-color: #1e1e1e !important;
-    --mblock-border-color: #404040 !important;
-    --mblock-text-color: #ffffff !important;
+/* Button-Anpassungen */
+.mblock-wrapper .btn-outline-secondary {
+    border-color: #your-brand-color;
+    color: #your-brand-color;
+}
+
+.mblock-wrapper .btn-outline-secondary:hover {
+    background-color: #your-brand-color;
+    border-color: #your-brand-color;
 }
 ```
 
-### Vollständige Variablen-Liste
-MBlock bietet über 120 CSS Custom Properties für:
-
-**Grundfarben:** `--mblock-primary-color`, `--mblock-accent-color`, `--mblock-background-color`  
-**Buttons:** `--mblock-btn-*-bg`, `--mblock-btn-*-border`, `--mblock-btn-*-hover-*`  
-**Drag & Drop:** `--mblock-draggable-*`, `--mblock-sort-*`  
-**Layout:** `--mblock-*-spacing`, `--mblock-border-radius`, `--mblock-box-shadow`  
-**Zustände:** `--mblock-offline-*`, `--mblock-hover-*`, `--mblock-focus-*`  
-**Responsive:** `--mblock-mobile-*`, `--mblock-tablet-*`  
-
-### Dark Mode Integration
-Das CSS Custom Properties System unterstützt automatisch:
-
-- **REDAXO Themes** (`body.rex-theme-dark`)
-- **Bootstrap 5 Dark Mode** (`[data-bs-theme="dark"]`) 
-- **Browser Preference** (`@media (prefers-color-scheme: dark)`)
-
-```css
-/* Beispiel: Vollständige Dark Mode Anpassung */
-body.rex-theme-dark,
-[data-bs-theme="dark"] {
-    --mblock-background-color: #1a1a1a !important;
-    --mblock-item-bg: #2d2d2d !important;
-    --mblock-border-color: #404040 !important;
-    --mblock-text-color: #ffffff !important;
-    --mblock-btn-primary-bg: #0d6efd !important;
-    --mblock-draggable-handle-bg: #6c757d !important;
-}
-```
-
-### CSS in REDAXO einbinden
-Eigene CSS-Dateien können in REDAXO über verschiedene Wege eingebunden werden:
-
-**Template Integration:**
-```php
-// In Template-Datei
-rex_view::addCssFile($this->getAssetsUrl('css/custom-mblock.css'));
-```
-
-**Project AddOn:**
-```php
-// In boot.php des Project AddOns
-if (rex::isBackend()) {
-    rex_view::addCssFile(rex_url::addonAssets('project', 'custom-mblock.css'));
-}
-```
-
-**Direkte Einbindung:**
-```html
-<!-- In HTML-Template -->
-<link rel="stylesheet" href="<?= rex_url::assets('css/custom-mblock.css') ?>">
-```
 
 ## Modulbeispiele / Module examples
 

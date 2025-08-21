@@ -1,0 +1,390 @@
+/* AKG Skin CSS für MBlock - REDAXO 4 Nostalgie */
+/* Klassisches Blau-Grün Design im Stil von REDAXO 4 */
+
+.mblock_wrapper {
+    border: 2px solid #336699 !important;
+    border-radius: 0px !important;
+    background: #f0f8f0 !important;
+    padding: 8px !important;
+    margin: 10px 0 !important;
+    box-shadow: 2px 2px 4px rgba(51, 102, 153, 0.3) !important;
+}
+
+.mblock_wrapper .mblock_item,
+.mblock_wrapper > div {
+    margin: 4px 0 !important;
+    padding: 10px !important;
+    border: 1px solid #99cc99 !important;
+    border-left: 6px solid #336699 !important;
+    border-radius: 0px !important;
+    background: #ffffff !important;
+    background: linear-gradient(to bottom, #ffffff 0%, #f0f8ff 100%) !important;
+    transition: all 0.2s ease !important;
+}
+
+.mblock_wrapper .mblock_item:hover,
+.mblock_wrapper > div:hover {
+    border-left-color: #225588 !important;
+    background: linear-gradient(to bottom, #f0f8ff 0%, #e0f0e0 100%) !important;
+    box-shadow: 1px 1px 3px rgba(51, 102, 153, 0.4) !important;
+}
+
+.mblock_wrapper .btn-xs,
+.mblock_wrapper .btn-group-xs > .btn {
+    font-size: 11px !important;
+    padding: 3px 8px !important;
+    margin: 2px !important;
+    border-radius: 2px !important;
+    font-family: Verdana, Arial, sans-serif !important;
+    font-weight: bold !important;
+}
+
+.mblock_wrapper .btn-success {
+    background: #669966 !important;
+    background: linear-gradient(to bottom, #77aa77 0%, #556655 100%) !important;
+    border: 1px solid #556655 !important;
+    color: white !important;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
+}
+
+.mblock_wrapper .btn-success:hover {
+    background: linear-gradient(to bottom, #88bb88 0%, #445544 100%) !important;
+    border-color: #445544 !important;
+}
+
+.mblock_wrapper .btn-danger {
+    background: #cc6666 !important;
+    background: linear-gradient(to bottom, #dd7777 0%, #aa5555 100%) !important;
+    border: 1px solid #aa5555 !important;
+    color: white !important;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
+}
+
+.mblock_wrapper .btn-danger:hover {
+    background: linear-gradient(to bottom, #ee8888 0%, #994444 100%) !important;
+    border-color: #994444 !important;
+}
+
+.mblock_wrapper .btn-info {
+    background: #336699 !important;
+    background: linear-gradient(to bottom, #4477aa 0%, #225588 100%) !important;
+    border: 1px solid #225588 !important;
+    color: white !important;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
+}
+
+.mblock_wrapper .btn-info:hover {
+    background: linear-gradient(to bottom, #5588bb 0%, #114477 100%) !important;
+    border-color: #114477 !important;
+}
+
+.mblock_wrapper .btn-warning {
+    background: #99aa66 !important;
+    background: linear-gradient(to bottom, #aabb77 0%, #778855 100%) !important;
+    border: 1px solid #778855 !important;
+    color: white !important;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
+}
+
+.mblock_wrapper .btn-warning:hover {
+    background: linear-gradient(to bottom, #bbcc88 0%, #667744 100%) !important;
+    border-color: #667744 !important;
+}
+
+/* === MBlock spezifische Button-Klassen - Grün & Blau === */
+.mblock_wrapper .btn-default,
+.mblock_wrapper .addme {
+    background: #66aa66 !important;  /* Schönes Grün für Add-Button */
+    background: linear-gradient(to bottom, #77bb77 0%, #559955 100%) !important;
+    border: 1px solid #559955 !important;
+    color: white !important;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
+    font-family: Verdana, Arial, sans-serif !important;
+}
+
+.mblock_wrapper .btn-default:hover,
+.mblock_wrapper .addme:hover {
+    background: linear-gradient(to bottom, #88cc88 0%, #447744 100%) !important;
+    border-color: #447744 !important;
+    color: white !important;
+}
+
+.mblock_wrapper .btn-delete,
+.mblock_wrapper .removeme {
+    background: #336699 !important;  /* Klassisches REDAXO 4 Blau für Delete */
+    background: linear-gradient(to bottom, #4477aa 0%, #225588 100%) !important;
+    border: 1px solid #225588 !important;
+    color: white !important;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
+    font-family: Verdana, Arial, sans-serif !important;
+}
+
+.mblock_wrapper .btn-delete:hover,
+.mblock_wrapper .removeme:hover {
+    background: linear-gradient(to bottom, #5588bb 0%, #114477 100%) !important;
+    border-color: #114477 !important;
+    color: white !important;
+}
+
+/* Disabled State - gedämpfte Farben */
+.mblock_wrapper .btn-delete:disabled,
+.mblock_wrapper .removeme:disabled {
+    background: linear-gradient(to bottom, #6688aa 0%, #447788 100%) !important;
+    border-color: #447788 !important;
+    opacity: 0.6 !important;
+}
+
+.mblock_wrapper .btn-default:disabled,
+.mblock_wrapper .addme:disabled {
+    background: linear-gradient(to bottom, #88aa88 0%, #669966 100%) !important;
+    border-color: #669966 !important;
+    opacity: 0.6 !important;
+}
+
+.mblock_wrapper span.mblock_adder,
+.mblock_wrapper .mblock_add {
+    text-align: center !important;
+    padding: 12px !important;
+    border: 2px dashed #336699 !important;
+    border-radius: 0px !important;
+    background: #e0f0e0 !important;
+    background: linear-gradient(to bottom, #f0f8f0 0%, #e0f0e0 100%) !important;
+    margin: 6px 0 0 0 !important;
+    transition: all 0.2s ease !important;
+}
+
+.mblock_wrapper span.mblock_adder:hover,
+.mblock_wrapper .mblock_add:hover {
+    background: linear-gradient(to bottom, #e0f0e0 0%, #d0e8d0 100%) !important;
+    border-color: #225588 !important;
+    box-shadow: 1px 1px 3px rgba(51, 102, 153, 0.3) !important;
+}
+
+.mblock_wrapper span.mblock_adder .btn,
+.mblock_wrapper .mblock_add .btn {
+    background: #336699 !important;
+    background: linear-gradient(to bottom, #4477aa 0%, #225588 100%) !important;
+    border: 1px solid #225588 !important;
+    color: white !important;
+    font-weight: bold !important;
+    padding: 8px 16px !important;
+    border-radius: 2px !important;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
+    font-family: Verdana, Arial, sans-serif !important;
+}
+
+.mblock_wrapper span.mblock_adder .btn:hover,
+.mblock_wrapper .mblock_add .btn:hover {
+    background: linear-gradient(to bottom, #5588bb 0%, #114477 100%) !important;
+    border-color: #114477 !important;
+    color: white !important;
+}
+
+/* === DARK MODE SUPPORT === */
+/* REDAXO Dark Theme Support */
+body.rex-theme-dark .mblock_wrapper {
+    border-color: #4a7eb8 !important;
+    background: #1a2a1a !important;
+    color: #e9ecef !important;
+    box-shadow: 2px 2px 4px rgba(74, 126, 184, 0.4) !important;
+}
+
+body.rex-theme-dark .mblock_wrapper .mblock_item,
+body.rex-theme-dark .mblock_wrapper > div {
+    border-color: #5a7a5a !important;
+    border-left-color: #4a7eb8 !important;
+    background: #2a3a2a !important;
+    background: linear-gradient(to bottom, #2a3a2a 0%, #1f2f3f 100%) !important;
+    color: #e9ecef !important;
+}
+
+body.rex-theme-dark .mblock_wrapper .mblock_item:hover,
+body.rex-theme-dark .mblock_wrapper > div:hover {
+    border-left-color: #5ba8e0 !important;
+    background: linear-gradient(to bottom, #1f2f3f 0%, #2a4a2a 100%) !important;
+    box-shadow: 1px 1px 3px rgba(74, 126, 184, 0.5) !important;
+}
+
+body.rex-theme-dark .mblock_wrapper .btn-success {
+    background: linear-gradient(to bottom, #4a7eb8 0%, #3a6ea8 100%) !important;
+    border-color: #4a7eb8 !important;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8) !important;
+}
+
+body.rex-theme-dark .mblock_wrapper .btn-success:hover {
+    background: linear-gradient(to bottom, #5ba8e0 0%, #4a7eb8 100%) !important;
+    border-color: #5ba8e0 !important;
+}
+
+body.rex-theme-dark .mblock_wrapper span.mblock_adder,
+body.rex-theme-dark .mblock_wrapper .mblock_add {
+    border-color: #4a7eb8 !important;
+    background: #1f2f1f !important;
+    background: linear-gradient(to bottom, #1f2f1f 0%, #1a2f3a 100%) !important;
+    color: #e9ecef !important;
+}
+
+body.rex-theme-dark .mblock_wrapper span.mblock_adder:hover,
+body.rex-theme-dark .mblock_wrapper .mblock_add:hover {
+    background: linear-gradient(to bottom, #1a2f3a 0%, #2a4a3a 100%) !important;
+    border-color: #5ba8e0 !important;
+}
+
+body.rex-theme-dark .mblock_wrapper span.mblock_adder .btn,
+body.rex-theme-dark .mblock_wrapper .mblock_add .btn {
+    background: linear-gradient(to bottom, #4a7eb8 0%, #3a6ea8 100%) !important;
+    border-color: #4a7eb8 !important;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8) !important;
+}
+
+body.rex-theme-dark .mblock_wrapper span.mblock_adder .btn:hover,
+body.rex-theme-dark .mblock_wrapper .mblock_add .btn:hover {
+    background: linear-gradient(to bottom, #5ba8e0 0%, #4a7eb8 100%) !important;
+    border-color: #5ba8e0 !important;
+}
+
+/* Dark Mode für MBlock spezifische Button-Klassen */
+body.rex-theme-dark .mblock_wrapper .btn-default,
+body.rex-theme-dark .mblock_wrapper .addme {
+    background: linear-gradient(to bottom, #66aa66 0%, #559955 100%) !important;
+    border-color: #559955 !important;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8) !important;
+}
+
+body.rex-theme-dark .mblock_wrapper .btn-default:hover,
+body.rex-theme-dark .mblock_wrapper .addme:hover {
+    background: linear-gradient(to bottom, #77bb77 0%, #447744 100%) !important;
+    border-color: #447744 !important;
+}
+
+body.rex-theme-dark .mblock_wrapper .btn-delete,
+body.rex-theme-dark .mblock_wrapper .removeme {
+    background: linear-gradient(to bottom, #4a7eb8 0%, #3a6ea8 100%) !important;
+    border-color: #4a7eb8 !important;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8) !important;
+}
+
+body.rex-theme-dark .mblock_wrapper .btn-delete:hover,
+body.rex-theme-dark .mblock_wrapper .removeme:hover {
+    background: linear-gradient(to bottom, #5ba8e0 0%, #4a7eb8 100%) !important;
+    border-color: #5ba8e0 !important;
+}
+
+body.rex-theme-dark .mblock_wrapper .btn-delete:disabled,
+body.rex-theme-dark .mblock_wrapper .removeme:disabled {
+    background: linear-gradient(to bottom, #6688aa 0%, #557799 100%) !important;
+    border-color: #557799 !important;
+    opacity: 0.5 !important;
+}
+
+body.rex-theme-dark .mblock_wrapper .btn-default:disabled,
+body.rex-theme-dark .mblock_wrapper .addme:disabled {
+    background: linear-gradient(to bottom, #77aa77 0%, #668866 100%) !important;
+    border-color: #668866 !important;
+    opacity: 0.5 !important;
+}
+
+/* Auto Dark Mode (System Preference) */
+@media (prefers-color-scheme: dark) {
+    .mblock_wrapper {
+        border-color: #4a7eb8 !important;
+        background: #1a2a1a !important;
+        color: #e9ecef !important;
+        box-shadow: 2px 2px 4px rgba(74, 126, 184, 0.4) !important;
+    }
+
+    .mblock_wrapper .mblock_item,
+    .mblock_wrapper > div {
+        border-color: #5a7a5a !important;
+        border-left-color: #4a7eb8 !important;
+        background: #2a3a2a !important;
+        background: linear-gradient(to bottom, #2a3a2a 0%, #1f2f3f 100%) !important;
+        color: #e9ecef !important;
+    }
+
+    .mblock_wrapper .mblock_item:hover,
+    .mblock_wrapper > div:hover {
+        border-left-color: #5ba8e0 !important;
+        background: linear-gradient(to bottom, #1f2f3f 0%, #2a4a2a 100%) !important;
+        box-shadow: 1px 1px 3px rgba(74, 126, 184, 0.5) !important;
+    }
+
+    .mblock_wrapper .btn-success {
+        background: linear-gradient(to bottom, #4a7eb8 0%, #3a6ea8 100%) !important;
+        border-color: #4a7eb8 !important;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.8) !important;
+    }
+
+    .mblock_wrapper .btn-success:hover {
+        background: linear-gradient(to bottom, #5ba8e0 0%, #4a7eb8 100%) !important;
+        border-color: #5ba8e0 !important;
+    }
+
+    .mblock_wrapper span.mblock_adder,
+    .mblock_wrapper .mblock_add {
+        border-color: #4a7eb8 !important;
+        background: #1f2f1f !important;
+        background: linear-gradient(to bottom, #1f2f1f 0%, #1a2f3a 100%) !important;
+        color: #e9ecef !important;
+    }
+
+    .mblock_wrapper span.mblock_adder:hover,
+    .mblock_wrapper .mblock_add:hover {
+        background: linear-gradient(to bottom, #1a2f3a 0%, #2a4a3a 100%) !important;
+        border-color: #5ba8e0 !important;
+    }
+
+    .mblock_wrapper span.mblock_adder .btn,
+    .mblock_wrapper .mblock_add .btn {
+        background: linear-gradient(to bottom, #4a7eb8 0%, #3a6ea8 100%) !important;
+        border-color: #4a7eb8 !important;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.8) !important;
+    }
+
+    .mblock_wrapper span.mblock_adder .btn:hover,
+    .mblock_wrapper .mblock_add .btn:hover {
+        background: linear-gradient(to bottom, #5ba8e0 0%, #4a7eb8 100%) !important;
+        border-color: #5ba8e0 !important;
+    }
+
+    /* Auto Dark Mode für MBlock spezifische Button-Klassen */
+    .mblock_wrapper .btn-default,
+    .mblock_wrapper .addme {
+        background: linear-gradient(to bottom, #66aa66 0%, #559955 100%) !important;
+        border-color: #559955 !important;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.8) !important;
+    }
+
+    .mblock_wrapper .btn-default:hover,
+    .mblock_wrapper .addme:hover {
+        background: linear-gradient(to bottom, #77bb77 0%, #447744 100%) !important;
+        border-color: #447744 !important;
+    }
+
+    .mblock_wrapper .btn-delete,
+    .mblock_wrapper .removeme {
+        background: linear-gradient(to bottom, #4a7eb8 0%, #3a6ea8 100%) !important;
+        border-color: #4a7eb8 !important;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.8) !important;
+    }
+
+    .mblock_wrapper .btn-delete:hover,
+    .mblock_wrapper .removeme:hover {
+        background: linear-gradient(to bottom, #5ba8e0 0%, #4a7eb8 100%) !important;
+        border-color: #5ba8e0 !important;
+    }
+
+    .mblock_wrapper .btn-delete:disabled,
+    .mblock_wrapper .removeme:disabled {
+        background: linear-gradient(to bottom, #6688aa 0%, #557799 100%) !important;
+        border-color: #557799 !important;
+        opacity: 0.5 !important;
+    }
+
+    .mblock_wrapper .btn-default:disabled,
+    .mblock_wrapper .addme:disabled {
+        background: linear-gradient(to bottom, #77aa77 0%, #668866 100%) !important;
+        border-color: #668866 !important;
+        opacity: 0.5 !important;
+    }
+}

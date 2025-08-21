@@ -63,6 +63,15 @@ if (rex::isBackend() && is_object(rex::getUser())) {
     rex_view::addJsFile($this->getAssetsUrl($jsFile));
     rex_view::addCssFile($this->getAssetsUrl('mblock.css'));
     
+    // Add custom template CSS if selected and available
+    $selectedTemplate = $this->getConfig('mblock_theme', 'default_theme');
+    if ($selectedTemplate !== 'default_theme') {
+        $templateCSSUrl = \FriendsOfRedaxo\MBlock\Utils\TemplateManager::getTemplateCSSUrl($selectedTemplate);
+        if ($templateCSSUrl) {
+            rex_view::addCssFile($templateCSSUrl);
+        }
+    }
+    
     // 🌍 Make toast message translations available to frontend
     rex_view::setJsProperty('mblock_i18n', [
         'copy_success' => $this->i18n('mblock_toast_copy_success'),

@@ -1,0 +1,342 @@
+/* 🎮 RETRO 8-BIT THEME for MBlock 🎮 */
+/* Inspired by classic 80s computing and arcade games */
+
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+:root {
+    --retro-green: #00ff00;
+    --retro-amber: #ffaa00;
+    --retro-red: #ff4444;
+    --retro-blue: #4444ff;
+    --retro-cyan: #00ffff;
+    --retro-magenta: #ff00ff;
+    --retro-yellow: #ffff00;
+    --retro-white: #ffffff;
+    --retro-black: #000000;
+    --retro-dark-green: #008800;
+    --retro-dark-blue: #000088;
+}
+
+/* === 8-BIT CONTAINER === */
+.mblock_wrapper.retro-container {
+    border: 4px solid var(--retro-green) !important;
+    border-radius: 0 !important;
+    background: var(--retro-black) !important;
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 255, 0, 0.03) 2px,
+            rgba(0, 255, 0, 0.03) 4px
+        ) !important;
+    padding: 16px !important;
+    margin: 16px 0 !important;
+    font-family: 'VT323', 'Courier New', monospace !important;
+    box-shadow: 
+        0 0 20px var(--retro-green),
+        inset 0 0 20px rgba(0, 255, 0, 0.1) !important;
+    position: relative !important;
+}
+
+/* Retro Screen Flicker Effect */
+@keyframes flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.98; }
+}
+
+.mblock_wrapper.retro-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 3px,
+            rgba(0, 255, 0, 0.02) 3px,
+            rgba(0, 255, 0, 0.02) 6px
+        );
+    pointer-events: none;
+    animation: flicker 0.15s infinite linear;
+}
+
+/* === RETRO HEADER === */
+.retro-header {
+    text-align: center !important;
+    margin-bottom: 16px !important;
+    border-bottom: 2px solid var(--retro-green) !important;
+    padding-bottom: 8px !important;
+}
+
+.retro-title {
+    color: var(--retro-green) !important;
+    font-size: 20px !important;
+    font-weight: bold !important;
+    text-shadow: 0 0 10px var(--retro-green) !important;
+    letter-spacing: 2px !important;
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    from { text-shadow: 0 0 10px var(--retro-green), 0 0 20px var(--retro-green); }
+    to { text-shadow: 0 0 20px var(--retro-green), 0 0 30px var(--retro-green); }
+}
+
+/* === RETRO BLOCKS === */
+.retro-block {
+    border: 2px solid var(--retro-amber) !important;
+    border-radius: 0 !important;
+    background: var(--retro-dark-blue) !important;
+    margin: 12px 0 !important;
+    transition: all 0.2s ease !important;
+    position: relative !important;
+}
+
+.retro-block:hover {
+    border-color: var(--retro-yellow) !important;
+    box-shadow: 0 0 15px rgba(255, 170, 0, 0.5) !important;
+    transform: scale(1.02) !important;
+}
+
+.retro-block-header {
+    background: var(--retro-amber) !important;
+    color: var(--retro-black) !important;
+    padding: 8px 12px !important;
+    font-size: 16px !important;
+    font-weight: bold !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    letter-spacing: 1px !important;
+}
+
+.retro-block-number {
+    text-shadow: none !important;
+}
+
+.retro-content {
+    padding: 16px !important;
+    background: rgba(0, 0, 136, 0.3) !important;
+    color: var(--retro-white) !important;
+    border-top: 1px solid var(--retro-amber) !important;
+}
+
+/* === RETRO BUTTONS === */
+.mblock_wrapper .btn,
+.mblock_wrapper button {
+    font-family: 'VT323', 'Courier New', monospace !important;
+    border-radius: 0 !important;
+    border: 2px solid !important;
+    padding: 6px 12px !important;
+    margin: 2px !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    transition: all 0.1s ease !important;
+    cursor: pointer !important;
+}
+
+/* Add Buttons - Bright Green */
+.mblock_wrapper .btn-default,
+.mblock_wrapper .addme,
+.mblock_wrapper .btn-success {
+    background: var(--retro-green) !important;
+    border-color: var(--retro-dark-green) !important;
+    color: var(--retro-black) !important;
+    text-shadow: none !important;
+}
+
+.mblock_wrapper .btn-default:hover,
+.mblock_wrapper .addme:hover,
+.mblock_wrapper .btn-success:hover {
+    background: var(--retro-white) !important;
+    border-color: var(--retro-green) !important;
+    color: var(--retro-green) !important;
+    box-shadow: 0 0 10px var(--retro-green) !important;
+}
+
+/* Delete Buttons - Bright Red */
+.mblock_wrapper .btn-delete,
+.mblock_wrapper .removeme,
+.mblock_wrapper .btn-danger {
+    background: var(--retro-red) !important;
+    border-color: #cc0000 !important;
+    color: var(--retro-white) !important;
+    text-shadow: none !important;
+}
+
+.mblock_wrapper .btn-delete:hover,
+.mblock_wrapper .removeme:hover,
+.mblock_wrapper .btn-danger:hover {
+    background: var(--retro-white) !important;
+    border-color: var(--retro-red) !important;
+    color: var(--retro-red) !important;
+    box-shadow: 0 0 10px var(--retro-red) !important;
+}
+
+/* Info Buttons - Bright Cyan */
+.mblock_wrapper .btn-info {
+    background: var(--retro-cyan) !important;
+    border-color: #0088cc !important;
+    color: var(--retro-black) !important;
+    text-shadow: none !important;
+}
+
+.mblock_wrapper .btn-info:hover {
+    background: var(--retro-white) !important;
+    border-color: var(--retro-cyan) !important;
+    color: var(--retro-cyan) !important;
+    box-shadow: 0 0 10px var(--retro-cyan) !important;
+}
+
+/* Warning Buttons - Bright Yellow */
+.mblock_wrapper .btn-warning {
+    background: var(--retro-yellow) !important;
+    border-color: #cccc00 !important;
+    color: var(--retro-black) !important;
+    text-shadow: none !important;
+}
+
+.mblock_wrapper .btn-warning:hover {
+    background: var(--retro-black) !important;
+    border-color: var(--retro-yellow) !important;
+    color: var(--retro-yellow) !important;
+    box-shadow: 0 0 10px var(--retro-yellow) !important;
+}
+
+/* Disabled Buttons */
+.mblock_wrapper .btn:disabled,
+.mblock_wrapper button:disabled {
+    background: #333333 !important;
+    border-color: #666666 !important;
+    color: #888888 !important;
+    box-shadow: none !important;
+    opacity: 0.5 !important;
+}
+
+/* === ADD ZONE === */
+.retro-add-zone {
+    text-align: center !important;
+    padding: 20px !important;
+    border: 3px dashed var(--retro-magenta) !important;
+    border-radius: 0 !important;
+    background: rgba(255, 0, 255, 0.1) !important;
+    margin: 16px 0 !important;
+    position: relative !important;
+}
+
+.retro-add-zone:hover {
+    border-color: var(--retro-yellow) !important;
+    background: rgba(255, 255, 0, 0.1) !important;
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.3) !important;
+}
+
+.retro-blink {
+    color: var(--retro-magenta) !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    letter-spacing: 2px !important;
+    margin-bottom: 12px !important;
+    text-shadow: 0 0 10px var(--retro-magenta) !important;
+    animation: blink 1s ease-in-out infinite alternate;
+}
+
+@keyframes blink {
+    from { opacity: 1; }
+    to { opacity: 0.3; }
+}
+
+/* === DARK MODE SUPPORT === */
+/* In 8-bit theme, dark mode just intensifies the glow effects */
+body.rex-theme-dark .mblock_wrapper.retro-container {
+    box-shadow: 
+        0 0 30px var(--retro-green),
+        inset 0 0 30px rgba(0, 255, 0, 0.15) !important;
+}
+
+body.rex-theme-dark .retro-title {
+    animation: glow 1.5s ease-in-out infinite alternate;
+}
+
+body.rex-theme-dark .retro-block:hover {
+    box-shadow: 0 0 25px rgba(255, 170, 0, 0.7) !important;
+}
+
+body.rex-theme-dark .mblock_wrapper .btn:hover {
+    box-shadow: 0 0 15px !important;
+}
+
+@media (prefers-color-scheme: dark) {
+    .mblock_wrapper.retro-container {
+        box-shadow: 
+            0 0 30px var(--retro-green),
+            inset 0 0 30px rgba(0, 255, 0, 0.15) !important;
+    }
+    
+    .retro-title {
+        animation: glow 1.5s ease-in-out infinite alternate;
+    }
+    
+    .retro-block:hover {
+        box-shadow: 0 0 25px rgba(255, 170, 0, 0.7) !important;
+    }
+    
+    .mblock_wrapper .btn:hover {
+        box-shadow: 0 0 15px !important;
+    }
+}
+
+/* === RETRO CONTROLS === */
+.retro-controls {
+    display: flex !important;
+    gap: 4px !important;
+}
+
+.retro-controls .btn {
+    min-width: 32px !important;
+    padding: 4px 8px !important;
+    font-size: 12px !important;
+}
+
+/* === PIXEL PERFECT BORDERS === */
+.mblock_wrapper.retro-container * {
+    box-sizing: border-box !important;
+}
+
+/* === SPECIAL EFFECTS === */
+.retro-block::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid var(--retro-amber);
+    border-bottom: 8px solid transparent;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+    .mblock_wrapper.retro-container {
+        padding: 12px !important;
+    }
+    
+    .retro-title {
+        font-size: 16px !important;
+    }
+    
+    .retro-block-header {
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+    
+    .retro-controls {
+        flex-wrap: wrap !important;
+    }
+}
