@@ -1,390 +1,511 @@
-/* AKG Skin CSS für MBlock - REDAXO 4 Nostalgie */
-/* Klassisches Blau-Grün Design im Stil von REDAXO 4 */
+/* 🎨 AKG 2025 Theme - Modern CSS Variables Implementation
+ * =====================================================
+ * Ein modernes Update des klassischen AKG-Designs mit CSS Custom Properties.
+ * Kombiniert REDAXO 4 Nostalgie mit modernen Web-Standards.
+ */
 
+:root {
+    /* === Block Container === */
+    --mblock-border-color: #336699;
+    --mblock-background: linear-gradient(135deg, #f0f8f0 0%, #e6f5ff 100%);
+    --mblock-shadow: 2px 2px 8px rgba(51, 102, 153, 0.3);
+    --mblock-shadow-hover: 3px 3px 12px rgba(51, 102, 153, 0.4);
+    --mblock-border-radius: 0px;
+    --mblock-padding: 15px 20px 20px 20px;
+    --mblock-margin: 0 0 12px 0;
+    --mblock-transition: all 0.2s ease;
+    --mblock-transform-hover: translateY(-1px);
+    --mblock-text-color: #2c3e50;
+    
+    /* AKG Spezial: Linke Akzent-Bordüre */
+    --akg-accent-border: 6px solid #336699;
+    --akg-accent-border-hover: 6px solid #225588;
+    
+    /* === Drag Handle === */
+    --mblock-drag-color: #336699;
+    --mblock-drag-color-hover: #225588;
+    --mblock-drag-opacity: 0.7;
+    --mblock-drag-opacity-hover: 1;
+    --mblock-drag-font-size: 16px;
+    --mblock-drag-position-top: 12px;
+    --mblock-drag-position-left: 12px;
+    --mblock-drag-letter-spacing: -1px;
+    
+    /* === Buttons Base === */
+    --mblock-button-border-radius: 2px;
+    --mblock-button-font-size: 11px;
+    --mblock-button-padding: 6px 12px;
+    --mblock-button-min-size: 32px;
+    --mblock-button-transition: all 0.2s ease;
+    --mblock-button-shadow-hover: 1px 1px 4px rgba(51, 102, 153, 0.4);
+    --mblock-button-transform-hover: translateY(-1px);
+    --mblock-button-font-family: Verdana, Arial, sans-serif;
+    --mblock-button-font-weight: bold;
+    --mblock-button-text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+    
+    /* === Control Buttons === */
+    --mblock-control-background: linear-gradient(to bottom, #77aa77 0%, #559955 100%);
+    --mblock-control-border: #559955;
+    --mblock-control-color: white;
+    --mblock-control-background-hover: linear-gradient(to bottom, #88cc88 0%, #447744 100%);
+    --mblock-control-border-hover: #447744;
+    --mblock-control-background-disabled: linear-gradient(to bottom, #88aa88 0%, #669966 100%);
+    --mblock-control-color-disabled: rgba(255, 255, 255, 0.7);
+    
+    /* === Add Button === */
+    --mblock-add-background: linear-gradient(to bottom, #66aa66 0%, #559955 100%);
+    --mblock-add-border: #559955;
+    --mblock-add-color: white;
+    --mblock-add-background-hover: linear-gradient(to bottom, #77bb77 0%, #447744 100%);
+    --mblock-add-border-hover: #447744;
+    --mblock-add-shadow-hover: 2px 2px 6px rgba(85, 153, 85, 0.4);
+    --mblock-add-transform-hover: translateY(-2px);
+    --mblock-add-padding: 8px 16px;
+    --mblock-add-gap: 6px;
+    
+    /* === Remove/Delete Buttons === */
+    --akg-remove-background: linear-gradient(to bottom, #4477aa 0%, #225588 100%);
+    --akg-remove-border: #225588;
+    --akg-remove-color: white;
+    --akg-remove-background-hover: linear-gradient(to bottom, #5588bb 0%, #114477 100%);
+    --akg-remove-border-hover: #114477;
+    --akg-remove-background-disabled: linear-gradient(to bottom, #6688aa 0%, #447788 100%);
+    
+    /* === Online/Offline Toggle === */
+    --mblock-toggle-width: 75px;
+    --mblock-toggle-padding: 4px 8px;
+    --mblock-toggle-font-size: 10px;
+    --mblock-toggle-border-radius: 2px;
+    --mblock-toggle-letter-spacing: 0.2px;
+    --mblock-toggle-gap: 3px;
+    
+    /* Online State - Grün */
+    --mblock-online-background: linear-gradient(to bottom, #66aa66 0%, #559955 100%);
+    --mblock-online-color: white;
+    --mblock-online-shadow: 1px 1px 3px rgba(85, 153, 85, 0.4);
+    --mblock-online-background-hover: linear-gradient(to bottom, #77bb77 0%, #447744 100%);
+    --mblock-online-shadow-hover: 2px 2px 6px rgba(85, 153, 85, 0.5);
+    
+    /* Offline State - Blau */
+    --mblock-offline-background: linear-gradient(to bottom, #4477aa 0%, #225588 100%);
+    --mblock-offline-color: white;
+    --mblock-offline-shadow: 1px 1px 3px rgba(51, 102, 153, 0.4);
+    --mblock-offline-background-hover: linear-gradient(to bottom, #5588bb 0%, #114477 100%);
+    --mblock-offline-shadow-hover: 2px 2px 6px rgba(51, 102, 153, 0.5);
+    
+    /* Offline Block State */
+    --mblock-offline-block-opacity: 0.6;
+    --mblock-offline-block-background: rgba(240, 248, 240, 0.5);
+    --mblock-offline-block-border: #99cc99;
+    --mblock-offline-pattern: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(51, 102, 153, 0.1) 10px, rgba(51, 102, 153, 0.1) 20px);
+    
+    /* === Copy & Paste Toolbar === */
+    --mblock-toolbar-background: linear-gradient(135deg, #e0f0e0 0%, #d0e8d0 100%);
+    --mblock-toolbar-border: #99cc99;
+    --mblock-toolbar-shadow: 2px 2px 6px rgba(51, 102, 153, 0.2);
+    --mblock-toolbar-shadow-hover: 3px 3px 8px rgba(51, 102, 153, 0.3);
+    --mblock-toolbar-padding: 12px 16px;
+    --mblock-toolbar-margin: 10px;
+    --mblock-toolbar-border-radius: 0px;
+    --mblock-toolbar-gap: 8px;
+    
+    /* === Sortable Ghost === */
+    --mblock-ghost-opacity: 0.7;
+    --mblock-ghost-background: rgba(240, 248, 240, 0.9);
+    --mblock-ghost-border: 2px dashed #336699;
+    --mblock-ghost-padding: 10px;
+    --mblock-ghost-margin: 6px 0;
+    --mblock-ghost-shimmer: linear-gradient(90deg, transparent, rgba(51, 102, 153, 0.2), transparent);
+    
+    /* === Dark Mode Variables === */
+    --mblock-dark-border-color: #4a7eb8;
+    --mblock-dark-background: linear-gradient(135deg, #1a2a1a 0%, #1f2f3f 100%);
+    --mblock-dark-shadow: 2px 2px 8px rgba(74, 126, 184, 0.4);
+    --mblock-dark-shadow-hover: 3px 3px 12px rgba(74, 126, 184, 0.5);
+    --mblock-dark-border-color-hover: #5ba8e0;
+    --mblock-dark-text-color: #e9ecef;
+    
+    --akg-dark-accent-border: 6px solid #4a7eb8;
+    --akg-dark-accent-border-hover: 6px solid #5ba8e0;
+    
+    --mblock-dark-drag-color: #4a7eb8;
+    --mblock-dark-drag-color-hover: #5ba8e0;
+    
+    --mblock-dark-control-background: linear-gradient(to bottom, #66aa66 0%, #559955 100%);
+    --mblock-dark-control-border: #559955;
+    --mblock-dark-control-color: white;
+    --mblock-dark-control-background-hover: linear-gradient(to bottom, #77bb77 0%, #447744 100%);
+    --mblock-dark-control-border-hover: #447744;
+    
+    --mblock-dark-add-background: linear-gradient(to bottom, #66aa66 0%, #559955 100%);
+    --mblock-dark-add-border: #559955;
+    --mblock-dark-add-background-hover: linear-gradient(to bottom, #77bb77 0%, #447744 100%);
+    --mblock-dark-add-border-hover: #447744;
+    --mblock-dark-add-shadow-hover: 2px 2px 8px rgba(85, 153, 85, 0.5);
+    
+    --akg-dark-remove-background: linear-gradient(to bottom, #4a7eb8 0%, #3a6ea8 100%);
+    --akg-dark-remove-border: #4a7eb8;
+    --akg-dark-remove-background-hover: linear-gradient(to bottom, #5ba8e0 0%, #4a7eb8 100%);
+    --akg-dark-remove-border-hover: #5ba8e0;
+}
+
+/* === AKG 2025 Custom Styles === */
+
+/* MBlock Wrapper Base Styling - Applying Variables */
 .mblock_wrapper {
-    border: 2px solid #336699 !important;
-    border-radius: 0px !important;
-    background: #f0f8f0 !important;
-    padding: 8px !important;
-    margin: 10px 0 !important;
-    box-shadow: 2px 2px 4px rgba(51, 102, 153, 0.3) !important;
+    margin: var(--mblock-margin);
+    padding: 0;
+    list-style: none;
+    position: relative;
 }
 
-.mblock_wrapper .mblock_item,
 .mblock_wrapper > div {
-    margin: 4px 0 !important;
-    padding: 10px !important;
-    border: 1px solid #99cc99 !important;
-    border-left: 6px solid #336699 !important;
-    border-radius: 0px !important;
-    background: #ffffff !important;
-    background: linear-gradient(to bottom, #ffffff 0%, #f0f8ff 100%) !important;
-    transition: all 0.2s ease !important;
+    border: 1px solid var(--mblock-border-color);
+    border-left: var(--akg-accent-border);
+    background: var(--mblock-background);
+    margin: var(--mblock-margin);
+    padding: var(--mblock-padding);
+    position: relative;
+    box-shadow: var(--mblock-shadow);
+    border-radius: var(--mblock-border-radius);
+    transition: var(--mblock-transition);
+    color: var(--mblock-text-color);
 }
 
-.mblock_wrapper .mblock_item:hover,
 .mblock_wrapper > div:hover {
-    border-left-color: #225588 !important;
-    background: linear-gradient(to bottom, #f0f8ff 0%, #e0f0e0 100%) !important;
-    box-shadow: 1px 1px 3px rgba(51, 102, 153, 0.4) !important;
+    border-left: var(--akg-accent-border-hover);
+    box-shadow: var(--mblock-shadow-hover);
+    transform: var(--mblock-transform-hover);
 }
 
-.mblock_wrapper .btn-xs,
-.mblock_wrapper .btn-group-xs > .btn {
-    font-size: 11px !important;
-    padding: 3px 8px !important;
-    margin: 2px !important;
-    border-radius: 2px !important;
-    font-family: Verdana, Arial, sans-serif !important;
-    font-weight: bold !important;
+/* Drag Handle Styling */
+.mblock_wrapper span.sorthandle {
+    cursor: grab;
+    position: absolute;
+    top: var(--mblock-drag-position-top);
+    left: var(--mblock-drag-position-left);
+    opacity: var(--mblock-drag-opacity);
+    color: var(--mblock-drag-color);
+    font-size: var(--mblock-drag-font-size);
+    font-weight: bold;
+    letter-spacing: var(--mblock-drag-letter-spacing);
+    transition: var(--mblock-transition);
+    user-select: none;
+    line-height: 1;
 }
 
-.mblock_wrapper .btn-success {
-    background: #669966 !important;
-    background: linear-gradient(to bottom, #77aa77 0%, #556655 100%) !important;
-    border: 1px solid #556655 !important;
-    color: white !important;
-    text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
+.mblock_wrapper span.sorthandle:hover {
+    opacity: var(--mblock-drag-opacity-hover);
+    color: var(--mblock-drag-color-hover);
+    cursor: grab;
 }
 
-.mblock_wrapper .btn-success:hover {
-    background: linear-gradient(to bottom, #88bb88 0%, #445544 100%) !important;
-    border-color: #445544 !important;
+.mblock_wrapper span.sorthandle:active {
+    cursor: grabbing;
 }
 
-.mblock_wrapper .btn-danger {
-    background: #cc6666 !important;
-    background: linear-gradient(to bottom, #dd7777 0%, #aa5555 100%) !important;
-    border: 1px solid #aa5555 !important;
-    color: white !important;
-    text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
+.mblock_wrapper span.sorthandle::before {
+    content: "⋮⋮";
 }
 
-.mblock_wrapper .btn-danger:hover {
-    background: linear-gradient(to bottom, #ee8888 0%, #994444 100%) !important;
-    border-color: #994444 !important;
+/* Custom Button Styling mit CSS Properties */
+.mblock_wrapper .btn {
+    font-family: var(--mblock-button-font-family);
+    font-weight: var(--mblock-button-font-weight);
+    text-shadow: var(--mblock-button-text-shadow);
+    border-radius: var(--mblock-button-border-radius);
+    transition: var(--mblock-button-transition);
+    padding: var(--mblock-button-padding);
+    font-size: var(--mblock-button-font-size);
+    min-width: var(--mblock-button-min-size);
+    min-height: var(--mblock-button-min-size);
 }
 
-.mblock_wrapper .btn-info {
-    background: #336699 !important;
-    background: linear-gradient(to bottom, #4477aa 0%, #225588 100%) !important;
-    border: 1px solid #225588 !important;
-    color: white !important;
-    text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
+.mblock_wrapper .btn:hover:not(:disabled) {
+    transform: var(--mblock-button-transform-hover);
+    box-shadow: var(--mblock-button-shadow-hover);
 }
 
-.mblock_wrapper .btn-info:hover {
-    background: linear-gradient(to bottom, #5588bb 0%, #114477 100%) !important;
-    border-color: #114477 !important;
+/* Add Button Styling */
+.mblock_wrapper .btn.addme {
+    background: var(--mblock-add-background);
+    border-color: var(--mblock-add-border);
+    color: var(--mblock-add-color);
+    padding: var(--mblock-add-padding);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--mblock-add-gap);
+    font-weight: var(--mblock-button-font-weight);
+    text-shadow: var(--mblock-button-text-shadow);
 }
 
-.mblock_wrapper .btn-warning {
-    background: #99aa66 !important;
-    background: linear-gradient(to bottom, #aabb77 0%, #778855 100%) !important;
-    border: 1px solid #778855 !important;
-    color: white !important;
-    text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
+.mblock_wrapper .btn.addme:hover:not(:disabled) {
+    background: var(--mblock-add-background-hover);
+    border-color: var(--mblock-add-border-hover);
+    color: var(--mblock-add-color);
+    transform: var(--mblock-add-transform-hover);
+    box-shadow: var(--mblock-add-shadow-hover);
 }
 
-.mblock_wrapper .btn-warning:hover {
-    background: linear-gradient(to bottom, #bbcc88 0%, #667744 100%) !important;
-    border-color: #667744 !important;
+/* Control Buttons (Copy, Up, Down, etc.) */
+.mblock_wrapper span.removeadded .btn:not(.btn-danger):not(.removeme):not(.btn-delete) {
+    background: var(--mblock-control-background);
+    border-color: var(--mblock-control-border);
+    color: var(--mblock-control-color);
+    font-weight: var(--mblock-button-font-weight);
+    text-shadow: var(--mblock-button-text-shadow);
 }
 
-/* === MBlock spezifische Button-Klassen - Grün & Blau === */
-.mblock_wrapper .btn-default,
-.mblock_wrapper .addme {
-    background: #66aa66 !important;  /* Schönes Grün für Add-Button */
-    background: linear-gradient(to bottom, #77bb77 0%, #559955 100%) !important;
-    border: 1px solid #559955 !important;
-    color: white !important;
-    text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
-    font-family: Verdana, Arial, sans-serif !important;
+.mblock_wrapper span.removeadded .btn:not(.btn-danger):not(.removeme):not(.btn-delete):hover:not(:disabled) {
+    background: var(--mblock-control-background-hover);
+    border-color: var(--mblock-control-border-hover);
+    color: var(--mblock-control-color);
 }
 
-.mblock_wrapper .btn-default:hover,
-.mblock_wrapper .addme:hover {
-    background: linear-gradient(to bottom, #88cc88 0%, #447744 100%) !important;
-    border-color: #447744 !important;
-    color: white !important;
+.mblock_wrapper span.removeadded .btn:not(.btn-danger):not(.removeme):not(.btn-delete):disabled {
+    background: var(--mblock-control-background-disabled);
+    color: var(--mblock-control-color-disabled);
+    opacity: 0.6;
 }
 
-.mblock_wrapper .btn-delete,
-.mblock_wrapper .removeme {
-    background: #336699 !important;  /* Klassisches REDAXO 4 Blau für Delete */
-    background: linear-gradient(to bottom, #4477aa 0%, #225588 100%) !important;
-    border: 1px solid #225588 !important;
-    color: white !important;
-    text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
-    font-family: Verdana, Arial, sans-serif !important;
+/* Spezielle AKG Remove Button Styles */
+.mblock_wrapper .btn-danger,
+.mblock_wrapper .removeme,
+.mblock_wrapper .btn-delete {
+    background: var(--akg-remove-background);
+    border-color: var(--akg-remove-border);
+    color: var(--akg-remove-color);
 }
 
-.mblock_wrapper .btn-delete:hover,
-.mblock_wrapper .removeme:hover {
-    background: linear-gradient(to bottom, #5588bb 0%, #114477 100%) !important;
-    border-color: #114477 !important;
-    color: white !important;
+.mblock_wrapper .btn-danger:hover:not(:disabled),
+.mblock_wrapper .removeme:hover:not(:disabled),
+.mblock_wrapper .btn-delete:hover:not(:disabled) {
+    background: var(--akg-remove-background-hover);
+    border-color: var(--akg-remove-border-hover);
 }
 
-/* Disabled State - gedämpfte Farben */
-.mblock_wrapper .btn-delete:disabled,
-.mblock_wrapper .removeme:disabled {
-    background: linear-gradient(to bottom, #6688aa 0%, #447788 100%) !important;
-    border-color: #447788 !important;
-    opacity: 0.6 !important;
+.mblock_wrapper .btn-danger:disabled,
+.mblock_wrapper .removeme:disabled,
+.mblock_wrapper .btn-delete:disabled {
+    background: var(--akg-remove-background-disabled);
+    opacity: 0.6;
 }
 
-.mblock_wrapper .btn-default:disabled,
-.mblock_wrapper .addme:disabled {
-    background: linear-gradient(to bottom, #88aa88 0%, #669966 100%) !important;
-    border-color: #669966 !important;
-    opacity: 0.6 !important;
+/* AKG Add Area Styling */
+.mblock_wrapper .mblock-copy-paste-toolbar {
+    border: 2px dashed var(--mblock-toolbar-border);
+    background: var(--mblock-toolbar-background);
+    border-radius: var(--mblock-toolbar-border-radius);
+    padding: var(--mblock-toolbar-padding);
+    margin: var(--mblock-toolbar-margin);
+    box-shadow: var(--mblock-toolbar-shadow);
+    transition: var(--mblock-transition);
+    display: flex;
+    align-items: center;
+    gap: var(--mblock-toolbar-gap);
 }
 
-.mblock_wrapper span.mblock_adder,
-.mblock_wrapper .mblock_add {
-    text-align: center !important;
-    padding: 12px !important;
-    border: 2px dashed #336699 !important;
-    border-radius: 0px !important;
-    background: #e0f0e0 !important;
-    background: linear-gradient(to bottom, #f0f8f0 0%, #e0f0e0 100%) !important;
-    margin: 6px 0 0 0 !important;
-    transition: all 0.2s ease !important;
+.mblock_wrapper .mblock-copy-paste-toolbar:hover {
+    box-shadow: var(--mblock-toolbar-shadow-hover);
 }
 
-.mblock_wrapper span.mblock_adder:hover,
-.mblock_wrapper .mblock_add:hover {
-    background: linear-gradient(to bottom, #e0f0e0 0%, #d0e8d0 100%) !important;
-    border-color: #225588 !important;
-    box-shadow: 1px 1px 3px rgba(51, 102, 153, 0.3) !important;
+/* Remove/Add Button Container */
+.mblock_wrapper span.removeadded {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    z-index: 1;
+    padding: 0;
+    display: flex;
+    gap: 4px;
+    align-items: center;
 }
 
-.mblock_wrapper span.mblock_adder .btn,
-.mblock_wrapper .mblock_add .btn {
-    background: #336699 !important;
-    background: linear-gradient(to bottom, #4477aa 0%, #225588 100%) !important;
-    border: 1px solid #225588 !important;
-    color: white !important;
-    font-weight: bold !important;
-    padding: 8px 16px !important;
-    border-radius: 2px !important;
-    text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
-    font-family: Verdana, Arial, sans-serif !important;
+/* Offline State Styling */
+.mblock_wrapper > div.mblock-offline {
+    opacity: var(--mblock-offline-block-opacity);
+    background: var(--mblock-offline-block-background);
+    border-style: dashed;
+    border-color: var(--mblock-offline-block-border);
+    position: relative;
 }
 
-.mblock_wrapper span.mblock_adder .btn:hover,
-.mblock_wrapper .mblock_add .btn:hover {
-    background: linear-gradient(to bottom, #5588bb 0%, #114477 100%) !important;
-    border-color: #114477 !important;
-    color: white !important;
+.mblock_wrapper > div.mblock-offline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--mblock-offline-pattern);
+    pointer-events: none;
+    border-radius: var(--mblock-border-radius);
 }
 
-/* === DARK MODE SUPPORT === */
-/* REDAXO Dark Theme Support */
-body.rex-theme-dark .mblock_wrapper {
-    border-color: #4a7eb8 !important;
-    background: #1a2a1a !important;
-    color: #e9ecef !important;
-    box-shadow: 2px 2px 4px rgba(74, 126, 184, 0.4) !important;
+/* Sortable Ghost */
+div.sortable-ghost {
+    opacity: var(--mblock-ghost-opacity);
+    background: var(--mblock-ghost-background);
+    border: var(--mblock-ghost-border);
+    border-radius: var(--mblock-border-radius);
+    padding: var(--mblock-ghost-padding);
+    margin: var(--mblock-ghost-margin);
+    transform: none !important;
+    position: relative;
+    overflow: hidden;
 }
 
-body.rex-theme-dark .mblock_wrapper .mblock_item,
-body.rex-theme-dark .mblock_wrapper > div {
-    border-color: #5a7a5a !important;
-    border-left-color: #4a7eb8 !important;
-    background: #2a3a2a !important;
-    background: linear-gradient(to bottom, #2a3a2a 0%, #1f2f3f 100%) !important;
-    color: #e9ecef !important;
+div.sortable-ghost::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: var(--mblock-ghost-shimmer);
+    animation: mblockGhostShimmer 2s ease-in-out infinite;
+    pointer-events: none;
 }
 
-body.rex-theme-dark .mblock_wrapper .mblock_item:hover,
-body.rex-theme-dark .mblock_wrapper > div:hover {
-    border-left-color: #5ba8e0 !important;
-    background: linear-gradient(to bottom, #1f2f3f 0%, #2a4a2a 100%) !important;
-    box-shadow: 1px 1px 3px rgba(74, 126, 184, 0.5) !important;
+@keyframes mblockGhostShimmer {
+    0% { left: -100%; }
+    50% { left: 100%; }
+    100% { left: 100%; }
 }
 
-body.rex-theme-dark .mblock_wrapper .btn-success {
-    background: linear-gradient(to bottom, #4a7eb8 0%, #3a6ea8 100%) !important;
-    border-color: #4a7eb8 !important;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.8) !important;
+/* === Dark Mode Support === */
+body.rex-theme-dark .mblock_wrapper > div,
+html[data-bs-theme="dark"] .mblock_wrapper > div {
+    border-left: var(--akg-dark-accent-border);
+    border-color: var(--mblock-dark-border-color);
+    background: var(--mblock-dark-background);
+    box-shadow: var(--mblock-dark-shadow);
+    color: var(--mblock-dark-text-color);
 }
 
-body.rex-theme-dark .mblock_wrapper .btn-success:hover {
-    background: linear-gradient(to bottom, #5ba8e0 0%, #4a7eb8 100%) !important;
-    border-color: #5ba8e0 !important;
+body.rex-theme-dark .mblock_wrapper > div:hover,
+html[data-bs-theme="dark"] .mblock_wrapper > div:hover {
+    border-left: var(--akg-dark-accent-border-hover);
+    border-color: var(--mblock-dark-border-color-hover);
+    box-shadow: var(--mblock-dark-shadow-hover);
 }
 
-body.rex-theme-dark .mblock_wrapper span.mblock_adder,
-body.rex-theme-dark .mblock_wrapper .mblock_add {
-    border-color: #4a7eb8 !important;
-    background: #1f2f1f !important;
-    background: linear-gradient(to bottom, #1f2f1f 0%, #1a2f3a 100%) !important;
-    color: #e9ecef !important;
+body.rex-theme-dark .mblock_wrapper span.sorthandle,
+html[data-bs-theme="dark"] .mblock_wrapper span.sorthandle {
+    color: var(--mblock-dark-drag-color);
 }
 
-body.rex-theme-dark .mblock_wrapper span.mblock_adder:hover,
-body.rex-theme-dark .mblock_wrapper .mblock_add:hover {
-    background: linear-gradient(to bottom, #1a2f3a 0%, #2a4a3a 100%) !important;
-    border-color: #5ba8e0 !important;
+body.rex-theme-dark .mblock_wrapper span.sorthandle:hover,
+html[data-bs-theme="dark"] .mblock_wrapper span.sorthandle:hover {
+    color: var(--mblock-dark-drag-color-hover);
 }
 
-body.rex-theme-dark .mblock_wrapper span.mblock_adder .btn,
-body.rex-theme-dark .mblock_wrapper .mblock_add .btn {
-    background: linear-gradient(to bottom, #4a7eb8 0%, #3a6ea8 100%) !important;
-    border-color: #4a7eb8 !important;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.8) !important;
+/* Dark Mode Control Buttons */
+body.rex-theme-dark .mblock_wrapper span.removeadded .btn:not(.btn-danger):not(.removeme):not(.btn-delete),
+html[data-bs-theme="dark"] .mblock_wrapper span.removeadded .btn:not(.btn-danger):not(.removeme):not(.btn-delete) {
+    background: var(--mblock-dark-control-background);
+    border-color: var(--mblock-dark-control-border);
+    color: var(--mblock-dark-control-color);
 }
 
-body.rex-theme-dark .mblock_wrapper span.mblock_adder .btn:hover,
-body.rex-theme-dark .mblock_wrapper .mblock_add .btn:hover {
-    background: linear-gradient(to bottom, #5ba8e0 0%, #4a7eb8 100%) !important;
-    border-color: #5ba8e0 !important;
+body.rex-theme-dark .mblock_wrapper span.removeadded .btn:not(.btn-danger):not(.removeme):not(.btn-delete):hover:not(:disabled),
+html[data-bs-theme="dark"] .mblock_wrapper span.removeadded .btn:not(.btn-danger):not(.removeme):not(.btn-delete):hover:not(:disabled) {
+    background: var(--mblock-dark-control-background-hover);
+    border-color: var(--mblock-dark-control-border-hover);
 }
 
-/* Dark Mode für MBlock spezifische Button-Klassen */
-body.rex-theme-dark .mblock_wrapper .btn-default,
-body.rex-theme-dark .mblock_wrapper .addme {
-    background: linear-gradient(to bottom, #66aa66 0%, #559955 100%) !important;
-    border-color: #559955 !important;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.8) !important;
+/* Dark Mode Add Button */
+body.rex-theme-dark .mblock_wrapper .btn.addme,
+html[data-bs-theme="dark"] .mblock_wrapper .btn.addme {
+    background: var(--mblock-dark-add-background);
+    border-color: var(--mblock-dark-add-border);
 }
 
-body.rex-theme-dark .mblock_wrapper .btn-default:hover,
-body.rex-theme-dark .mblock_wrapper .addme:hover {
-    background: linear-gradient(to bottom, #77bb77 0%, #447744 100%) !important;
-    border-color: #447744 !important;
+body.rex-theme-dark .mblock_wrapper .btn.addme:hover:not(:disabled),
+html[data-bs-theme="dark"] .mblock_wrapper .btn.addme:hover:not(:disabled) {
+    background: var(--mblock-dark-add-background-hover);
+    border-color: var(--mblock-dark-add-border-hover);
+    box-shadow: var(--mblock-dark-add-shadow-hover);
 }
 
+/* Dark Mode Remove Buttons */
+body.rex-theme-dark .mblock_wrapper .btn-danger,
+body.rex-theme-dark .mblock_wrapper .removeme,
 body.rex-theme-dark .mblock_wrapper .btn-delete,
-body.rex-theme-dark .mblock_wrapper .removeme {
-    background: linear-gradient(to bottom, #4a7eb8 0%, #3a6ea8 100%) !important;
-    border-color: #4a7eb8 !important;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.8) !important;
+html[data-bs-theme="dark"] .mblock_wrapper .btn-danger,
+html[data-bs-theme="dark"] .mblock_wrapper .removeme,
+html[data-bs-theme="dark"] .mblock_wrapper .btn-delete {
+    background: var(--akg-dark-remove-background);
+    border-color: var(--akg-dark-remove-border);
 }
 
-body.rex-theme-dark .mblock_wrapper .btn-delete:hover,
-body.rex-theme-dark .mblock_wrapper .removeme:hover {
-    background: linear-gradient(to bottom, #5ba8e0 0%, #4a7eb8 100%) !important;
-    border-color: #5ba8e0 !important;
+body.rex-theme-dark .mblock_wrapper .btn-danger:hover:not(:disabled),
+body.rex-theme-dark .mblock_wrapper .removeme:hover:not(:disabled),
+body.rex-theme-dark .mblock_wrapper .btn-delete:hover:not(:disabled),
+html[data-bs-theme="dark"] .mblock_wrapper .btn-danger:hover:not(:disabled),
+html[data-bs-theme="dark"] .mblock_wrapper .removeme:hover:not(:disabled),
+html[data-bs-theme="dark"] .mblock_wrapper .btn-delete:hover:not(:disabled) {
+    background: var(--akg-dark-remove-background-hover);
+    border-color: var(--akg-dark-remove-border-hover);
 }
 
-body.rex-theme-dark .mblock_wrapper .btn-delete:disabled,
-body.rex-theme-dark .mblock_wrapper .removeme:disabled {
-    background: linear-gradient(to bottom, #6688aa 0%, #557799 100%) !important;
-    border-color: #557799 !important;
-    opacity: 0.5 !important;
-}
-
-body.rex-theme-dark .mblock_wrapper .btn-default:disabled,
-body.rex-theme-dark .mblock_wrapper .addme:disabled {
-    background: linear-gradient(to bottom, #77aa77 0%, #668866 100%) !important;
-    border-color: #668866 !important;
-    opacity: 0.5 !important;
-}
-
-/* Auto Dark Mode (System Preference) */
+/* System Dark Mode */
 @media (prefers-color-scheme: dark) {
-    .mblock_wrapper {
-        border-color: #4a7eb8 !important;
-        background: #1a2a1a !important;
-        color: #e9ecef !important;
-        box-shadow: 2px 2px 4px rgba(74, 126, 184, 0.4) !important;
+    body:not(.rex-theme-light) .mblock_wrapper > div {
+        border-left: var(--akg-dark-accent-border);
+        border-color: var(--mblock-dark-border-color);
+        background: var(--mblock-dark-background);
+        box-shadow: var(--mblock-dark-shadow);
+        color: var(--mblock-dark-text-color);
     }
 
-    .mblock_wrapper .mblock_item,
-    .mblock_wrapper > div {
-        border-color: #5a7a5a !important;
-        border-left-color: #4a7eb8 !important;
-        background: #2a3a2a !important;
-        background: linear-gradient(to bottom, #2a3a2a 0%, #1f2f3f 100%) !important;
-        color: #e9ecef !important;
+    body:not(.rex-theme-light) .mblock_wrapper > div:hover {
+        border-left: var(--akg-dark-accent-border-hover);
+        border-color: var(--mblock-dark-border-color-hover);
+        box-shadow: var(--mblock-dark-shadow-hover);
     }
 
-    .mblock_wrapper .mblock_item:hover,
-    .mblock_wrapper > div:hover {
-        border-left-color: #5ba8e0 !important;
-        background: linear-gradient(to bottom, #1f2f3f 0%, #2a4a2a 100%) !important;
-        box-shadow: 1px 1px 3px rgba(74, 126, 184, 0.5) !important;
+    body:not(.rex-theme-light) .mblock_wrapper span.sorthandle {
+        color: var(--mblock-dark-drag-color);
     }
 
-    .mblock_wrapper .btn-success {
-        background: linear-gradient(to bottom, #4a7eb8 0%, #3a6ea8 100%) !important;
-        border-color: #4a7eb8 !important;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.8) !important;
+    body:not(.rex-theme-light) .mblock_wrapper span.sorthandle:hover {
+        color: var(--mblock-dark-drag-color-hover);
     }
 
-    .mblock_wrapper .btn-success:hover {
-        background: linear-gradient(to bottom, #5ba8e0 0%, #4a7eb8 100%) !important;
-        border-color: #5ba8e0 !important;
+    body:not(.rex-theme-light) .mblock_wrapper span.removeadded .btn:not(.btn-danger):not(.removeme):not(.btn-delete) {
+        background: var(--mblock-dark-control-background);
+        border-color: var(--mblock-dark-control-border);
+        color: var(--mblock-dark-control-color);
     }
 
-    .mblock_wrapper span.mblock_adder,
-    .mblock_wrapper .mblock_add {
-        border-color: #4a7eb8 !important;
-        background: #1f2f1f !important;
-        background: linear-gradient(to bottom, #1f2f1f 0%, #1a2f3a 100%) !important;
-        color: #e9ecef !important;
+    body:not(.rex-theme-light) .mblock_wrapper span.removeadded .btn:not(.btn-danger):not(.removeme):not(.btn-delete):hover:not(:disabled) {
+        background: var(--mblock-dark-control-background-hover);
+        border-color: var(--mblock-dark-control-border-hover);
     }
 
-    .mblock_wrapper span.mblock_adder:hover,
-    .mblock_wrapper .mblock_add:hover {
-        background: linear-gradient(to bottom, #1a2f3a 0%, #2a4a3a 100%) !important;
-        border-color: #5ba8e0 !important;
+    body:not(.rex-theme-light) .mblock_wrapper .btn.addme {
+        background: var(--mblock-dark-add-background);
+        border-color: var(--mblock-dark-add-border);
     }
 
-    .mblock_wrapper span.mblock_adder .btn,
-    .mblock_wrapper .mblock_add .btn {
-        background: linear-gradient(to bottom, #4a7eb8 0%, #3a6ea8 100%) !important;
-        border-color: #4a7eb8 !important;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.8) !important;
+    body:not(.rex-theme-light) .mblock_wrapper .btn.addme:hover:not(:disabled) {
+        background: var(--mblock-dark-add-background-hover);
+        border-color: var(--mblock-dark-add-border-hover);
+        box-shadow: var(--mblock-dark-add-shadow-hover);
     }
 
-    .mblock_wrapper span.mblock_adder .btn:hover,
-    .mblock_wrapper .mblock_add .btn:hover {
-        background: linear-gradient(to bottom, #5ba8e0 0%, #4a7eb8 100%) !important;
-        border-color: #5ba8e0 !important;
+    body:not(.rex-theme-light) .mblock_wrapper .btn-danger,
+    body:not(.rex-theme-light) .mblock_wrapper .removeme,
+    body:not(.rex-theme-light) .mblock_wrapper .btn-delete {
+        background: var(--akg-dark-remove-background);
+        border-color: var(--akg-dark-remove-border);
     }
 
-    /* Auto Dark Mode für MBlock spezifische Button-Klassen */
-    .mblock_wrapper .btn-default,
-    .mblock_wrapper .addme {
-        background: linear-gradient(to bottom, #66aa66 0%, #559955 100%) !important;
-        border-color: #559955 !important;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.8) !important;
-    }
-
-    .mblock_wrapper .btn-default:hover,
-    .mblock_wrapper .addme:hover {
-        background: linear-gradient(to bottom, #77bb77 0%, #447744 100%) !important;
-        border-color: #447744 !important;
-    }
-
-    .mblock_wrapper .btn-delete,
-    .mblock_wrapper .removeme {
-        background: linear-gradient(to bottom, #4a7eb8 0%, #3a6ea8 100%) !important;
-        border-color: #4a7eb8 !important;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.8) !important;
-    }
-
-    .mblock_wrapper .btn-delete:hover,
-    .mblock_wrapper .removeme:hover {
-        background: linear-gradient(to bottom, #5ba8e0 0%, #4a7eb8 100%) !important;
-        border-color: #5ba8e0 !important;
-    }
-
-    .mblock_wrapper .btn-delete:disabled,
-    .mblock_wrapper .removeme:disabled {
-        background: linear-gradient(to bottom, #6688aa 0%, #557799 100%) !important;
-        border-color: #557799 !important;
-        opacity: 0.5 !important;
-    }
-
-    .mblock_wrapper .btn-default:disabled,
-    .mblock_wrapper .addme:disabled {
-        background: linear-gradient(to bottom, #77aa77 0%, #668866 100%) !important;
-        border-color: #668866 !important;
-        opacity: 0.5 !important;
+    body:not(.rex-theme-light) .mblock_wrapper .btn-danger:hover:not(:disabled),
+    body:not(.rex-theme-light) .mblock_wrapper .removeme:hover:not(:disabled),
+    body:not(.rex-theme-light) .mblock_wrapper .btn-delete:hover:not(:disabled) {
+        background: var(--akg-dark-remove-background-hover);
+        border-color: var(--akg-dark-remove-border-hover);
     }
 }
