@@ -18,6 +18,10 @@ if (!$this->hasConfig('mblock_scroll')) {
 if (!$this->hasConfig('mblock_delete_confirm')) {
     $this->setConfig('mblock_delete_confirm', 1);
 }
+// MBlock 4.0 - Copy/Paste Feature - Default aktiviert für neue und bestehende Installationen
+if (!$this->hasConfig('mblock_copy_paste')) {
+    $this->setConfig('mblock_copy_paste', 1); // Default: aktiviert
+}
 
 // MBlock 4.0 - Template System Update
 // Löscht alte Default-Templates aus dem data/ Ordner
@@ -60,21 +64,6 @@ if (!is_dir($this->getDataPath())) {
 rex_dir::deleteFiles($this->getAssetsPath(), true);
 // copy assets
 rex_dir::copy($this->getPath('assets'), $this->getAssetsPath());
-
-
-// ensure demo table
-rex_sql_table::get(rex::getTable('mblock_rexform_demo'))
-    ->ensureColumn(new rex_sql_column('id', 'int(11)', false, null, 'auto_increment'))
-    ->ensureColumn(new rex_sql_column('status', 'int(1)', true, '1'))
-    ->ensureColumn(new rex_sql_column('name', 'text'))
-    ->ensureColumn(new rex_sql_column('mblock_field', 'text'))
-    ->ensureColumn(new rex_sql_column('createdate', 'datetime', true))
-    ->ensureColumn(new rex_sql_column('updatedate', 'datetime', true))
-    ->ensureColumn(new rex_sql_column('createuser', 'varchar(255)'))
-    ->ensureColumn(new rex_sql_column('updateuser', 'varchar(255)'))
-    ->setPrimaryKey('id')
-    ->ensure();
-
 
 // rex media and link updater
 $values = array();

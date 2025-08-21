@@ -44,6 +44,16 @@ class MBlockElement
     public $offline_button;
 
     /**
+     * @var string
+     */
+    public $copy_paste_buttons;
+
+    /**
+     * @var string
+     */
+    public $copy_paste_toolbar;
+
+    /**
      * @return mixed
      * @author Joachim Doerr
      */
@@ -120,6 +130,26 @@ class MBlockElement
     public function setOfflineButton($offline_button)
     {
         $this->offline_button = $offline_button;
+        return $this;
+    }
+
+    /**
+     * @param string $copy_paste_buttons
+     * @return $this
+     */
+    public function setCopyPasteButtons($copy_paste_buttons)
+    {
+        $this->copy_paste_buttons = $copy_paste_buttons;
+        return $this;
+    }
+
+    /**
+     * @param string $copy_paste_toolbar
+     * @return $this
+     */
+    public function setCopyPasteToolbar($copy_paste_toolbar)
+    {
+        $this->copy_paste_toolbar = $copy_paste_toolbar;
         return $this;
     }
 

@@ -20,8 +20,11 @@ use FriendsOfRedaxo\MBlock\Replacer\MBlockValueReplacer;
 use FriendsOfRedaxo\MBlock\Utils\MBlockSessionHelper;
 use FriendsOfRedaxo\MBlock\Utils\MBlockSettingsHelper;
 use InvalidArgumentException;
+use MForm;
+use mblock_rex_form;
 use rex;
 use rex_addon;
+use rex_config;
 use rex_escape;
 use rex_extension;
 use rex_extension_point;
@@ -223,6 +226,9 @@ class MBlock
         $wrapper->setOutput(implode('', static::$output))
             ->setSettings(MBlockSettingsHelper::getSettings(array_merge($settings, ['mblock-plain-sortitem' => $plainItem, 'mblock-single-add' => $addItem])));
 
+        // Set copy/paste toolbar based on configuration
+        self::setCopyPasteToolbar($wrapper);
+
         // return wrapped from elements
         $output = MBlockParser::parseElement($wrapper, 'wrapper', $theme);
 
@@ -291,6 +297,9 @@ class MBlock
 
         // Detect offline field and set offline properties
         self::setOfflineProperties($element, $item);
+
+        // Set copy/paste buttons based on configuration
+        self::setCopyPasteProperties($element, $item);
 
         // parse element to output
         $output = MBlockParser::parseElement($element, 'element', $theme);
@@ -371,6 +380,56 @@ class MBlock
             $element->setOfflineClass('');
             $element->setOfflineButton('');
         }
+    }
+
+    /**
+     * Setzt die Copy/Paste-Properties für ein Element basierend auf der Konfiguration
+     * @param MBlockElement $element Das MBlock Element
+     * @param MBlockItem $item Das MBlock Item
+     * @author Joachim Doerr
+     */
+    private static function setCopyPasteProperties(MBlockElement $element, MBlockItem $item)
+    {
+        // Get copy/paste configuration using rex_config
+        $copyPasteEnabled = rex_config::get('mblock', 'copy_paste', 1); // Default: enabled
+        
+        if ($copyPasteEnabled) {
+            // Copy/Paste ist aktiviert - Buttons anzeigen
+            $copyPasteButtons = '<div class="btn-group btn-group-xs">
+                <button type="button" class="btn btn-default mblock-copy-btn" title="{{mblock_copy_element}}"><i class="rex-icon rex-icon-copy"></i></button>
+                <button type="button" class="btn btn-default mblock-paste-btn" title="{{mblock_paste_element}}"><i class="rex-icon rex-icon-paste"></i></button>
+            </div>';
+        } else {
+            // Copy/Paste ist deaktiviert - keine Buttons
+            $copyPasteButtons = '';
+        }
+        
+        $element->setCopyPasteButtons($copyPasteButtons);
+    }
+
+    /**
+     * Setzt die Copy/Paste-Toolbar für den Wrapper basierend auf der Konfiguration
+     * @param MBlockElement $wrapper Das MBlock Wrapper Element
+     * @author Joachim Doerr
+     */
+    private static function setCopyPasteToolbar(MBlockElement $wrapper)
+    {
+        // Get copy/paste configuration using rex_config
+        $copyPasteEnabled = rex_config::get('mblock', 'copy_paste', 1); // Default: enabled
+        
+        if ($copyPasteEnabled) {
+            // Copy/Paste ist aktiviert - Toolbar anzeigen
+            $copyPasteToolbar = '<div class="mblock-copy-paste-toolbar">
+                <div class="btn-group btn-group-xs">
+                    <button type="button" class="btn btn-default mblock-clear-clipboard" title="{{mblock_clear_clipboard}}"><i class="rex-icon rex-icon-delete"></i> {{mblock_clear_clipboard}}</button>
+                </div>
+            </div>';
+        } else {
+            // Copy/Paste ist deaktiviert - keine Toolbar
+            $copyPasteToolbar = '';
+        }
+        
+        $wrapper->setCopyPasteToolbar($copyPasteToolbar);
     }
 
     /**

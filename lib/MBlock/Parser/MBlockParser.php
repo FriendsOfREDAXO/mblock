@@ -29,10 +29,14 @@ class MBlockParser
         // Replace language placeholders first
         $template = self::replaceLanguagePlaceholders($template);
         
-        return str_replace(
+        // Replace element placeholders
+        $output = str_replace(
             array_merge(array(' />'), $element->getKeys()),
             array_merge(array('/>'), $element->getValues()),
             $template);
+            
+        // Replace language placeholders in the output again (for dynamic content like buttons)
+        return self::replaceLanguagePlaceholders($output);
     }
     
     /**
