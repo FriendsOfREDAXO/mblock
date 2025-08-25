@@ -1,0 +1,475 @@
+/* 🕹️ Retro 8-Bit Theme - Pixel Perfect Gaming Nostalgia
+ * =====================================================
+ * Ein authentisches 8-Bit Gaming-Theme mit klassischen Pixel-Farben,
+ * Chip-Tune-inspirierten Animationen und retro Gaming-Ästhetik.
+ * Verwendet nur system-eigene monospace Fonts für bessere Performance.
+ */
+
+:root {
+    /* === 8-Bit Color Palette === */
+    --pixel-green: #09914d;
+    --pixel-red: #FF4040; 
+    --pixel-blue: #4080FF;
+    --pixel-yellow: #FFFF00;
+    --pixel-cyan: #00FFFF;
+    --pixel-magenta: #FF40FF;
+    --pixel-orange: #FF8000;
+    --pixel-purple: #8040FF;
+    
+    /* === Console Colors === */
+    --console-bg: #000000;
+    --console-border: #404040;
+    --console-screen: #001010;
+    --console-text: #056937;
+    --console-shadow: #000000;
+    --console-highlight: #FFFFFF;
+    
+    /* === Block Container === */
+    --retro-border-color: var(--pixel-green);
+    --retro-background: linear-gradient(45deg, #002200 0%, #004400 25%, #002200 50%, #006600 75%, #002200 100%);
+    --retro-shadow: 4px 4px 0px var(--console-shadow), 6px 6px 0px rgba(0, 255, 128, 0.3);
+    --retro-shadow-hover: 6px 6px 0px var(--console-shadow), 8px 8px 0px rgba(0, 255, 128, 0.4);
+    --retro-border-width: 3px;
+    --retro-padding: 16px 20px 20px 20px;
+    --retro-margin: 0 0 16px 0;
+    --retro-transform-hover: translate(-2px, -2px);
+    --retro-text-color: var(--console-text);
+    
+    /* === Drag Handle === */
+    --retro-drag-color: var(--pixel-cyan);
+    --retro-drag-color-hover: var(--pixel-yellow);
+    --retro-drag-font-size: 12px;
+    --retro-drag-position-top: 8px;
+    --retro-drag-position-left: 8px;
+    --retro-drag-animation: pixelBlink 2s infinite;
+    
+    /* === Buttons Base === */
+    --retro-button-font-family: 'Courier New', 'Monaco', 'Menlo', 'Consolas', 'DejaVu Sans Mono', monospace;
+    --retro-button-font-size: 10px;
+    --retro-button-padding: 10px 14px;
+    --retro-button-min-size: 36px;
+    --retro-button-border-width: 2px;
+    --retro-button-text-shadow: 2px 2px 0px var(--console-shadow);
+    --retro-button-transition: all 0.1s steps(4);
+    --retro-button-font-weight: bold;
+    --retro-button-text-transform: uppercase;
+    
+    /* === Add Button === */
+    --retro-add-background: #00DD00;
+    --retro-add-border: var(--console-shadow);
+    --retro-add-color: #000000;
+    --retro-add-shadow: 3px 3px 0px var(--console-shadow);
+    --retro-add-shadow-hover: 5px 5px 0px var(--console-shadow);
+    --retro-add-animation: pixelPulse 1.5s infinite;
+    
+    /* === Control Buttons === */
+    --retro-control-background: #4080FF;
+    --retro-control-border: var(--console-shadow);
+    --retro-control-color: #FFFFFF;
+    --retro-control-shadow: 3px 3px 0px var(--console-shadow);
+    --retro-control-shadow-hover: 4px 4px 0px var(--console-shadow);
+    
+    /* === Remove/Delete Buttons === */
+    --retro-remove-background: #FF4040;
+    --retro-remove-border: var(--console-shadow);
+    --retro-remove-color: #FFFFFF;
+    --retro-remove-shadow: 3px 3px 0px var(--console-shadow);
+    --retro-remove-shadow-hover: 4px 4px 0px var(--console-shadow);
+    --retro-remove-animation: pixelShake 0.5s;
+    
+    /* === Copy & Paste Toolbar === */
+    --retro-toolbar-background: linear-gradient(90deg, #001a1a 0%, #003030 50%, #001a1a 100%);
+    --retro-toolbar-border: var(--pixel-cyan);
+    --retro-toolbar-shadow: 4px 4px 0px var(--console-shadow);
+    --retro-toolbar-padding: 16px 20px;
+    --retro-toolbar-margin: 12px 0;
+    
+    /* === Scanlines Effect === */
+    --scanline-color: rgba(0, 255, 128, 0.1);
+    --scanline-animation: scanlines 2s infinite linear;
+    
+    /* === Offline State === */
+    --retro-offline-filter: hue-rotate(180deg) saturate(0.5);
+    --retro-offline-animation: pixelGlitch 0.3s infinite;
+    
+    /* === Dark Console Mode === */
+    --retro-dark-bg: #0a0a0a;
+    --retro-dark-border: var(--pixel-purple);
+    --retro-dark-text: var(--pixel-magenta);
+    --retro-dark-shadow: 4px 4px 0px #000000, 6px 6px 0px rgba(255, 64, 255, 0.3);
+}
+
+/* === 8-Bit Animations === */
+@keyframes pixelBlink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.3; }
+}
+
+@keyframes pixelPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes pixelShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
+}
+
+@keyframes scanlines {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 20px; }
+}
+
+@keyframes pixelGlitch {
+    0%, 90%, 100% { transform: translateX(0); }
+    95% { transform: translateX(-2px); }
+    97% { transform: translateX(2px); }
+}
+
+@keyframes powerOn {
+    0% { 
+        transform: scaleY(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scaleY(1) scaleX(0.1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scaleY(1) scaleX(1);
+        opacity: 1;
+    }
+}
+
+/* === Retro 8-Bit Base Styles === */
+
+/* MBlock Wrapper with Console Styling */
+.mblock_wrapper.retro_8bit {
+    margin: var(--retro-margin);
+    padding: 0;
+    list-style: none;
+    position: relative;
+    font-family: var(--retro-button-font-family);
+}
+
+.mblock_wrapper.retro_8bit > div {
+    border: var(--retro-border-width) solid var(--retro-border-color);
+    background: var(--retro-background);
+    margin: var(--retro-margin);
+    padding: var(--retro-padding);
+    position: relative;
+    box-shadow: var(--retro-shadow);
+    transition: var(--retro-button-transition);
+    color: var(--retro-text-color);
+    animation: powerOn 0.5s ease-out;
+    
+    /* Scanlines Effect */
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            var(--scanline-color) 2px,
+            var(--scanline-color) 4px
+        );
+    background-size: 100% 20px;
+    animation: var(--scanline-animation);
+}
+
+.mblock_wrapper.retro_8bit > div:hover {
+    box-shadow: var(--retro-shadow-hover);
+    transform: var(--retro-transform-hover);
+    border-color: var(--pixel-yellow);
+}
+
+/* Pixel Perfect Drag Handle */
+.mblock_wrapper.retro_8bit span.pixel-handle {
+    cursor: grab;
+    position: absolute;
+    top: var(--retro-drag-position-top);
+    left: var(--retro-drag-position-left);
+    color: var(--retro-drag-color);
+    font-size: var(--retro-drag-font-size);
+    font-family: var(--retro-button-font-family);
+    font-weight: bold;
+    transition: var(--retro-button-transition);
+    user-select: none;
+    line-height: 1;
+    animation: var(--retro-drag-animation);
+    z-index: 2;
+}
+
+.mblock_wrapper.retro_8bit span.pixel-handle:hover {
+    color: var(--retro-drag-color-hover);
+    animation: pixelPulse 0.8s infinite;
+}
+
+.mblock_wrapper.retro_8bit span.pixel-handle:active {
+    cursor: grabbing;
+    animation: none;
+}
+
+.mblock_wrapper.retro_8bit span.pixel-handle::before {
+    content: "■■■";
+}
+
+/* Retro Container Layout */
+.mblock_wrapper.retro_8bit .retro-container {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.mblock_wrapper.retro_8bit .retro-content {
+    flex: 1;
+    padding-left: 32px; /* Space for drag handle */
+}
+
+.mblock_wrapper.retro_8bit .retro-controls {
+    flex-shrink: 0;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid var(--console-border);
+    border-radius: 4px;
+}
+
+/* Pixel Button Styling */
+.mblock_wrapper.retro_8bit .pixel-btn {
+    font-family: var(--retro-button-font-family);
+    font-size: var(--retro-button-font-size);
+    font-weight: var(--retro-button-font-weight);
+    text-transform: var(--retro-button-text-transform);
+    text-shadow: var(--retro-button-text-shadow);
+    border-width: var(--retro-button-border-width);
+    transition: var(--retro-button-transition);
+    padding: var(--retro-button-padding);
+    min-width: var(--retro-button-min-size);
+    min-height: var(--retro-button-min-size);
+    border-radius: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.mblock_wrapper.retro_8bit .pixel-btn:hover:not(:disabled) {
+    transform: translate(-1px, -1px);
+    filter: brightness(1.2);
+}
+
+.mblock_wrapper.retro_8bit .pixel-btn:active {
+    transform: translate(1px, 1px);
+}
+
+/* Pixel Icon Styling */
+.mblock_wrapper.retro_8bit .pixel-icon {
+    display: inline-block;
+    line-height: 1;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Add Button */
+.mblock_wrapper.retro_8bit .pixel-btn.addme {
+    background: var(--retro-add-background);
+    border-color: var(--retro-add-border);
+    color: var(--retro-add-color);
+    box-shadow: var(--retro-add-shadow);
+    animation: var(--retro-add-animation);
+}
+
+.mblock_wrapper.retro_8bit .pixel-btn.addme:hover:not(:disabled) {
+    box-shadow: var(--retro-add-shadow-hover);
+    animation: pixelPulse 0.5s infinite;
+}
+
+/* Control Buttons */
+.mblock_wrapper.retro_8bit .pixel-btn.btn-move,
+.mblock_wrapper.retro_8bit .pixel-btn:not(.addme):not(.removeme):not(.btn-delete) {
+    background: var(--retro-control-background);
+    border-color: var(--retro-control-border);
+    color: var(--retro-control-color);
+    box-shadow: var(--retro-control-shadow);
+}
+
+.mblock_wrapper.retro_8bit .pixel-btn.btn-move:hover:not(:disabled),
+.mblock_wrapper.retro_8bit .pixel-btn:not(.addme):not(.removeme):not(.btn-delete):hover:not(:disabled) {
+    box-shadow: var(--retro-control-shadow-hover);
+    background: var(--pixel-cyan);
+}
+
+/* Remove/Delete Buttons */
+.mblock_wrapper.retro_8bit .pixel-btn.removeme,
+.mblock_wrapper.retro_8bit .pixel-btn.btn-delete {
+    background: var(--retro-remove-background);
+    border-color: var(--retro-remove-border);
+    color: var(--retro-remove-color);
+    box-shadow: var(--retro-remove-shadow);
+}
+
+.mblock_wrapper.retro_8bit .pixel-btn.removeme:hover:not(:disabled),
+.mblock_wrapper.retro_8bit .pixel-btn.btn-delete:hover:not(:disabled) {
+    box-shadow: var(--retro-remove-shadow-hover);
+    animation: var(--retro-remove-animation);
+    background: var(--pixel-magenta);
+}
+
+/* Button Group Layout */
+.mblock_wrapper.retro_8bit .pixel-button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* Copy-Paste-Toolbar Console Styling */
+.mblock_wrapper.retro_8bit .mblock-copy-paste-toolbar {
+    border: var(--retro-border-width) solid var(--retro-toolbar-border);
+    background: var(--retro-toolbar-background);
+    padding: var(--retro-toolbar-padding);
+    margin: var(--retro-toolbar-margin);
+    box-shadow: var(--retro-toolbar-shadow);
+    transition: var(--retro-button-transition);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+    
+    /* Console Screen Effect */
+    background-image: 
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 255, 255, 0.1) 2px,
+            rgba(0, 255, 255, 0.1) 4px
+        );
+}
+
+.mblock_wrapper.retro_8bit .mblock-copy-paste-toolbar:hover {
+    border-color: var(--pixel-yellow);
+    box-shadow: 6px 6px 0px var(--console-shadow);
+    transform: translate(-2px, -2px);
+}
+
+/* Offline State - Glitch Effect */
+.mblock_wrapper.retro_8bit > div.mblock-offline {
+    filter: var(--retro-offline-filter);
+    animation: var(--retro-offline-animation);
+    opacity: 0.7;
+}
+
+.mblock_wrapper.retro_8bit > div.mblock-offline::before {
+    content: 'OFFLINE';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-15deg);
+    font-family: var(--retro-button-font-family);
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--pixel-red);
+    text-shadow: 2px 2px 0px var(--console-shadow);
+    z-index: 10;
+    animation: pixelBlink 0.8s infinite;
+}
+
+/* Sortable Ghost - Power Down Effect */
+div.sortable-ghost.retro_8bit {
+    opacity: 0.5;
+    filter: grayscale(1) contrast(0.5);
+    animation: pixelGlitch 0.2s infinite;
+    transform: none !important;
+}
+
+/* === Dark Console Mode === */
+body.rex-theme-dark .mblock_wrapper.retro_8bit > div,
+html[data-bs-theme="dark"] .mblock_wrapper.retro_8bit > div {
+    background: linear-gradient(45deg, #1a0a1a 0%, #2a0a2a 25%, #1a0a1a 50%, #3a0a3a 75%, #1a0a1a 100%);
+    border-color: var(--retro-dark-border);
+    box-shadow: var(--retro-dark-shadow);
+    color: var(--retro-dark-text);
+}
+
+body.rex-theme-dark .mblock_wrapper.retro_8bit > div:hover,
+html[data-bs-theme="dark"] .mblock_wrapper.retro_8bit > div:hover {
+    border-color: var(--pixel-magenta);
+}
+
+body.rex-theme-dark .mblock_wrapper.retro_8bit span.pixel-handle,
+html[data-bs-theme="dark"] .mblock_wrapper.retro_8bit span.pixel-handle {
+    color: var(--pixel-magenta);
+}
+
+body.rex-theme-dark .mblock_wrapper.retro_8bit span.pixel-handle:hover,
+html[data-bs-theme="dark"] .mblock_wrapper.retro_8bit span.pixel-handle:hover {
+    color: var(--pixel-cyan);
+}
+
+/* System Dark Mode */
+@media (prefers-color-scheme: dark) {
+    body:not(.rex-theme-light) .mblock_wrapper.retro_8bit > div {
+        background: linear-gradient(45deg, #1a0a1a 0%, #2a0a2a 25%, #1a0a1a 50%, #3a0a3a 75%, #1a0a1a 100%);
+        border-color: var(--retro-dark-border);
+        box-shadow: var(--retro-dark-shadow);
+        color: var(--retro-dark-text);
+    }
+
+    body:not(.rex-theme-light) .mblock_wrapper.retro_8bit > div:hover {
+        border-color: var(--pixel-magenta);
+    }
+
+    body:not(.rex-theme-light) .mblock_wrapper.retro_8bit span.pixel-handle {
+        color: var(--pixel-magenta);
+    }
+
+    body:not(.rex-theme-light) .mblock_wrapper.retro_8bit span.pixel-handle:hover {
+        color: var(--pixel-cyan);
+    }
+}
+
+/* === Responsive Pixel Perfect === */
+@media (max-width: 768px) {
+    .mblock_wrapper.retro_8bit .retro-container {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .mblock_wrapper.retro_8bit .retro-controls {
+        align-self: stretch;
+    }
+    
+    .mblock_wrapper.retro_8bit .pixel-button-group {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .mblock_wrapper.retro_8bit .retro-content {
+        padding-left: 16px;
+    }
+}
+
+/* === Accessibility === */
+@media (prefers-reduced-motion: reduce) {
+    .mblock_wrapper.retro_8bit > div,
+    .mblock_wrapper.retro_8bit .pixel-btn,
+    .mblock_wrapper.retro_8bit span.pixel-handle {
+        animation: none !important;
+    }
+    
+    .mblock_wrapper.retro_8bit .pixel-btn {
+        transition: none;
+    }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    .mblock_wrapper.retro_8bit > div {
+        border-width: 4px;
+        box-shadow: 8px 8px 0px var(--console-shadow);
+    }
+    
+    .mblock_wrapper.retro_8bit .pixel-btn {
+        border-width: 3px;
+        font-weight: bold;
+    }
+}

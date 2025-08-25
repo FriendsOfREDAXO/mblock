@@ -41,7 +41,6 @@
     --mblock-button-transform-hover: translateY(-1px);
     --mblock-button-font-family: Verdana, Arial, sans-serif;
     --mblock-button-font-weight: bold;
-    --mblock-button-text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
     
     /* === Control Buttons === */
     --mblock-control-background: linear-gradient(to bottom, #77aa77 0%, #559955 100%);
@@ -212,7 +211,6 @@
 .mblock_wrapper .btn {
     font-family: var(--mblock-button-font-family);
     font-weight: var(--mblock-button-font-weight);
-    text-shadow: var(--mblock-button-text-shadow);
     border-radius: var(--mblock-button-border-radius);
     transition: var(--mblock-button-transition);
     padding: var(--mblock-button-padding);
@@ -236,7 +234,6 @@
     align-items: center;
     gap: var(--mblock-add-gap);
     font-weight: var(--mblock-button-font-weight);
-    text-shadow: var(--mblock-button-text-shadow);
 }
 
 .mblock_wrapper .btn.addme:hover:not(:disabled) {
@@ -253,7 +250,6 @@
     border-color: var(--mblock-control-border);
     color: var(--mblock-control-color);
     font-weight: var(--mblock-button-font-weight);
-    text-shadow: var(--mblock-button-text-shadow);
 }
 
 .mblock_wrapper span.removeadded .btn:not(.btn-danger):not(.removeme):not(.btn-delete):hover:not(:disabled) {
@@ -291,22 +287,26 @@
     opacity: 0.6;
 }
 
-/* AKG Add Area Styling */
+/* AKG Copy-Paste-Toolbar Styling */
 .mblock_wrapper .mblock-copy-paste-toolbar {
-    border: 2px dashed var(--mblock-toolbar-border);
-    background: var(--mblock-toolbar-background);
-    border-radius: var(--mblock-toolbar-border-radius);
-    padding: var(--mblock-toolbar-padding);
-    margin: var(--mblock-toolbar-margin);
-    box-shadow: var(--mblock-toolbar-shadow);
+    border: 1px solid var(--mblock-border-color);
+    border-left: var(--akg-accent-border);
+    background: var(--mblock-background);
+    border-radius: var(--mblock-border-radius);
+    padding: var(--mblock-padding);
+    margin: var(--mblock-margin);
+    box-shadow: var(--mblock-shadow);
     transition: var(--mblock-transition);
     display: flex;
     align-items: center;
     gap: var(--mblock-toolbar-gap);
+    position: relative;
 }
 
 .mblock_wrapper .mblock-copy-paste-toolbar:hover {
-    box-shadow: var(--mblock-toolbar-shadow-hover);
+    border-left: var(--akg-accent-border-hover);
+    box-shadow: var(--mblock-shadow-hover);
+    transform: var(--mblock-transform-hover);
 }
 
 /* Remove/Add Button Container */
@@ -449,6 +449,22 @@ html[data-bs-theme="dark"] .mblock_wrapper .btn-delete:hover:not(:disabled) {
     border-color: var(--akg-dark-remove-border-hover);
 }
 
+/* Dark Mode Copy-Paste-Toolbar */
+body.rex-theme-dark .mblock_wrapper .mblock-copy-paste-toolbar,
+html[data-bs-theme="dark"] .mblock_wrapper .mblock-copy-paste-toolbar {
+    border-left: var(--akg-dark-accent-border);
+    border-color: var(--mblock-dark-border-color);
+    background: var(--mblock-dark-background);
+    box-shadow: var(--mblock-dark-shadow);
+}
+
+body.rex-theme-dark .mblock_wrapper .mblock-copy-paste-toolbar:hover,
+html[data-bs-theme="dark"] .mblock_wrapper .mblock-copy-paste-toolbar:hover {
+    border-left: var(--akg-dark-accent-border-hover);
+    border-color: var(--mblock-dark-border-color-hover);
+    box-shadow: var(--mblock-dark-shadow-hover);
+}
+
 /* System Dark Mode */
 @media (prefers-color-scheme: dark) {
     body:not(.rex-theme-light) .mblock_wrapper > div {
@@ -507,5 +523,18 @@ html[data-bs-theme="dark"] .mblock_wrapper .btn-delete:hover:not(:disabled) {
     body:not(.rex-theme-light) .mblock_wrapper .btn-delete:hover:not(:disabled) {
         background: var(--akg-dark-remove-background-hover);
         border-color: var(--akg-dark-remove-border-hover);
+    }
+
+    body:not(.rex-theme-light) .mblock_wrapper .mblock-copy-paste-toolbar {
+        border-left: var(--akg-dark-accent-border);
+        border-color: var(--mblock-dark-border-color);
+        background: var(--mblock-dark-background);
+        box-shadow: var(--mblock-dark-shadow);
+    }
+
+    body:not(.rex-theme-light) .mblock_wrapper .mblock-copy-paste-toolbar:hover {
+        border-left: var(--akg-dark-accent-border-hover);
+        border-color: var(--mblock-dark-border-color-hover);
+        box-shadow: var(--mblock-dark-shadow-hover);
     }
 }

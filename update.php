@@ -58,6 +58,38 @@ if (is_dir($dataTemplatesPath)) {
 // copy data directory (für neue Installationen)
 if (!is_dir($this->getDataPath())) {
     rex_dir::copy($this->getPath('data'), $this->getDataPath());
+} else {
+    // Bei Updates: Mitgelieferte Templates aktualisieren
+    $addonDataTemplatesPath = $this->getPath('data/templates/');
+    $userDataTemplatesPath = $this->getDataPath('templates/');
+    
+    if (is_dir($addonDataTemplatesPath)) {
+        // Erstelle templates Ordner im data-Verzeichnis falls nicht vorhanden
+        if (!is_dir($userDataTemplatesPath)) {
+            rex_dir::create($userDataTemplatesPath);
+        }
+        
+        // Kopiere/aktualisiere mitgelieferte Templates
+        $addonTemplates = glob($addonDataTemplatesPath . '*', GLOB_ONLYDIR);
+        foreach ($addonTemplates as $templateDir) {
+            $templateName = basename($templateDir);
+            $targetDir = $userDataTemplatesPath . $templateName;
+            
+            // Überschreibe mitgelieferte Templates immer (für Updates)
+            if (is_dir($templateDir)) {
+                if (is_dir($targetDir)) {
+                    rex_dir::delete($targetDir);
+                }
+                rex_dir::copy($templateDir, $targetDir);
+            }
+        }
+        
+        // Kopiere auch die README.md
+        $readmePath = $addonDataTemplatesPath . 'README.md';
+        if (file_exists($readmePath)) {
+            copy($readmePath, $userDataTemplatesPath . 'README.md');
+        }
+    }
 }
 
 // delete all assets

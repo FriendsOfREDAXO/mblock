@@ -25,3 +25,30 @@ if (!$this->hasConfig('mblock_copy_paste')) {
 
 // copy data directory
 rex_dir::copy($this->getPath('data'), $this->getDataPath());
+
+// Sicherstellen, dass mitgelieferte Templates immer aktuell sind
+$addonDataTemplatesPath = $this->getPath('data/templates/');
+$userDataTemplatesPath = $this->getDataPath('templates/');
+
+if (is_dir($addonDataTemplatesPath) && is_dir($userDataTemplatesPath)) {
+    // Kopiere/aktualisiere mitgelieferte Templates auch bei Installation
+    $addonTemplates = glob($addonDataTemplatesPath . '*', GLOB_ONLYDIR);
+    foreach ($addonTemplates as $templateDir) {
+        $templateName = basename($templateDir);
+        $targetDir = $userDataTemplatesPath . $templateName;
+        
+        // Überschreibe mitgelieferte Templates (für konsistente Installation)
+        if (is_dir($templateDir)) {
+            if (is_dir($targetDir)) {
+                rex_dir::delete($targetDir);
+            }
+            rex_dir::copy($templateDir, $targetDir);
+        }
+    }
+    
+    // Kopiere auch die README.md
+    $readmePath = $addonDataTemplatesPath . 'README.md';
+    if (file_exists($readmePath)) {
+        copy($readmePath, $userDataTemplatesPath . 'README.md');
+    }
+}

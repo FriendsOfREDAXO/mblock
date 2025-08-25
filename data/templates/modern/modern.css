@@ -1,0 +1,598 @@
+/* 🎨 Modern Theme - Clean Bootstrap-Based Design
+ * ==============================================
+ * Ein modernes Theme basierend auf der Default-Struktur mit zeitgemäßen
+ * Design-Elementen und glassmorphism-inspirierten Effekten.
+ */
+
+:root {
+    /* === Modern Color Palette === */
+    --modern-primary: #007bff;
+    --modern-success: #28a745;
+    --modern-warning: #ffc107;
+    --modern-danger: #dc3545;
+    --modern-secondary: #6c757d;
+    --modern-light: #f8f9fa;
+    --modern-dark: #343a40;
+    
+    /* === Glassmorphism Effects === */
+    --modern-glass-bg: rgba(255, 255, 255, 0.25);
+    --modern-glass-border: rgba(255, 255, 255, 0.18);
+    --modern-glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    --modern-backdrop-filter: blur(40px);
+    
+    /* === Dark Mode Colors === */
+    --modern-glass-bg-dark: rgba(28, 28, 30, 0.8);
+    --modern-glass-border-dark: rgba(255, 255, 255, 0.12);
+    --modern-glass-shadow-dark: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    
+    /* === Typography === */
+    --modern-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    
+    /* === Layout === */
+    --modern-border-radius: 12px;
+    --modern-border-radius-small: 6px;
+    --modern-spacing: 1rem;
+    --modern-spacing-small: 0.5rem;
+    
+    /* === Transitions === */
+    --modern-transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* === Modern Wrapper === */
+.mblock_wrapper.modern {
+    font-family: var(--modern-font-family);
+}
+
+/* === Modern Block Styling === */
+.mblock_wrapper.modern .modern-block {
+    background: var(--modern-glass-bg);
+    backdrop-filter: var(--modern-backdrop-filter);
+    -webkit-backdrop-filter: var(--modern-backdrop-filter);
+    border: 1px solid var(--modern-glass-border);
+    border-radius: var(--modern-border-radius);
+    box-shadow: var(--modern-glass-shadow);
+    margin: var(--modern-spacing) 0;
+    padding: var(--modern-spacing);
+    transition: var(--modern-transition);
+    position: relative;
+}
+
+.mblock_wrapper.modern .modern-block:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* === Hide Default Handle === */
+.mblock_wrapper.modern .sorthandle:not(.modern-handle) {
+    display: none;
+}
+
+/* === Hide Default Handle Content === */
+.mblock_wrapper.modern span.sorthandle::before {
+    content: none;
+}
+
+/* === Modern Handle === */
+.mblock_wrapper.modern .modern-handle {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 40px;
+    cursor: grab;
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.1) 0,
+        rgba(0, 0, 0, 0.1) 2px,
+        transparent 2px,
+        transparent 6px
+    );
+    border-radius: 4px;
+    transition: var(--modern-transition);
+}
+
+.mblock_wrapper.modern .modern-handle:hover {
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.2) 0,
+        rgba(0, 0, 0, 0.2) 2px,
+        transparent 2px,
+        transparent 6px
+    );
+    transform: translateY(-50%) scale(1.1);
+}
+
+.mblock_wrapper.modern .modern-handle:active {
+    cursor: grabbing;
+}
+
+/* === Modern Content === */
+.mblock_wrapper.modern .modern-content {
+    margin-left: 40px;
+    margin-right: 120px;
+    padding: var(--modern-spacing-small);
+}
+
+/* === Modern Controls === */
+.mblock_wrapper.modern .modern-controls {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: var(--modern-border-radius-small);
+    padding: 4px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* === Modern Button Groups === */
+.mblock_wrapper.modern .modern-btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 4px;
+}
+
+/* === Move Buttons und Action Buttons nebeneinander === */
+.mblock_wrapper.modern .modern-move-buttons,
+.mblock_wrapper.modern .modern-action-buttons {
+    flex-direction: row;
+    gap: 2px;
+}
+
+.mblock_wrapper.modern .modern-separator {
+    height: 8px;
+    margin: 4px 0;
+}
+
+/* === Modern Copy/Paste Styling === */
+.mblock_wrapper.modern .modern-copy-paste-wrapper {
+    margin: 4px 0;
+}
+
+.mblock_wrapper.modern .modern-copy-paste-wrapper .btn-group {
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+    margin-bottom: 4px;
+}
+
+.mblock_wrapper.modern .modern-copy-paste-wrapper .btn {
+    border-radius: var(--modern-border-radius-small) !important;
+    border: none !important;
+    padding: 4px 6px !important;
+    font-size: 12px !important;
+    line-height: 1 !important;
+    transition: var(--modern-transition) !important;
+    position: relative;
+    overflow: hidden;
+    min-width: 24px;
+    height: 24px;
+    background: var(--modern-secondary) !important;
+    color: white !important;
+}
+
+.mblock_wrapper.modern .modern-copy-paste-wrapper .btn:hover {
+    transform: scale(1.05);
+    background: #5a6268 !important;
+    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+}
+
+.mblock_wrapper.modern .modern-copy-paste-wrapper .btn:active {
+    transform: scale(0.95);
+}
+
+.mblock_wrapper.modern .modern-btn-group:last-child {
+    margin-bottom: 0;
+}
+
+/* === Modern Button Styling === */
+.mblock_wrapper.modern .modern-btn {
+    border-radius: var(--modern-border-radius-small) !important;
+    border: none !important;
+    padding: 4px 6px !important;
+    font-size: 12px !important;
+    line-height: 1 !important;
+    transition: var(--modern-transition) !important;
+    position: relative;
+    overflow: hidden;
+    min-width: 24px;
+    height: 24px;
+}
+
+.mblock_wrapper.modern .modern-btn:hover {
+    transform: scale(1.05);
+}
+
+.mblock_wrapper.modern .modern-btn:active {
+    transform: scale(0.95);
+}
+
+/* === Button Variants === */
+.mblock_wrapper.modern .modern-btn-add {
+    background: var(--modern-success) !important;
+    color: white !important;
+}
+
+.mblock_wrapper.modern .modern-btn-add:hover {
+    background: #218838 !important;
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+.mblock_wrapper.modern .modern-btn-delete {
+    background: var(--modern-danger) !important;
+    color: white !important;
+}
+
+.mblock_wrapper.modern .modern-btn-delete:hover {
+    background: #c82333 !important;
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+.mblock_wrapper.modern .modern-btn-move {
+    background: var(--modern-primary) !important;
+    color: white !important;
+}
+
+.mblock_wrapper.modern .modern-btn-move:hover {
+    background: #0069d9 !important;
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+.mblock_wrapper.modern .modern-btn-online {
+    background: var(--modern-success) !important;
+    color: white !important;
+}
+
+.mblock_wrapper.modern .modern-btn-online:hover {
+    background: #218838 !important;
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+.mblock_wrapper.modern .modern-btn-offline {
+    background: var(--modern-warning) !important;
+    color: #212529 !important;
+}
+
+.mblock_wrapper.modern .modern-btn-offline:hover {
+    background: #e0a800 !important;
+    box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+}
+
+/* === Copy-Paste Toolbar === */
+.mblock_wrapper.modern .mblock-copy-paste-toolbar {
+    background: var(--modern-glass-bg);
+    backdrop-filter: var(--modern-backdrop-filter);
+    -webkit-backdrop-filter: var(--modern-backdrop-filter);
+    border: 1px solid var(--modern-glass-border);
+    border-radius: var(--modern-border-radius);
+    box-shadow: var(--modern-glass-shadow);
+    margin: var(--modern-spacing) 0;
+    padding: var(--modern-spacing);
+    transition: var(--modern-transition);
+}
+
+.mblock_wrapper.modern .mblock-copy-paste-toolbar:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.4);
+}
+
+/* === Offline State === */
+.mblock_wrapper.modern .modern-block.mblock-offline {
+    background: rgba(220, 53, 69, 0.1);
+    border-color: rgba(220, 53, 69, 0.3);
+    opacity: 0.6;
+    transition: opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* === Offline Block wird beim Bearbeiten voll sichtbar === */
+.mblock_wrapper.modern .modern-block.mblock-offline:hover,
+.mblock_wrapper.modern .modern-block.mblock-offline:focus-within,
+.mblock_wrapper.modern .modern-block.mblock-offline:has(:focus) {
+    opacity: 1;
+    background: rgba(220, 53, 69, 0.05);
+    border-color: rgba(220, 53, 69, 0.4);
+}
+
+.mblock_wrapper.modern .modern-block.mblock-offline::before {
+    content: 'OFFLINE';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--modern-danger);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: bold;
+    z-index: 10;
+}
+
+/* === Sortable Ghost === */
+.mblock_wrapper.modern .sortable-ghost {
+    opacity: 0.5;
+    background: rgba(0, 123, 255, 0.1) !important;
+    transform: scale(0.95) !important;
+}
+
+/* === Dark Mode Support === */
+body.rex-theme-dark .mblock_wrapper.modern .modern-block,
+html[data-bs-theme="dark"] .mblock_wrapper.modern .modern-block {
+    background: var(--modern-glass-bg-dark);
+    border-color: var(--modern-glass-border-dark);
+    box-shadow: var(--modern-glass-shadow-dark);
+}
+
+body.rex-theme-dark .mblock_wrapper.modern .modern-block:hover,
+html[data-bs-theme="dark"] .mblock_wrapper.modern .modern-block:hover {
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.7);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+body.rex-theme-dark .mblock_wrapper.modern .modern-handle,
+html[data-bs-theme="dark"] .mblock_wrapper.modern .modern-handle {
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.2) 0,
+        rgba(255, 255, 255, 0.2) 2px,
+        transparent 2px,
+        transparent 6px
+    );
+}
+
+body.rex-theme-dark .mblock_wrapper.modern .modern-handle:hover,
+html[data-bs-theme="dark"] .mblock_wrapper.modern .modern-handle:hover {
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.4) 0,
+        rgba(255, 255, 255, 0.4) 2px,
+        transparent 2px,
+        transparent 6px
+    );
+}
+
+body.rex-theme-dark .mblock_wrapper.modern .modern-controls,
+html[data-bs-theme="dark"] .mblock_wrapper.modern .modern-controls {
+    background: rgba(28, 28, 30, 0.9);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* === Dark Mode Button Styling === */
+body.rex-theme-dark .mblock_wrapper.modern .modern-btn-add,
+html[data-bs-theme="dark"] .mblock_wrapper.modern .modern-btn-add {
+    background: var(--modern-success) !important;
+    color: white !important;
+}
+
+body.rex-theme-dark .mblock_wrapper.modern .modern-btn-add:hover,
+html[data-bs-theme="dark"] .mblock_wrapper.modern .modern-btn-add:hover {
+    background: #218838 !important;
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+body.rex-theme-dark .mblock_wrapper.modern .modern-btn-delete,
+html[data-bs-theme="dark"] .mblock_wrapper.modern .modern-btn-delete {
+    background: var(--modern-danger) !important;
+    color: white !important;
+}
+
+body.rex-theme-dark .mblock_wrapper.modern .modern-btn-delete:hover,
+html[data-bs-theme="dark"] .mblock_wrapper.modern .modern-btn-delete:hover {
+    background: #c82333 !important;
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+body.rex-theme-dark .mblock_wrapper.modern .modern-btn-move,
+html[data-bs-theme="dark"] .mblock_wrapper.modern .modern-btn-move {
+    background: var(--modern-primary) !important;
+    color: white !important;
+}
+
+body.rex-theme-dark .mblock_wrapper.modern .modern-btn-move:hover,
+html[data-bs-theme="dark"] .mblock_wrapper.modern .modern-btn-move:hover {
+    background: #0069d9 !important;
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+body.rex-theme-dark .mblock_wrapper.modern .modern-btn-online,
+html[data-bs-theme="dark"] .mblock_wrapper.modern .modern-btn-online {
+    background: var(--modern-success) !important;
+    color: white !important;
+}
+
+body.rex-theme-dark .mblock_wrapper.modern .modern-btn-online:hover,
+html[data-bs-theme="dark"] .mblock_wrapper.modern .modern-btn-online:hover {
+    background: #218838 !important;
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+body.rex-theme-dark .mblock_wrapper.modern .modern-btn-offline,
+html[data-bs-theme="dark"] .mblock_wrapper.modern .modern-btn-offline {
+    background: var(--modern-warning) !important;
+    color: #212529 !important;
+}
+
+body.rex-theme-dark .mblock_wrapper.modern .modern-btn-offline:hover,
+html[data-bs-theme="dark"] .mblock_wrapper.modern .modern-btn-offline:hover {
+    background: #e0a800 !important;
+    box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+}
+
+/* === Dark Mode Copy/Paste Buttons === */
+body.rex-theme-dark .mblock_wrapper.modern .modern-copy-paste-wrapper .btn,
+html[data-bs-theme="dark"] .mblock_wrapper.modern .modern-copy-paste-wrapper .btn {
+    background: var(--modern-secondary) !important;
+    color: white !important;
+}
+
+body.rex-theme-dark .mblock_wrapper.modern .modern-copy-paste-wrapper .btn:hover,
+html[data-bs-theme="dark"] .mblock_wrapper.modern .modern-copy-paste-wrapper .btn:hover {
+    background: #5a6268 !important;
+    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+}
+
+body.rex-theme-dark .mblock_wrapper.modern .mblock-copy-paste-toolbar,
+html[data-bs-theme="dark"] .mblock_wrapper.modern .mblock-copy-paste-toolbar {
+    background: var(--modern-glass-bg-dark);
+    border-color: var(--modern-glass-border-dark);
+    box-shadow: var(--modern-glass-shadow-dark);
+}
+
+/* === System Dark Mode === */
+@media (prefers-color-scheme: dark) {
+    body:not(.rex-theme-light) .mblock_wrapper.modern .modern-block {
+        background: var(--modern-glass-bg-dark);
+        border-color: var(--modern-glass-border-dark);
+        box-shadow: var(--modern-glass-shadow-dark);
+    }
+
+    body:not(.rex-theme-light) .mblock_wrapper.modern .modern-controls {
+        background: rgba(28, 28, 30, 0.9);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    body:not(.rex-theme-light) .mblock_wrapper.modern .modern-handle {
+        background: repeating-linear-gradient(
+            to bottom,
+            rgba(255, 255, 255, 0.2) 0,
+            rgba(255, 255, 255, 0.2) 2px,
+            transparent 2px,
+            transparent 6px
+        );
+    }
+
+    /* === System Dark Mode Buttons === */
+    body:not(.rex-theme-light) .mblock_wrapper.modern .modern-btn-add {
+        background: var(--modern-success) !important;
+        color: white !important;
+    }
+
+    body:not(.rex-theme-light) .mblock_wrapper.modern .modern-btn-add:hover {
+        background: #218838 !important;
+        box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+    }
+
+    body:not(.rex-theme-light) .mblock_wrapper.modern .modern-btn-delete {
+        background: var(--modern-danger) !important;
+        color: white !important;
+    }
+
+    body:not(.rex-theme-light) .mblock_wrapper.modern .modern-btn-delete:hover {
+        background: #c82333 !important;
+        box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+    }
+
+    body:not(.rex-theme-light) .mblock_wrapper.modern .modern-btn-move {
+        background: var(--modern-primary) !important;
+        color: white !important;
+    }
+
+    body:not(.rex-theme-light) .mblock_wrapper.modern .modern-btn-move:hover {
+        background: #0069d9 !important;
+        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+    }
+
+    body:not(.rex-theme-light) .mblock_wrapper.modern .modern-btn-online {
+        background: var(--modern-success) !important;
+        color: white !important;
+    }
+
+    body:not(.rex-theme-light) .mblock_wrapper.modern .modern-btn-online:hover {
+        background: #218838 !important;
+        box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+    }
+
+    body:not(.rex-theme-light) .mblock_wrapper.modern .modern-btn-offline {
+        background: var(--modern-warning) !important;
+        color: #212529 !important;
+    }
+
+    body:not(.rex-theme-light) .mblock_wrapper.modern .modern-btn-offline:hover {
+        background: #e0a800 !important;
+        box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+    }
+
+    /* === System Dark Mode Copy/Paste Buttons === */
+    body:not(.rex-theme-light) .mblock_wrapper.modern .modern-copy-paste-wrapper .btn {
+        background: var(--modern-secondary) !important;
+        color: white !important;
+    }
+
+    body:not(.rex-theme-light) .mblock_wrapper.modern .modern-copy-paste-wrapper .btn:hover {
+        background: #5a6268 !important;
+        box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+    }
+}
+
+/* === Responsive Design === */
+@media (max-width: 768px) {
+    .mblock_wrapper.modern .modern-block {
+        padding: var(--modern-spacing-small);
+    }
+    
+    .mblock_wrapper.modern .modern-content {
+        margin-left: 0;
+        margin-right: 0;
+        margin-top: 40px;
+        margin-bottom: 40px;
+    }
+    
+    .mblock_wrapper.modern .modern-handle {
+        position: static;
+        width: 100%;
+        height: 20px;
+        margin-bottom: var(--modern-spacing-small);
+        background: repeating-linear-gradient(
+            to right,
+            rgba(0, 0, 0, 0.1) 0,
+            rgba(0, 0, 0, 0.1) 2px,
+            transparent 2px,
+            transparent 6px
+        );
+        transform: none;
+    }
+    
+    .mblock_wrapper.modern .modern-controls {
+        position: static;
+        transform: none;
+        flex-direction: row;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: var(--modern-spacing-small);
+    }
+    
+    .mblock_wrapper.modern .modern-btn-group {
+        flex-direction: column;
+        margin-bottom: 4px;
+        margin-right: 0;
+    }
+}
+
+/* === Accessibility === */
+@media (prefers-reduced-motion: reduce) {
+    .mblock_wrapper.modern * {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* === High Contrast === */
+@media (prefers-contrast: high) {
+    .mblock_wrapper.modern .modern-block {
+        border-width: 2px;
+        background: rgba(255, 255, 255, 0.9);
+    }
+    
+    .mblock_wrapper.modern .modern-btn {
+        border: 1px solid rgba(0, 0, 0, 0.2) !important;
+    }
+}
