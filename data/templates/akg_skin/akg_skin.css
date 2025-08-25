@@ -264,6 +264,29 @@
     opacity: 0.6;
 }
 
+/* Copy & Paste Buttons im AKG Style */
+.mblock_wrapper .mblock-copy-paste-toolbar .btn {
+    font-family: var(--mblock-button-font-family);
+    font-weight: var(--mblock-button-font-weight);
+    border-radius: var(--mblock-button-border-radius);
+    transition: var(--mblock-button-transition);
+    padding: var(--mblock-button-padding);
+    font-size: var(--mblock-button-font-size);
+    min-width: var(--mblock-button-min-size);
+    min-height: var(--mblock-button-min-size);
+    background: var(--mblock-control-background);
+    border-color: var(--mblock-control-border);
+    color: var(--mblock-control-color);
+}
+
+.mblock_wrapper .mblock-copy-paste-toolbar .btn:hover:not(:disabled) {
+    background: var(--mblock-control-background-hover);
+    border-color: var(--mblock-control-border-hover);
+    color: var(--mblock-control-color);
+    transform: var(--mblock-button-transform-hover);
+    box-shadow: var(--mblock-button-shadow-hover);
+}
+
 /* Spezielle AKG Remove Button Styles */
 .mblock_wrapper .btn-danger,
 .mblock_wrapper .removeme,
@@ -414,6 +437,21 @@ html[data-bs-theme="dark"] .mblock_wrapper span.removeadded .btn:not(.btn-danger
     border-color: var(--mblock-dark-control-border-hover);
 }
 
+/* Dark Mode Copy & Paste Buttons */
+body.rex-theme-dark .mblock_wrapper .mblock-copy-paste-toolbar .btn,
+html[data-bs-theme="dark"] .mblock_wrapper .mblock-copy-paste-toolbar .btn {
+    background: var(--mblock-dark-control-background);
+    border-color: var(--mblock-dark-control-border);
+    color: var(--mblock-dark-control-color);
+}
+
+body.rex-theme-dark .mblock_wrapper .mblock-copy-paste-toolbar .btn:hover:not(:disabled),
+html[data-bs-theme="dark"] .mblock_wrapper .mblock-copy-paste-toolbar .btn:hover:not(:disabled) {
+    background: var(--mblock-dark-control-background-hover);
+    border-color: var(--mblock-dark-control-border-hover);
+    color: var(--mblock-dark-control-color);
+}
+
 /* Dark Mode Add Button */
 body.rex-theme-dark .mblock_wrapper .btn.addme,
 html[data-bs-theme="dark"] .mblock_wrapper .btn.addme {
@@ -498,6 +536,19 @@ html[data-bs-theme="dark"] .mblock_wrapper .mblock-copy-paste-toolbar:hover {
     body:not(.rex-theme-light) .mblock_wrapper span.removeadded .btn:not(.btn-danger):not(.removeme):not(.btn-delete):hover:not(:disabled) {
         background: var(--mblock-dark-control-background-hover);
         border-color: var(--mblock-dark-control-border-hover);
+    }
+
+    /* System Dark Mode Copy & Paste Buttons */
+    body:not(.rex-theme-light) .mblock_wrapper .mblock-copy-paste-toolbar .btn {
+        background: var(--mblock-dark-control-background);
+        border-color: var(--mblock-dark-control-border);
+        color: var(--mblock-dark-control-color);
+    }
+
+    body:not(.rex-theme-light) .mblock_wrapper .mblock-copy-paste-toolbar .btn:hover:not(:disabled) {
+        background: var(--mblock-dark-control-background-hover);
+        border-color: var(--mblock-dark-control-border-hover);
+        color: var(--mblock-dark-control-color);
     }
 
     body:not(.rex-theme-light) .mblock_wrapper .btn.addme {
