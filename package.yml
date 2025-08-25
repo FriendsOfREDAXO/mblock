@@ -24,7 +24,7 @@ page:
 requires:
     redaxo: ^5.18.0
     packages:
-        bloecks: '^5.2.0'
+        bloecks: '^5.2.4'
 
 # Default addon configuration
 default_config:
