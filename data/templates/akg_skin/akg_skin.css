@@ -170,7 +170,6 @@
     border-radius: var(--mblock-border-radius);
     transition: var(--mblock-transition);
     color: var(--mblock-text-color);
-    padding-top: 60px;
 }
 
 .mblock_wrapper > div:hover {
