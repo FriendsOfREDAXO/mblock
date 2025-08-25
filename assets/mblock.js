@@ -8,12 +8,15 @@ let mblock = '.mblock_wrapper';
 
 // 🔧 Helper function for improved error/warning feedback using bloecks
 function mblock_show_message(message, type = 'warning', duration = 5000) {
-    // Try to use bloecks toast system first
-    if (typeof BLOECKS !== 'undefined' && BLOECKS.showToast) {
+    // Try to use bloecks toast system first with specific mblock method
+    if (typeof BLOECKS !== 'undefined' && BLOECKS.fireMBlockToast) {
+        BLOECKS.fireMBlockToast(message, type, duration);
+    } else if (typeof BLOECKS !== 'undefined' && BLOECKS.showToast) {
+        // Fallback to general showToast method
         BLOECKS.showToast(message, type, duration);
     } else {
         // Fallback to console
-        if (type === 'error') {
+        if (type === 'error' || type === 'danger') {
             console.error('MBlock:', message);
         } else {
             console.warn('MBlock:', message);
@@ -1427,7 +1430,10 @@ var MBlockClipboard = {
                     pastedItem.addClass('mblock-paste-glow');
                     
                     // Use bloecks Toast System for success feedback
-                    if (typeof BLOECKS !== 'undefined' && BLOECKS.showToast) {
+                    if (typeof BLOECKS !== 'undefined' && BLOECKS.fireMBlockToast) {
+                        const message = '✅ ' + mblock_get_text('mblock_toast_paste_success', 'Block erfolgreich eingefügt!');
+                        BLOECKS.fireMBlockToast(message, 'success', 4000);
+                    } else if (typeof BLOECKS !== 'undefined' && BLOECKS.showToast) {
                         const message = '✅ ' + mblock_get_text('mblock_toast_paste_success', 'Block erfolgreich eingefügt!');
                         BLOECKS.showToast(message, 'success', 4000);
                     }
@@ -1718,7 +1724,10 @@ var MBlockClipboard = {
         }, 1000);
         
         // Use bloecks Toast System for additional feedback
-        if (typeof BLOECKS !== 'undefined' && BLOECKS.showToast) {
+        if (typeof BLOECKS !== 'undefined' && BLOECKS.fireMBlockToast) {
+            const message = '📋 ' + mblock_get_text('mblock_toast_copy_success', 'Block erfolgreich kopiert!');
+            BLOECKS.fireMBlockToast(message, 'success', 3000);
+        } else if (typeof BLOECKS !== 'undefined' && BLOECKS.showToast) {
             const message = '📋 ' + mblock_get_text('mblock_toast_copy_success', 'Block erfolgreich kopiert!');
             BLOECKS.showToast(message, 'success', 3000);
         }
