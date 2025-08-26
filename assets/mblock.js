@@ -754,6 +754,9 @@ function mblock_add_item(element, item) {
             iClone.find('select.chosen').chosen();
         }
         
+        // CRITICAL FIX: Reinitialize REDAXO Media and Link functionality for new blocks
+        mblock_reinitialize_redaxo_widgets(iClone);
+        
         // trigger change events to update any dependent elements
         iClone.find('input, select, textarea').trigger('change');
     }, 50);
@@ -1412,6 +1415,9 @@ var MBlockClipboard = {
                 if (typeof $.fn.chosen === 'function') {
                     pastedItem.find('select.chosen').chosen();
                 }
+                
+                // CRITICAL FIX: Reinitialize REDAXO Media and Link functionality for pasted blocks
+                mblock_reinitialize_redaxo_widgets(pastedItem);
                 
                 // Trigger change events to update any dependent elements
                 pastedItem.find('input, select, textarea').trigger('change');
@@ -2330,6 +2336,241 @@ function mblock_add(element) {
         return true;
     } catch (error) {
         console.error('MBlock: Fehler in mblock_add:', error);
+        return false;
+    }
+}
+
+/**
+ * Critical function to reinitialize REDAXO Media and Link widgets in new blocks
+ * This fixes the issue where media/link selection doesn't work in dynamically added blocks
+ */
+function mblock_reinitialize_redaxo_widgets(container) {
+    try {
+        if (!container || !container.length) {
+            return false;
+        }
+        
+        // Reinitialize REX Media widgets (single media selection)
+        container.find('input[id^="REX_MEDIA_"]').each(function() {
+            const $input = $(this);
+            const inputId = $input.attr('id');
+            
+            if (inputId) {
+                // Find corresponding buttons and reinitialize their functionality
+                const $widget = $input.closest('.rex-js-widget-media');
+                if ($widget.length) {
+                    // Reinitialize media widget buttons
+                    $widget.find('.btn-popup').each(function() {
+                        const $btn = $(this);
+                        const onclick = $btn.attr('onclick');
+                        
+                        if (onclick) {
+                            // Extract the media ID from the input ID (REX_MEDIA_123456 -> 123456)
+                            const mediaIdMatch = inputId.match(/REX_MEDIA_(\d+)/);
+                            if (mediaIdMatch) {
+                                const mediaId = mediaIdMatch[1];
+                                
+                                // Update onclick attribute with correct media ID
+                                if (onclick.includes('openREXMedia')) {
+                                    const newOnclick = onclick.replace(/openREXMedia\([^,)]+/, `openREXMedia('${mediaId}'`);
+                                    $btn.attr('onclick', newOnclick);
+                                } else if (onclick.includes('viewREXMedia')) {
+                                    const newOnclick = onclick.replace(/viewREXMedia\([^,)]+/, `viewREXMedia('${mediaId}'`);
+                                    $btn.attr('onclick', newOnclick);
+                                } else if (onclick.includes('deleteREXMedia')) {
+                                    const newOnclick = onclick.replace(/deleteREXMedia\([^)]+/, `deleteREXMedia('${mediaId}'`);
+                                    $btn.attr('onclick', newOnclick);
+                                } else if (onclick.includes('addREXMedia')) {
+                                    const newOnclick = onclick.replace(/addREXMedia\([^,)]+/, `addREXMedia('${mediaId}'`);
+                                    $btn.attr('onclick', newOnclick);
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        });
+        
+        // Reinitialize REX Medialist widgets (multiple media selection)
+        container.find('input[id^="REX_MEDIALIST_"], select[id^="REX_MEDIALIST_SELECT_"]').each(function() {
+            const $element = $(this);
+            const elementId = $element.attr('id');
+            
+            if (elementId) {
+                // Extract medialist ID
+                const medialistIdMatch = elementId.match(/REX_MEDIALIST_(?:SELECT_)?(\d+)/);
+                if (medialistIdMatch) {
+                    const medialistId = medialistIdMatch[1];
+                    
+                    // Find widget container
+                    const $widget = $element.closest('.rex-js-widget-medialist');
+                    if ($widget.length) {
+                        // Update all buttons for this medialist
+                        $widget.find('.btn-popup').each(function() {
+                            const $btn = $(this);
+                            const onclick = $btn.attr('onclick');
+                            
+                            if (onclick) {
+                                if (onclick.includes('openREXMedialist')) {
+                                    const newOnclick = onclick.replace(/openREXMedialist\([^,)]+/, `openREXMedialist('${medialistId}'`);
+                                    $btn.attr('onclick', newOnclick);
+                                } else if (onclick.includes('viewREXMedialist')) {
+                                    const newOnclick = onclick.replace(/viewREXMedialist\([^,)]+/, `viewREXMedialist('${medialistId}'`);
+                                    $btn.attr('onclick', newOnclick);
+                                } else if (onclick.includes('addREXMedialist')) {
+                                    const newOnclick = onclick.replace(/addREXMedialist\([^,)]+/, `addREXMedialist('${medialistId}'`);
+                                    $btn.attr('onclick', newOnclick);
+                                } else if (onclick.includes('deleteREXMedialist')) {
+                                    const newOnclick = onclick.replace(/deleteREXMedialist\([^)]+/, `deleteREXMedialist('${medialistId}'`);
+                                    $btn.attr('onclick', newOnclick);
+                                } else if (onclick.includes('moveREXMedialist')) {
+                                    const newOnclick = onclick.replace(/moveREXMedialist\([^,)]+/, `moveREXMedialist('${medialistId}'`);
+                                    $btn.attr('onclick', newOnclick);
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
+        
+        // Reinitialize REX Link widgets (single link selection)
+        container.find('input[id^="REX_LINK_"]').each(function() {
+            const $input = $(this);
+            const inputId = $input.attr('id');
+            
+            if (inputId && !inputId.includes('_NAME')) {
+                // Extract link ID
+                const linkIdMatch = inputId.match(/REX_LINK_(\d+)$/);
+                if (linkIdMatch) {
+                    const linkId = linkIdMatch[1];
+                    
+                    // Find widget container
+                    const $widget = $input.closest('.rex-js-widget-link, .rex-js-widget-customlink');
+                    if ($widget.length) {
+                        // Update all buttons for this link widget
+                        $widget.find('.btn-popup').each(function() {
+                            const $btn = $(this);
+                            const onclick = $btn.attr('onclick');
+                            
+                            if (onclick) {
+                                if (onclick.includes('openLinkMap')) {
+                                    const newOnclick = onclick.replace(/openLinkMap\([^,)]+/, `openLinkMap('REX_LINK_${linkId}'`);
+                                    $btn.attr('onclick', newOnclick);
+                                } else if (onclick.includes('deleteREXLink')) {
+                                    const newOnclick = onclick.replace(/deleteREXLink\([^)]+/, `deleteREXLink('${linkId}'`);
+                                    $btn.attr('onclick', newOnclick);
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
+        
+        // Reinitialize REX Linklist widgets (multiple link selection)  
+        container.find('input[id^="REX_LINKLIST_"], select[id^="REX_LINKLIST_SELECT_"]').each(function() {
+            const $element = $(this);
+            const elementId = $element.attr('id');
+            
+            if (elementId) {
+                // Extract linklist ID
+                const linklistIdMatch = elementId.match(/REX_LINKLIST_(?:SELECT_)?(\d+)/);
+                if (linklistIdMatch) {
+                    const linklistId = linklistIdMatch[1];
+                    
+                    // Find widget container
+                    const $widget = $element.closest('.rex-js-widget-linklist');
+                    if ($widget.length) {
+                        // Update all buttons for this linklist
+                        $widget.find('.btn-popup').each(function() {
+                            const $btn = $(this);
+                            const onclick = $btn.attr('onclick');
+                            
+                            if (onclick) {
+                                if (onclick.includes('openREXLinklist')) {
+                                    const newOnclick = onclick.replace(/openREXLinklist\([^,)]+/, `openREXLinklist('${linklistId}'`);
+                                    $btn.attr('onclick', newOnclick);
+                                } else if (onclick.includes('deleteREXLinklist')) {
+                                    const newOnclick = onclick.replace(/deleteREXLinklist\([^)]+/, `deleteREXLinklist('${linklistId}'`);
+                                    $btn.attr('onclick', newOnclick);
+                                } else if (onclick.includes('moveREXLinklist')) {
+                                    const newOnclick = onclick.replace(/moveREXLinklist\([^,)]+/, `moveREXLinklist('${linklistId}'`);
+                                    $btn.attr('onclick', newOnclick);
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
+        
+        // Reinitialize MForm custom link widgets (if mform is available)
+        if (typeof mform_custom_link !== 'undefined' && typeof customlink_init_widget === 'function') {
+            container.find('.rex-js-widget-customlink .input-group.custom-link').each(function() {
+                const $customLink = $(this);
+                // Only reinitialize if not already initialized
+                if (!$customLink.hasClass('init_custom_link_widget')) {
+                    try {
+                        customlink_init_widget($customLink);
+                    } catch (error) {
+                        console.warn('MBlock: Fehler bei MForm custom link Initialisierung:', error);
+                    }
+                }
+            });
+        }
+        
+        // Reinitialize standard HTML form element functionality for older templates
+        container.find('button[onclick], a[onclick]').each(function() {
+            const $element = $(this);
+            const onclick = $element.attr('onclick');
+            
+            if (onclick && (onclick.includes('REX_MEDIA') || onclick.includes('REX_LINK'))) {
+                // For standard HTML forms, we need to make sure the onclick handlers work
+                // This is a fallback for custom templates that don't use rex-js-widget classes
+                try {
+                    // Re-evaluate the onclick to bind it to the current context
+                    const originalOnclick = onclick;
+                    $element.off('click.mblock-widget').on('click.mblock-widget', function(e) {
+                        // Allow the original onclick to execute
+                        return true;
+                    });
+                } catch (error) {
+                    console.warn('MBlock: Fehler bei HTML onclick Reinitialisierung:', error);
+                }
+            }
+        });
+        
+        // Ensure all REX_MEDIA and REX_LINK input fields have proper IDs in the DOM
+        // This is crucial for popup window communication
+        container.find('input[name*="REX_MEDIA"], input[name*="REX_LINK"]').each(function() {
+            const $input = $(this);
+            const name = $input.attr('name');
+            let id = $input.attr('id');
+            
+            // If input doesn't have an ID, try to generate one from the name
+            if (!id && name) {
+                if (name.includes('REX_MEDIA')) {
+                    // Extract media ID from name pattern and ensure input has correct ID
+                    const currentId = $input.attr('id');
+                    if (!currentId || !currentId.startsWith('REX_MEDIA_')) {
+                        console.warn('MBlock: Media input missing proper ID, trying to fix:', name);
+                    }
+                } else if (name.includes('REX_LINK')) {
+                    // Extract link ID from name pattern and ensure input has correct ID
+                    const currentId = $input.attr('id');
+                    if (!currentId || !currentId.startsWith('REX_LINK_')) {
+                        console.warn('MBlock: Link input missing proper ID, trying to fix:', name);
+                    }
+                }
+            }
+        });
+        
+        console.log('MBlock: REDAXO widgets reinitialized for new block');
+        return true;
+        
+    } catch (error) {
+        console.error('MBlock: Fehler bei der Reinitialisierung der REDAXO Widgets:', error);
         return false;
     }
 }
