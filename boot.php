@@ -51,7 +51,7 @@ if (rex::isBackend() && is_object(rex::getUser())) {
         $useMinified = ($assetMode === 'prod');
     }
     
-    $jsFile = $useMinified ? 'mblock.min.js' : 'mblock.js';
+    $jsFile = $useMinified ? 'mblock.min.js' : 'mblock.min.js';
     $debugInfo = $useMinified ? 'Production (minified)' : 'Development (source)';
     
     // Add debug comment for developers

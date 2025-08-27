@@ -331,6 +331,93 @@ foreach ($items as $item) {
 }
 ```
 
+## Development & Build
+
+### Minifizierte Version erstellen
+
+MBlock enthält ein Build-System für die automatische Minifizierung der JavaScript-Dateien. Dies ist besonders nützlich für die Entwicklung und für bessere Performance im produktiven Einsatz.
+
+#### Voraussetzungen
+
+- **Node.js** (Version 14 oder höher)
+- **npm** (wird normalerweise mit Node.js installiert)
+
+#### Build-Prozess
+
+1. **Terminal öffnen** und in das MBlock-Verzeichnis wechseln:
+   ```bash
+   cd redaxo/src/addons/mblock
+   ```
+
+2. **Build-Script ausführen**:
+   ```bash
+   node build.js
+   ```
+   
+   **Alternativ mit npm**:
+   ```bash
+   npm run build
+   ```
+
+3. **Automatischer Prozess**:
+   - Das Script installiert automatisch **Terser** falls nicht vorhanden
+   - Minifiziert `assets/mblock.js` → `assets/mblock.min.js`
+   - Erstellt eine **Source Map** (`mblock.min.js.map`)
+   - Zeigt **Statistiken** der Komprimierung an
+
+#### Build-Ausgabe
+```
+🔧 MBlock Build Script gestartet...
+📄 Source: /path/to/assets/mblock.js
+📄 Target: /path/to/assets/mblock.min.js
+✅ Source-Code gelesen: 140158 Zeichen
+⚙️ Minifiziere Code...
+✅ Minifizierte Datei erstellt: /path/to/assets/mblock.min.js
+🗺️ Source Map erstellt
+
+📈 Statistiken:
+   Original: 140158 Zeichen
+   Minifiziert: 50128 Zeichen
+   Ersparnis: 64.2%
+
+🎉 Build erfolgreich!
+```
+
+#### Features des Build-Systems
+
+- **Automatische Terser-Installation** - keine manuelle Setup erforderlich
+- **Source Maps** - für einfaches Debugging der minifizierten Datei
+- **Optimierte Minifizierung** - mit 2 Compression-Passes für maximale Komprimierung
+- **Erhaltene Namen** - wichtige JavaScript-Funktionen bleiben unverändert
+- **Performance-Statistiken** - zeigt Größenvergleich und Ersparnis an
+- **Console-Logs erhalten** - wichtige Debug-Informationen bleiben verfügbar
+
+#### Wichtige Hinweise
+
+- **Console-Logs erhalten** - für Debugging und wichtige Funktionalitäts-Logs
+- **jQuery-Kompatibilität** - alle jQuery-relevanten Namen werden geschützt
+- **MBlock-Funktionen** - kritische Funktionsnamen bleiben lesbar
+- **Git-Ignore** - `node_modules/` und `*.map` Dateien sind bereits ausgeschlossen
+
+#### Troubleshooting
+
+Falls Probleme auftreten:
+
+1. **Node.js Version prüfen**:
+   ```bash
+   node --version  # sollte >= 14.0.0 sein
+   ```
+
+2. **Cache leeren** (falls nötig):
+   ```bash
+   npm cache clean --force
+   ```
+
+3. **Manuelle Terser Installation**:
+   ```bash
+   npm install terser --no-save
+   ```
+
 ---
 
 ## Author
