@@ -1,7 +1,13 @@
 REDAXO AddOn :: MBlock
 ======
 
-Mit MBlock ist es möglich, innerhalb eines Moduls beliebig viele Datenblöcke zu erzeugen. Diese können dann einfach per Button oder Drag & Drop sortiert werden. Die erweiterte Version bietet Copy & Paste Funktionalität und einen Offline/Online Toggle für einzelne Blöcke.
+Mit MBlock ist es möglich, innerhalb eines Moduls beliebig viele Datenblöcke zu erzeugen. Diese können dann einfach per But# Online/Offline Check
+foreach ($data as $item) {
+    if (MBlock::isOnline($item)) {
+        // Item ist online
+        echo rex_escape($item['title']);
+    }
+}r Drag & Drop sortiert werden. Die erweiterte Version bietet Copy & Paste Funktionalität und einen Offline/Online Toggle für einzelne Blöcke.
 
 _English:_ MBlock lets you create an unlimited number of data blocks within a single module. These data blocks can be sorted per click or drag & drop. The enhanced version provides copy & paste functionality and an offline/online toggle for individual blocks.
 
@@ -28,13 +34,13 @@ _English:_ MBlock lets you create an unlimited number of data blocks within a si
 - [x] **Template-Priorität** - Custom templates überschreiben defaults
 - [x] **Media-ID Konflikt-Schutz** - Bessere Warnung bei ID-Überschneidungen
 
-## Namespace Migration (Version 4.0)
+## Namespace Migration
 
-** 🙋‍♂️ MBlock 4.0 führt Namespaces ein!** Für neue Projekte wird die Verwendung des Namespace empfohlen:
+**MBlock führt Namespaces ein!** Für neue Projekte wird die Verwendung des Namespace empfohlen:
 
 ```php
 <?php
-// Empfohlen: Neue Namespace-Syntax (MBlock 4.0+)
+// Empfohlen: Neue Namespace-Syntax
 use FriendsOfRedaxo\MBlock\MBlock;
 
 $items = MBlock::getDataArray("REX_VALUE[1]");
@@ -68,7 +74,7 @@ MBlock erfordert:
 
 ## API & Datenabfrage
 
-### MBlock 4.0 - Neue zentrale getDataArray() Methode
+### Zentrale getDataArray() Methode
 
 **Mit Namespace (empfohlen für neue Projekte):**
 ```php
@@ -106,7 +112,7 @@ $onlineItems = MBlock::getOnlineDataArray("REX_VALUE[1]");
 $offlineItems = MBlock::getOfflineDataArray("REX_VALUE[1]");
 ``` 
 
-### Frontend API - Datenverarbeitung (MBlock 4.0)
+### Frontend API - Datenverarbeitung
 
 **Mit Namespace (empfohlen):**
 ```php
@@ -213,14 +219,14 @@ __Input:__
 
 ```php
 <?php
-// MBlock 4.0 - Modernisiertes Beispiel mit MForm 8
+// Modernisiertes Beispiel mit MForm
 
 use FriendsOfRedaxo\MForm;
 
 // base ID
 $id = 1;
 
-// init mform mit moderner MForm 8 Syntax
+// init mform mit moderner MForm Syntax
 $mform = MForm::factory();
 
 // fieldset
@@ -232,7 +238,7 @@ $mform->addTextField("$id.0.name", array('label'=>'Name'));
 // media button
 $mform->addMediaField(1, array('label'=>'Avatar'));
 
-// MBlock 4.0 - Online/Offline Status (hidden field für Toggle-Funktion)
+// Online/Offline Status (hidden field für Toggle-Funktion)
 $mform->addHiddenField("$id.0.mblock_offline", '0');
 
 // MBlock anzeigen (Copy & Paste ist automatisch aktiv)
@@ -247,7 +253,7 @@ __Output:__
 ```php
 <?php
 use FriendsOfRedaxo\MBlock\MBlock;
-// MBlock 4.0 - Verbesserte Ausgabe
+// Verbesserte Ausgabe
 $items = MBlock::getOnlineDataArray("REX_VALUE[1]"); // Nur Online-Items
 
 foreach ($items as $item) {
@@ -301,7 +307,7 @@ $form = <<<EOT
     </fieldset>
 EOT;
 
-// MBlock 4.0 mit Features
+// MBlock mit Features
 echo MBlock::show($id, $form, array(
     'online_offline' => true,
     'copy_paste' => true
@@ -333,9 +339,9 @@ foreach ($items as $item) {
 
 ## Development & Build
 
-### Modulare JavaScript-Architektur (MBlock 5.0)
+### Modulare JavaScript-Architektur
 
-MBlock 5.0 führt eine **modulare JavaScript-Architektur** ein, die den Code in drei logische Module aufteilt:
+MBlock verwendet eine **modulare JavaScript-Architektur**, die den Code in drei logische Module aufteilt:
 
 - **`mblock-core.js`** - Base utilities, Validierung, Übersetzungen (384 Zeilen)
 - **`mblock-management.js`** - DOM-Manipulation, Sortable-Handling (1008 Zeilen)  

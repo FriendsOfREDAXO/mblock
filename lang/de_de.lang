@@ -3,6 +3,7 @@ mblock_help = Hilfe
 mblock_configuration = Konfiguration
 mblock_settings = Einstellungen
 mblock_best_practices = Best Practices
+mblock_changelog = Changelog
 
 mblock_overview = Übersicht
 mblock_config_save = Einstellungen speichern
@@ -30,7 +31,8 @@ mblock_example_base_teammember_example = Teammitglieder
 mblock_example_base_link_example = Link und Linklist
 mblock_example_base_media_example = Media und Medialist
 mblock_example_base_defaults_example = Diverse Formularelemente
-mblock_example_base_cardgrid_example = Cardgrid mit Tabs (erweitert)
+mblock_example_base_cardgrid_example = Cardgrid Basis-Layout
+mblock_example_extended_cardgrid_example = Cardgrid mit Tabs (erweitert)
 mblock_example_base_cards_api_example = Content Cards mit API Features
 
 mblock_example_html_teammember_example = Teammitglieder

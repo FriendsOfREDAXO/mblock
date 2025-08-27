@@ -1,5 +1,20 @@
 # MBlock - REDAXO Addon für Modul-Input-Blöcke
 
+## Version 4.2.0-dev
+
+### Template System Improvements
+* **Template Migration**: `default_theme` renamed to `standard` for consistency
+* **Template Location**: All templates now in `data/templates/` directory for unified handling
+* **Template Selection**: Simplified dropdown selection in addon settings
+* **Automatic Updates**: Templates are refreshed on every addon update
+* **Default Configuration**: `standard` theme is always set on install/update
+* **Simplified Management**: Only built-in templates are available, no custom template support
+
+### Configuration
+* **Standard Theme**: Default theme is now called `standard` instead of `default_theme`
+* **Theme Reset**: Theme configuration is reset to `standard` on every update/install
+* **Package Config**: Added default `mblock_theme: 'standard'` to package.yml
+
 ## Version 4.0.0 - 2025-01-18
 
 ### Major New Features
