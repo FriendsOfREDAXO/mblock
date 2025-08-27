@@ -324,8 +324,10 @@ class MBlock
     {
         $form = $item->getForm();
         
-        // Check if form contains mblock_offline field
-        $hasOfflineField = (strpos($form, 'name="mblock_offline"') !== false || 
+        // Check if online/offline feature is enabled AND form contains mblock_offline field
+        $onlineOfflineEnabled = rex_config::get('mblock', 'mblock_online_offline', true);
+        $hasOfflineField = $onlineOfflineEnabled && 
+                          (strpos($form, 'name="mblock_offline"') !== false || 
                            strpos($form, "name='mblock_offline'") !== false ||
                            preg_match('/name=.*mblock_offline.*\[/', $form));
         
