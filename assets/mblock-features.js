@@ -1113,45 +1113,187 @@ function mblock_reinitialize_redaxo_widgets(container) {
             return false;
         }
         
-        // Get the mblock indices for unique ID generation
+        // Get context information
         const mblockIndex = parseInt(container.attr('data-mblock_index')) || 1;
         const mblockWrapper = container.closest('.mblock_wrapper');
         const mblockCount = mblockWrapper.find('.sortitem').length || 1;
+        const isGridBlock = container.closest('.gridblock_wrapper').length > 0 || container.hasClass('gridblock-item');
         
-        // Reinitialize REX Media widgets (single media selection)
+        console.log('MBlock: Widget-Reinitialisierung gestartet', {
+            mblockIndex: mblockIndex,
+            isGridBlock: isGridBlock,
+            containerClass: container.attr('class')
+        });
+        
+        // 🔧 REX MEDIA widgets - Enhanced for GridBlock compatibility
         container.find('input[id^="REX_MEDIA_"]').each(function() {
             const $input = $(this);
             const inputId = $input.attr('id');
+            const inputName = $input.attr('name');
             
             if (inputId) {
-                // Find corresponding buttons and reinitialize their functionality
-                const $widget = $input.closest('.rex-js-widget-media');
+                console.log('MBlock: Reinitialisiere REX_MEDIA Widget:', inputId, 'Name:', inputName);
+                
+                // Find media widget container - try multiple selectors
+                let $widget = $input.closest('.rex-js-widget-media');
+                if (!$widget.length) {
+                    $widget = $input.closest('.form-group, .col-sm-10, .input-group');
+                }
+                
                 if ($widget.length) {
-                    // Reinitialize media widget buttons
-                    $widget.find('.btn-popup').each(function() {
+                    // Find all media buttons
+                    const $mediaButtons = $widget.find('.btn-popup, a[onclick*="REXMedia"], a[onclick*="openREXMedia"]');
+                    
+                    console.log('MBlock: Gefundene Media-Buttons:', $mediaButtons.length);
+                    
+                    $mediaButtons.each(function() {
                         const $btn = $(this);
-                        const onclick = $btn.attr('onclick');
+                        let onclick = $btn.attr('onclick');
                         
                         if (onclick) {
+                            console.log('MBlock: Original onclick:', onclick);
+                            
                             // Extract the media ID from the input ID (REX_MEDIA_123456 -> 123456)
                             const mediaIdMatch = inputId.match(/REX_MEDIA_(\d+)/);
                             if (mediaIdMatch) {
                                 const mediaId = mediaIdMatch[1];
+                                let newOnclick = onclick;
                                 
-                                // Update onclick attribute with correct media ID
+                                // Update different types of media function calls
                                 if (onclick.includes('openREXMedia')) {
-                                    const newOnclick = onclick.replace(/openREXMedia\([^,)]+/, `openREXMedia('${mediaId}'`);
-                                    $btn.attr('onclick', newOnclick);
+                                    newOnclick = onclick.replace(/openREXMedia\([^,)]+/, `openREXMedia('${mediaId}'`);
                                 } else if (onclick.includes('viewREXMedia')) {
-                                    const newOnclick = onclick.replace(/viewREXMedia\([^,)]+/, `viewREXMedia('${mediaId}'`);
-                                    $btn.attr('onclick', newOnclick);
+                                    newOnclick = onclick.replace(/viewREXMedia\([^,)]+/, `viewREXMedia('${mediaId}'`);
                                 } else if (onclick.includes('deleteREXMedia')) {
-                                    const newOnclick = onclick.replace(/deleteREXMedia\([^)]+/, `deleteREXMedia('${mediaId}'`);
-                                    $btn.attr('onclick', newOnclick);
+                                    newOnclick = onclick.replace(/deleteREXMedia\([^,)]+/, `deleteREXMedia('${mediaId}'`);
                                 } else if (onclick.includes('addREXMedia')) {
-                                    const newOnclick = onclick.replace(/addREXMedia\([^,)]+/, `addREXMedia('${mediaId}'`);
-                                    $btn.attr('onclick', newOnclick);
+                                    newOnclick = onclick.replace(/addREXMedia\([^,)]+/, `addREXMedia('${mediaId}'`);
                                 }
+                                // GridBlock-specific patterns
+                                else if (onclick.includes('openMedia')) {
+                                    newOnclick = onclick.replace(/openMedia\([^,)]+/, `openMedia('${mediaId}'`);
+                                } else if (onclick.includes('deleteMedia')) {
+                                    newOnclick = onclick.replace(/deleteMedia\([^,)]+/, `deleteMedia('${mediaId}'`);
+                                }
+                                
+                                if (newOnclick !== onclick) {
+                                    $btn.attr('onclick', newOnclick);
+                                    console.log('MBlock: Aktualisiert onclick:', newOnclick);
+                                }
+                            }
+                        }
+                    });
+                    
+                    // GridBlock-specific: Update data attributes if present
+                    if (isGridBlock) {
+                        const $preview = $widget.find('.rex-media-preview, [data-media-id]');
+                        if ($preview.length) {
+                            const mediaValue = $input.val();
+                            if (mediaValue) {
+                                $preview.attr('data-media-id', mediaValue);
+                                console.log('MBlock: GridBlock Media-Preview aktualisiert:', mediaValue);
+                            }
+                        }
+                    }
+                } else {
+                    console.warn('MBlock: Kein Media-Widget-Container gefunden für:', inputId);
+                }
+            }
+        });
+        
+        // 🔧 REX LINK widgets - Enhanced for GridBlock compatibility  
+        container.find('input[id^="REX_LINK_"]').each(function() {
+            const $input = $(this);
+            const inputId = $input.attr('id');
+            const inputName = $input.attr('name');
+            
+            // Only process hidden inputs (not the _NAME display inputs)
+            if (inputId && !inputId.includes('_NAME') && $input.attr('type') === 'hidden') {
+                console.log('MBlock: Reinitialisiere REX_LINK Widget:', inputId, 'Name:', inputName);
+                
+                // Find link widget container
+                let $widget = $input.closest('.rex-js-widget-link, .form-group, .input-group');
+                if (!$widget.length) {
+                    $widget = $input.parent();
+                }
+                
+                if ($widget.length) {
+                    // Find all link buttons
+                    const $linkButtons = $widget.find('.btn-popup, a[onclick*="REXLink"], a[onclick*="openLinkMap"]');
+                    
+                    console.log('MBlock: Gefundene Link-Buttons:', $linkButtons.length);
+                    
+                    $linkButtons.each(function() {
+                        const $btn = $(this);
+                        let onclick = $btn.attr('onclick');
+                        
+                        if (onclick) {
+                            console.log('MBlock: Original Link onclick:', onclick);
+                            
+                            // Extract the link ID from the input ID (REX_LINK_123456 -> 123456)
+                            const linkIdMatch = inputId.match(/REX_LINK_(\d+)/);
+                            if (linkIdMatch) {
+                                const linkId = linkIdMatch[1];
+                                let newOnclick = onclick;
+                                
+                                // Update different types of link function calls
+                                if (onclick.includes('openLinkMap')) {
+                                    newOnclick = onclick.replace(/openLinkMap\([^,)]+/, `openLinkMap('${inputId}'`);
+                                } else if (onclick.includes('deleteREXLink')) {
+                                    newOnclick = onclick.replace(/deleteREXLink\([^,)]+/, `deleteREXLink('${linkId}'`);
+                                }
+                                // GridBlock-specific patterns
+                                else if (onclick.includes('openLink')) {
+                                    newOnclick = onclick.replace(/openLink\([^,)]+/, `openLink('${inputId}'`);
+                                } else if (onclick.includes('deleteLink')) {
+                                    newOnclick = onclick.replace(/deleteLink\([^,)]+/, `deleteLink('${linkId}'`);
+                                }
+                                
+                                if (newOnclick !== onclick) {
+                                    $btn.attr('onclick', newOnclick);
+                                    console.log('MBlock: Aktualisiert Link onclick:', newOnclick);
+                                }
+                            }
+                        }
+                    });
+                    
+                    // Auto-populate display field if empty
+                    const displayId = inputId + '_NAME';
+                    const $displayField = container.find('#' + displayId);
+                    const articleId = $input.val();
+                    
+                    if ($displayField.length && articleId && !$displayField.val()) {
+                        console.log('MBlock: Auto-populate Link display field for:', displayId);
+                        mblock_fetch_article_name(articleId, $displayField);
+                    }
+                }
+            }
+        });
+        
+        // 🔧 REX LINKLIST widgets
+        container.find('input[id^="REX_LINKLIST_"]').each(function() {
+            const $input = $(this);
+            const inputId = $input.attr('id');
+            
+            if (inputId) {
+                console.log('MBlock: Reinitialisiere REX_LINKLIST Widget:', inputId);
+                
+                let $widget = $input.closest('.rex-js-widget-linklist, .form-group');
+                if (!$widget.length) {
+                    $widget = $input.parent();
+                }
+                
+                if ($widget.length) {
+                    // Update linklist buttons
+                    $widget.find('.btn-popup, a[onclick*="openLinklistMap"]').each(function() {
+                        const $btn = $(this);
+                        let onclick = $btn.attr('onclick');
+                        
+                        if (onclick && onclick.includes('openLinklistMap')) {
+                            const newOnclick = onclick.replace(/openLinklistMap\([^,)]+/, `openLinklistMap('${inputId}'`);
+                            if (newOnclick !== onclick) {
+                                $btn.attr('onclick', newOnclick);
+                                console.log('MBlock: Aktualisiert Linklist onclick:', newOnclick);
                             }
                         }
                     });
@@ -1159,10 +1301,41 @@ function mblock_reinitialize_redaxo_widgets(container) {
             }
         });
         
-        // Additional widget types can be added here...
-        // (REX Link widgets, REX Linklist widgets, etc. - abbreviated for brevity)
+        // 🔧 GridBlock-specific: Trigger rex:ready event for custom widgets
+        if (isGridBlock) {
+            console.log('MBlock: GridBlock erkannt - triggere rex:ready Event');
+            
+            // Trigger rex:ready specifically for GridBlock
+            container.trigger('rex:ready', [container]);
+            
+            // Also trigger on individual form elements
+            container.find('input, select, textarea').trigger('rex:ready');
+            
+            // GridBlock-specific media widget reinitialization
+            if (typeof window.gridblock_reinit_widgets === 'function') {
+                window.gridblock_reinit_widgets(container);
+            }
+            
+            // Try to reinitialize selectpicker in GridBlock context
+            setTimeout(() => {
+                if (typeof $.fn.selectpicker === 'function') {
+                    container.find('select.selectpicker').selectpicker('refresh');
+                }
+            }, 100);
+        }
         
-        console.log('MBlock: REDAXO widgets reinitialized for new block');
+        // 🔧 General widget reinitialization
+        setTimeout(() => {
+            // Trigger rex:ready event for general REDAXO widget initialization
+            container.trigger('rex:ready', [container]);
+            
+            // Also trigger change events to ensure proper widget state
+            container.find('input, select, textarea').trigger('change');
+            
+            console.log('MBlock: Rex:ready events getriggert');
+        }, 50);
+        
+        console.log('MBlock: REDAXO widgets erfolgreich reinitialisiert für', isGridBlock ? 'GridBlock' : 'Standard MBlock');
         
         return true;
         

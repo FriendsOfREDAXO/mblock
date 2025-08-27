@@ -333,71 +333,115 @@ foreach ($items as $item) {
 
 ## Development & Build
 
-### Minifizierte Version erstellen
+### Modulare JavaScript-Architektur (MBlock 5.0)
 
-MBlock enthält ein Build-System für die automatische Minifizierung der JavaScript-Dateien. Dies ist besonders nützlich für die Entwicklung und für bessere Performance im produktiven Einsatz.
+MBlock 5.0 führt eine **modulare JavaScript-Architektur** ein, die den Code in drei logische Module aufteilt:
+
+- **`mblock-core.js`** - Base utilities, Validierung, Übersetzungen (384 Zeilen)
+- **`mblock-management.js`** - DOM-Manipulation, Sortable-Handling (1008 Zeilen)  
+- **`mblock-features.js`** - Copy/Paste, Online/Offline Toggle, REDAXO Widgets (815 Zeilen)
+
+Dies verbessert die **Wartbarkeit**, reduziert **Code-Redundanz** und ermöglicht besseres **Debugging**.
+
+### Build-System
+
+Das Build-System kombiniert automatisch die modularen Dateien und erstellt optimierte Versionen:
 
 #### Voraussetzungen
 
-- **Node.js** (Version 14 oder höher)
+- **Node.js** (Version 14 oder höher)  
 - **npm** (wird normalerweise mit Node.js installiert)
 
-#### Build-Prozess
+#### Build-Prozess ausführen
 
-1. **Terminal öffnen** und in das MBlock-Verzeichnis wechseln:
+1. **Terminal öffnen** und in das Build-Verzeichnis wechseln:
    ```bash
-   cd redaxo/src/addons/mblock
+   cd redaxo/src/addons/mblock/build
    ```
 
 2. **Build-Script ausführen**:
    ```bash
-   node build.js
-   ```
-   
-   **Alternativ mit npm**:
-   ```bash
-   npm run build
+   ./build.sh
    ```
 
 3. **Automatischer Prozess**:
-   - Das Script installiert automatisch **Terser** falls nicht vorhanden
-   - Minifiziert `assets/mblock.js` → `assets/mblock.min.js`
-   - Erstellt eine **Source Map** (`mblock.min.js.map`)
-   - Zeigt **Statistiken** der Komprimierung an
+   - Kombiniert die 3 modularen Dateien zu einer einzigen Datei
+   - Erstellt `mblock-combined.js` (Zwischenergebnis)
+   - Aktualisiert `mblock.js` (Development-Version) 
+   - Erstellt `mblock.min.js` (Production-Version mit Terser-Minifizierung)
+   - Generiert Source Map für Debugging
 
 #### Build-Ausgabe
 ```
-🔧 MBlock Build Script gestartet...
-📄 Source: /path/to/assets/mblock.js
-📄 Target: /path/to/assets/mblock.min.js
-✅ Source-Code gelesen: 140158 Zeichen
-⚙️ Minifiziere Code...
-✅ Minifizierte Datei erstellt: /path/to/assets/mblock.min.js
-🗺️ Source Map erstellt
+� MBlock Build Process gestartet
+═══════════════════════════════════
+✅ Node.js gefunden: v23.9.0
+✅ Dependencies bereits vorhanden
+� Quelldatei gefunden: ../assets/mblock.js
+🔗 Erstelle kombinierte Datei aus modularen Komponenten...
+✅ Kombinierte Datei erstellt: mblock-combined.js
+🔗 Aktualisiere mblock.js für Entwicklungsmodus...
+✅ mblock.js aktualisiert
+⚙️  Starte Minification der kombinierten Datei...
 
-📈 Statistiken:
-   Original: 140158 Zeichen
-   Minifiziert: 50128 Zeichen
-   Ersparnis: 64.2%
+� Minification Statistiken:
+────────────────────────────────────────
+📏 Originalgröße:     105.23 KB
+🗜️  Minified Größe:   36.37 KB  
+💾 Ersparnis:         68.85 KB (65.43%)
+⏱️  Verarbeitungszeit: 238ms
+────────────────────────────────────────
 
-🎉 Build erfolgreich!
+✅ MBlock JavaScript erfolgreich minified!
+🎉 MBlock Build Process abgeschlossen!
 ```
 
-#### Features des Build-Systems
+#### Asset Loading Modi
 
-- **Automatische Terser-Installation** - keine manuelle Setup erforderlich
-- **Source Maps** - für einfaches Debugging der minifizierten Datei
-- **Optimierte Minifizierung** - mit 2 Compression-Passes für maximale Komprimierung
-- **Erhaltene Namen** - wichtige JavaScript-Funktionen bleiben unverändert
-- **Performance-Statistiken** - zeigt Größenvergleich und Ersparnis an
-- **Console-Logs erhalten** - wichtige Debug-Informationen bleiben verfügbar
+Das System unterstützt verschiedene Asset-Loading Modi (konfigurierbar in `boot.php`):
 
-#### Wichtige Hinweise
+```php
+$assetMode = 'auto'; // Options: 'auto', 'modular', 'combined', 'prod'
+```
 
-- **Console-Logs erhalten** - für Debugging und wichtige Funktionalitäts-Logs
-- **jQuery-Kompatibilität** - alle jQuery-relevanten Namen werden geschützt
-- **MBlock-Funktionen** - kritische Funktionsnamen bleiben lesbar
-- **Git-Ignore** - `node_modules/` und `*.map` Dateien sind bereits ausgeschlossen
+- **`auto`** (Standard) - Automatische Erkennung basierend auf Debug-Modus
+  - **Development**: `mblock.js` (kombinierte Datei)
+  - **Production**: `mblock.min.js` (minifiziert)
+  
+- **`modular`** - Lädt 3 separate Dateien (erweiterte Debugging-Möglichkeiten)
+  - `mblock-core.js` → `mblock-management.js` → `mblock-features.js`
+  
+- **`combined`** - Immer kombinierte Datei (`mblock.js`)
+- **`prod`** - Immer minifizierte Datei (`mblock.min.js`)
+
+#### Code-Verbesserungen
+
+Die modulare Architektur bringt folgende **Verbesserungen**:
+
+✅ **Code-Reduktion**: ~200 Zeilen Redundanz eliminiert  
+✅ **Reusable Functions**: `MBlockUtils`, `MBlockClipboard`, `MBlockOnlineToggle`  
+✅ **Unified Event Handling**: Zentralisierte Event-Konfiguration  
+✅ **Better Error Handling**: Konsistente Fehlerbehandlung  
+✅ **Memory Management**: Automatisches Event-Cleanup  
+✅ **Performance**: Cached Selectors und optimierte Algorithmen  
+
+#### Enhanced REX_LINK/REX_MEDIA Support
+
+Das neue System bietet **verbesserte REDAXO Widget-Unterstützung**:
+
+- ✅ **REX_LINK Copy/Paste** - Artikel-IDs und Namen werden korrekt kopiert
+- ✅ **REX_MEDIA Copy/Paste** - Media-Dateien mit Metadaten  
+- ✅ **Widget-Reinitialization** - Onclick-Handler werden automatisch aktualisiert
+- ✅ **Auto Name Fetching** - Artikel-Namen werden automatisch per AJAX geholt
+
+#### Build-System Features
+
+- **🔗 Smart Combining** - Intelligente Kombination der modularen Dateien
+- **⚙️  Advanced Minification** - Terser mit optimierten Settings (2 Compression-Passes)
+- **🗺️  Source Maps** - Für einfaches Debugging der minifizierten Datei
+- **📊 Performance Stats** - Detaillierte Größen- und Kompressions-Statistiken
+- **🔧 Error Handling** - Robuste Fehlerbehandlung und Validierung
+- **♻️  Auto-Update** - Synchronisation zwischen Development- und Production-Dateien
 
 #### Troubleshooting
 
@@ -408,15 +452,41 @@ Falls Probleme auftreten:
    node --version  # sollte >= 14.0.0 sein
    ```
 
-2. **Cache leeren** (falls nötig):
+2. **Dependencies neu installieren**:
    ```bash
-   npm cache clean --force
+   cd redaxo/src/addons/mblock/build
+   rm -rf node_modules
+   npm install
    ```
 
-3. **Manuelle Terser Installation**:
+3. **Modulare Dateien prüfen**:
    ```bash
-   npm install terser --no-save
+   ls -la ../assets/mblock-*.js
+   # Sollte alle 3 modularen Dateien anzeigen
    ```
+
+4. **Manuelle Terser Installation**:
+   ```bash
+   npm install terser
+   ```
+
+#### Development Workflow
+
+**Für MBlock-Entwicklung**:
+
+1. **Bearbeite die modularen Dateien**:
+   - `assets/mblock-core.js`
+   - `assets/mblock-management.js` 
+   - `assets/mblock-features.js`
+
+2. **Build ausführen** nach Änderungen:
+   ```bash
+   cd build && ./build.sh
+   ```
+
+3. **Testen** in REDAXO (Debug-Modus nutzt automatisch die Development-Version)
+
+4. **Production-Deploy**: Die minifizierte Version wird automatisch generiert
 
 ---
 
