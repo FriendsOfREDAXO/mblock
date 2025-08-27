@@ -7,7 +7,12 @@
 
 // set default template
 if (!$this->hasConfig('mblock_theme')) {
-    $this->setConfig('mblock_theme', 'default_theme');
+    $this->setConfig('mblock_theme', 'standard');
+}
+
+// Migration: Update old default_theme to standard
+if ($this->getConfig('mblock_theme') === 'default_theme') {
+    $this->setConfig('mblock_theme', 'standard');
 }
 if (!$this->hasConfig('mblock_delete')) {
     $this->setConfig('mblock_delete', 1);
