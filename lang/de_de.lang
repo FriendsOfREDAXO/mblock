@@ -11,7 +11,7 @@ mblock_api = API-Dokumenta
 mblock_config_label_template = Theme für MBlock Sort-Fields
 mblock_config_saved = Einstellungen wurden gespeichert
 mblock_theme = Theme
-mblock_theme_default = Standard Theme
+mblock_theme_standard = Standard Theme
 mblock_theme_custom = Benutzerdefiniert
 mblock_smooth_scroll = Smooth Scroll
 mblock_nested_support = Verschachtelte Blöcke
@@ -81,7 +81,7 @@ mblock_toast_module_type_mismatch = Modultyp stimmt nicht überein
 
 # Template selection
 mblock_theme_label = Template-Auswahl
-mblock_theme_default = Standard Template
-mblock_theme_info = Hier können Sie ein eigenes mblock-Template auswählen. Legen Sie dazu einen Ordner in <code>data/templates/</code> an. Jedes Template kann eine eigene CSS-Datei mit dem Prefix des Template-Namens enthalten (z.B. <code>mytemplate.css</code>). Diese wird bei Auswahl automatisch nach <code>assets/</code> kopiert und nach der Standard-CSS geladen, sodass Sie Defaults überschreiben können. Das Default-Template bleibt immer verfügbar.
+mblock_theme_standard = Standard Template
+mblock_theme_info = Hier können Sie zwischen den verfügbaren MBlock-Templates wählen. Verfügbare Templates sind im <code>data/templates/</code> Ordner gespeichert. Jedes Template kann eine eigene CSS-Datei enthalten, die automatisch geladen wird.
 mblock_theme_css_copied = Template-CSS wurde erfolgreich kopiert
 mblock_theme_saved = Template-Auswahl wurde gespeichert

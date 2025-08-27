@@ -16,27 +16,31 @@ class TemplateManager
 {
     /**
      * Get all available templates from data/templates directory
+     * Only built-in templates are offered, no custom templates
      * 
      * @return array Array with template key => display name
      */
     public static function getAvailableTemplates()
     {
+        // Only built-in templates are available
+        $availableTemplates = array(
+            'standard' => \rex_i18n::msg('mblock_theme_standard'),
+            'modern' => 'Modern',
+            'akg_skin' => 'AKG Skin',
+            'retro_8bit' => 'Retro 8bit'
+        );
+        
+        // Only return templates that actually exist
         $templatesPath = \rex_path::addon('mblock', 'data/templates/');
-        $availableTemplates = array();
+        $existingTemplates = array();
         
-        // Always include default theme (from main templates/ directory)
-        $availableTemplates['default_theme'] = \rex_i18n::msg('mblock_theme_default');
-        
-        if (is_dir($templatesPath)) {
-            $templateDirs = scandir($templatesPath);
-            foreach ($templateDirs as $dir) {
-                if ($dir !== '.' && $dir !== '..' && is_dir($templatesPath . $dir)) {
-                    $availableTemplates[$dir] = ucfirst(str_replace('_', ' ', $dir));
-                }
+        foreach ($availableTemplates as $key => $label) {
+            if (is_dir($templatesPath . $key)) {
+                $existingTemplates[$key] = $label;
             }
         }
         
-        return $availableTemplates;
+        return $existingTemplates;
     }
     
     /**
@@ -47,8 +51,8 @@ class TemplateManager
      */
     public static function copyTemplateCSS($templateName)
     {
-        if ($templateName === 'default_theme') {
-            return true; // Default theme doesn't need CSS copying (uses main templates/ dir)
+        if ($templateName === 'standard') {
+            return true; // Standard theme doesn't need CSS copying
         }
         
         $templatePath = \rex_path::addon('mblock', 'data/templates/' . $templateName . '/');
@@ -88,8 +92,8 @@ class TemplateManager
      */
     public static function getTemplateCSSUrl($templateName)
     {
-        if ($templateName === 'default_theme') {
-            return null; // Default theme CSS is handled separately
+        if ($templateName === 'standard') {
+            return null; // Standard theme CSS is handled separately
         }
         
         $assetsPath = \rex_path::addonAssets('mblock') . '/';
@@ -110,8 +114,8 @@ class TemplateManager
      */
     public static function removeTemplateCSS($templateName)
     {
-        if ($templateName === 'default_theme') {
-            return true; // Default theme doesn't have removable CSS
+        if ($templateName === 'standard') {
+            return true; // Standard theme doesn't have removable CSS
         }
         
         $assetsPath = \rex_path::addonAssets('mblock') . '/';
@@ -132,8 +136,8 @@ class TemplateManager
      */
     public static function hasTemplateCSS($templateName)
     {
-        if ($templateName === 'default_theme') {
-            return false; // Default theme CSS is handled via main templates/ dir
+        if ($templateName === 'standard') {
+            return false; // Standard theme CSS is handled differently
         }
         
         $templatePath = \rex_path::addon('mblock', 'data/templates/' . $templateName . '/');
