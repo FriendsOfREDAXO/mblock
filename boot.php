@@ -30,38 +30,50 @@ if (rex::isBackend() && is_object(rex::getUser())) {
     }
     // Note: bloecks Addon is required for MBlock functionality
 
-    // 🔧 Development/Production Asset Management
+    // 🔧 MBlock JavaScript Asset Management
     // 
     // Options:
-    // - 'auto'  : Auto-detect based on environment (recommended)
-    // - 'dev'   : Always use mblock.js (development/debugging)  
-    // - 'prod'  : Always use mblock.min.js (production/performance)
+    // - 'auto'     : Auto-detect based on environment (recommended)
+    // - 'modular'  : Always use modular files (debugging)
+    // - 'combined' : Always use combined file (development)
+    // - 'prod'     : Always use minified file (production)
     //
-    $assetMode = 'auto'; // Change this to 'dev' or 'prod' to override
+    $assetMode = 'auto'; // Change to override auto-detection
     
     // Auto-detection logic
     if ($assetMode === 'auto') {
-        // Use minified in production, development version otherwise
-        $isProduction = (
+        // Use combined file approach for simplicity and compatibility
+        $useMinified = (
             !rex::isDebugMode() &&                    // Debug mode disabled
             !rex_addon::get('debug')->isAvailable()   // Debug addon not active
         );
-        $useMinified = $isProduction;
+        $debugInfo = $useMinified ? 'Production (minified)' : 'Development (combined)';
     } else {
         $useMinified = ($assetMode === 'prod');
+        $useModular = ($assetMode === 'modular');
+        $debugInfo = $assetMode;
     }
     
-    $jsFile = $useMinified ? 'mblock.min.js' : 'mblock.min.js';
-    $debugInfo = $useMinified ? 'Production (minified)' : 'Development (source)';
+    if (isset($useModular) && $useModular) {
+        // 📦 Load modular JavaScript files (Advanced debugging)
+        rex_view::addJsFile($this->getAssetsUrl('mblock-core.js'));
+        rex_view::addJsFile($this->getAssetsUrl('mblock-management.js'));
+        rex_view::addJsFile($this->getAssetsUrl('mblock-features.js'));
+        $debugInfo = 'Modular (3 files)';
+    } else {
+        // 📦 Load combined/minified file (Standard approach)
+        $jsFile = $useMinified ? 'mblock.min.js' : 'mblock.js';
+        rex_view::addJsFile($this->getAssetsUrl($jsFile));
+        $debugInfo .= ' (' . $jsFile . ')';
+    }
     
-    // Add debug comment for developers
+    // Add CSS
+    rex_view::addCssFile($this->getAssetsUrl('mblock.css'));
+    
+    // Add debug info for developers
     if (rex::isDebugMode()) {
         rex_view::setJsProperty('mblock_asset_mode', $debugInfo);
     }
-    
-    // Always add our assets
-    rex_view::addJsFile($this->getAssetsUrl($jsFile));
-    rex_view::addCssFile($this->getAssetsUrl('mblock.css'));
     
     // Add custom template CSS if selected and available
     $selectedTemplate = $this->getConfig('mblock_theme', 'default_theme');
