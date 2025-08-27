@@ -1,16 +1,16 @@
 <?php
 /**
- * MBlock 4.0 Overview - Neue Features und Verbesserungen
+ * MBlock Overview - Features und Verbesserungen
  */
 
 $fragment = new rex_fragment();
-$fragment->setVar('title', 'MBlock 4.0 - Was ist neu?', false);
+$fragment->setVar('title', 'MBlock - Was bietet das Addon?', false);
 
 $content = '
-<div class="mblock-overview-v4">
+<div class="mblock-overview">
     <div class="alert alert-success">
-        <h3><i class="rex-icon fa-rocket"></i> MBlock 4.0 - Komplette Modernisierung</h3>
-        <p>Eine umfassende Überarbeitung des beliebten MBlock-Addons mit modernen Features, verbesserter Performance und erweiterten APIs für Entwickler.</p>
+        <h3><i class="rex-icon fa-rocket"></i> MBlock - Leistungsstarke Blockbearbeitung</h3>
+        <p>Ein umfassendes AddOn für die Erstellung und Verwaltung wiederholbarer Inhaltsblöcke in REDAXO-Modulen mit modernen Features und erweiterten APIs für Entwickler.</p>
     </div>
 
     <div class="row">
