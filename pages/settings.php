@@ -14,6 +14,7 @@ $config = rex_post('config', array(
     array('mblock_delete', 'boolean'),
     array('mblock_delete_confirm', 'boolean'),
     array('mblock_copy_paste', 'boolean'),
+    array('mblock_online_offline', 'boolean'),
     array('mblock_theme', 'string'),
     array('submit', 'boolean')
 ));
@@ -78,6 +79,7 @@ if ($config['submit']) {
     $this->setConfig('mblock_scroll', $config['mblock_scroll']);
     $this->setConfig('mblock_delete_confirm', $config['mblock_delete_confirm']);
     $this->setConfig('mblock_copy_paste', $config['mblock_copy_paste']);
+    $this->setConfig('mblock_online_offline', $config['mblock_online_offline']);
     
     $saveMessage = $templateChanged ? rex_i18n::msg('mblock_theme_saved') : rex_i18n::msg('mblock_config_saved');
     $form .= rex_view::info($saveMessage);
@@ -152,6 +154,30 @@ $select->addOption(rex_i18n::msg('mblock_disabled'), 0);
 $select->addOption(rex_i18n::msg('mblock_enabled'), 1);
 $select->setSelected($this->getConfig('mblock_copy_paste', 1)); // Default: enabled
 $elements['field'] = $select->get();
+$formElements[] = $elements;
+// parse select element
+$fragment = new rex_fragment();
+$fragment->setVar('elements', $formElements, false);
+$form .= $fragment->parse('core/form/form.php');
+
+// Online/Offline Toggle configuration
+$formElements = array();
+$elements = array();
+$elements['label'] = '
+  <label for="rex-mblock-config-online-offline">' . rex_i18n::msg('mblock_online_offline') . '</label>
+';
+// create select
+$select = new rex_select;
+$select->setId('rex-mblock-config-online-offline');
+$select->setSize(1);
+$select->setAttribute('class', 'form-control');
+$select->setName('config[mblock_online_offline]');
+// add options
+$select->addOption(rex_i18n::msg('mblock_disabled'), 0);
+$select->addOption(rex_i18n::msg('mblock_enabled'), 1);
+$select->setSelected($this->getConfig('mblock_online_offline', 1)); // Default: enabled
+$elements['field'] = $select->get();
+$elements['note'] = '<div class="help-block small">' . rex_i18n::msg('mblock_online_offline_info') . '</div>';
 $formElements[] = $elements;
 // parse select element
 $fragment = new rex_fragment();

@@ -31,5 +31,6 @@ requires:
 default_config:
     mblock_theme: 'standard'
     mblock_copy_paste: true
+    mblock_online_offline: true
     mblock_scroll: true
     mblock_delete_confirm: true
