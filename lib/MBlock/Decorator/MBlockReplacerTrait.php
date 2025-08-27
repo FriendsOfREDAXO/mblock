@@ -20,6 +20,32 @@ trait MBlockReplacerTrait
     private static function createDom($html)
     {
         $dom = new DOMDocument();
+        
+        // Handle case where $html is an object (like MForm) instead of a string
+        if (is_object($html)) {
+            if (method_exists($html, '__toString')) {
+                $html = (string) $html;
+            } elseif (method_exists($html, 'show')) {
+                // Try to get HTML from MForm, but catch any errors
+                try {
+                    $html = $html->show();
+                } catch (\Throwable $e) {
+                    // MForm has compatibility issues with MBlock - fallback to string conversion
+                    if (method_exists($html, '__toString')) {
+                        $html = (string) $html;
+                    } else {
+                        throw new \InvalidArgumentException('MBlock: Could not render MForm object. Error: ' . $e->getMessage() . '. Please ensure MForm compatibility with MBlock.');
+                    }
+                }
+            } else {
+                throw new \InvalidArgumentException('MBlock: HTML parameter must be a string or an object with __toString() or show() method. Got: ' . get_class($html));
+            }
+        }
+        
+        if (!is_string($html)) {
+            $html = (string) $html;
+        }
+        
         //replaces $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
         $html = preg_replace_callback('/[\x{80}-\x{10FFFF}]/u', function ($match) {
             $utf8 = $match[0];

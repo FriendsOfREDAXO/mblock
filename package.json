@@ -1,0 +1,12 @@
+{
+  "name": "mblock-build",
+  "version": "1.0.0",
+  "description": "Build Script for MBlock JavaScript Minification",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "devDependencies": {
+    "terser": "^5.19.0"
+  },
+  "private": true
+}

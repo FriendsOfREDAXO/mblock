@@ -1271,6 +1271,65 @@ var MBlockClipboard = {
                 }
             });
             
+            // Normale REX_LINK Felder (REDAXO Core + MForm Varianten)
+            item.find('input[id^="REX_LINK_"]').each(function() {
+                const $hiddenInput = $(this);
+                const inputId = $hiddenInput.attr('id');
+                
+                // Nur Hidden Inputs bearbeiten (nicht die _NAME Felder) und nicht bereits behandelte customlinks
+                if (inputId && !inputId.includes('_NAME') && 
+                    $hiddenInput.attr('type') === 'hidden' && 
+                    !$hiddenInput.closest('.rex-js-widget-customlink').length) {
+                    
+                    const name = $hiddenInput.attr('name');
+                    const nameFieldId = inputId + '_NAME';
+                    
+                    // Versuche beide Varianten für das Display-Feld zu finden:
+                    // 1. REDAXO Core: input[name="REX_LINK_NAME[X]"] 
+                    // 2. MForm: input[id="REX_LINK_X_NAME"]
+                    let $nameInput = $('#' + nameFieldId);
+                    let displayText = '';
+                    let nameFieldName = '';
+                    let isCorePowered = false;
+                    
+                    if ($nameInput.length) {
+                        // MForm Style (ID-basiert)
+                        displayText = $nameInput.val() || '';
+                        nameFieldName = $nameInput.attr('name') || nameFieldId;
+                    } else {
+                        // REDAXO Core Style (Name-basiert)
+                        const idMatch = inputId.match(/REX_LINK_(\d+)$/);
+                        if (idMatch) {
+                            const linkId = idMatch[1];
+                            $nameInput = $('input[name="REX_LINK_NAME[' + linkId + ']"]');
+                            if ($nameInput.length) {
+                                displayText = $nameInput.val() || '';
+                                nameFieldName = $nameInput.attr('name');
+                                isCorePowered = true;
+                            }
+                        }
+                    }
+                    
+                    formData[name] = {
+                        type: 'rex_link_normal',
+                        value: $hiddenInput.val(),
+                        displayText: displayText,
+                        hiddenId: inputId,
+                        nameId: nameFieldId,
+                        nameFieldName: nameFieldName,
+                        isCorePowered: isCorePowered // Flag für Core vs MForm
+                    };
+                    
+                    console.log('MBlock: REX_LINK erfasst beim Kopieren:', {
+                        name: name,
+                        value: $hiddenInput.val(),
+                        displayText: displayText,
+                        hiddenId: inputId,
+                        isCorePowered: isCorePowered
+                    });
+                }
+            });
+            
             // Bootstrap Select elements
             item.find('.bootstrap-select select').each(function() {
                 const $select = $(this);
@@ -1283,6 +1342,52 @@ var MBlockClipboard = {
                         selectedText: $select.find('option:selected').text(),
                         title: $select.closest('.bootstrap-select').find('.filter-option-inner-inner').text()
                     };
+                }
+            });
+            
+            // REX_LINKLIST Felder (speziell für REDAXO LINKLIST-Widgets)
+            item.find('input[id^="REX_LINKLIST_"]').each(function() {
+                const $hiddenInput = $(this);
+                const inputId = $hiddenInput.attr('id');
+                const name = $hiddenInput.attr('name');
+                
+                if (inputId && name && $hiddenInput.attr('type') === 'hidden') {
+                    // Finde das zugehörige SELECT-Element
+                    const linklistIdMatch = inputId.match(/REX_LINKLIST_(\d+)$/);
+                    if (linklistIdMatch) {
+                        const linklistId = linklistIdMatch[1];
+                        const $selectElement = $('#REX_LINKLIST_SELECT_' + linklistId);
+                        
+                        if ($selectElement.length) {
+                            // Erfasse alle Option-Elemente mit Values und Texten
+                            const options = [];
+                            $selectElement.find('option').each(function() {
+                                const $option = $(this);
+                                options.push({
+                                    value: $option.val(),
+                                    text: $option.text(),
+                                    selected: $option.prop('selected')
+                                });
+                            });
+                            
+                            formData[name] = {
+                                type: 'rex_linklist',
+                                value: $hiddenInput.val(),
+                                selectName: $selectElement.attr('name'),
+                                selectId: $selectElement.attr('id'),
+                                hiddenId: inputId,
+                                linklistId: linklistId,
+                                options: options
+                            };
+                            
+                            console.log('MBlock: REX_LINKLIST erfasst beim Kopieren:', {
+                                name: name,
+                                value: $hiddenInput.val(),
+                                options: options.length,
+                                linklistId: linklistId
+                            });
+                        }
+                    }
                 }
             });
             
@@ -1358,11 +1463,6 @@ var MBlockClipboard = {
             // Clean up IDs and names to avoid conflicts
             this.cleanupPastedItem(pastedItem);
             
-            // Restore form values from clipboard with enhanced data restoration
-            if (this.data.formData) {
-                this.restoreComplexFormData(pastedItem, this.data.formData);
-            }
-            
             // Insert item
             if (afterItem && afterItem.length) {
                 // Destroy sortable before manipulation with better error handling
@@ -1384,12 +1484,31 @@ var MBlockClipboard = {
             // Add unique ids
             mblock_set_unique_id(pastedItem, true);
             
+            // CRITICAL: Reinitialize widgets BEFORE form data restoration
+            mblock_reinitialize_redaxo_widgets(pastedItem);
+            
+            // Restore form values from clipboard with enhanced data restoration
+            if (this.data.formData) {
+                this.restoreComplexFormData(pastedItem, this.data.formData);
+            }
+            
             // Reinitialize sortable
             mblock_init_sort(element);
             
             // Trigger rex:ready event only on the pasted item for component initialization
             // We handle selectpicker manually below, so we only need this single event
             pastedItem.trigger('rex:ready', [pastedItem]);
+            
+            // CRITICAL FIX: Re-restore LINKLIST data after REDAXO widget initialization
+            setTimeout(() => {
+                if (this.data.formData) {
+                    this.restoreLinklistDataDelayed(pastedItem, this.data.formData);
+                }
+                
+                // ZUSÄTZLICH: REX_LINK Felder in Tabs nochmals prüfen und reparieren
+                const self = this;
+                this.repairRexLinkFieldsInTabs(pastedItem, self.data);
+            }, 100);
             
             // Specific component reinitialization
             setTimeout(function() {
@@ -1415,9 +1534,6 @@ var MBlockClipboard = {
                 if (typeof $.fn.chosen === 'function') {
                     pastedItem.find('select.chosen').chosen();
                 }
-                
-                // CRITICAL FIX: Reinitialize REDAXO Media and Link functionality for pasted blocks
-                mblock_reinitialize_redaxo_widgets(pastedItem);
                 
                 // Trigger change events to update any dependent elements
                 pastedItem.find('input, select, textarea').trigger('change');
@@ -1579,7 +1695,7 @@ var MBlockClipboard = {
                 if (!$field.length) {
                     // Only warn for significant fields, not bootstrap/metadata fields
                     if (!originalName.includes('_bootstrap') && !originalName.includes('active_tab')) {
-                        console.warn(`MBlock: Feld "${originalName}" nicht gefunden`);
+                        console.warn(`MBlock: Feld "${originalName}" nicht gefunden für Typ: ${fieldData.type}`);
                     }
                     return;
                 }
@@ -1674,6 +1790,79 @@ var MBlockClipboard = {
                         }
                         break;
                         
+                    case 'rex_link_normal':
+                        // Normale REX_LINK Felder (REDAXO Core + MForm + HTML Varianten)
+                        $field.val(fieldData.value);
+                        console.log('MBlock: Normales REX_LINK wiederhergestellt:', fieldData.value, 'für', $field.attr('name'), fieldData.isCorePowered ? '(Core)' : '(HTML)');
+                        
+                        // Display Text wiederherstellen oder per AJAX holen
+                        let $displayInput;
+                        
+                        if (fieldData.isCorePowered && fieldData.nameFieldName) {
+                            // REDAXO Core Style: input[name="REX_LINK_NAME[X]"]
+                            $displayInput = $('input[name="' + fieldData.nameFieldName + '"]');
+                        } else {
+                            // HTML/MForm Style: input[id="REX_LINK_X_NAME"]
+                            const currentFieldId = $field.attr('id');
+                            if (currentFieldId) {
+                                const nameId = currentFieldId + '_NAME';
+                                $displayInput = $('#' + nameId);
+                            }
+                        }
+                        
+                        if ($displayInput && $displayInput.length && fieldData.value) {
+                            if (fieldData.displayText) {
+                                // Bereits bekannter Display-Text
+                                $displayInput.val(fieldData.displayText);
+                                $displayInput.trigger('input').trigger('change');
+                                console.log('MBlock: REX_LINK Display Text aus Cache wiederhergestellt:', fieldData.displayText);
+                            } else {
+                                // Display-Text per AJAX holen
+                                mblock_fetch_article_name(fieldData.value, $displayInput);
+                            }
+                        }
+                        break;
+                        
+                    case 'rex_linklist':
+                        // REX_LINKLIST Felder wiederherstellen
+                        $field.val(fieldData.value);
+                        console.log('MBlock: REX_LINKLIST wiederhergestellt:', fieldData.value, 'für', $field.attr('name'), 'ID:', $field.attr('id'));
+                        
+                        // Finde das zugehörige SELECT-Element über die aktuelle ID
+                        const currentHiddenId = $field.attr('id');
+                        if (currentHiddenId && fieldData.options) {
+                            const currentLinklistIdMatch = currentHiddenId.match(/REX_LINKLIST_(\d+)$/);
+                            if (currentLinklistIdMatch) {
+                                const currentLinklistId = currentLinklistIdMatch[1];
+                                const $currentSelectElement = $('#REX_LINKLIST_SELECT_' + currentLinklistId);
+                                
+                                console.log('MBlock: Suche SELECT-Element:', 'REX_LINKLIST_SELECT_' + currentLinklistId, 'gefunden:', $currentSelectElement.length);
+                                
+                                if ($currentSelectElement.length) {
+                                    // SELECT-Element leeren und neue Options hinzufügen
+                                    $currentSelectElement.empty();
+                                    
+                                    fieldData.options.forEach(function(option) {
+                                        const $option = $('<option></option>')
+                                            .val(option.value)
+                                            .text(option.text);
+                                        
+                                        if (option.selected) {
+                                            $option.prop('selected', true);
+                                        }
+                                        
+                                        $currentSelectElement.append($option);
+                                    });
+                                    
+                                    console.log('MBlock: REX_LINKLIST SELECT wiederhergestellt mit', fieldData.options.length, 'Optionen');
+                                    $currentSelectElement.trigger('change');
+                                } else {
+                                    console.warn('MBlock: SELECT-Element nicht gefunden für ID:', currentLinklistId);
+                                }
+                            }
+                        }
+                        break;
+                        
                     case 'active_tab':
                         // Restore active tab states
                         if (fieldData.href) {
@@ -1717,6 +1906,144 @@ var MBlockClipboard = {
             
         } catch (error) {
             console.error('MBlock: Fehler beim Wiederherstellen komplexer Formulardaten:', error);
+        }
+    },
+    
+    restoreLinklistDataDelayed: function(pastedItem, formData) {
+        // Verzögerte LINKLIST-Wiederherstellung nach REDAXO-Widget-Initialisierung
+        try {
+            Object.keys(formData).forEach(originalName => {
+                const fieldData = formData[originalName];
+                
+                if (!fieldData || typeof fieldData !== 'object' || fieldData.type !== 'rex_linklist') {
+                    return;
+                }
+                
+                // Finde das Hidden Input Field
+                const $field = this.findFieldBySmartMatching(pastedItem, originalName);
+                if (!$field.length) {
+                    console.warn('MBlock: LINKLIST Delayed - Feld nicht gefunden:', originalName);
+                    return;
+                }
+                
+                // Erneut Hidden Input setzen
+                $field.val(fieldData.value);
+                console.log('MBlock: LINKLIST Delayed wiederhergestellt:', fieldData.value, 'ID:', $field.attr('id'));
+                
+                // Finde das zugehörige SELECT-Element über die aktuelle ID
+                const currentHiddenId = $field.attr('id');
+                if (currentHiddenId && fieldData.options) {
+                    const currentLinklistIdMatch = currentHiddenId.match(/REX_LINKLIST_(\d+)$/);
+                    if (currentLinklistIdMatch) {
+                        const currentLinklistId = currentLinklistIdMatch[1];
+                        const $currentSelectElement = $('#REX_LINKLIST_SELECT_' + currentLinklistId);
+                        
+                        console.log('MBlock: LINKLIST Delayed - SELECT-Element:', 'REX_LINKLIST_SELECT_' + currentLinklistId, 'gefunden:', $currentSelectElement.length);
+                        
+                        if ($currentSelectElement.length) {
+                            // SELECT-Element leeren und neue Options hinzufügen
+                            $currentSelectElement.empty();
+                            
+                            fieldData.options.forEach(function(option) {
+                                const $option = $('<option></option>')
+                                    .val(option.value)
+                                    .text(option.text);
+                                
+                                if (option.selected) {
+                                    $option.prop('selected', true);
+                                }
+                                
+                                $currentSelectElement.append($option);
+                            });
+                            
+                            console.log('MBlock: LINKLIST Delayed - SELECT wiederhergestellt mit', fieldData.options.length, 'Optionen');
+                            $currentSelectElement.trigger('change');
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('MBlock: Fehler bei verzögerter LINKLIST-Wiederherstellung:', error);
+        }
+    },
+    
+    repairRexLinkFieldsInTabs: function(pastedItem, clipboardData) {
+        try {
+            console.log('[MBlock] Repariere REX_LINK Felder in Tabs...');
+            
+            // Finde alle REX_LINK Felder die einen Display-Wert haben aber leere Hidden-Werte
+            pastedItem.find('input[id*="REX_LINK_"][id$="_NAME"]').each(function() {
+                const $displayField = $(this);
+                const displayValue = $displayField.val();
+                
+                if (!displayValue) return; // Kein Display-Wert vorhanden
+                
+                // Finde das zugehörige Hidden Field
+                const baseId = $displayField.attr('id').replace('_NAME', '');
+                const $hiddenField = pastedItem.find('#' + baseId);
+                
+                if ($hiddenField.length === 0) {
+                    console.warn('[MBlock] Hidden Field nicht gefunden für:', baseId);
+                    return;
+                }
+                
+                const hiddenValue = $hiddenField.val();
+                const isInTab = $displayField.closest('.tab-pane').length > 0;
+                
+                console.log('[MBlock] REX_LINK Tab-Repair Check:', {
+                    displayField: $displayField.attr('id'),
+                    displayValue: displayValue,
+                    hiddenField: baseId,
+                    hiddenValue: hiddenValue,
+                    inTab: isInTab,
+                    needsRepair: !hiddenValue
+                });
+                
+                // Wenn Display-Field einen Wert hat, aber Hidden-Field leer ist
+                if (!hiddenValue) {
+                    console.log('[MBlock] Versuche Reparatur für REX_LINK:', baseId, 'mit Display-Text:', displayValue);
+                    
+                    // 1. Wenn Display-Text eine Zahl ist, verwende sie als ID
+                    if (displayValue.match(/^\d+$/)) {
+                        console.log('[MBlock] Verwende numerischen Display-Wert als ID:', displayValue);
+                        $hiddenField.val(displayValue);
+                        $hiddenField.trigger('change');
+                        return;
+                    }
+                    
+                    // 2. Versuche über die Clipboard-Daten die ursprüngliche ID zu finden
+                    if (clipboardData && clipboardData.formData) {
+                        const currentFieldName = $hiddenField.attr('name');
+                        if (currentFieldName) {
+                            // Suche nach dem ursprünglichen Feldnamen ohne "mblock_new_" Prefix
+                            const cleanFieldName = currentFieldName.replace('mblock_new_', '');
+                            
+                            // Durchsuche alle gespeicherten Felder
+                            Object.keys(clipboardData.formData).forEach(originalName => {
+                                const fieldData = clipboardData.formData[originalName];
+                                
+                                if (fieldData && fieldData.type === 'rex_link_normal' && 
+                                    fieldData.displayText === displayValue && fieldData.value) {
+                                    
+                                    console.log('[MBlock] Verwende ursprüngliche ID aus Clipboard:', fieldData.value, 'für Display-Text:', displayValue);
+                                    $hiddenField.val(fieldData.value);
+                                    $hiddenField.trigger('change');
+                                    return;
+                                }
+                            });
+                        }
+                    }
+                    
+                    // 3. Als letzter Fallback: Warnung ausgeben
+                    setTimeout(() => {
+                        if (!$hiddenField.val()) {
+                            console.warn('[MBlock] Konnte keine passende ID für REX_LINK finden:', displayValue, '- Feld bleibt leer. Möglicherweise muss der Link manuell neu gesetzt werden.');
+                        }
+                    }, 1000);
+                }
+            });
+        } catch (error) {
+            console.error('[MBlock] Fehler beim Reparieren von REX_LINK Feldern in Tabs:', error);
         }
     },
     
@@ -2350,6 +2677,11 @@ function mblock_reinitialize_redaxo_widgets(container) {
             return false;
         }
         
+        // Get the mblock indices for unique ID generation
+        const mblockIndex = parseInt(container.attr('data-mblock_index')) || 1;
+        const mblockWrapper = container.closest('.mblock_wrapper');
+        const mblockCount = mblockWrapper.find('.sortitem').length || 1;
+        
         // Reinitialize REX Media widgets (single media selection)
         container.find('input[id^="REX_MEDIA_"]').each(function() {
             const $input = $(this);
@@ -2505,6 +2837,67 @@ function mblock_reinitialize_redaxo_widgets(container) {
             }
         });
         
+        // 🔧 Normale REX_LINK Felder reinitialisieren (wie LINKLIST)
+        container.find('input[id^="REX_LINK_"]').each(function() {
+            const $input = $(this);
+            const inputId = $input.attr('id');
+            
+            if (inputId && !inputId.includes('_NAME') && $input.attr('type') === 'hidden') {
+                // Extract old link ID
+                const linkIdMatch = inputId.match(/REX_LINK_(\d+)$/);
+                if (linkIdMatch) {
+                    const oldLinkId = linkIdMatch[1];
+                    
+                    // Generate new unique ID (wie bei LINKLIST)
+                    const newLinkId = mblockIndex + mblockCount + '00' + ($input.index() || Math.floor(Math.random() * 100));
+                    
+                    // Update hidden input ID
+                    const newHiddenId = 'REX_LINK_' + newLinkId;
+                    $input.attr('id', newHiddenId);
+                    
+                    // Update display input ID
+                    const oldDisplayId = 'REX_LINK_' + oldLinkId + '_NAME';
+                    const newDisplayId = 'REX_LINK_' + newLinkId + '_NAME';
+                    
+                    // Search for display input in the same container first, then globally
+                    let $displayInput = $input.closest('.input-group, .form-group, .rex-widget').find('#' + oldDisplayId);
+                    if (!$displayInput.length) {
+                        $displayInput = container.find('#' + oldDisplayId);
+                    }
+                    if (!$displayInput.length) {
+                        $displayInput = $('#' + oldDisplayId);
+                    }
+                    
+                    if ($displayInput.length) {
+                        $displayInput.attr('id', newDisplayId);
+                        console.log('MBlock: REX_LINK IDs aktualisiert:', oldDisplayId, '→', newDisplayId);
+                    } else {
+                        console.warn('MBlock: Display Input nicht gefunden:', oldDisplayId);
+                    }
+                    
+                    // Find widget container (kann auch nur input-group sein)
+                    const $widget = $input.closest('.rex-js-widget-link, .rex-js-widget-customlink, .input-group');
+                    if ($widget.length) {
+                        // Update all buttons for this link
+                        $widget.find('.btn-popup').each(function() {
+                            const $btn = $(this);
+                            const onclick = $btn.attr('onclick');
+                            
+                            if (onclick) {
+                                if (onclick.includes('openLinkMap')) {
+                                    const newOnclick = onclick.replace(/openLinkMap\([^,)]+/, `openLinkMap('REX_LINK_${newLinkId}'`);
+                                    $btn.attr('onclick', newOnclick);
+                                } else if (onclick.includes('deleteREXLink')) {
+                                    const newOnclick = onclick.replace(/deleteREXLink\([^)]+/, `deleteREXLink('${newLinkId}'`);
+                                    $btn.attr('onclick', newOnclick);
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
+        
         // Reinitialize MForm custom link widgets (if mform is available)
         if (typeof mform_custom_link !== 'undefined' && typeof customlink_init_widget === 'function') {
             container.find('.rex-js-widget-customlink .input-group.custom-link').each(function() {
@@ -2567,6 +2960,82 @@ function mblock_reinitialize_redaxo_widgets(container) {
         });
         
         console.log('MBlock: REDAXO widgets reinitialized for new block');
+        
+        // 🔧 REX_LINK Display-Texte nach Widget-Reinitialisierung wiederherstellen
+        if (window.MBlockClipboard && window.MBlockClipboard.data && window.MBlockClipboard.data.formData) {
+            setTimeout(() => {
+                const formData = window.MBlockClipboard.data.formData;
+                Object.keys(formData).forEach(fieldName => {
+                    const fieldData = formData[fieldName];
+                    if (fieldData && fieldData.type === 'rex_link_normal' && fieldData.displayText) {
+                        // Finde das entsprechende Feld im Container
+                        container.find('input[type="hidden"][id^="REX_LINK_"]').each(function() {
+                            const $hiddenField = $(this);
+                            const hiddenName = $hiddenField.attr('name');
+                            if (hiddenName === fieldName && $hiddenField.val() === fieldData.value) {
+                                let $displayField;
+                                
+                                if (fieldData.isCorePowered && fieldData.nameFieldName) {
+                                    // REDAXO Core Style: input[name="REX_LINK_NAME[X]"]
+                                    $displayField = container.find('input[name="' + fieldData.nameFieldName + '"]');
+                                } else {
+                                    // MForm Style: input[id="REX_LINK_X_NAME"]
+                                    const hiddenId = $hiddenField.attr('id');
+                                    const nameId = hiddenId + '_NAME';
+                                    $displayField = $('#' + nameId);
+                                }
+                                
+                                if ($displayField && $displayField.length && (!$displayField.val() || $displayField.val() === '')) {
+                                    if (fieldData.displayText) {
+                                        $displayField.val(fieldData.displayText);
+                                        console.log('MBlock: REX_LINK Display Text post-widget wiederhergestellt:', fieldData.displayText, 'für', 
+                                            $displayField.attr('id') || $displayField.attr('name'), fieldData.isCorePowered ? '(Core)' : '(HTML)');
+                                    } else {
+                                        // Per AJAX holen falls kein Display-Text im Cache
+                                        mblock_fetch_article_name(fieldData.value, $displayField);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+            }, 100); // Erstes Delay nach Widget-Reinitialisierung
+            
+            // 🔧 AGGRESSIVER Post-Widget Fix: Mehrere Versuche mit steigenden Delays
+            [200, 500, 1000].forEach((delay, index) => {
+                setTimeout(() => {
+                    const formData = window.MBlockClipboard.data.formData;
+                    Object.keys(formData).forEach(fieldName => {
+                        const fieldData = formData[fieldName];
+                        if (fieldData && fieldData.type === 'rex_link_normal' && fieldData.value) {
+                            container.find('input[type="hidden"][id^="REX_LINK_"]').each(function() {
+                                const $hiddenField = $(this);
+                                const hiddenName = $hiddenField.attr('name');
+                                if (hiddenName === fieldName && $hiddenField.val() === fieldData.value) {
+                                    let $displayField;
+                                    
+                                    if (fieldData.isCorePowered && fieldData.nameFieldName) {
+                                        $displayField = container.find('input[name="' + fieldData.nameFieldName + '"]');
+                                    } else {
+                                        const hiddenId = $hiddenField.attr('id');
+                                        const nameId = hiddenId + '_NAME';
+                                        $displayField = $('#' + nameId);
+                                    }
+                                    
+                                    if ($displayField && $displayField.length && (!$displayField.val() || $displayField.val() === '')) {
+                                        const displayText = fieldData.displayText || window.mblock_article_cache?.[fieldData.value] || 'Artikel [' + fieldData.value + ']';
+                                        $displayField.val(displayText);
+                                        $displayField.trigger('change');
+                                        console.log(`MBlock: AGGRESSIVER REX_LINK Fix (Versuch ${index + 2}):`, displayText, 'für', $displayField.attr('id'));
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }, delay);
+            });
+        }
+        
         return true;
         
     } catch (error) {
@@ -2625,5 +3094,175 @@ function mblock_smooth_scroll_to_element(element, options = {}) {
         } catch (fallbackError) {
             console.warn('MBlock: Smooth scroll nicht verfügbar:', fallbackError);
         }
+    }
+}
+
+// 🔧 AJAX-Funktion zum Holen von Artikel-Namen für REX_LINK Felder
+function mblock_fetch_article_name(articleId, $displayField) {
+    if (!articleId || !$displayField || !$displayField.length) return;
+    
+    // Cache für bereits geladene Artikel-Namen
+    if (!window.mblock_article_cache) {
+        window.mblock_article_cache = {};
+    }
+    
+    // Aus Cache verwenden falls vorhanden
+    if (window.mblock_article_cache[articleId]) {
+        $displayField.val(window.mblock_article_cache[articleId]);
+        console.log('MBlock: Artikel-Name aus Cache:', window.mblock_article_cache[articleId], 'für ID:', articleId);
+        return;
+    }
+    
+    // AJAX-Request an REDAXO Structure Linkmap
+    const currentClang = $('input[name="clang"]').val() || 1;
+    const ajaxUrl = rex.backend + '?page=structure/linkmap&opener_input_field=temp&article_id=' + articleId + '&clang=' + currentClang;
+    
+    $.ajax({
+        url: ajaxUrl,
+        method: 'GET',
+        timeout: 5000,
+        success: function(response) {
+            // Artikel-Name aus Response extrahieren
+            let articleName = '';
+            
+            // Verschiedene Patterns versuchen
+            const patterns = [
+                /<a[^>]+onclick="[^"]*selectLink[^"]*"[^>]*>([^<]+)</gi,
+                /<span[^>]*class="[^"]*article[^"]*"[^>]*>([^<]+)</gi,
+                /article_name['"]*:\s*['"]([^'"]+)['"]/gi,
+                /"name"\s*:\s*"([^"]+)"/gi
+            ];
+            
+            for (const pattern of patterns) {
+                const match = pattern.exec(response);
+                if (match && match[1] && match[1].trim()) {
+                    articleName = match[1].trim();
+                    break;
+                }
+            }
+            
+            // Fallback: ID mit Artikel-Prefix verwenden
+            if (!articleName) {
+                articleName = 'Artikel [' + articleId + ']';
+            }
+            
+            // In Cache speichern und Display-Feld setzen
+            window.mblock_article_cache[articleId] = articleName;
+            $displayField.val(articleName);
+            $displayField.trigger('change');
+            
+            console.log('MBlock: Artikel-Name per AJAX geholt:', articleName, 'für ID:', articleId);
+        },
+        error: function() {
+            // Fallback bei AJAX-Fehler
+            const fallbackName = 'Artikel [' + articleId + ']';
+            window.mblock_article_cache[articleId] = fallbackName;
+            $displayField.val(fallbackName);
+            
+            console.log('MBlock: Artikel-Name Fallback verwendet:', fallbackName, 'für ID:', articleId);
+        }
+    });
+}
+
+// 🚀 AUTO-INITIALIZATION: Befülle leere REX_LINK Display-Felder beim Seitenladen
+$(document).ready(function() {
+    // Warte bis REDAXO vollständig geladen ist
+    setTimeout(function() {
+        mblock_initialize_empty_rex_link_fields();
+    }, 500);
+    
+    // 🔧 TAB-SUPPORT: Initialisiere REX_LINK-Felder wenn Tabs gewechselt werden
+    $(document).on('shown.bs.tab', function(e) {
+        // Verzögere die Initialisierung, da Tab-Inhalte Zeit brauchen um sichtbar zu werden
+        setTimeout(function() {
+            console.log('MBlock: Bootstrap Tab gewechselt - initialisiere REX_LINK-Felder...');
+            mblock_initialize_empty_rex_link_fields();
+        }, 100);
+    });
+    
+    // Alternative für verschiedene Tab-Systeme (Bootstrap 3/4/5 + MForm)
+    $(document).on('click', '.nav-tabs a, .nav-pills a, [data-toggle="tab"], [data-bs-toggle="tab"], .mform-tabs a', function() {
+        setTimeout(function() {
+            console.log('MBlock: Tab-Click erkannt - initialisiere REX_LINK-Felder...');
+            mblock_initialize_empty_rex_link_fields();
+        }, 200);
+    });
+    
+    // 🔧 MForm-spezifische Tab-Events
+    $(document).on('mform:tabChanged mform:tabShow', function(e) {
+        setTimeout(function() {
+            console.log('MBlock: MForm Tab-Event - initialisiere REX_LINK-Felder...');
+            mblock_initialize_empty_rex_link_fields();
+        }, 150);
+    });
+});
+
+// 🔧 Befülle alle leeren REX_LINK Display-Felder mit Artikel-Namen
+function mblock_initialize_empty_rex_link_fields() {
+    try {
+        console.log('MBlock: Initialisiere leere REX_LINK Display-Felder...');
+        let foundFields = 0;
+        let processedFields = 0;
+        
+        // Finde alle REX_LINK Hidden-Inputs mit Werten (auch in versteckten Tabs)
+        $('input[id^="REX_LINK_"]').each(function() {
+            const $hiddenInput = $(this);
+            const hiddenId = $hiddenInput.attr('id');
+            const articleId = $hiddenInput.val();
+            foundFields++;
+            
+            console.log('MBlock: Prüfe REX_LINK Feld:', hiddenId, 'Wert:', articleId, 'Typ:', $hiddenInput.attr('type'));
+            
+            // Nur Hidden Inputs mit Werten bearbeiten (nicht die _NAME Felder)
+            if (hiddenId && !hiddenId.includes('_NAME') && 
+                $hiddenInput.attr('type') === 'hidden' && 
+                articleId && articleId.trim() !== '') {
+                
+                // Finde das zugehörige Display-Feld
+                const displayId = hiddenId + '_NAME';
+                const $displayField = $('#' + displayId);
+                
+                console.log('MBlock: Suche Display-Feld:', displayId, 'gefunden:', $displayField.length, 'aktueller Wert:', $displayField.val());
+                
+                if ($displayField.length) {
+                    const currentDisplayValue = $displayField.val() || '';
+                    
+                    // Nur befüllen wenn das Display-Feld leer ist
+                    if (currentDisplayValue.trim() === '') {
+                        console.log('MBlock: Befülle leeres REX_LINK Display-Feld:', displayId, 'für Artikel:', articleId);
+                        mblock_fetch_article_name(articleId, $displayField);
+                        processedFields++;
+                    } else {
+                        console.log('MBlock: Display-Feld bereits befüllt:', displayId, 'Wert:', currentDisplayValue);
+                    }
+                } else {
+                    console.warn('MBlock: Display-Feld nicht gefunden:', displayId, '(möglicherweise in verstecktem Tab)');
+                }
+            }
+        });
+        
+        console.log('MBlock: REX_LINK Initialisierung abgeschlossen. Gefunden:', foundFields, 'Verarbeitet:', processedFields);
+        
+        // 🔧 ZUSÄTZLICH: Initialisiere auch sichtbare Tabs explizit
+        $('.tab-pane.active input[id^="REX_LINK_"], .tab-content .active input[id^="REX_LINK_"]').each(function() {
+            const $hiddenInput = $(this);
+            const hiddenId = $hiddenInput.attr('id');
+            const articleId = $hiddenInput.val();
+            
+            if (hiddenId && !hiddenId.includes('_NAME') && 
+                $hiddenInput.attr('type') === 'hidden' && 
+                articleId && articleId.trim() !== '') {
+                
+                const displayId = hiddenId + '_NAME';
+                const $displayField = $('#' + displayId);
+                
+                if ($displayField.length && (!$displayField.val() || $displayField.val().trim() === '')) {
+                    console.log('MBlock: Befülle REX_LINK in aktivem Tab:', displayId);
+                    mblock_fetch_article_name(articleId, $displayField);
+                }
+            }
+        });
+    } catch (error) {
+        console.error('MBlock: Fehler beim Initialisieren der REX_LINK Display-Felder:', error);
     }
 }
