@@ -1,7 +1,7 @@
 REDAXO AddOn :: MBlock
 ======
 
-Mit MBlock ist es möglich, innerhalb eines Moduls beliebig viele Datenblöcke zu erzeugen. Diese können dann einfach per But# Online/Offline Check
+Mit MBlock ist es möglich, innerhalb eines Moduls beliebig viele Unerblöcke zu erzeugen. Diese können dann einfach per But# Online/Offline Check
 foreach ($data as $item) {
     if (MBlock::isOnline($item)) {
         // Item ist online
