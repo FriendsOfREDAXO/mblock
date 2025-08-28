@@ -11,7 +11,24 @@ foreach ($data as $item) {
 
 _English:_ MBlock lets you create an unlimited number of data blocks within a single module. These data blocks can be sorted per click or drag & drop. The enhanced version provides copy & paste functionality and an offline/online toggle for individual blocks.
 
-> Please note: The examples are valid for MForm version 8 and higher. MBlock now requires the bloecks addon (^5.2.0) for modern drag & drop functionality. 
+> Please note: The examples are valid for MForm version 8 and higher. MBlock now requires the bloecks addon (^5.2.0) for modern drag & drop functionality.
+
+### 🚨 Hinweis für markitup- und ckeditor-Nutzer 
+
+Copy & Paste funktioniert leider nicht! 
+
+Es sollte in den betreffenden Modulen deaktiviert werden. 
+
+Beispiel 
+```
+echo MBlock::show(1, $form, [
+    'min' => 1,              // Minimale Anzahl Items
+    'max' => 10,             // Maximale Anzahl Items  
+    'template' => 'modern',  // Template-Name
+    'copy_paste' => false,    // Copy & Paste aktivieren
+    'online_offline' => true // Online/Offline Toggle , hidden field muss angelegt sein. 
+]);
+```
 
 ## Features / Funktionen
 
