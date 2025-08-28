@@ -340,18 +340,61 @@ var MBlockClipboard = {
                     // Try to get CKEditor content
                     let content = $editor.val();
                     
-                    // Check if there's a CKEditor instance
+                    // Check if there's a CKEditor5 instance (CKE5 uses different API than CKE4)
                     const editorId = $editor.attr('id');
-                    if (editorId && window.CKEDITOR && window.CKEDITOR.instances[editorId]) {
-                        content = window.CKEDITOR.instances[editorId].getData();
+                    
+                    console.log('MBlock Copy: Checking CKEditor', {
+                        editorId: editorId,
+                        name: name,
+                        textareaValue: content,
+                        ckeditorsAvailable: typeof ckeditors !== 'undefined',
+                        ckeditorInstance: (typeof ckeditors !== 'undefined' && ckeditors[editorId]) ? 'found' : 'not found'
+                    });
+                    
+                    // Try CKEditor5 first (global ckeditors object)
+                    if (editorId && typeof ckeditors !== 'undefined' && ckeditors[editorId]) {
+                        try {
+                            const editorData = ckeditors[editorId].getData();
+                            console.log('MBlock Copy: CKEditor5 data retrieved:', editorData.substring(0, 100) + '...');
+                            content = editorData;
+                        } catch (e) {
+                            console.warn('MBlock: Fehler beim Lesen der CKEditor5-Daten:', e);
+                        }
                     }
+                    // Fallback to CKEditor4 if available
+                    else if (editorId && window.CKEDITOR && window.CKEDITOR.instances[editorId]) {
+                        try {
+                            const editorData = window.CKEDITOR.instances[editorId].getData();
+                            console.log('MBlock Copy: CKEditor4 data retrieved:', editorData.substring(0, 100) + '...');
+                            content = editorData;
+                        } catch (e) {
+                            console.warn('MBlock: Fehler beim Lesen der CKEditor4-Daten:', e);
+                        }
+                    }
+                    // If no editor instance found, try to get content from the next DOM element (CKEditor container)
+                    else {
+                        const $ckContainer = $editor.next('.ck-editor');
+                        if ($ckContainer.length) {
+                            const $editable = $ckContainer.find('.ck-editor__editable');
+                            if ($editable.length) {
+                                content = $editable.html() || content;
+                                console.log('MBlock Copy: Content from DOM:', content.substring(0, 100) + '...');
+                            }
+                        }
+                    }
+                    
+                    console.log('MBlock Copy: Final content for', name, ':', content.substring(0, 100) + '...');
                     
                     formData[name] = {
                         type: 'ckeditor',
                         value: content,
+                        editorId: editorId,
                         config: {
                             lang: $editor.attr('data-lang'),
-                            profile: $editor.attr('data-profile')
+                            profile: $editor.attr('data-profile'),
+                            'content-lang': $editor.attr('data-content-lang'),
+                            'min-height': $editor.attr('data-min-height'),
+                            'max-height': $editor.attr('data-max-height')
                         }
                     };
                 }
@@ -495,15 +538,52 @@ var MBlockClipboard = {
                 mblock_reinitialize_redaxo_widgets(pastedItem);
             }
             
-            // Restore form values from clipboard with enhanced data restoration
+            // Destroy existing CKEditor5 instances before reindexing
+            pastedItem.find('.cke5-editor').each(function() {
+                const $textarea = $(this);
+                const editorId = $textarea.attr('id');
+                
+                if (editorId && typeof ckeditors !== 'undefined' && ckeditors[editorId]) {
+                    console.log('MBlock: Destroying CKEditor5 instance before reinit:', editorId);
+                    try {
+                        ckeditors[editorId].destroy();
+                        delete ckeditors[editorId];
+                    } catch (e) {
+                        console.warn('MBlock: Error destroying CKEditor5:', e);
+                    }
+                }
+                
+                // Remove CKEditor DOM elements
+                $textarea.next('.ck-editor').remove();
+                $textarea.show(); // Show textarea again
+            });
+            
+            // Store CKEditor content in textareas for rex:ready restoration
             if (this.data.formData) {
-                this.restoreComplexFormData(pastedItem, this.data.formData);
+                Object.keys(this.data.formData).forEach(originalName => {
+                    const fieldData = this.data.formData[originalName];
+                    
+                    if (fieldData && fieldData.type === 'ckeditor') {
+                        // Find the new textarea and set content
+                        let $field = pastedItem.find(`[name="${originalName}"], [name="mblock_new_${originalName}"]`);
+                        if ($field.length && fieldData.value) {
+                            $field.val(fieldData.value);
+                            console.log('MBlock: Set CKEditor content in textarea:', $field.attr('id'), fieldData.value.substring(0, 50) + '...');
+                        }
+                    }
+                });
+            }
+            
+            // Restore NON-CKEditor form values
+            if (this.data.formData) {
+                this.restoreNonCKEditorFormData(pastedItem, this.data.formData);
             }
             
             // Reinitialize sortable
             mblock_init_sort(element);
             
-            // Trigger rex:ready event
+            // Trigger rex:ready event for full reinitialization (including CKEditor5)
+            // The global rex:cke5IsInit listener will handle automatic sync
             pastedItem.trigger('rex:ready', [pastedItem]);
             
             // Component reinitialization
@@ -586,13 +666,254 @@ var MBlockClipboard = {
             item.find('[id]').each(function() {
                 const $el = $(this);
                 const id = $el.attr('id');
-                if (id && !id.match(/^REX_/)) {
+                // Keep CKEditor and REX widget IDs - they need proper reindexing
+                if (id && !id.match(/^(REX_|ck)/)) {
                     $el.removeAttr('id');
                 }
             });
             
         } catch (error) {
             console.error('MBlock: Fehler beim Bereinigen des eingefügten Items:', error);
+        }
+    },
+
+    restoreNonCKEditorFormData: function(pastedItem, formData) {
+        try {
+            Object.keys(formData).forEach(originalName => {
+                const fieldData = formData[originalName];
+                
+                if (!fieldData || typeof fieldData !== 'object') return;
+                if (fieldData.type === 'ckeditor') return; // Skip CKEditor fields
+                
+                // Find field by smart matching
+                let $field = pastedItem.find(`[name="${originalName}"], [name="mblock_new_${originalName}"]`);
+                
+                if (!$field.length) {
+                    return;
+                }
+                
+                // Handle different field types (except ckeditor)
+                this.restoreFieldData($field, fieldData, pastedItem, originalName);
+            });
+        } catch (error) {
+            console.error('MBlock: Fehler beim Wiederherstellen der Nicht-CKEditor-Daten:', error);
+        }
+    },
+
+    restoreCKEditorFormData: function(pastedItem, formData) {
+        try {
+            Object.keys(formData).forEach(originalName => {
+                const fieldData = formData[originalName];
+                
+                if (!fieldData || typeof fieldData !== 'object') return;
+                if (fieldData.type !== 'ckeditor') return; // Only CKEditor fields
+                
+                // Find field by smart matching
+                let $field = pastedItem.find(`[name="${originalName}"], [name="mblock_new_${originalName}"]`);
+                
+                if (!$field.length) {
+                    return;
+                }
+                
+                // Handle CKEditor field
+                this.restoreFieldData($field, fieldData, pastedItem, originalName);
+            });
+        } catch (error) {
+            console.error('MBlock: Fehler beim Wiederherstellen der CKEditor-Daten:', error);
+        }
+    },
+
+    restoreFieldData: function($field, fieldData, pastedItem, originalName) {
+        // Handle different field types
+        switch (fieldData.type) {
+            case 'checkbox_radio':
+                $field.val(fieldData.value);
+                $field.prop('checked', fieldData.checked);
+                if (fieldData.defaultValue) {
+                    $field.attr('value', fieldData.defaultValue);
+                }
+                break;
+                
+            case 'select':
+                // Restore select HTML if needed
+                if (fieldData.html) {
+                    $field.html(fieldData.html);
+                }
+                $field.val(fieldData.value);
+                break;
+                
+            case 'ckeditor':
+                console.log('MBlock Restore: Processing CKEditor field', originalName, 'with content:', fieldData.value.substring(0, 100) + '...');
+                
+                if (fieldData.value) {
+                    // Always set the textarea value first
+                    $field.val(fieldData.value);
+                    
+                    // Store the data for later initialization
+                    const editorId = $field.attr('id');
+                    if (editorId) {
+                        console.log('MBlock Restore: Setting up restoration for editor', editorId);
+                        
+                        // Enhanced restoration with multiple attempts and immediate check
+                        const restoreCKE5Content = function(attempt = 0) {
+                            const maxAttempts = 15; // Reduced from 25 to 15
+                            
+                            console.log('MBlock Restore: Attempt', attempt + 1, 'for editor', editorId);
+                            
+                            // Try CKEditor5 first
+                            if (typeof ckeditors !== 'undefined' && ckeditors[editorId]) {
+                                try {
+                                    ckeditors[editorId].setData(fieldData.value);
+                                    console.log('✅ MBlock Restore: CKEditor5 content restored for', editorId);
+                                    return;
+                                } catch (e) {
+                                    console.warn('MBlock Restore: Failed to restore CKEditor5 content:', e);
+                                }
+                            }
+                            // Fallback to CKEditor4
+                            else if (window.CKEDITOR && window.CKEDITOR.instances[editorId]) {
+                                try {
+                                    window.CKEDITOR.instances[editorId].setData(fieldData.value);
+                                    console.log('✅ MBlock Restore: CKEditor4 content restored for', editorId);
+                                    return;
+                                } catch (e) {
+                                    console.warn('MBlock Restore: Failed to restore CKEditor4 content:', e);
+                                }
+                            }
+                            
+                            // If editor is not ready yet and we haven't exceeded max attempts
+                            if (attempt < maxAttempts) {
+                                setTimeout(() => restoreCKE5Content(attempt + 1), 300); // Increased delay
+                            } else {
+                                console.warn('❌ MBlock Restore: Timeout restoring content for', editorId, 'after', maxAttempts, 'attempts');
+                            }
+                        };
+                        
+                        // Start the restoration process with initial delay
+                        setTimeout(() => restoreCKE5Content(0), 100);
+                    }
+                }
+                break;
+                
+            case 'rex_link':
+                // REX_LINK handling code (moved from restoreComplexFormData)
+                if (fieldData.value !== undefined) {
+                    $field.val(fieldData.value);
+                    
+                    // Find and restore display field
+                    const $displayField = pastedItem.find('#' + fieldData.displayId);
+                    if (!$displayField.length) {
+                        // Fallback: find by pattern matching if ID changed
+                        const fieldId = $field.attr('id');
+                        if (fieldId) {
+                            const $displayFieldFallback = pastedItem.find('#' + fieldId + '_NAME');
+                            if ($displayFieldFallback.length) {
+                                if (fieldData.displayValue) {
+                                    $displayFieldFallback.val(fieldData.displayValue);
+                                } else if (fieldData.value) {
+                                    // Auto-fetch article name if display value is missing
+                                    mblock_fetch_article_name(fieldData.value, $displayFieldFallback);
+                                }
+                            }
+                        }
+                    } else {
+                        if (fieldData.displayValue) {
+                            $displayField.val(fieldData.displayValue);
+                        } else if (fieldData.value) {
+                            // Auto-fetch article name if display value is missing
+                            mblock_fetch_article_name(fieldData.value, $displayField);
+                        }
+                    }
+                    
+                    // Restore button onclick handlers
+                    if (fieldData.buttonOnclicks) {
+                        const $linkContainer = $field.closest('.input-group');
+                        if ($linkContainer.length) {
+                            $linkContainer.find('.btn-popup').each(function(index) {
+                                const $btn = $(this);
+                                const onclickKey = 'btn_' + index;
+                                if (fieldData.buttonOnclicks[onclickKey]) {
+                                    let onclick = fieldData.buttonOnclicks[onclickKey];
+                                    
+                                    // Update REX_LINK IDs in onclick handlers
+                                    const newFieldId = $field.attr('id');
+                                    if (newFieldId && fieldData.hiddenId !== newFieldId) {
+                                        onclick = onclick.replace(new RegExp(fieldData.hiddenId, 'g'), newFieldId);
+                                        
+                                        // Also update numeric part for deleteREXLink calls
+                                        const oldNumericId = fieldData.hiddenId.replace('REX_LINK_', '');
+                                        const newNumericId = newFieldId.replace('REX_LINK_', '');
+                                        onclick = onclick.replace(new RegExp("'" + oldNumericId + "'", 'g'), "'" + newNumericId + "'");
+                                    }
+                                    
+                                    $btn.attr('onclick', onclick);
+                                }
+                            });
+                        }
+                    }
+                }
+                break;
+                
+            case 'rex_media':
+                // REX_MEDIA handling code (moved from restoreComplexFormData)
+                if (fieldData.value !== undefined) {
+                    $field.val(fieldData.value);
+                    
+                    // Find and restore display field
+                    const $displayField = pastedItem.find('#' + fieldData.displayId);
+                    if (!$displayField.length) {
+                        // Fallback: find by pattern matching if ID changed
+                        const fieldId = $field.attr('id');
+                        if (fieldId) {
+                            const $displayFieldFallback = pastedItem.find('#' + fieldId + '_NAME');
+                            if ($displayFieldFallback.length && fieldData.displayValue) {
+                                $displayFieldFallback.val(fieldData.displayValue);
+                            }
+                        }
+                    } else {
+                        if (fieldData.displayValue) {
+                            $displayField.val(fieldData.displayValue);
+                        }
+                    }
+                    
+                    // Restore button onclick handlers
+                    if (fieldData.buttonOnclicks) {
+                        const $mediaContainer = $field.closest('.input-group, .rex-js-widget-media');
+                        if ($mediaContainer.length) {
+                            $mediaContainer.find('.btn-popup').each(function(index) {
+                                const $btn = $(this);
+                                const onclickKey = 'btn_' + index;
+                                if (fieldData.buttonOnclicks[onclickKey]) {
+                                    let onclick = fieldData.buttonOnclicks[onclickKey];
+                                    
+                                    // Update REX_MEDIA IDs in onclick handlers
+                                    const newFieldId = $field.attr('id');
+                                    if (newFieldId && fieldData.hiddenId !== newFieldId) {
+                                        onclick = onclick.replace(new RegExp(fieldData.hiddenId, 'g'), newFieldId);
+                                        
+                                        // Also update numeric part for deleteREXMedia calls
+                                        const oldNumericId = fieldData.hiddenId.replace('REX_MEDIA_', '');
+                                        const newNumericId = newFieldId.replace('REX_MEDIA_', '');
+                                        onclick = onclick.replace(new RegExp("'" + oldNumericId + "'", 'g'), "'" + newNumericId + "'");
+                                    }
+                                    
+                                    $btn.attr('onclick', onclick);
+                                }
+                            });
+                        }
+                    }
+                }
+                break;
+                
+            default:
+                // Handle regular input fields
+                if (fieldData.value !== undefined) {
+                    $field.val(fieldData.value);
+                    if (fieldData.placeholder) {
+                        $field.attr('placeholder', fieldData.placeholder);
+                    }
+                }
+                break;
         }
     },
 
@@ -630,15 +951,70 @@ var MBlockClipboard = {
                         break;
                         
                     case 'ckeditor':
+                        console.log('MBlock Restore: Processing CKEditor field', originalName, 'with content:', fieldData.value.substring(0, 100) + '...');
+                        
                         if (fieldData.value) {
+                            // Always set the textarea value first
                             $field.val(fieldData.value);
                             
-                            // If CKEditor instance exists, set data
+                            // Store the data for later initialization
                             const editorId = $field.attr('id');
-                            if (editorId && window.CKEDITOR && window.CKEDITOR.instances[editorId]) {
-                                setTimeout(() => {
-                                    window.CKEDITOR.instances[editorId].setData(fieldData.value);
-                                }, 200);
+                            if (editorId) {
+                                console.log('MBlock Restore: Setting up restoration for editor', editorId);
+                                
+                                // Store CKE5 content for restoration after editor initialization
+                                $field.attr('data-cke5-restore-content', fieldData.value);
+                                
+                                // Restore all configuration attributes
+                                if (fieldData.config) {
+                                    Object.keys(fieldData.config).forEach(attr => {
+                                        if (fieldData.config[attr]) {
+                                            $field.attr('data-' + attr, fieldData.config[attr]);
+                                        }
+                                    });
+                                }
+                                
+                                // Enhanced restoration with multiple attempts and immediate check
+                                const restoreCKE5Content = function(attempt = 0) {
+                                    const maxAttempts = 25; // 5 seconds
+                                    
+                                    console.log('MBlock Restore: Attempt', attempt + 1, 'for editor', editorId);
+                                    
+                                    // Try CKEditor5 first
+                                    if (typeof ckeditors !== 'undefined' && ckeditors[editorId]) {
+                                        try {
+                                            ckeditors[editorId].setData(fieldData.value);
+                                            $field.removeAttr('data-cke5-restore-content');
+                                            console.log('✅ MBlock Restore: CKEditor5 content restored for', editorId);
+                                            return;
+                                        } catch (e) {
+                                            console.warn('MBlock Restore: Failed to restore CKEditor5 content:', e);
+                                        }
+                                    }
+                                    // Fallback to CKEditor4
+                                    else if (window.CKEDITOR && window.CKEDITOR.instances[editorId]) {
+                                        try {
+                                            window.CKEDITOR.instances[editorId].setData(fieldData.value);
+                                            $field.removeAttr('data-cke5-restore-content');
+                                            console.log('✅ MBlock Restore: CKEditor4 content restored for', editorId);
+                                            return;
+                                        } catch (e) {
+                                            console.warn('MBlock Restore: Failed to restore CKEditor4 content:', e);
+                                        }
+                                    }
+                                    
+                                    // If editor is not ready yet and we haven't exceeded max attempts
+                                    if (attempt < maxAttempts) {
+                                        setTimeout(() => restoreCKE5Content(attempt + 1), 200);
+                                    } else {
+                                        console.warn('❌ MBlock Restore: Timeout restoring content for', editorId, 'after', maxAttempts, 'attempts');
+                                        $field.removeAttr('data-cke5-restore-content');
+                                    }
+                                };
+                                
+                                // Start the restoration process immediately and also after a short delay
+                                restoreCKE5Content(0);
+                                setTimeout(() => restoreCKE5Content(0), 500);
                             }
                         }
                         break;
@@ -1495,6 +1871,97 @@ function mblock_initialize_empty_rex_link_fields() {
         console.error('MBlock: Fehler beim Initialisieren der REX_LINK Display-Felder:', error);
     }
 }
+
+// 🔧 CKEditor5 Content Restoration after rex:ready
+$(document).on('rex:ready', function(e, container) {
+    // Restore CKEditor5 content for pasted items
+    container.find('.cke5-editor[data-cke5-restore-content]').each(function() {
+        const $editor = $(this);
+        const editorId = $editor.attr('id');
+        const restoreContent = $editor.attr('data-cke5-restore-content');
+        
+        if (editorId && restoreContent) {
+            console.log('MBlock: Attempting to restore CKEditor5 content for', editorId);
+            
+            // Wait for CKEditor5 to be fully initialized
+            const checkAndRestore = function(attempts = 0) {
+                if (attempts > 20) { // Max 4 seconds (20 * 200ms)
+                    console.warn('MBlock: Timeout restoring CKEditor5 content for', editorId);
+                    $editor.removeAttr('data-cke5-restore-content');
+                    return;
+                }
+                
+                if (typeof ckeditors !== 'undefined' && ckeditors[editorId]) {
+                    try {
+                        ckeditors[editorId].setData(restoreContent);
+                        $editor.removeAttr('data-cke5-restore-content');
+                        console.log('MBlock: Successfully restored CKEditor5 content for', editorId);
+                        return;
+                    } catch (e) {
+                        console.warn('MBlock: Error setting CKEditor5 data:', e);
+                    }
+                }
+                
+                // Try again after a short delay
+                setTimeout(() => checkAndRestore(attempts + 1), 200);
+            };
+            
+            // Start checking after a small initial delay
+            setTimeout(() => checkAndRestore(), 300);
+        }
+    });
+});
+
+// 🔧 Global CKEditor5 Auto-Sync Setup
+// This fixes the main issue: CKEditor5 doesn't sync changes back to textarea automatically
+$(document).on('rex:cke5IsInit', function(e, editor, editorId) {
+    try {
+        const textarea = document.querySelector('#' + editorId);
+        if (textarea && editor) {
+            console.log('MBlock: Setting up auto-sync for CKEditor5:', editorId);
+            
+            // Remove any existing sync to prevent duplicates
+            if (editor._mblockSyncSetup) return;
+            editor._mblockSyncSetup = true;
+            
+            // 1. Sync on every content change
+            editor.model.document.on('change:data', () => {
+                try {
+                    textarea.value = editor.getData();
+                    $(textarea).trigger('change'); // Trigger change event for other scripts
+                } catch (e) {
+                    console.warn('MBlock: Error syncing CKEditor5 data on change:', e);
+                }
+            });
+            
+            // 2. Sync on blur (when user clicks elsewhere)
+            editor.editing.view.document.on('blur', () => {
+                try {
+                    textarea.value = editor.getData();
+                    $(textarea).trigger('blur');
+                } catch (e) {
+                    console.warn('MBlock: Error syncing CKEditor5 data on blur:', e);
+                }
+            });
+            
+            // 3. Sync on form submit (most important for saving)
+            const form = textarea.closest('form');
+            if (form) {
+                $(form).on('submit.mblock-cke5-sync', function() {
+                    try {
+                        textarea.value = editor.getData();
+                    } catch (e) {
+                        console.warn('MBlock: Error syncing CKEditor5 data on form submit:', e);
+                    }
+                });
+            }
+            
+            console.log('✅ MBlock: CKEditor5 auto-sync setup complete for', editorId);
+        }
+    } catch (error) {
+        console.error('MBlock: Error setting up CKEditor5 auto-sync:', error);
+    }
+});
 
 // Export for module systems (if used)
 if (typeof module !== 'undefined' && module.exports) {
