@@ -13,7 +13,7 @@ _English:_ MBlock lets you create an unlimited number of data blocks within a si
 
 > Please note: The examples are valid for MForm version 8 and higher. MBlock now requires the bloecks addon (^5.2.0) for modern drag & drop functionality.
 
-### 🚨 Hinweis für markitup- und ckeditor-Nutzer 
+## 🚨 Hinweis für markitup- und ckeditor-Nutzer 
 
 Copy & Paste funktioniert leider nicht! 
 
