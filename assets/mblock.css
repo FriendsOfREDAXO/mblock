@@ -425,7 +425,7 @@ div.sortable-ghost::before {
 }
 
 /* Add Button (Bloecks-Style) */
-.btn.addme {
+.sortitem .btn.addme {
     background: var(--mblock-add-background);
     border-color: var(--mblock-add-border);
     color: var(--mblock-add-color);
@@ -439,7 +439,7 @@ div.sortable-ghost::before {
     text-decoration: none;
 }
 
-.btn.addme:hover:not([disabled]) {
+.sortitem .btn.addme:hover:not([disabled]) {
     background: var(--mblock-add-background-hover);
     border-color: var(--mblock-add-border-hover);
     transform: var(--mblock-add-transform-hover);
@@ -448,12 +448,12 @@ div.sortable-ghost::before {
     text-decoration: none;
 }
 
-.btn.addme:active {
+.sortitem .btn.addme:active {
     transform: translateY(0);
     box-shadow: 0 2px 6px rgba(40, 167, 69, 0.4);
 }
 
-.btn.addme[disabled] {
+.sortitem .btn.addme[disabled] {
     background: #6c757d;
     border-color: #6c757d;
     opacity: 0.5;
