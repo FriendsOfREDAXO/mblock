@@ -20,15 +20,17 @@ if (rex::isBackend() && is_object(rex::getUser())) {
             return $params->getSubject();
     });
 
-    // Use Sortable.js from bloecks addon (required dependency)
+    // Prefer Bloecks styles if available, but do NOT require bloecks for functionality.
+    // MBlock ships its own Sortable.js and will only load it when bloecks is NOT available.
     $bloecksAddon = rex_addon::get('bloecks');
     if ($bloecksAddon && $bloecksAddon->isAvailable()) {
-        // Use bloecks Sortable.js
-        rex_view::addJsFile($bloecksAddon->getAssetsUrl('js/sortable.min.js'));
-        // Add bloecks CSS for consistent styling
+        // Use bloecks CSS for consistent styling when present. Do NOT auto-load bloecks' Sortable
+        // to avoid duplicate global Sortable registrations.
         rex_view::addCssFile($bloecksAddon->getAssetsUrl('css/bloecks.css'));
+    } else {
+        // Bloecks not available — register our bundled Sortable implementation.
+        rex_view::addJsFile($this->getAssetsUrl('sortable.min.js'));
     }
-    // Note: bloecks Addon is required for MBlock functionality
 
     // 🔧 MBlock JavaScript Asset Management
     // 
