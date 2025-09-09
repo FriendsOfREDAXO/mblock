@@ -132,6 +132,12 @@ function mblock_show_message(message, type = 'warning', duration = 5000) {
         // Fallback to general showToast method
         BLOECKS.showToast(message, type, duration);
     } else {
+        // Use internal toast fallback if available
+        if (typeof MBLOCK_TOAST !== 'undefined' && MBLOCK_TOAST.show) {
+            MBLOCK_TOAST.show(message, type, duration);
+            return;
+        }
+
         // Fallback to console
         if (type === 'error' || type === 'danger') {
             console.error('MBlock:', message);
@@ -140,6 +146,62 @@ function mblock_show_message(message, type = 'warning', duration = 5000) {
         }
     }
 }
+
+// Simple namespaced toast fallback used when BLOECKS toast isn't available
+const MBLOCK_TOAST = (function () {
+    let counter = 0;
+    let container = null;
+
+    function createContainer() {
+        if (container) return container;
+        container = document.createElement('div');
+        container.className = 'mblock-toast-container';
+        container.style.position = 'fixed';
+        container.style.top = '20px';
+        container.style.right = '20px';
+        container.style.zIndex = 99999;
+        container.style.display = 'flex';
+        container.style.flexDirection = 'column';
+        container.style.gap = '8px';
+        document.body.appendChild(container);
+        return container;
+    }
+
+    function show(message, type = 'info', duration = 4000) {
+        try {
+            const cont = createContainer();
+            const id = 'mblock-toast-' + (++counter);
+            const toast = document.createElement('div');
+            toast.id = id;
+            toast.className = 'mblock-toast mblock-toast-' + type;
+            toast.style.minWidth = '180px';
+            toast.style.maxWidth = '420px';
+            toast.style.padding = '10px 14px';
+            toast.style.borderRadius = '4px';
+            toast.style.boxShadow = '0 2px 8px rgba(0,0,0,0.12)';
+            toast.style.background = type === 'error' || type === 'danger' ? '#f8d7da' : (type === 'success' ? '#d4edda' : '#fff3cd');
+            toast.style.color = '#222';
+            toast.style.border = '1px solid rgba(0,0,0,0.06)';
+            toast.style.fontSize = '13px';
+            toast.innerText = message;
+            cont.appendChild(toast);
+
+            setTimeout(() => {
+                try { toast.style.opacity = '0'; toast.style.transition = 'opacity 250ms ease'; } catch (e) {}
+            }, Math.max(50, duration - 250));
+
+            setTimeout(() => {
+                try { if (toast.parentNode) toast.parentNode.removeChild(toast); } catch (e) {}
+            }, duration + 100);
+            return id;
+        } catch (e) {
+            console.warn('MBlock: Toast fallback failed', e);
+            return false;
+        }
+    }
+
+    return { show };
+})();
 
 // 🌍 Helper function to get translated text for toast messages
 function mblock_get_text(key, fallback = '') {
@@ -634,7 +696,7 @@ function mblock_sort_it(element) {
             MBlockSortable.reinitialize(element);
             return true;
         } else {
-            console.error('MBlock: Sortable.js (bloecks Addon) ist erforderlich aber nicht verfügbar');
+            console.error('MBlock: Sortable.js ist nicht verfügbar');
             return false;
         }
         
@@ -1985,6 +2047,24 @@ var MBlockClipboard = {
             // Trigger rex:ready event for full reinitialization (including CKEditor5)
             pastedItem.trigger('rex:ready', [pastedItem]);
             
+            // Ensure nested MBlock wrappers inside pasted content are initialized (compat with gridblock)
+            try {
+                pastedItem.find('.mblock_wrapper').each(function() {
+                    try {
+                        const $nested = $(this);
+                        if ($nested.length) {
+                            // mark as not run so mblock_init will initialize properly
+                            $nested.removeData('mblock_run');
+                            mblock_init($nested);
+                        }
+                    } catch (inner) {
+                        console.warn('MBlock: Fehler beim Initialisieren eines verschachtelten MBlock-Elements:', inner);
+                    }
+                });
+            } catch (e) {
+                console.warn('MBlock: Fehler beim Suchen nach verschachtelten MBlocks im eingefügten Inhalt:', e);
+            }
+
             // Wait for CKEditor5 initialization, then restore content
             if (this.data.formData) {
                 setTimeout(() => {
@@ -2020,14 +2100,9 @@ var MBlockClipboard = {
                 if (pastedItem && pastedItem.length && pastedItem.is(':visible')) {
                     MBlockUtils.animation.addGlowEffect(pastedItem, 'mblock-paste-glow', 1200);
                     
-                    // Use bloecks Toast System for success feedback
-                    if (typeof BLOECKS !== 'undefined' && BLOECKS.fireMBlockToast) {
-                        const message = '✅ ' + mblock_get_text('mblock_toast_paste_success', 'Block erfolgreich eingefügt!');
-                        BLOECKS.fireMBlockToast(message, 'success', 4000);
-                    } else if (typeof BLOECKS !== 'undefined' && BLOECKS.showToast) {
-                        const message = '✅ ' + mblock_get_text('mblock_toast_paste_success', 'Block erfolgreich eingefügt!');
-                        BLOECKS.showToast(message, 'success', 4000);
-                    }
+                    // Centralized success feedback (uses BLOECKS when available, otherwise MBLOCK fallback)
+                    const message = '✅ ' + mblock_get_text('mblock_toast_paste_success', 'Block erfolgreich eingefügt!');
+                    mblock_show_message(message, 'success', 4000);
                 }
             }, 150);
             
@@ -2560,14 +2635,9 @@ var MBlockClipboard = {
         // Visual feedback using centralized animation utility
         MBlockUtils.animation.addGlowEffect(item, 'mblock-copy-glow', 1000);
         
-        // Use bloecks Toast System for additional feedback
-        if (typeof BLOECKS !== 'undefined' && BLOECKS.fireMBlockToast) {
-            const message = '📋 ' + mblock_get_text('mblock_toast_copy_success', 'Block erfolgreich kopiert!');
-            BLOECKS.fireMBlockToast(message, 'success', 3000);
-        } else if (typeof BLOECKS !== 'undefined' && BLOECKS.showToast) {
-            const message = '📋 ' + mblock_get_text('mblock_toast_copy_success', 'Block erfolgreich kopiert!');
-            BLOECKS.showToast(message, 'success', 3000);
-        }
+    // Centralized copy feedback
+    const copyMessage = '📋 ' + mblock_get_text('mblock_toast_copy_success', 'Block erfolgreich kopiert!');
+    mblock_show_message(copyMessage, 'success', 3000);
         
         // Optional: Also give feedback to the copy button if it exists
         const $copyBtn = item.find('.mblock-copy-btn');

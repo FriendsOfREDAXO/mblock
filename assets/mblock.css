@@ -1,3 +1,36 @@
+/* Intelligentes Fallback-System für Copy/Paste-Icons */
+
+/* Falls Bloecks-Addon aktiv ist: HTML rex-icons bevorzugen, CSS-Icons verstecken */
+body.rex-addon-bloecks .mblock-copy-btn::before,
+body.rex-addon-bloecks .mblock-paste-btn::before {
+    display: none !important;
+}
+
+/* Falls Bloecks-Addon nicht aktiv: Font Awesome CSS-Icons als Fallback verwenden */
+.mblock-copy-btn::before {
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    content: '\f0c5'; /* fa-copy */
+    font-size: 16px;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+.mblock-paste-btn::before {
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    content: '\f0ea'; /* fa-paste */
+    font-size: 16px;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+/* Falls rex-icons vorhanden sind: CSS-Icons verstecken um Dopplung zu vermeiden */
+.mblock-copy-btn .rex-icon ~ *::before,
+.mblock-paste-btn .rex-icon ~ *::before,
+.mblock-copy-btn:has(.rex-icon)::before,
+.mblock-paste-btn:has(.rex-icon)::before {
+    display: none !important;
+}
 /* 🎨 MBlock Theme Variables - Customizable Design System
  * ========================================================
  * Diese CSS-Variablen ermöglichen einfache Theme-Anpassungen.
