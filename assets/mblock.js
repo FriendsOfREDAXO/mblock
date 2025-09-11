@@ -90,6 +90,66 @@ const MBlockUtils = {
         }
     },
 
+    // Nested MBlock utilities for GridBlock compatibility
+    nested: {
+        /**
+         * Clean up duplicate elements in nested MBlocks
+         * @param {jQuery} container - Container to clean
+         */
+        cleanupDuplicates(container) {
+            try {
+                if (!container || !container.length) return;
+                
+                container.find('.mblock_wrapper').each(function() {
+                    const $wrapper = $(this);
+                    
+                    // Remove duplicate single-add buttons
+                    const $addButtons = $wrapper.find('> .mblock-single-add');
+                    if ($addButtons.length > 1) {
+                        console.log('MBlock: Removing duplicate single-add buttons');
+                        $addButtons.slice(1).remove(); // Keep first, remove rest
+                    }
+                    
+                    // Remove single-add button if there are sortitems
+                    const $sortItems = $wrapper.find('> .sortitem');
+                    if ($sortItems.length > 0 && $addButtons.length > 0) {
+                        console.log('MBlock: Removing single-add button (sortitems exist)');
+                        $addButtons.remove();
+                    }
+                });
+            } catch (error) {
+                console.error('MBlock: Error cleaning up nested duplicates:', error);
+            }
+        },
+
+        /**
+         * Initialize nested MBlocks safely
+         * @param {jQuery} container - Container with nested MBlocks
+         */
+        initializeNested(container) {
+            try {
+                if (!container || !container.length) return;
+                
+                container.find('.mblock_wrapper').each(function() {
+                    const $nestedWrapper = $(this);
+                    if ($nestedWrapper.length) {
+                        // Clean up first
+                        MBlockUtils.nested.cleanupDuplicates($nestedWrapper.parent());
+                        
+                        // Reset initialization flag
+                        $nestedWrapper.removeData('mblock_run');
+                        
+                        // Initialize
+                        console.log('MBlock: Safe initialization of nested wrapper');
+                        mblock_init($nestedWrapper);
+                    }
+                });
+            } catch (error) {
+                console.error('MBlock: Error initializing nested MBlocks:', error);
+            }
+        }
+    },
+
     // Animation utilities
     animation: {
         addGlowEffect(element, className = 'mblock-copy-glow', duration = 1000) {
@@ -530,6 +590,13 @@ $(document).on('rex:ready', function (e, container) {
                 const $element = $(this);
                 if ($element.length) {
                     try {
+                        // Check if this is a nested initialization to prevent conflicts
+                        const isNestedContext = container.closest('.mblock_wrapper').length > 0;
+                        if (isNestedContext) {
+                            console.log('MBlock: Skipping nested rex:ready initialization (handled by parent)');
+                            return;
+                        }
+                        
                         mblock_init($element);
                     } catch (initError) {
                         console.error('MBlock: Fehler beim Initialisieren eines einzelnen MBlock-Elements:', initError);
@@ -538,7 +605,7 @@ $(document).on('rex:ready', function (e, container) {
                 }
             });
         } else {
-            // Initialize all MBlock elements
+            // Initialize all MBlock elements (global initialization)
             $(mblock).each(function () {
                 const $element = $(this);
                 if ($element.length) {
@@ -558,7 +625,11 @@ function mblock_init(element) {
             return false;
         }
 
-        if (!element.data('mblock_run')) {
+        // Check if element is already initialized
+        const isAlreadyInitialized = element.data('mblock_run');
+        
+        if (!isAlreadyInitialized) {
+            console.log('MBlock: Initializing new MBlock wrapper');
             element.data('mblock_run', 1);
             mblock_sort(element);
             mblock_set_unique_id(element, false);
@@ -568,6 +639,10 @@ function mblock_init(element) {
             if (minValue == 1 && maxValue == 1) {
                 element.addClass('hide_removeadded').addClass('hide_sorthandle');
             }
+        } else {
+            console.log('MBlock: Reinitializing existing MBlock wrapper - cleaning up first');
+            // Remove any duplicate mblock-single-add elements before reinitializing
+            element.find('.mblock-single-add').remove();
         }
         
         mblock_add_plus(element);
@@ -621,14 +696,22 @@ function mblock_sort(element) {
 }
 
 function mblock_add_plus(element) {
-    if (!element.find('> div.sortitem').length) {
-
+    // Only add the "add" button if there are no sortitems AND no existing add button
+    const hasSortItems = element.find('> div.sortitem').length > 0;
+    const hasAddButton = element.find('> div.mblock-single-add').length > 0;
+    
+    if (!hasSortItems && !hasAddButton) {
+        console.log('MBlock: Adding single-add button for empty wrapper');
         element.prepend($($.parseHTML(element.data('mblock-single-add'))));
 
         element.find('> div.mblock-single-add .addme').unbind().bind('click', function () {
             mblock_add_item(element, false);
             $(this).parents('.mblock-single-add').remove();
         });
+    } else if (hasSortItems && hasAddButton) {
+        // Remove add button if there are now sortitems (should not happen but safety check)
+        console.log('MBlock: Removing unnecessary single-add button (items exist)');
+        element.find('> div.mblock-single-add').remove();
     }
 }
 
@@ -1021,8 +1104,12 @@ function mblock_add_item(element, item) {
     // trigger rex:ready event only on the new item for component initialization
     iClone.trigger('rex:ready', [iClone]);
     
-    // specific component reinitialization
+    // CRITICAL: Initialize nested MBlocks BEFORE other components to prevent duplicate initialization
     setTimeout(function() {
+        // Use utility function for safe nested MBlock initialization
+        MBlockUtils.nested.initializeNested(iClone);
+        
+        // specific component reinitialization
         // Initialize selectpicker with REDAXO core method for new items
         if (typeof $.fn.selectpicker === 'function') {
             var selects = iClone.find('select.selectpicker');
@@ -2047,20 +2134,11 @@ var MBlockClipboard = {
             // Trigger rex:ready event for full reinitialization (including CKEditor5)
             pastedItem.trigger('rex:ready', [pastedItem]);
             
-            // Ensure nested MBlock wrappers inside pasted content are initialized (compat with gridblock)
+            // CRITICAL: Handle nested MBlock wrappers inside pasted content (GridBlock compatibility)
             try {
-                pastedItem.find('.mblock_wrapper').each(function() {
-                    try {
-                        const $nested = $(this);
-                        if ($nested.length) {
-                            // mark as not run so mblock_init will initialize properly
-                            $nested.removeData('mblock_run');
-                            mblock_init($nested);
-                        }
-                    } catch (inner) {
-                        console.warn('MBlock: Fehler beim Initialisieren eines verschachtelten MBlock-Elements:', inner);
-                    }
-                });
+                console.log('MBlock Paste: Checking for nested MBlock wrappers');
+                // Use utility function for safe nested MBlock initialization
+                MBlockUtils.nested.initializeNested(pastedItem);
             } catch (e) {
                 console.warn('MBlock: Fehler beim Suchen nach verschachtelten MBlocks im eingefügten Inhalt:', e);
             }
