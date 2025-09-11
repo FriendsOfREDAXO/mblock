@@ -1,6 +1,6 @@
-# MBlock Build System - Modulare Architektur
+# MBlock Build System - Simplified Minification
 
-Automatisierte Kombination und Minification für MBlock JavaScript Assets
+Automatisierte Minification für MBlock JavaScript mit optimaler Performance
 
 ## 🚀 Quick Start
 
@@ -9,32 +9,24 @@ cd build/
 ./build.sh
 ```
 
-## 🏗️ Modulare Architektur (MBlock 5.0)
+## 🏗️ Vereinfachte Build-Architektur
 
-Das Build-System kombiniert **3 modulare JavaScript-Dateien** zu einer optimierten Version:
+Das Build-System erstellt aus der bestehenden `mblock.js` eine optimierte minifizierte Version:
 
-### Module Structure
+### Build Structure
 ```
 ../assets/
-├── mblock-core.js        # 384 Zeilen - Base Utilities & Validation
-├── mblock-management.js  # 1008 Zeilen - DOM Manipulation & Sortable  
-├── mblock-features.js    # 815 Zeilen - Copy/Paste, Online/Offline Toggle
-│
-│ Build Ergebnis:
-├── mblock-combined.js    # ~105 KB - Kombinierte Datei (Zwischenresultat)
-├── mblock.js             # ~105 KB - Development Version (readable)
-├── mblock.min.js         # ~36 KB - Production Version (minifiziert)
-└── mblock.min.js.map     # ~40 KB - Source Map für Debugging
+├── mblock.js         # ~142 KB - Source (Development & Editing)
+├── mblock.min.js     # ~45 KB - Production (minifiziert) ✨
+├── mblock.min.js.map # ~50 KB - Source Map für Debugging
+└── mblock.css        # 🎨 Stylesheet
 ```
 
-### Module Dependencies
-```
-mblock-core.js
-    ↓ (depends on)
-mblock-management.js  
-    ↓ (depends on)
-mblock-features.js
-```
+### Performance Stats
+- **Input:** `mblock.js` (~142 KB)
+- **Output:** `mblock.min.js` (~45 KB)  
+- **Ersparnis:** ~68% kleinere Dateigröße
+- **Build Zeit:** ~200-300ms
 
 ## 📋 Voraussetzungen
 
@@ -61,78 +53,43 @@ mblock-features.js
    npm run build
    ```
 
-## 📊 Build-Ergebnis
-
-### Performance Stats
-- **Input:** 3 modulare Dateien (~105 KB kombiniert)
-- **Output:** `../assets/mblock.min.js` (~36 KB)
-- **Ersparnis:** ~65% kleinere Dateigröße
-- **Source Map:** `../assets/mblock.min.js.map` (~40 KB)
-- **Build Zeit:** ~200-300ms
-
-### Code Improvements
-✅ **~200 Zeilen Redundanz eliminiert**  
-✅ **Reusable Functions** (`MBlockUtils`, `MBlockClipboard`, etc.)  
-✅ **Unified Event Handling** mit Namespace-Management  
-✅ **Better Error Handling** mit konsistenten Patterns  
-✅ **Enhanced REX_LINK/REX_MEDIA Support** für Copy/Paste  
-
 ## ⚙️ Build-Prozess
 
-### 1. Module Combination
+### 1. Source Validation
 ```bash
-🔗 Erstelle kombinierte Datei aus modularen Komponenten...
-   mblock-core.js (384 lines)
-   + mblock-management.js (1008 lines)  
-   + mblock-features.js (815 lines)
-   = mblock-combined.js (105.23 KB)
+📖 Quelldatei gefunden: ../assets/mblock.js
+📏 Quelldatei Größe: 141 KB
 ```
 
-### 2. Development Sync
+### 2. Minification
 ```bash
-🔗 Aktualisiere mblock.js für Entwicklungsmodus...
-   mblock-combined.js → mblock.js
+⚙️ Starte Minification von mblock.js...
+🗜️ Minified Größe: 45.21 KB
+💾 Ersparnis: 96.67 KB (68.13%)
+⏱️ Verarbeitungszeit: 231ms
 ```
 
-### 3. Production Minification
+### 3. Output
 ```bash
-⚙️ Starte Minification der kombinierten Datei...
-   mblock-combined.js → mblock.min.js (36.37 KB, 65.43% Ersparnis)
-   + Source Map erstellt (mblock.min.js.map)
+💾 Minified Datei erstellt: mblock.min.js
+🗺️ Source Map erstellt: mblock.min.js.map
 ```
 
-## 🎯 Asset Loading Modi
+## 🎯 Asset Loading
 
-### boot.php Konfiguration
+Die `boot.php` lädt automatisch die optimierte Version:
+
 ```php
-// Asset-Modus in boot.php
-$assetMode = 'auto'; // Optionen: 'auto', 'modular', 'combined', 'prod'
+// Automatisches Laden der minimizierten Version
+rex_view::addJsFile($this->getAssetsUrl('mblock.min.js'));
+rex_view::addCssFile($this->getAssetsUrl('mblock.css'));
 ```
 
-**Modi:**
-- **`'auto'`** (Standard) - Automatische Erkennung
-  - **Development:** `mblock.js` (kombiniert)
-  - **Production:** `mblock.min.js` (minifiziert)
-  
-- **`'modular'`** - Lädt 3 separate Module (erweiterte Debugging)
-  - `mblock-core.js` → `mblock-management.js` → `mblock-features.js`
-  
-- **`'combined'`** - Immer `mblock.js` (kombiniert, unminifiziert)
-- **`'prod'`** - Immer `mblock.min.js` (minifiziert)
-
-### Asset Loading Logic
-```php
-if (isset($useModular) && $useModular) {
-    // 📦 Load modular files for advanced debugging
-    rex_view::addJsFile($this->getAssetsUrl('mblock-core.js'));
-    rex_view::addJsFile($this->getAssetsUrl('mblock-management.js'));
-    rex_view::addJsFile($this->getAssetsUrl('mblock-features.js'));
-} else {
-    // 📦 Load combined/minified file (standard approach)
-    $jsFile = $useMinified ? 'mblock.min.js' : 'mblock.js';
-    rex_view::addJsFile($this->getAssetsUrl($jsFile));
-}
-```
+**Vorteile:**
+- ✅ **68% kleinere Dateigröße** für bessere Performance
+- ✅ **Source Maps** für einfaches Debugging  
+- ✅ **Automatische Compression** von Console-Ausgaben
+- ✅ **Preserved Function Names** für externe API-Calls
 
 ## 🔧 Preserved Function Names
 
@@ -150,9 +107,7 @@ Diese **kritischen Funktionen** werden nicht umbenannt:
 'MBlockOnlineToggle',
 
 // Utility Functions
-'mblock_smooth_scroll_to_element',
-'mblock_reinitialize_redaxo_widgets',
-'mblock_fetch_article_name'
+'mblock_smooth_scroll_to_element'
 ```
 
 ## 📁 Datei-Struktur
@@ -166,12 +121,8 @@ build/
 └── README.md          # 📖 Diese Datei
 
 ../assets/
-├── mblock-core.js        # 🧩 Modul 1: Base Utilities
-├── mblock-management.js  # 🧩 Modul 2: DOM Management  
-├── mblock-features.js    # 🧩 Modul 3: Advanced Features
-├── mblock-combined.js    # 🔗 Kombinierte Datei (intermediate)
-├── mblock.js            # 🛠️ Development Version
-├── mblock.min.js        # 🚀 Production Version ✨
+├── mblock.js            # 🛠️ Source (bearbeiten hier)
+├── mblock.min.js        # 🚀 Production Version ✨ (automatisch generiert)
 ├── mblock.min.js.map    # 🗺️ Source Map für Debugging
 └── mblock.css           # 🎨 Stylesheet
 ```
@@ -179,20 +130,18 @@ build/
 ## 🎯 NPM Scripts
 
 ```bash
-npm run build     # Modulare Kombination + Minification
+npm run build     # Minification ausführen
 npm run minify    # Alias für build
 npm run clean     # Minified Dateien löschen
 ```
 
-## � Development Workflow
+## 🛠️ Development Workflow
 
 ### Für MBlock-Entwicklung:
 
-1. **Bearbeite modulare Dateien:**
+1. **Bearbeite Source-Datei:**
    ```bash
-   assets/mblock-core.js        # Base utilities
-   assets/mblock-management.js  # DOM manipulation
-   assets/mblock-features.js    # Copy/Paste & widgets
+   assets/mblock.js        # Hauptdatei bearbeiten
    ```
 
 2. **Build nach Änderungen:**
@@ -201,31 +150,22 @@ npm run clean     # Minified Dateien löschen
    ```
 
 3. **Testing:**
-   - Debug-Modus: Nutzt automatisch `mblock.js` (readable)
-   - Production: Nutzt `mblock.min.js` (optimiert)
-
-### Modulare Entwicklung:
-
-Für **erweiterte Debugging-Möglichkeiten** setze in `boot.php`:
-```php
-$assetMode = 'modular'; // Lädt 3 separate JavaScript-Dateien
-```
+   - Production nutzt automatisch `mblock.min.js` (optimiert)
+   - Source Maps ermöglichen Debugging der Original-Zeilen
 
 ## 🚨 Wichtige Hinweise
 
-1. **⚠️ Bearbeite NIE `mblock.js` oder `mblock.min.js` direkt!**
-   - Ändere nur die modularen Dateien (`mblock-*.js`)
-   - Build-System überschreibt kombinierte Dateien
+1. **⚠️ Bearbeite NIE `mblock.min.js` direkt!**
+   - Ändere nur `mblock.js`
+   - Build-System überschreibt minifizierte Datei
 
-2. **🔄 Nach jeder Änderung** an modularen Dateien muss Build ausgeführt werden
+2. **🔄 Nach jeder Änderung** an `mblock.js` muss Build ausgeführt werden
 
 3. **📍 Source Maps** helfen beim Debugging der Production-Version
 
 4. **🔗 Preserved Functions** können weiterhin extern aufgerufen werden
 
-5. **🧩 Module Dependencies** werden automatisch in korrekter Reihenfolge geladen
-
-## � Troubleshooting
+## 🚨 Troubleshooting
 
 ### Build-Fehler beheben:
 ```bash
@@ -236,31 +176,29 @@ node --version  # sollte >= 14.0.0 sein
 rm -rf node_modules
 npm install
 
-# Modulare Dateien validieren
-ls -la ../assets/mblock-*.js  
-# Sollte alle 3 modularen Dateien zeigen
+# Source-Datei validieren
+ls -la ../assets/mblock.js  
+# Sollte mblock.js zeigen
 
 # Manuelle Terser Installation
 npm install terser
 ```
 
-### Syntax-Fehler in modularen Dateien:
+### Syntax-Fehler in Source-Datei:
 ```bash
 # JavaScript-Syntax prüfen
-node -c ../assets/mblock-core.js
-node -c ../assets/mblock-management.js  
-node -c ../assets/mblock-features.js
+node -c ../assets/mblock.js
 ```
 
 ### Asset-Loading-Probleme:
 ```bash
-# boot.php Debug-Info aktivieren
-rex::isDebugMode() // sollte true sein für Development
+# Prüfe ob mblock.min.js existiert
+ls -la ../assets/mblock.min.js
 
-# Asset-Modus prüfen in Browser-Konsole
-console.log(rex.mblock_asset_mode);
+# Browser-Konsole für Debugging
+# Source Maps zeigen Original-Zeilen bei Fehlern
 ```
 
 ---
 
-**💡 Tip:** Nutze `$assetMode = 'modular'` für line-genaues Debugging der JavaScript-Module!
+**💡 Tip:** Die Source Maps ermöglichen es, auch in der minimizierten Production-Version die Original-Zeilennummern zu sehen!
