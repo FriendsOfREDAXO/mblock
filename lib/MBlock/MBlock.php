@@ -268,10 +268,7 @@ class MBlock
      * @author Joachim Doerr
      */
     private static function createOutput(MBlockItem $item, $count, $theme = null)
-    {
-        // Debug: Check if createOutput is called
-        file_put_contents('/tmp/mblock_debug.log', 'createOutput called for count: ' . $count . ' at ' . date('Y-m-d H:i:s') . "\n", FILE_APPEND);
-        
+    {       
         $item->setForm(MBlockSystemButtonReplacer::replaceSystemButtons($item, $count));
         $item->setForm(MBlockCountReplacer::replaceCountKeys($item, $count));
         $item->setForm(MBlockBootstrapReplacer::replaceTabIds($item, $count));
