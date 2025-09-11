@@ -16,8 +16,8 @@ const fs = require('fs');
 const path = require('path');
 const { minify } = require('terser');
 
-// Configuration - Support environment variable for dynamic source file
-const sourceFile = process.env.MBLOCK_SOURCE_FILE || '../assets/mblock.js';
+// Configuration - Use standard mblock.js as source
+const sourceFile = '../assets/mblock.js';
 const outputFile = '../assets/mblock.min.js';
 const sourceMapFile = '../assets/mblock.min.js.map';
 

@@ -179,6 +179,18 @@ body.rex-addon-bloecks .mblock-paste-btn::before {
     padding-top: 60px;
 }
 
+/* Specific icon codes for FontAwesome 6 Regular */
+.rex-icon-copy::before {
+    content: "\f0c5" !important; /* fa-regular fa-copy */
+}
+
+.rex-icon-cut::before {
+    content: "\f0c4" !important; /* fa-regular fa-scissors */
+}
+
+.rex-icon-paste::before {
+    content: "\f0ea" !important; /* fa-regular fa-paste */
+}
 
 /* 🎨 Dark Mode Consistency - REDAXO Dark Theme + Bootstrap 5 */
 body.rex-theme-dark .mblock_wrapper,
