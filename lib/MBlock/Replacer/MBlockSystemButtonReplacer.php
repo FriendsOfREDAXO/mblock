@@ -181,7 +181,9 @@ class MBlockSystemButtonReplacer
                 foreach ($dom->getElementsByTagName('select') as $child) {
                     if (strpos($child->getAttribute('id'), 'REX_MEDIALIST_SELECT_') !== false) {
                         // replace name
-                        $child->setAttribute('name', str_replace($item->getSystemId(), $item->getId(), $child->getAttribute('name')));
+                        if ($item->getSystemId() !== null && $item->getId() !== null) {
+                            $child->setAttribute('name', str_replace($item->getSystemId(), $item->getId(), $child->getAttribute('name')));
+                        }
                         // change id
                         self::replaceId($child, $item);
                         // add options
@@ -311,7 +313,9 @@ class MBlockSystemButtonReplacer
             foreach ($dom->getElementsByTagName('select') as $child) {
                 if (strpos($child->getAttribute('id'), 'REX_LINKLIST_SELECT_') !== false) {
                     // replace name
-                    $child->setAttribute('name', str_replace($item->getSystemId(), $item->getId(), $child->getAttribute('name')));
+                    if ($item->getSystemId() !== null && $item->getId() !== null) {
+                        $child->setAttribute('name', str_replace($item->getSystemId(), $item->getId(), $child->getAttribute('name')));
+                    }
                     // replace id
                     self::replaceId($child, $item);
                     // add options
@@ -395,7 +399,9 @@ class MBlockSystemButtonReplacer
             $item->setSystemId($matches[1]);
             // and replace name attribute
             $replaceName = str_replace(strtoupper('_input'), '', $name);
-            $dom->setAttribute('name', str_replace(array($name, '[' . $item->getSystemId() . ']'), array('REX_INPUT_VALUE', '[' . $item->getValueId() . '][0][' . $replaceName . '_' . $item->getSystemId() . ']'), $dom->getAttribute('name')));
+            if ($item->getSystemId() !== null && $item->getValueId() !== null) {
+                $dom->setAttribute('name', str_replace(array($name, '[' . $item->getSystemId() . ']'), array('REX_INPUT_VALUE', '[' . $item->getValueId() . '][0][' . $replaceName . '_' . $item->getSystemId() . ']'), $dom->getAttribute('name')));
+            }
         }
     }
 
