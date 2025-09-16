@@ -345,65 +345,106 @@ window.mblock_gridblock_hooks.push(function(container) {
 
 MBlock feuert verschiedene Events für erweiterte Integration:
 
-#### Core Events
+#### Tatsächlich verfügbare Events
+
+**⚠️ Wichtiger Hinweis**: Viele dokumentierte MBlock-Events existieren **nicht** im Code! Verwenden Sie nur die folgenden **bestätigten Events**:
 
 ```javascript
-// Block wurde hinzugefügt
-$(document).on('mblock:add', function(e, mblock, element) {
-    console.log('Block hinzugefügt:', element);
+// ✅ Das einzige echte MBlock-Event  
+$(document).on('mblock:change', function(e, element) {
+    console.log('Block-Änderung (Sortierung/Verschiebung):', element);
+    // Wird bei Drag & Drop und Move-Buttons ausgelöst
 });
 
-// Block wurde entfernt
-$(document).on('mblock:remove', function(e, mblock, element) {
-    console.log('Block entfernt:', element);
-});
-
-// Sortierung geändert
-$(document).on('mblock:sort', function(e, mblock, element, ui) {
-    console.log('Sortierung geändert:', element);
-});
-
-// MBlock vollständig initialisiert
-$(document).on('mblock:ready', function(e, mblock) {
-    console.log('MBlock bereit:', mblock);
+// ✅ Standard REDAXO-Event für neue Blöcke
+$(document).on('rex:ready', function(e, container) {
+    if (container) {
+        console.log('Neue Inhalte hinzugefügt:', container);
+        // Wird bei Add-Button und initialer Seitenladung ausgelöst
+    }
 });
 ```
 
-#### Copy & Paste Events
+#### Copy & Paste Detection (über DOM Events)
+
+Da MBlock **keine nativen Copy/Paste Events** hat, verwenden Sie DOM-Events:
 
 ```javascript
-// Element wurde kopiert
-$(document).on('mblock:copy', function(e, mblock, element, data) {
-    console.log('Element kopiert:', data);
-});
-
-// Element wurde eingefügt
-$(document).on('mblock:paste', function(e, mblock, element, data) {
-    console.log('Element eingefügt:', data);
-});
-
-// Zwischenablage wurde geleert
-$(document).on('mblock:clipboard-clear', function(e) {
-    console.log('Zwischenablage geleert');
+// Copy & Paste Detection über DOM-Änderungen
+$(document).on('change input', '.mblock_wrapper textarea, .mblock_wrapper input', function() {
+    const $wrapper = $(this).closest('.mblock_wrapper');
+    if ($wrapper.length) {
+        console.log('Mögliche Copy/Paste Operation erkannt');
+        
+        // Debounce für bessere Performance
+        clearTimeout($wrapper.data('reinit-timeout'));
+        $wrapper.data('reinit-timeout', setTimeout(() => {
+            // Komponenten reinitialisieren
+            reinitializeComponents($wrapper);
+        }, 300));
+    }
 });
 ```
 
-#### Online/Offline Events
+#### ❌ Diese Events existieren NICHT:
+
+- `mblock:add` - **Nicht vorhanden**
+- `mblock:remove` - **Nicht vorhanden**  
+- `mblock:sort` - **Nicht vorhanden**
+- `mblock:ready` - **Nicht vorhanden**
+- `mblock:copy` - **Nicht vorhanden**
+- `mblock:paste` - **Nicht vorhanden**
+- `mblock:clipboard-clear` - **Nicht vorhanden**
+- `mblock:status-change` - **Nicht vorhanden**
+
+#### Korrekte Integration Pattern
 
 ```javascript
-// Status wurde geändert (online/offline)
-$(document).on('mblock:status-change', function(e, mblock, element, status) {
-    console.log('Status geändert zu:', status);
+// Universal MBlock-Integration - funktioniert für alle Szenarien
+$(document).on('rex:ready', function(e, container) {
+    // Neue Blöcke (Add-Button, initiale Ladung)
+    if (container && container.length) {
+        initializeMyComponents(container);
+    }
 });
-```
 
-#### Legacy Events (deprecated)
-
-```javascript
-// Deprecated - verwenden Sie mblock:add stattdessen
-$(document).on('rex:change', function(e) {
-    // Wird in v5.0 entfernt
+$(document).on('mblock:change', function(e, element) {
+    // Sortierte/verschobene Blöcke
+    if (element && element.length) {
+        reinitializeMyComponents(element);
+    }
 });
+
+// Copy & Paste Detection
+$(document).on('change input', '.mblock_wrapper textarea, .mblock_wrapper input', function() {
+    const $wrapper = $(this).closest('.mblock_wrapper');
+    if ($wrapper.length) {
+        debouncedReinit($wrapper);
+    }
+});
+
+function initializeMyComponents(container) {
+    container.find('.my-component').each(function() {
+        const $element = $(this);
+        if (!$element.data('my-component-ready')) {
+            $element.myPlugin();
+            $element.data('my-component-ready', true);
+        }
+    });
+}
+
+function reinitializeMyComponents(container) {
+    // Destroy und Reinit nach Sortierung
+    container.find('.my-component').each(function() {
+        const $element = $(this);
+        $element.removeData('my-component-ready');
+        if (typeof $element.myPlugin === 'function') {
+            $element.myPlugin('destroy'); // Falls unterstützt
+        }
+        $element.myPlugin();
+        $element.data('my-component-ready', true);
+    });
+}
 ```
 
 ### Methoden
@@ -719,21 +760,37 @@ rex_extension::register('REX_FORM_SAVED', function($params) {
 // Custom Event Handler für MBlock-Integration
 $(document).ready(function() {
     
-    // Reagiere auf alle MBlock-Events
-    $(document).on('mblock:add mblock:remove mblock:sort', function(e) {
-        console.log('MBlock Event:', e.type);
+    // ✅ Korrekte MBlock-Events (nur diese existieren!)
+    $(document).on('mblock:change', function(e, element) {
+        console.log('MBlock Sortierung:', e.type);
         
-        // Custom logic nach Block-Änderungen
+        // Custom logic nach Block-Sortierung
         updatePreview();
         saveFormState();
     });
     
-    // Custom Copy & Paste Handler
-    $(document).on('mblock:paste', function(e, mblock, element, data) {
-        // Reinitialisiere Custom-Widgets
-        element.find('.custom-widget').each(function() {
-            // Custom widget initialization
-        });
+    $(document).on('rex:ready', function(e, container) {
+        if (container) {
+            console.log('Neue Blöcke hinzugefügt');
+            updatePreview();
+            saveFormState();
+        }
+    });
+    
+    // ✅ Copy & Paste Detection über DOM-Events
+    $(document).on('change input', '.mblock_wrapper textarea, .mblock_wrapper input', function() {
+        const $wrapper = $(this).closest('.mblock_wrapper');
+        if ($wrapper.length) {
+            console.log('Copy/Paste möglicherweise erkannt');
+            
+            // Reinitialisiere Custom-Widgets nach Copy/Paste
+            setTimeout(() => {
+                $wrapper.find('.custom-widget').each(function() {
+                    // Custom widget initialization
+                    $(this).customWidget();
+                });
+            }, 100);
+        }
     });
 });
 
@@ -827,14 +884,34 @@ $items = MBlock::getDataArray("REX_VALUE[1]");
 ### JavaScript Event Migration
 
 ```javascript
-// Alt (deprecated)
+// ❌ Alt (deprecated) - funktioniert nicht mehr
 $(document).on('rex:change', function() {
-    // Legacy handler
+    // Legacy handler - entfernt
 });
 
-// Neu (v4.x)
+// ❌ Falsche Dokumentation (diese Events existieren nicht!)
 $(document).on('mblock:add mblock:remove mblock:sort', function() {
-    // Modern handler
+    // Diese Events gibt es NICHT im Code!
+});
+
+// ✅ Korrekt (v4.x) - nur diese Events sind verfügbar
+$(document).on('rex:ready', function(e, container) {
+    // Für neue Blöcke (Add-Button)
+    if (container) {
+        // Initialisierung
+    }
+});
+
+$(document).on('mblock:change', function(e, element) {
+    // Für Sortierung/Verschiebung
+    if (element) {
+        // Reinitialisierung
+    }
+});
+
+// Copy/Paste über DOM-Events
+$(document).on('change input', '.mblock_wrapper textarea, .mblock_wrapper input', function() {
+    // Copy/Paste Detection
 });
 ```
 
