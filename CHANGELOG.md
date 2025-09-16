@@ -1,5 +1,36 @@
 # MBlock - REDAXO Addon für Modul-Input-Blöcke
 
+## Version 4.4.0 - 2025-09-16
+
+### Major Performance & Architecture Improvements
+
+#### Modular JavaScript Architecture
+* **Code Modularization**: Split monolithic `mblock.js` (84KB) into three focused modules:
+  - `mblock-core.js`: Base utilities, validation, messaging, and core functions
+  - `mblock-management.js`: DOM manipulation, sortable functionality, and item management
+  - `mblock-features.js`: Advanced features like copy/paste, online/offline toggle, and REDAXO integration
+* **Unified Build System**: New npm-based build pipeline combining modules into single minified file
+* **Performance Optimization**: 62% size reduction (84KB → 32KB minified) while maintaining full functionality
+* **Development Workflow**: Improved maintainability with modular development and automated builds
+
+#### Enhanced Build System
+* **Node.js Build Pipeline**: Modern build system using npm scripts and Terser minification
+* **Watch Mode**: `npm run build:watch` for automatic rebuilding during development
+* **Production Builds**: `npm run full-build` for optimized production assets
+* **Source Maps**: Generated source maps for debugging minified code
+* **Build Scripts**: Comprehensive build configuration in `build/` directory
+
+#### Technical Improvements
+* **API Compatibility**: All existing functions and methods remain unchanged
+* **Backward Compatibility**: No breaking changes for existing REDAXO integrations
+* **Error Handling**: Enhanced error handling in modular architecture
+* **Code Quality**: Improved code organization and maintainability
+
+#### Development Environment
+* **Package Management**: Updated `package.json` with new build dependencies
+* **Version Control**: Optimized `.gitignore` for modular build artifacts
+* **Documentation**: Comprehensive build system documentation and usage examples
+
 ## Version 4.2.0-dev
 
 ### Template System Improvements

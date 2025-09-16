@@ -1,15 +1,15 @@
 #!/bin/bash
 
 #
-# MBlock JavaScript Build Script
-# 
-# Automatisierte Minification für mblock.js
-# Erstellt mblock.min.js für Produktionseinsatz
+# MBlock Modular Build Script
+#
+# Combines modular source files and minifies for production
+# Uses new modular build system with separate core, management, and features modules
 #
 # Usage: ./build.sh
 #
 # @author MBlock Development Team
-# @version 1.0.0
+# @version 2.0.0
 #
 
 set -e  # Exit on any error
@@ -17,8 +17,8 @@ set -e  # Exit on any error
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
-echo "🚀 MBlock Build Process gestartet"
-echo "═══════════════════════════════════"
+echo "🚀 MBlock Modular Build Process gestartet"
+echo "════════════════════════════════════════════"
 
 # Check if Node.js is available
 if ! command -v node &> /dev/null; then
@@ -44,39 +44,53 @@ else
     echo "✅ Dependencies bereits vorhanden"
 fi
 
-# Check if source file exists
-SOURCE_FILE="../assets/mblock.js"
-if [ ! -f "$SOURCE_FILE" ]; then
-    echo "❌ Quelldatei nicht gefunden: $SOURCE_FILE"
-    exit 1
-fi
+# Check if source modules exist
+MODULES=("src/mblock-core.js" "src/mblock-management.js" "src/mblock-features.js")
+for module in "${MODULES[@]}"; do
+    if [ ! -f "$module" ]; then
+        echo "❌ Modul nicht gefunden: $module"
+        exit 1
+    fi
+done
 
-echo "📖 Quelldatei gefunden: $SOURCE_FILE"
+echo "✅ Alle Module gefunden"
 
-# Get file size for statistics
-SOURCE_SIZE=$(stat -f%z "$SOURCE_FILE" 2>/dev/null || stat -c%s "$SOURCE_FILE" 2>/dev/null || echo "unknown")
-echo "📏 Quelldatei Größe: $([ "$SOURCE_SIZE" != "unknown" ] && echo "$((SOURCE_SIZE / 1024)) KB" || echo "unbekannt")"
+# Get source file sizes for statistics
+echo "📊 Modul-Größen:"
+for module in "${MODULES[@]}"; do
+    if [ -f "$module" ]; then
+        SIZE=$(stat -f%z "$module" 2>/dev/null || stat -c%s "$module" 2>/dev/null || echo "unknown")
+        if [ "$SIZE" != "unknown" ]; then
+            echo "   $module: $((SIZE / 1024)) KB"
+        fi
+    fi
+done
 
-echo "⚙️  Starte Minification von mblock.js..."
-# Use the existing mblock.js as source
-node minify.js
+echo ""
+echo "🔧 Kombiniere Module..."
+# Use the new modular build system
+node build-modules.js
 
 # Verify output
-OUTPUT_FILE="../assets/mblock.min.js"
+OUTPUT_FILE="../assets/mblock.js"
 if [ -f "$OUTPUT_FILE" ]; then
-    echo "✅ Build erfolgreich abgeschlossen!"
-    echo ""
-    echo "📁 Output Dateien:"
-    ls -la "$OUTPUT_FILE"* 2>/dev/null || true
-    echo ""
-    echo "🎯 Nächste Schritte:"
-    echo "   1. Teste mblock.min.js in deiner REDAXO-Installation"
-    echo "   2. boot.php lädt automatisch mblock.min.js"
-    echo "   3. Deploye in die Produktion"
+    echo "✅ Kombination erfolgreich abgeschlossen!"
+    ls -la "$OUTPUT_FILE"
 else
-    echo "❌ Build fehlgeschlagen - Output Datei nicht erstellt"
+    echo "❌ Kombination fehlgeschlagen - Output Datei nicht erstellt"
     exit 1
 fi
 
 echo ""
-echo "🎉 MBlock Build Process abgeschlossen!"
+echo "🎯 Nächste Schritte:"
+echo "   1. Teste mblock.js in deiner REDAXO-Installation"
+echo "   2. Führe 'npm run minify' aus für Produktions-Build"
+echo "   3. Oder verwende 'npm run full-build' für alles zusammen"
+echo ""
+echo "💡 Entwicklungs-Tipps:"
+echo "   • Bearbeite die Module in src/ (nicht die kombinierte Datei)"
+echo "   • Verwende 'npm run build:watch' für automatischen Rebuild"
+echo "   • Core-Änderungen erfordern meist Neustart des Browsers"
+
+echo ""
+echo "🎉 MBlock Modular Build Process abgeschlossen!"
