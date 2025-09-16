@@ -70,7 +70,7 @@ async function buildModules() {
             const moduleContent = fs.readFileSync(modulePath, 'utf8');
 
             // Add module separator comment
-            const separator = `\n\n// ==================== ${module.toUpperCase().replace('.JS', ' MODULE')} ====================\n`;
+            const separator = `\n\n// ==================== ${module.replace(/\.js$/i, ' MODULE').toUpperCase()} ====================\n`;
             combinedContent += separator + moduleContent;
         }
 
