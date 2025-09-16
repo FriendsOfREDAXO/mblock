@@ -386,16 +386,6 @@ $(document).on('change input', '.mblock_wrapper textarea, .mblock_wrapper input'
 });
 ```
 
-#### ❌ Diese Events existieren NICHT:
-
-- `mblock:add` - **Nicht vorhanden**
-- `mblock:remove` - **Nicht vorhanden**  
-- `mblock:sort` - **Nicht vorhanden**
-- `mblock:ready` - **Nicht vorhanden**
-- `mblock:copy` - **Nicht vorhanden**
-- `mblock:paste` - **Nicht vorhanden**
-- `mblock:clipboard-clear` - **Nicht vorhanden**
-- `mblock:status-change` - **Nicht vorhanden**
 
 #### Korrekte Integration Pattern
 
