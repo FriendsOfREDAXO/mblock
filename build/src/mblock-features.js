@@ -132,8 +132,8 @@ var MBlockClipboard = {
 
         } catch (error) {
             console.error('MBlock: Fehler beim Anzeigen der Modultyp-Warnung:', error);
-            // Fallback to browser alert
-            alert('Das kopierte Element kann hier nicht eingefügt werden (anderer Modul-Typ).');
+            // Fallback: show minimal notification div
+            $('body').prepend('<div style="background: #f8d7da; color: #721c24; padding: 10px; margin: 10px 0; border: 1px solid #f5c6cb; border-radius: 4px; z-index: 9999;">Das kopierte Element kann hier nicht eingefügt werden (anderer Modul-Typ).</div>');
         }
     },
 
