@@ -13,6 +13,7 @@
     "full-build": "npm run build && npm run minify"
   },
   "devDependencies": {
+    "chokidar": "^3.5.3",
     "terser": "^5.24.0"
   },
   "engines": {
