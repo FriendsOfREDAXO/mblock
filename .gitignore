@@ -7,6 +7,10 @@ yarn-error.log*
 # Build artifacts
 *.map
 
+# Build dependencies (should not be committed)
+build/node_modules/
+build/package-lock.json
+
 # IDE files
 .vscode/
 .idea/
