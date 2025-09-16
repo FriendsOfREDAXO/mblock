@@ -950,7 +950,13 @@ function mblock_fetch_article_name(articleId, $displayField) {
 
     // AJAX-Request an REDAXO Structure Linkmap
     const currentClang = $('input[name="clang"]').val() || 1;
-    const ajaxUrl = rex.backend + '?page=structure/linkmap&opener_input_field=temp&article_id=' + articleId + '&clang=' + currentClang;
+    const params = new URLSearchParams({
+        page: 'structure/linkmap',
+        opener_input_field: 'temp',
+        article_id: articleId,
+        clang: currentClang
+    });
+    const ajaxUrl = rex.backend + '?' + params.toString();
 
     $.ajax({
         url: ajaxUrl,
