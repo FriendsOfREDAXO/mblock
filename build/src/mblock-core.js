@@ -35,7 +35,6 @@ const MBlockUtils = {
         findElement(container, selector) {
             return container?.find ? container.find(selector) : $(selector);
         },
-
         safeRemove(element) {
             if (element?.length) {
                 element.find('*').off('.mblock');
@@ -45,7 +44,6 @@ const MBlockUtils = {
             }
             return false;
         },
-
         createFromHTML(html) {
             return $($.parseHTML(html));
         }
@@ -58,7 +56,6 @@ const MBlockUtils = {
                 element.off(event + namespace).on(event + namespace, handler);
             }
         },
-
         cleanup(element, namespace = '.mblock') {
             if (mblock_validate_element(element) && element.jquery) {
                 element.find('*').off(namespace);
@@ -72,7 +69,6 @@ const MBlockUtils = {
         isDisabled(element) {
             return element.prop('disabled') || element.hasClass('disabled');
         },
-
         toggleDisabled(element, disabled) {
             element.prop('disabled', disabled);
             element.toggleClass('disabled', disabled);
@@ -88,7 +84,6 @@ const MBlockUtils = {
         cleanupDuplicates(container) {
             try {
                 if (!container || !container.length) return;
-                
                 container.find('.mblock_wrapper').each(function() {
                     const $nestedWrapper = $(this);
                     // Remove duplicate initialization
@@ -108,7 +103,6 @@ const MBlockUtils = {
         initializeNested(container) {
             try {
                 if (!container || !container.length) return;
-                
                 container.find('.mblock_wrapper').each(function() {
                     const $nestedWrapper = $(this);
                     if (!$nestedWrapper.data('mblock_initialized')) {
@@ -130,7 +124,6 @@ const MBlockUtils = {
                 setTimeout(() => element.removeClass(className), duration);
             }
         },
-
         flashEffect(element, className = 'mblock-dropped-flash', duration = 600) {
             if (element?.length) {
                 element.addClass(className);
@@ -144,11 +137,9 @@ const MBlockUtils = {
         validElement(element) {
             return mblock_validate_element(element);
         },
-
         rexField(id, type) {
             return id && id.indexOf(`REX_${type}_`) >= 0;
         },
-
         hiddenInput(element) {
             return element.attr('type') === 'hidden';
         }
@@ -182,7 +173,6 @@ function mblock_show_message(message, type = 'warning', duration = 5000) {
 const MBLOCK_TOAST = (function () {
     let counter = 0;
     let container = null;
-
     function createContainer() {
         if (container) return container;
         container = document.createElement('div');
@@ -216,14 +206,12 @@ const MBLOCK_TOAST = (function () {
             toast.style.fontSize = '13px';
             toast.innerText = message;
             cont.appendChild(toast);
-
             setTimeout(() => {
                 if (toast.parentNode) {
                     toast.style.opacity = '0';
                     toast.style.transform = 'translateX(100%)';
                 }
             }, Math.max(50, duration - 250));
-
             setTimeout(() => {
                 if (toast.parentNode) {
                     toast.parentNode.removeChild(toast);
@@ -291,7 +279,6 @@ function mblock_get_text(key, fallback = '') {
     // Get browser language or default to German
     const lang = (navigator.language || 'de').substring(0, 2);
     const langData = translations[key];
-    
     if (langData && langData[lang]) {
         return langData[lang];
     } else if (langData && langData['de']) {
@@ -367,7 +354,6 @@ function checkCopyPasteEnabled() {
         // Method 2: Check for presence of copy/paste buttons in DOM
         const hasCopyButtons = $('.mblock-copy-btn').length > 0;
         const hasToolbar = $('.mblock-copy-paste-toolbar').length > 0;
-        
         return hasCopyButtons || hasToolbar;
         
     } catch (error) {
@@ -397,7 +383,6 @@ function mblock_smooth_scroll_to_element(element, options = {}) {
         offset: -20, // Extra offset from top
         ...options
     };
-    
     try {
         // Modern approach with scrollIntoView
         if ('scrollIntoView' in element) {

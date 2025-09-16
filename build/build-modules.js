@@ -41,9 +41,9 @@ const headerComment = `/**
 /**
  * Main build function
  */
-async function buildModules() {
+async function buildModules(debugMode = false) {
     try {
-        console.log('🔄 MBlock Modular Build gestartet...\n');
+        console.log(`🔄 MBlock Modular Build gestartet${debugMode ? ' (Debug-Modus)' : ''}...\n`);
 
         // Check if source directory exists
         if (!fs.existsSync(sourceDir)) {
@@ -59,6 +59,15 @@ async function buildModules() {
         }
 
         console.log('✅ Alle Module gefunden');
+
+        // Preprocess modules for production (remove console.log statements) unless in debug mode
+        if (!debugMode) {
+            console.log('🔧 Preprocessing für Produktion...');
+            const { preprocess } = require('./preprocess.js');
+            preprocess();
+        } else {
+            console.log('🐛 Debug-Modus: Console.log Statements bleiben erhalten');
+        }
 
         // Read and combine modules
         let combinedContent = headerComment;
@@ -159,7 +168,12 @@ switch (command) {
         clean();
         break;
     case 'watch':
-        buildModules().then(() => watch());
+        buildModules(true).then(() => watch());
+        break;
+    case 'debug':
+        buildModules(true).then(() => {
+            console.log('\n🐛 Debug-Build abgeschlossen (mit console.log Statements)');
+        });
         break;
     default:
         buildModules();

@@ -155,6 +155,7 @@ mblock-features.js:    22 KB (26%)
 - ✅ **Bessere Wartbarkeit** durch klare Trennung
 - ✅ **Automatischer Rebuild** im Watch-Modus
 - ✅ **Source Maps** für einfaches Debugging
+- ✅ **Production Preprocessing** entfernt console.log automatisch
 
 ## 🔧 Technische Details
 

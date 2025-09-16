@@ -23,9 +23,7 @@ var MBlockClipboard = {
     init: function() {
         try {
             const loaded = this.loadFromStorage();
-            if (this.data) {
-                console.log('MBlock: Clipboard initialized with existing data');
-            }
+            if (this.data) {}
         } catch (error) {
             console.warn('MBlock: Fehler beim Initialisieren des Clipboards:', error);
         }
@@ -98,9 +96,7 @@ var MBlockClipboard = {
     toggleStorageMode: function() {
         const oldData = this.data;
         this.clearStorage(); // Clear current storage
-
         this.useSessionStorage = !this.useSessionStorage;
-
         if (oldData) {
             this.data = oldData;
             this.saveToStorage(); // Save to new storage
@@ -205,7 +201,6 @@ var MBlockClipboard = {
             return 'unknown_module';
         }
     },
-
     copy: function(element, item) {
 
         try {
@@ -219,7 +214,6 @@ var MBlockClipboard = {
             const wrapper = item.closest('.mblock_wrapper');
             const moduleType = this.getModuleType(wrapper);
 
-
             // Clone item completely
             const clonedItem = item.clone(true, true);
 
@@ -228,7 +222,6 @@ var MBlockClipboard = {
 
             // Capture comprehensive form data
             const formData = this.captureComplexFormData(item);
-
 
             // Store in clipboard with metadata and form values
             this.data = {
@@ -239,7 +232,6 @@ var MBlockClipboard = {
                 source: element.attr('class') || 'mblock_wrapper'
             };
 
-
             // Visual feedback
             this.showCopiedState(item);
 
@@ -248,7 +240,6 @@ var MBlockClipboard = {
 
             // Update paste button states
             this.updatePasteButtons();
-
             return true;
 
         } catch (error) {
@@ -256,17 +247,14 @@ var MBlockClipboard = {
             return false;
         }
     },
-
     captureComplexFormData: function(item) {
         const formData = {};
-
         try {
             // Regular form elements
             item.find('input, textarea, select').each(function() {
                 const $field = $(this);
                 const name = $field.attr('name');
                 const type = $field.attr('type');
-
                 if (name) {
                     if (type === 'checkbox' || type === 'radio') {
                         formData[name] = {
@@ -307,7 +295,6 @@ var MBlockClipboard = {
                 const $linkInput = $(this);
                 const id = $linkInput.attr('id');
                 const value = $linkInput.val();
-
                 formData[id] = {
                     type: 'rex_link',
                     value: value
@@ -329,7 +316,6 @@ var MBlockClipboard = {
                 const $mediaInput = $(this);
                 const id = $mediaInput.attr('id');
                 const value = $mediaInput.val();
-
                 formData[id] = {
                     type: 'rex_media',
                     value: value
@@ -338,7 +324,6 @@ var MBlockClipboard = {
 
             // Additional field types can be added here...
             // (REX Media widgets, REX Link widgets, etc. - abbreviated for brevity)
-
             return formData;
 
         } catch (error) {
@@ -346,12 +331,10 @@ var MBlockClipboard = {
             return formData;
         }
     },
-
     paste: function(element, afterItem) {
         try {
             // Load fresh data from storage in case it was updated in another tab
             this.loadFromStorage();
-
             if (!this.data) {
                 mblock_show_message(mblock_get_text('mblock_toast_clipboard_empty', 'Keine Daten in der Zwischenablage'), 'warning', 3000);
                 return false;
@@ -361,7 +344,6 @@ var MBlockClipboard = {
             const currentWrapper = element.closest('.mblock_wrapper');
             const currentModuleType = this.getModuleType(currentWrapper);
             const clipboardModuleType = this.data.moduleType || 'unknown_module';
-
             if (currentModuleType !== clipboardModuleType) {
                 this.showModuleTypeMismatchWarning(currentModuleType, clipboardModuleType);
                 return false;
@@ -457,7 +439,6 @@ var MBlockClipboard = {
                 MBlockUtils.animation.flashEffect(pastedItem);
                 mblock_show_message(mblock_get_text('mblock_toast_paste_success', 'Block erfolgreich eingefügt!'), 'success', 3000);
             }, 150);
-
             return true;
 
         } catch (error) {
@@ -465,7 +446,6 @@ var MBlockClipboard = {
             return false;
         }
     },
-
     cleanupPastedItem: function(item) {
         try {
 
@@ -498,7 +478,6 @@ var MBlockClipboard = {
             console.error('MBlock: Fehler beim Bereinigen des eingefügten Items:', error);
         }
     },
-
     restoreNonCKEditorFormData: function(pastedItem, formData) {
         try {
             Object.keys(formData).forEach(originalName => {
@@ -511,7 +490,6 @@ var MBlockClipboard = {
             console.error('MBlock: Fehler beim Wiederherstellen der Nicht-CKEditor-Daten:', error);
         }
     },
-
     restoreCKEditorFormData: function(pastedItem, formData) {
         try {
             Object.keys(formData).forEach(originalName => {
@@ -527,7 +505,6 @@ var MBlockClipboard = {
             console.error('MBlock: Fehler beim Wiederherstellen der CKEditor-Daten:', error);
         }
     },
-
     restoreFieldData: function($field, fieldData, pastedItem, originalName) {
         // Handle different field types
         switch (fieldData.type) {
@@ -536,14 +513,12 @@ var MBlockClipboard = {
                     $field.prop('checked', true);
                 }
                 break;
-
             case 'select':
                 $field.val(fieldData.value);
                 if (typeof $.fn.selectpicker === 'function') {
                     $field.selectpicker('refresh');
                 }
                 break;
-
             case 'rex_link':
                 $field.val(fieldData.value);
                 // Trigger article name fetch if value exists
@@ -555,11 +530,9 @@ var MBlockClipboard = {
                     }
                 }
                 break;
-
             case 'rex_media':
                 $field.val(fieldData.value);
                 break;
-
             default:
                 // Handle regular input fields
                 if (fieldData.value !== undefined) {
@@ -568,7 +541,6 @@ var MBlockClipboard = {
                 break;
         }
     },
-
     showCopiedState: function(item) {
         // Visual feedback using centralized animation utility
         MBlockUtils.animation.addGlowEffect(item, 'mblock-copy-glow', 1000);
@@ -583,10 +555,8 @@ var MBlockClipboard = {
             MBlockUtils.animation.addGlowEffect($copyBtn, 'is-copied', 1000);
         }
     },
-
     updatePasteButtons: function() {
         const hasData = !!this.data;
-
 
         if (hasData) {
             // Prüfe Modulkompatibilität für alle sichtbaren MBlock-Wrapper
@@ -630,11 +600,9 @@ var MBlockClipboard = {
 
             // Find all select elements that have selectpicker class or are inside bootstrap-select wrappers
             const $selectElements = container.find('select.selectpicker, .bootstrap-select select');
-
             $selectElements.each(function() {
                 const $select = $(this);
                 const $wrapper = $select.closest('.bootstrap-select');
-
                 if ($wrapper.length) {
                     // Move select out of wrapper and remove wrapper
                     $wrapper.before($select);
@@ -657,12 +625,10 @@ var MBlockClipboard = {
                 }
             });
 
-
         } catch (error) {
             console.error('MBlock: Error converting selectpicker to plain select:', error);
         }
     },
-
     clear: function() {
         this.data = null;
         this.clearStorage();
@@ -694,7 +660,6 @@ var MBlockOnlineToggle = {
             const isOnline = !item.hasClass('mblock-offline');
             const $toggleBtn = item.find('.mblock-online-toggle');
             const $icon = $toggleBtn.find('i');
-
             if (isOnline) {
                 // Set offline
                 item.addClass('mblock-offline');
@@ -722,12 +687,10 @@ var MBlockOnlineToggle = {
             return false;
         }
     },
-
     setOfflineState: function(item, isOffline) {
         try {
             // Look for existing mblock_offline input (must be defined in template)
             const $offlineInput = item.find('input[name*="mblock_offline"]');
-
             if ($offlineInput.length) {
                 $offlineInput.val(isOffline ? '1' : '0');
             } else {
@@ -739,7 +702,6 @@ var MBlockOnlineToggle = {
             console.error('MBlock: Fehler beim Setzen des Offline-Status:', error);
         }
     },
-
     initializeStates: function(element) {
         try {
 
@@ -748,10 +710,8 @@ var MBlockOnlineToggle = {
                 const $item = $(this);
                 const $offlineInput = $item.find('input[name*="mblock_offline"]');
                 const $toggleBtn = $item.find('.mblock-online-toggle');
-
                 if ($offlineInput.length && $toggleBtn.length) {
                     const isOffline = $offlineInput.val() === '1';
-
                     if (isOffline) {
                         $item.addClass('mblock-offline');
                         $toggleBtn.attr('title', 'Set online');
@@ -765,7 +725,6 @@ var MBlockOnlineToggle = {
                     }
                 }
             });
-
 
         } catch (error) {
             console.error('MBlock: Fehler beim Initialisieren der Online/Offline-States:', error);
@@ -786,7 +745,6 @@ var MBlockOnlineToggle = {
 
             // Find the corresponding mblock_offline input field
             const $offlineInput = item.find('input[name*="mblock_offline"]');
-
             if (!$offlineInput.length) {
                 console.warn('MBlock: No mblock_offline input found for auto-detected toggle');
                 return false;
@@ -848,20 +806,11 @@ function mblock_reinitialize_redaxo_widgets(container) {
         const mblockIndex = parseInt(container.attr('data-mblock_index')) || 1;
         const mblockWrapper = container.closest('.mblock_wrapper');
         const mblockCount = mblockWrapper.find('.sortitem').length || 1;
-        const isGridBlock = container.closest('.gridblock_wrapper').length > 0 || container.hasClass('gridblock-item');
-
-        console.log('MBlock: Widget-Reinitialisierung gestartet', {
-            mblockIndex: mblockIndex,
-            isGridBlock: isGridBlock,
-            containerClass: container.attr('class')
-        });
-
-        // 🔧 REX MEDIA widgets - Enhanced for GridBlock compatibility
+        const isGridBlock = container.closest('.gridblock_wrapper').length > 0 || container.hasClass('gridblock-item');// 🔧 REX MEDIA widgets - Enhanced for GridBlock compatibility
         container.find('input[id^="REX_MEDIA_"]').each(function() {
             const $mediaInput = $(this);
             const originalId = $mediaInput.attr('id');
             const newId = originalId.replace(/_\d+$/, '_' + mblockIndex);
-
             $mediaInput.attr('id', newId);
 
             // Update associated button if it exists
@@ -881,7 +830,6 @@ function mblock_reinitialize_redaxo_widgets(container) {
             const $linkInput = $(this);
             const originalId = $linkInput.attr('id');
             const newId = originalId.replace(/_\d+$/, '_' + mblockIndex);
-
             $linkInput.attr('id', newId);
 
             // Update associated button if it exists
@@ -901,7 +849,6 @@ function mblock_reinitialize_redaxo_widgets(container) {
             const $linklistInput = $(this);
             const originalId = $linklistInput.attr('id');
             const newId = originalId.replace(/_\d+$/, '_' + mblockIndex);
-
             $linklistInput.attr('id', newId);
         });
 
@@ -920,11 +867,7 @@ function mblock_reinitialize_redaxo_widgets(container) {
             if (typeof $.fn.chosen === 'function') {
                 container.find('select').chosen('destroy').chosen();
             }
-        }, 50);
-
-        console.log('MBlock: REDAXO widgets erfolgreich reinitialisiert für', isGridBlock ? 'GridBlock' : 'Standard MBlock');
-
-        return true;
+        }, 50);return true;
 
     } catch (error) {
         console.error('MBlock: Fehler bei der Reinitialisierung der REDAXO Widgets:', error);
@@ -943,9 +886,7 @@ function mblock_fetch_article_name(articleId, $displayField) {
 
     // Aus Cache verwenden falls vorhanden
     if (window.mblock_article_cache[articleId]) {
-        $displayField.val(window.mblock_article_cache[articleId]);
-        console.log('MBlock: Artikel-Name aus Cache:', window.mblock_article_cache[articleId], 'für ID:', articleId);
-        return;
+        $displayField.val(window.mblock_article_cache[articleId]);return;
     }
 
     // AJAX-Request an REDAXO Structure Linkmap
@@ -957,7 +898,6 @@ function mblock_fetch_article_name(articleId, $displayField) {
         clang: currentClang
     });
     const ajaxUrl = rex.backend + '?' + params.toString();
-
     $.ajax({
         url: ajaxUrl,
         method: 'GET',
@@ -973,7 +913,6 @@ function mblock_fetch_article_name(articleId, $displayField) {
                 /article_name['"]*:\s*['"]([^'"]+)['"]/gi,
                 /"name"\s*:\s*"([^"]+)"/gi
             ];
-
             for (const pattern of patterns) {
                 const match = pattern.exec(response);
                 if (match && match[1]) {
@@ -990,18 +929,12 @@ function mblock_fetch_article_name(articleId, $displayField) {
             // In Cache speichern und Display-Feld setzen
             window.mblock_article_cache[articleId] = articleName;
             $displayField.val(articleName);
-            $displayField.trigger('change');
-
-            console.log('MBlock: Artikel-Name per AJAX geholt:', articleName, 'für ID:', articleId);
-        },
+            $displayField.trigger('change');},
         error: function() {
             // Fallback bei AJAX-Fehler
             const fallbackName = 'Artikel [' + articleId + ']';
             window.mblock_article_cache[articleId] = fallbackName;
-            $displayField.val(fallbackName);
-
-            console.log('MBlock: Artikel-Name Fallback verwendet:', fallbackName, 'für ID:', articleId);
-        }
+            $displayField.val(fallbackName);}
     });
 }
 
@@ -1037,9 +970,7 @@ $(document).ready(function() {
 
 // 🔧 Befülle alle leeren REX_LINK Display-Felder mit Artikel-Namen
 function mblock_initialize_empty_rex_link_fields() {
-    try {
-        console.log('MBlock: Initialisiere leere REX_LINK Display-Felder...');
-        let foundFields = 0;
+    try {let foundFields = 0;
         let processedFields = 0;
 
         // Finde alle REX_LINK Hidden-Inputs mit Werten (auch in versteckten Tabs)
@@ -1047,24 +978,18 @@ function mblock_initialize_empty_rex_link_fields() {
             const $linkInput = $(this);
             const linkId = $linkInput.attr('id');
             const articleId = $linkInput.val();
-
             if (articleId && articleId !== '0') {
                 foundFields++;
 
                 // Finde zugehöriges Display-Feld
                 const displayId = linkId.replace('REX_LINK_', 'REX_LINK_NAME_');
                 const $displayField = $('#' + displayId);
-
                 if ($displayField.length && !$displayField.val()) {
                     processedFields++;
                     mblock_fetch_article_name(articleId, $displayField);
                 }
             }
-        });
-
-        console.log('MBlock: REX_LINK Initialisierung abgeschlossen. Gefunden:', foundFields, 'Verarbeitet:', processedFields);
-
-    } catch (error) {
+        });} catch (error) {
         console.error('MBlock: Fehler beim Initialisieren der REX_LINK Display-Felder:', error);
     }
 }
@@ -1076,7 +1001,6 @@ $(document).on('rex:ready', function(e, container) {
         const $editor = $(this);
         const editorId = $editor.attr('id');
         const restoreContent = $editor.attr('data-cke5-restore-content');
-
         if (editorId && restoreContent) {
             if (window.CKEDITOR && window.CKEDITOR.instances[editorId]) {
                 window.CKEDITOR.instances[editorId].setData(restoreContent);

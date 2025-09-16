@@ -24,9 +24,9 @@ const sourceMapFile = '../assets/mblock.min.js.map';
 // Terser options for optimal minification
 const terserOptions = {
     compress: {
-        // Remove console.log statements but keep console.error/warn
-        pure_funcs: ['console.log'],
-        drop_console: false,
+        // Remove console.log statements but keep console.error/warn for debugging
+        pure_funcs: ['console.log', 'console.debug', 'console.info'],
+        drop_console: false, // Keep console.error/warn but remove others
         drop_debugger: true,
         passes: 2,
         unsafe_arrows: true,
@@ -42,39 +42,59 @@ const terserOptions = {
         pure_getters: true,
         keep_fargs: false,
         keep_fnames: false,
-        keep_infinity: true
+        keep_infinity: true,
+        sequences: true,
+        dead_code: true,
+        conditionals: true,
+        comparisons: true,
+        evaluate: true,
+        booleans: true,
+        loops: true,
+        unused: true,
+        toplevel: true
     },
     mangle: {
         // Preserve specific function names that might be called externally
         reserved: [
             'mblock_init',
-            'mblock_init_sort', 
+            'mblock_init_sort',
             'mblock_sort',
             'mblock_add',
             'MBlockClipboard',
             'MBlockOnlineToggle',
-            'mblock_smooth_scroll_to_element'
+            'mblock_smooth_scroll_to_element',
+            'mblock_show_message',
+            'mblock_get_text',
+            'mblock_validate_element',
+            'MBlockUtils'
         ],
         toplevel: true,
         eval: true,
         keep_fnames: false,
-        safari10: true
+        safari10: true,
+        properties: {
+            regex: /^_[A-Z]/ // Preserve private properties starting with underscore
+        }
     },
     format: {
         comments: false, // Remove all comments
         semicolons: true,
         beautify: false,
-        ascii_only: true
+        ascii_only: true,
+        wrap_iife: true,
+        indent_level: 0
     },
     sourceMap: {
         filename: path.basename(outputFile),
-        url: path.basename(sourceMapFile)
+        url: path.basename(sourceMapFile),
+        includeSources: false // Don't include source code in map for smaller size
     },
     toplevel: true,
     ie8: false,
     safari10: true,
     keep_classnames: false,
-    keep_fnames: false
+    keep_fnames: false,
+    module: false
 };
 
 /**

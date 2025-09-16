@@ -41,7 +41,6 @@ const MBlockSortable = {
 
             // Destroy existing instance first
             this.destroy(element);
-
             const sortableOptions = {
                 handle: '.mblock-handle',
                 placeholder: 'mblock-sortable-placeholder',
@@ -53,7 +52,6 @@ const MBlockSortable = {
                 stop: (evt, ui) => this._handleEnd(evt, element),
                 update: (evt, ui) => this._handleUpdate(evt, element)
             };
-
             element.sortable(sortableOptions);
             element.data('sortable', true);
             return true;
@@ -80,7 +78,6 @@ const MBlockSortable = {
             console.warn('MBlock: Error in sort start handler:', error);
         }
     },
-
     _handleEnd(evt, element) {
         try {
             const $item = $(evt.target);
@@ -90,7 +87,6 @@ const MBlockSortable = {
             console.warn('MBlock: Error in sort end handler:', error);
         }
     },
-
     _handleUpdate(evt, element) {
         try {
             mblock_reindex(element);
@@ -123,7 +119,6 @@ $(document).on('rex:ready', function (e, container) {
         console.error('MBlock: Fehler bei rex:ready:', error);
     }
 });
-
 function mblock_init(element) {
     try {
         if (!element || !element.length || typeof element.data !== 'function') {
@@ -133,13 +128,10 @@ function mblock_init(element) {
 
         // Check if element is already initialized
         const isAlreadyInitialized = element.data('mblock_run');
-        
         if (!isAlreadyInitialized) {
             element.data('mblock_run', true);
             mblock_init_sort(element);
-        } else {
-            console.log('MBlock: Element already initialized, skipping');
-            return true;
+        } else {return true;
         }
         
         mblock_add_plus(element);
@@ -198,11 +190,7 @@ function mblock_add_plus(element) {
     // Only add the "add" button if there are no sortitems AND no existing add button
     const hasSortItems = element.find('> div.sortitem').length > 0;
     const hasAddButton = element.find('> div.mblock-single-add').length > 0;
-    
-    if (!hasSortItems && !hasAddButton) {
-        console.log('MBlock: Adding single-add button for empty wrapper');
-        element.prepend($($.parseHTML(element.data('mblock-single-add'))));
-
+    if (!hasSortItems && !hasAddButton) {element.prepend($($.parseHTML(element.data('mblock-single-add'))));
         element.find('> div.mblock-single-add .addme').unbind().bind('click', function () {
             const $wrapper = $(this).closest('.mblock_wrapper');
             mblock_add_item($wrapper, false);
@@ -214,7 +202,6 @@ function mblock_add_plus(element) {
 
 function mblock_remove(element) {
     var found = element.find('> div.sortitem');
-
     if (found.length == 1) {
         found.find('.removeme').prop('disabled', true);
         found.find('.removeme').attr('data-disabled', true);
@@ -312,10 +299,7 @@ function mblock_reindex(element) {
 
         const mblock_count = element.data('mblock_count') || 0;
         const sortItems = element.find('> div.sortitem');
-        
-        if (!sortItems.length) {
-            console.log('MBlock: No sortitems found, skipping reindex');
-            return true;
+        if (!sortItems.length) {return true;
         }
 
         // Performance-Optimierung: Batch DOM-Updates
@@ -336,7 +320,6 @@ function mblock_reindex(element) {
 
         // Nach Reindexierung: for-Attribute korrigieren
         mblock_replace_for(element);
-        
         return true;
     } catch (error) {
         console.error('MBlock: Fehler in mblock_reindex:', error);
@@ -353,7 +336,6 @@ function mblock_reindex_form_elements($sortItem, index, sindex, mblock_count) {
             const $element = $(this);
             const elementId = $element.attr('id');
             const elementName = $element.attr('name');
-            
             if (!elementId && !elementName) return;
             
             // Update IDs and names with new index
@@ -383,7 +365,6 @@ function mblock_update_rex_ids($element, sindex, mblock_count, eindex) {
     try {
         const elementId = $element.attr('id');
         const nodeName = $element.prop('nodeName');
-        
         if (!elementId) return;
 
         // Configuration for different REX field types
@@ -410,7 +391,6 @@ function mblock_update_rex_ids($element, sindex, mblock_count, eindex) {
             cfg.type === nodeName && 
             cfg.patterns.some(pattern => elementId.indexOf(pattern) >= 0)
         );
-
         if (config) {
             const newId = elementId.replace(/_\d+/, '_' + sindex);
             const nameAttr = $element.attr('name')?.replace(/\[(\d+)\]/, '[' + sindex + ']');
@@ -431,7 +411,6 @@ function mblock_update_rex_buttons($element, sindex, mblock_count, eindex) {
         $parent.find('a.btn-popup').each(function () {
             const $button = $(this);
             const onclick = $button.attr('onclick');
-            
             if (onclick) {
                 const newOnclick = onclick.replace(/_\d+/, '_' + sindex);
                 $button.attr('onclick', newOnclick);
@@ -513,7 +492,6 @@ function mblock_add_item(element, item) {
         // fix lost value
         $(this).attr('data-value', $(this).val());
     });
-
     if (item === false) {
         // add clone
         element.prepend(iClone);
@@ -572,7 +550,6 @@ function mblock_set_unique_id(item, input_delete) {
         item.find('input').each(function () {
             const $input = $(this);
             const name = $input.attr('name');
-            
             if (name && input_delete) {
                 // Remove old unique ID from name
                 const cleanName = name.replace(/_unique_\w+/, '');
@@ -596,7 +573,6 @@ function mblock_set_unique_id(item, input_delete) {
 function mblock_set_count(element, item) {
     var countItem = item.next().find('span.mb_count'),
         count = element.find('> div.sortitem').length;
-
     if (element.data('latest')) {
         count = element.data('latest') + 1;
     }
@@ -621,7 +597,6 @@ function mblock_remove_item(element, item) {
 
         const itemParent = item.parent();
         const elementClass = element.attr('class');
-        
         if (itemParent.length && elementClass && itemParent.hasClass(elementClass)) {
             // Remove item safely
             MBlockUtils.dom.safeRemove(item);
@@ -640,7 +615,6 @@ function mblock_remove_item(element, item) {
 function mblock_moveup(element, item) {
     var prev = item.prev();
     if (prev.length == 0) return;
-
     setTimeout(function () {
         item.insertBefore(prev);
         // set last user action
@@ -655,7 +629,6 @@ function mblock_moveup(element, item) {
 function mblock_movedown(element, item) {
     var next = item.next();
     if (next.length == 0) return;
-
     setTimeout(function () {
         item.insertAfter(next);
         // set last user action
@@ -800,7 +773,6 @@ mblock_add._bindCopyPasteHandlers = function(element) {
         });
     }
 };
-
 mblock_add._bindToggleHandlers = function(element) {
     // Online/Offline Toggle Handler (old system)
     const toggleButtons = MBlockUtils.dom.findElement(element, `${MBlockUtils.selectors.sortitem} ${MBlockUtils.selectors.onlineToggle}`);
@@ -840,9 +812,7 @@ mblock_add._bindToggleHandlers = function(element) {
 function mblock_init_toolbar(element) {
     try {
         // Nur initialisieren wenn Copy/Paste aktiviert ist
-        if (!checkCopyPasteEnabled()) {
-            console.log('MBlock: Copy/Paste disabled, skipping toolbar initialization');
-            return;
+        if (!checkCopyPasteEnabled()) {return;
         }
         
         // Centralized toolbar event configuration
