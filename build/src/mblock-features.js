@@ -23,7 +23,6 @@ var MBlockClipboard = {
     init: function() {
         try {
             const loaded = this.loadFromStorage();
-            if (this.data) {}
         } catch (error) {
             console.warn('MBlock: Fehler beim Initialisieren des Clipboards:', error);
         }
@@ -557,7 +556,6 @@ var MBlockClipboard = {
     },
     updatePasteButtons: function() {
         const hasData = !!this.data;
-
         if (hasData) {
             // Prüfe Modulkompatibilität für alle sichtbaren MBlock-Wrapper
             $('.mblock_wrapper').each((index, wrapperElement) => {
@@ -806,7 +804,8 @@ function mblock_reinitialize_redaxo_widgets(container) {
         const mblockIndex = parseInt(container.attr('data-mblock_index')) || 1;
         const mblockWrapper = container.closest('.mblock_wrapper');
         const mblockCount = mblockWrapper.find('.sortitem').length || 1;
-        const isGridBlock = container.closest('.gridblock_wrapper').length > 0 || container.hasClass('gridblock-item');// 🔧 REX MEDIA widgets - Enhanced for GridBlock compatibility
+        // 🔧 REX MEDIA widgets - Enhanced for GridBlock compatibility
+        const isGridBlock = container.closest('.gridblock_wrapper').length > 0 || container.hasClass('gridblock-item');
         container.find('input[id^="REX_MEDIA_"]').each(function() {
             const $mediaInput = $(this);
             const originalId = $mediaInput.attr('id');
