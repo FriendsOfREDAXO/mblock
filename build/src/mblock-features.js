@@ -89,7 +89,7 @@ var MBlockClipboard = {
     // Generate simple session ID
     getSessionId: function() {
         if (!this._sessionId) {
-            this._sessionId = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+            this._sessionId = Date.now().toString() + Math.random().toString(36).substring(2, 11);
         }
         return this._sessionId;
     },
