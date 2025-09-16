@@ -538,6 +538,12 @@ function mblock_add_item(element, item) {
             mblock_smooth_scroll_to_element(iClone.get(0));
         }
     }, 100);
+
+    // ✨ Add glow effect to new item using utility (same as paste effect)
+    setTimeout(() => {
+        MBlockUtils.animation.flashEffect(iClone);
+        mblock_show_message(mblock_get_text('mblock_toast_add_success', 'Block erfolgreich hinzugefügt!'), 'success', 3000);
+    }, 150);
 }
 
 function mblock_set_unique_id(item, input_delete) {
