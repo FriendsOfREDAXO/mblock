@@ -581,7 +581,7 @@ function mblock_set_unique_id(item, input_delete) {
             
             // Add new unique ID
             if (name && !name.includes('_unique_')) {
-                const uniqueId = Date.now() + Math.random().toString(36).substr(2, 9);
+                const uniqueId = Date.now() + Math.random().toString(36).substring(2, 11);
                 const newName = name.replace(/(\w+)(\[.*\])?$/, '$1_unique_' + uniqueId + '$2');
                 $input.attr('name', newName);
             }
