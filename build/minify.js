@@ -178,4 +178,14 @@ if (require.main === module) {
     }
 }
 
-module.exports = { minifyMBlock, sourceFile, outputFile, sourceMapFile, terserOptions };
+// Export the main function and configuration
+module.exports = {
+    minifyMBlock,
+    sourceFile,
+    outputFile,
+    sourceMapFile,
+    terserOptions
+};
+
+// Also export the function directly for easier importing
+module.exports.minifyMBlock = minifyMBlock;
