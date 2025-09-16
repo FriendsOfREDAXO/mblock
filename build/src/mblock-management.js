@@ -213,19 +213,19 @@ function mblock_add_plus(element) {
 }
 
 function mblock_remove(element) {
-    var finded = element.find('> div.sortitem');
+    var found = element.find('> div.sortitem');
 
-    if (finded.length == 1) {
-        finded.find('.removeme').prop('disabled', true);
-        finded.find('.removeme').attr('data-disabled', true);
+    if (found.length == 1) {
+        found.find('.removeme').prop('disabled', true);
+        found.find('.removeme').attr('data-disabled', true);
     } else {
-        finded.find('.removeme').prop('disabled', false);
-        finded.find('.removeme').attr('data-disabled', false);
+        found.find('.removeme').prop('disabled', false);
+        found.find('.removeme').attr('data-disabled', false);
     }
 
     // has data?
     if (element.data().hasOwnProperty('max')) {
-        if (finded.length >= element.data('max')) {
+        if (found.length >= element.data('max')) {
             element.find('.addme').prop('disabled', true);
             element.find('.addme').attr('data-disabled', true);
         } else {
@@ -235,18 +235,18 @@ function mblock_remove(element) {
     }
 
     if (element.data().hasOwnProperty('min')) {
-        if (finded.length <= element.data('min')) {
-            finded.find('.removeme').prop('disabled', true);
-            finded.find('.removeme').attr('data-disabled', true);
+        if (found.length <= element.data('min')) {
+            found.find('.removeme').prop('disabled', true);
+            found.find('.removeme').attr('data-disabled', true);
         } else {
-            finded.find('.removeme').prop('disabled', false);
-            finded.find('.removeme').attr('data-disabled', false);
+            found.find('.removeme').prop('disabled', false);
+            found.find('.removeme').attr('data-disabled', false);
         }
     }
 
-    finded.each(function (index) {
+    found.each(function (index) {
         // min removeme hide
-        if ((index + 1) == element.data('min') && finded.length == element.data('min')) {
+        if ((index + 1) == element.data('min') && found.length == element.data('min')) {
             $(this).find('.removeme').hide();
         }
         if (index == 0) {
@@ -254,7 +254,7 @@ function mblock_remove(element) {
         } else {
             $(this).find('.moveup').prop('disabled', false);
         }
-        if ((index + 1) == finded.length) {
+        if ((index + 1) == found.length) {
             $(this).find('.movedown').prop('disabled', true);
         } else {
             $(this).find('.movedown').prop('disabled', false);
