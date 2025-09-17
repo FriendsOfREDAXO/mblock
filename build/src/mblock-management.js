@@ -355,9 +355,25 @@ function mblock_reindex_form_elements($sortItem, index, sindex, mblock_count) {
             
             // Name-Attribut aktualisieren
             if (attr && typeof attr !== 'undefined') {
-                const nameMatches = attr.match(/\]\[\d+\]\[/g);
-                if (nameMatches) {
-                    const newValue = attr.replace(nameMatches, '][' + index + '][').replace('mblock_new_', '');
+                let newValue = attr;
+                
+                // Entferne zuerst 'mblock_new_' Prefix
+                newValue = newValue.replace('mblock_new_', '');
+                
+                // Behandle REX_MEDIALIST_SELECT[x] und REX_LINKLIST_SELECT[x] Pattern
+                if (newValue.match(/REX_(MEDIALIST|LINKLIST)_SELECT\[\d+\]$/)) {
+                    newValue = newValue.replace(/\[\d+\]$/, '[' + index + ']');
+                }
+                // Behandle normale Formularelement Pattern wie REX_INPUT_VALUE[1][0][name]
+                else {
+                    const nameMatches = newValue.match(/\]\[\d+\]\[/g);
+                    if (nameMatches) {
+                        newValue = newValue.replace(nameMatches, '][' + index + '][');
+                    }
+                }
+                
+                // Aktualisiere nur wenn sich etwas geändert hat
+                if (newValue !== attr) {
                     $element.attr('name', newValue);
                 }
             }
@@ -395,40 +411,35 @@ function mblock_update_rex_ids($element, sindex, mblock_count, eindex) {
         const nodeName = $element.prop('nodeName');
         if (!elementId) return;
 
-        // Configuration for different REX field types
-        const rexConfigs = [
-            {
-                type: 'SELECT',
-                patterns: ['REX_MEDIALIST_SELECT_', 'REX_LINKLIST_SELECT_'],
-                handler: (newId, nameAttr) => {
-                    $element.parent().data('eindex', eindex);
-                    $element.attr('id', newId);
-                    if (nameAttr) {
-                        $element.attr('name', nameAttr.replace(/_\d+/, '_' + sindex + mblock_count + '00' + eindex));
-                    }
-                }
-            },
-            {
-                type: 'INPUT',
-                patterns: ['REX_MEDIA_', 'REX_LINKLIST_', 'REX_MEDIALIST_'],
-                handler: (newId) => {
-                    const parentEindex = $element.parent().data('eindex') || eindex;
-                    const actualNewId = elementId.replace(/\d+/, sindex + mblock_count + '00' + parentEindex);
-                    $element.attr('id', actualNewId);
-                    mblock_update_rex_buttons($element, sindex, mblock_count, parentEindex);
+        // Generate consistent suffix for all REX elements in same widget
+        const widgetSuffix = sindex + mblock_count + '00' + eindex;
+        
+        // Handle REX SELECT elements (MEDIALIST_SELECT, LINKLIST_SELECT)
+        if (nodeName === 'SELECT' && (elementId.includes('REX_MEDIALIST_SELECT_') || elementId.includes('REX_LINKLIST_SELECT_'))) {
+            const newId = elementId.replace(/_\d+$/, '_' + widgetSuffix);
+            $element.attr('id', newId);
+            
+            // Store widget suffix for corresponding INPUT elements
+            $element.closest('.rex-js-widget-medialist, .rex-js-widget-linklist, .form-group').data('widget-suffix', widgetSuffix);
+            return;
+        }
+        
+        // Handle REX INPUT elements (MEDIA, MEDIALIST, LINKLIST)  
+        if (nodeName === 'INPUT' && (elementId.includes('REX_MEDIA_') || elementId.includes('REX_MEDIALIST_') || elementId.includes('REX_LINKLIST_'))) {
+            // For MEDIALIST/LINKLIST inputs, try to get suffix from corresponding SELECT
+            let actualSuffix = widgetSuffix;
+            if (elementId.includes('REX_MEDIALIST_') || elementId.includes('REX_LINKLIST_')) {
+                const $widget = $element.closest('.rex-js-widget-medialist, .rex-js-widget-linklist, .form-group');
+                const storedSuffix = $widget.data('widget-suffix');
+                if (storedSuffix) {
+                    actualSuffix = storedSuffix;
                 }
             }
-        ];
-
-        // Find matching configuration and apply handler
-        const config = rexConfigs.find(cfg => 
-            cfg.type === nodeName && 
-            cfg.patterns.some(pattern => elementId.indexOf(pattern) >= 0)
-        );
-        if (config) {
-            const newId = elementId.replace(/_\d+/, '_' + sindex + mblock_count + '00' + eindex);
-            const nameAttr = $element.attr('name');
-            config.handler(newId, nameAttr);
+            
+            const newId = elementId.replace(/\d+$/, actualSuffix);
+            $element.attr('id', newId);
+            mblock_update_rex_buttons($element, sindex, mblock_count, eindex, actualSuffix);
+            return;
         }
 
     } catch (error) {
@@ -439,16 +450,17 @@ function mblock_update_rex_ids($element, sindex, mblock_count, eindex) {
 /**
  * REX-Popup-Buttons aktualisieren
  */
-function mblock_update_rex_buttons($element, sindex, mblock_count, eindex) {
+function mblock_update_rex_buttons($element, sindex, mblock_count, eindex, customSuffix) {
     try {
-        const $parent = $element.parent();
-        $parent.find('a.btn-popup').each(function () {
+        const suffix = customSuffix || (sindex + mblock_count + '00' + eindex);
+        const $widget = $element.closest('.rex-js-widget, .rex-js-widget-media, .rex-js-widget-medialist, .rex-js-widget-linklist, .form-group');
+        $widget.find('a.btn-popup, a[onclick*="REX"]').each(function () {
             const $btn = $(this);
             const onclick = $btn.attr('onclick');
             if (onclick) {
                 const newOnclick = onclick
-                    .replace(/\('?\d+/, '(\'' + sindex + mblock_count + '00' + eindex)
-                    .replace(/_\d+/, '_' + sindex + mblock_count + '00' + eindex);
+                    .replace(/\('?\d+/g, '(\'' + suffix)
+                    .replace(/_\d+/g, '_' + suffix);
                 $btn.attr('onclick', newOnclick);
             }
         });
@@ -644,14 +656,19 @@ function mblock_add_item(element, item) {
         
         // trigger change events to update any dependent elements
         iClone.find('input, select, textarea').trigger('change');
-    }, 50);
-    
-    // scroll to item with slight delay to ensure DOM is ready
-    setTimeout(function() {
-        if (iClone && iClone.length && iClone.is(':visible')) {
-            mblock_scroll(element, iClone);
+        
+        // Add glow animation for new blocks (same as paste operation)
+        if (typeof MBlockUtils !== 'undefined' && MBlockUtils.animation && MBlockUtils.animation.addGlowEffect) {
+            MBlockUtils.animation.addGlowEffect(iClone);
         }
-    }, 100);
+        
+        // scroll to item after animation starts (longer delay to ensure animation and DOM are ready)
+        setTimeout(function() {
+            if (iClone && iClone.length && iClone.is(':visible')) {
+                mblock_scroll(element, iClone);
+            }
+        }, 200);
+    }, 50);
 }
 
 function mblock_set_unique_id(item, input_delete) {

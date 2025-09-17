@@ -1068,7 +1068,6 @@ var MBlockClipboard = {
     },
     updatePasteButtons: function() {
         const hasData = !!this.data;
-        
         if (hasData) {
             // Prüfe Modulkompatibilität für alle sichtbaren MBlock-Wrapper
             $('.mblock_wrapper').each((index, wrapperElement) => {
@@ -1480,6 +1479,102 @@ function mblock_reinitialize_redaxo_widgets(container) {
                     const $displayField = container.find('#' + displayId);
                     const articleId = $input.val();
                     if ($displayField.length && articleId && !$displayField.val()) {mblock_fetch_article_name(articleId, $displayField);
+                    }
+                }
+            }
+        });
+        
+        // 🔧 REX MEDIALIST widgets - Handle SELECT elements
+        container.find('select[id^="REX_MEDIALIST_SELECT_"]').each(function() {
+            const $select = $(this);
+            const selectId = $select.attr('id');
+            if (selectId) {
+                // Find the corresponding hidden input
+                const $hiddenInput = container.find('input[id^="REX_MEDIALIST_"]');
+                let $widget = $select.closest('.rex-js-widget-medialist');
+                if (!$widget.length) {
+                    $widget = $select.closest('.form-group, .col-sm-10, .input-group');
+                }
+                
+                if ($widget.length) {
+                    // Extract the ID suffix from SELECT (REX_MEDIALIST_SELECT_31008 -> 31008)
+                    const idMatch = selectId.match(/REX_MEDIALIST_SELECT_(\d+)/);
+                    if (idMatch) {
+                        const widgetId = idMatch[1];
+                        
+                        // Update all medialist buttons onclick handlers
+                        const $mediaButtons = $widget.find('.btn-popup, a[onclick*="REXMedialist"]');
+                        $mediaButtons.each(function() {
+                            const $btn = $(this);
+                            let onclick = $btn.attr('onclick');
+                            if (onclick) {
+                                let newOnclick = onclick;
+                                
+                                // Update different types of medialist function calls
+                                if (onclick.includes('moveREXMedialist')) {
+                                    newOnclick = onclick.replace(/moveREXMedialist\([^,)]+/, `moveREXMedialist('${widgetId}'`);
+                                } else if (onclick.includes('openREXMedialist')) {
+                                    newOnclick = onclick.replace(/openREXMedialist\([^,)]+/, `openREXMedialist('${widgetId}'`);
+                                } else if (onclick.includes('addREXMedialist')) {
+                                    newOnclick = onclick.replace(/addREXMedialist\([^,)]+/, `addREXMedialist('${widgetId}'`);
+                                } else if (onclick.includes('deleteREXMedialist')) {
+                                    newOnclick = onclick.replace(/deleteREXMedialist\([^,)]+/, `deleteREXMedialist('${widgetId}'`);
+                                } else if (onclick.includes('viewREXMedialist')) {
+                                    newOnclick = onclick.replace(/viewREXMedialist\([^,)]+/, `viewREXMedialist('${widgetId}'`);
+                                }
+                                
+                                if (newOnclick !== onclick) {
+                                    $btn.attr('onclick', newOnclick);
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
+        
+        // 🔧 REX LINKLIST_SELECT widgets - Handle SELECT elements  
+        container.find('select[id^="REX_LINKLIST_SELECT_"]').each(function() {
+            const $select = $(this);
+            const selectId = $select.attr('id');
+            if (selectId) {
+                let $widget = $select.closest('.rex-js-widget-linklist');
+                if (!$widget.length) {
+                    $widget = $select.closest('.form-group, .col-sm-10, .input-group');
+                }
+                
+                if ($widget.length) {
+                    // Extract the ID suffix from SELECT (REX_LINKLIST_SELECT_31008 -> 31008)
+                    const idMatch = selectId.match(/REX_LINKLIST_SELECT_(\d+)/);
+                    if (idMatch) {
+                        const widgetId = idMatch[1];
+                        
+                        // Update all linklist buttons onclick handlers
+                        const $linkButtons = $widget.find('.btn-popup, a[onclick*="REXLinklist"]');
+                        $linkButtons.each(function() {
+                            const $btn = $(this);
+                            let onclick = $btn.attr('onclick');
+                            if (onclick) {
+                                let newOnclick = onclick;
+                                
+                                // Update different types of linklist function calls
+                                if (onclick.includes('moveREXLinklist')) {
+                                    newOnclick = onclick.replace(/moveREXLinklist\([^,)]+/, `moveREXLinklist('${widgetId}'`);
+                                } else if (onclick.includes('openREXLinklist')) {
+                                    newOnclick = onclick.replace(/openREXLinklist\([^,)]+/, `openREXLinklist('${widgetId}'`);
+                                } else if (onclick.includes('addREXLinklist')) {
+                                    newOnclick = onclick.replace(/addREXLinklist\([^,)]+/, `addREXLinklist('${widgetId}'`);
+                                } else if (onclick.includes('deleteREXLinklist')) {
+                                    newOnclick = onclick.replace(/deleteREXLinklist\([^,)]+/, `deleteREXLinklist('${widgetId}'`);
+                                } else if (onclick.includes('viewREXLinklist')) {
+                                    newOnclick = onclick.replace(/viewREXLinklist\([^,)]+/, `viewREXLinklist('${widgetId}'`);
+                                }
+                                
+                                if (newOnclick !== onclick) {
+                                    $btn.attr('onclick', newOnclick);
+                                }
+                            }
+                        });
                     }
                 }
             }
