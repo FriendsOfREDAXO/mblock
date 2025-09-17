@@ -1,3 +1,4 @@
+// ================== MBLOCK MANAGEMENT MODULE ================
 /**
  * MBlock Management - DOM manipulation and sortable handling
  * 
@@ -21,13 +22,20 @@ const MBlockSortable = {
      */
     destroy(element) {
         try {
-            if (element && element.length && element.data('sortable')) {
-                element.sortable('destroy');
-                element.removeData('sortable');
+            const domElement = element?.get ? element.get(0) : element;
+            if (domElement && domElement._sortable) {
+                if (typeof domElement._sortable.destroy === 'function') {
+                    domElement._sortable.destroy();
+                }
+                domElement._sortable = null;
                 return true;
             }
         } catch (error) {
-            console.warn('MBlock: Error destroying sortable:', error);
+            console.warn('MBlock: Sortable destroy error:', error);
+            if (element?.get) {
+                const domElement = element.get(0);
+                if (domElement) domElement._sortable = null;
+            }
         }
         return false;
     },
@@ -37,26 +45,27 @@ const MBlockSortable = {
      */
     create(element) {
         try {
-            if (!element || !element.length) return false;
+            if (!element?.length || !element.get) return false;
+            const domElement = element.get(0);
+            if (!document.contains(domElement) || typeof Sortable === 'undefined') {
+                return false;
+            }
 
-            // Destroy existing instance first
-            this.destroy(element);
-            const sortableOptions = {
-                handle: '.mblock-handle',
-                placeholder: 'mblock-sortable-placeholder',
-                tolerance: 'pointer',
-                cursor: 'move',
-                axis: 'y',
-                containment: 'parent',
-                start: this._handleStart,
-                stop: (evt, ui) => this._handleEnd(evt, element),
-                update: (evt, ui) => this._handleUpdate(evt, element)
-            };
-            element.sortable(sortableOptions);
-            element.data('sortable', true);
+            const sortableInstance = Sortable.create(domElement, {
+                handle: '.sorthandle',
+                animation: 150,
+                ghostClass: 'sortable-ghost',
+                chosenClass: 'mblock-sortable-chosen',
+                dragClass: 'mblock-dragging',
+                onStart: (evt) => this._handleStart(evt),
+                onEnd: (evt) => this._handleEnd(evt, element),
+                onError: (evt) => console.error('MBlock: Sortable Fehler:', evt)
+            });
+            domElement._sortable = sortableInstance;
             return true;
+
         } catch (error) {
-            console.error('MBlock: Error creating sortable:', error);
+            console.error('MBlock: Fehler beim Erstellen der Sortable-Instanz:', error);
             return false;
         }
     },
@@ -72,27 +81,30 @@ const MBlockSortable = {
     // Private event handlers
     _handleStart(evt) {
         try {
-            const $item = $(evt.target);
-            $item.addClass('mblock-dragging');
+            document.body.classList.add('mblock-drag-active');
+            if (evt.item) {
+                evt.item.classList.add('mblock-dragging');
+            }
         } catch (error) {
-            console.warn('MBlock: Error in sort start handler:', error);
+            console.error('MBlock: Fehler in sortable onStart:', error);
         }
     },
     _handleEnd(evt, element) {
         try {
-            const $item = $(evt.target);
-            $item.removeClass('mblock-dragging');
-            mblock_reindex(element);
-        } catch (error) {
-            console.warn('MBlock: Error in sort end handler:', error);
-        }
-    },
-    _handleUpdate(evt, element) {
-        try {
+            document.body.classList.remove('mblock-drag-active');
+            if (evt.item) {
+                evt.item.classList.remove('mblock-dragging');
+                MBlockUtils.animation.flashEffect($(evt.item));
+            }
+            
             mblock_reindex(element);
             mblock_remove(element);
+            const iClone = $(evt.item);
+            if (iClone.length) {
+                iClone.trigger('mblock:change', [iClone]);
+            }
         } catch (error) {
-            console.warn('MBlock: Error in sort update handler:', error);
+            console.error('MBlock: Fehler in sortable onEnd:', error);
         }
     }
 };
@@ -107,12 +119,29 @@ $(document).on('rex:ready', function (e, container) {
         }
         
         if (container && typeof container.find === 'function') {
-            container.find('.mblock_wrapper').each(function() {
-                mblock_init($(this));
+            container.find(mblock).each(function () {
+                const $element = $(this);
+                if ($element.length) {
+                    try {
+                        // Check if this is a nested initialization to prevent conflicts
+                        const isNestedContext = container.closest('.mblock_wrapper').length > 0;
+                        if (isNestedContext) {return;
+                        }
+                        
+                        mblock_init($element);
+                    } catch (initError) {
+                        console.error('MBlock: Fehler beim Initialisieren eines einzelnen MBlock-Elements:', initError);
+                        // Einzelne Fehler nicht die gesamte Initialisierung abbrechen lassen
+                    }
+                }
             });
         } else {
-            $('.mblock_wrapper').each(function() {
-                mblock_init($(this));
+            // Initialize all MBlock elements (global initialization)
+            $(mblock).each(function () {
+                const $element = $(this);
+                if ($element.length) {
+                    mblock_init($element);
+                }
             });
         }
     } catch (error) {
@@ -122,16 +151,22 @@ $(document).on('rex:ready', function (e, container) {
 function mblock_init(element) {
     try {
         if (!element || !element.length || typeof element.data !== 'function') {
-            console.warn('MBlock: Invalid element passed to mblock_init');
+            console.warn('MBlock: Ungültiges Element bei mblock_init');
             return false;
         }
 
         // Check if element is already initialized
         const isAlreadyInitialized = element.data('mblock_run');
-        if (!isAlreadyInitialized) {
-            element.data('mblock_run', true);
-            mblock_init_sort(element);
-        } else {return true;
+        if (!isAlreadyInitialized) {element.data('mblock_run', 1);
+            mblock_sort(element);
+            mblock_set_unique_id(element, false);
+            const minValue = element.data('min');
+            const maxValue = element.data('max');
+            if (minValue == 1 && maxValue == 1) {
+                element.addClass('hide_removeadded').addClass('hide_sorthandle');
+            }
+        } else {// Remove any duplicate mblock-single-add elements before reinitializing
+            element.find('.mblock-single-add').remove();
         }
         
         mblock_add_plus(element);
@@ -153,7 +188,6 @@ function mblock_init(element) {
 function mblock_init_sort(element) {
     try {
         if (!element || !element.length) {
-            console.warn('MBlock: Invalid element passed to mblock_init_sort');
             return false;
         }
         // reindex
@@ -170,7 +204,6 @@ function mblock_init_sort(element) {
 function mblock_sort(element) {
     try {
         if (!element || !element.length) {
-            console.warn('MBlock: Invalid element passed to mblock_sort');
             return false;
         }
         // add linking
@@ -192,56 +225,52 @@ function mblock_add_plus(element) {
     const hasAddButton = element.find('> div.mblock-single-add').length > 0;
     if (!hasSortItems && !hasAddButton) {element.prepend($($.parseHTML(element.data('mblock-single-add'))));
         element.find('> div.mblock-single-add .addme').unbind().bind('click', function () {
-            const $wrapper = $(this).closest('.mblock_wrapper');
-            mblock_add_item($wrapper, false);
+            mblock_add_item(element, false);
+            $(this).parents('.mblock-single-add').remove();
         });
     } else if (hasSortItems && hasAddButton) {
-        element.find('> div.mblock-single-add').remove();
+        // Remove add button if there are now sortitems (should not happen but safety check)element.find('> div.mblock-single-add').remove();
     }
 }
 
 function mblock_remove(element) {
-    var found = element.find('> div.sortitem');
-    if (found.length == 1) {
-        found.find('.removeme').prop('disabled', true);
-        found.find('.removeme').attr('data-disabled', true);
+    var finded = element.find('> div.sortitem');
+    if (finded.length == 1) {
+        finded.find('.removeme').prop('disabled', true);
+        finded.find('.removeme').attr('data-disabled', true);
     } else {
-        found.find('.removeme').prop('disabled', false);
-        found.find('.removeme').attr('data-disabled', false);
+        finded.find('.removeme').prop('disabled', false);
+        finded.find('.removeme').attr('data-disabled', false);
     }
 
     // has data?
     if (element.data().hasOwnProperty('max')) {
-        if (found.length >= element.data('max')) {
+        if (finded.length >= element.data('max')) {
             element.find('.addme').prop('disabled', true);
-            element.find('.addme').attr('data-disabled', true);
         } else {
             element.find('.addme').prop('disabled', false);
-            element.find('.addme').attr('data-disabled', false);
         }
     }
 
     if (element.data().hasOwnProperty('min')) {
-        if (found.length <= element.data('min')) {
-            found.find('.removeme').prop('disabled', true);
-            found.find('.removeme').attr('data-disabled', true);
+        if (finded.length <= element.data('min')) {
+            element.find('.removeme').prop('disabled', true);
         } else {
-            found.find('.removeme').prop('disabled', false);
-            found.find('.removeme').attr('data-disabled', false);
+            element.find('.removeme').prop('disabled', false);
         }
     }
 
-    found.each(function (index) {
+    finded.each(function (index) {
         // min removeme hide
-        if ((index + 1) == element.data('min') && found.length == element.data('min')) {
-            $(this).find('.removeme').hide();
+        if ((index + 1) == element.data('min') && finded.length == element.data('min')) {
+            $(this).find('.removeme').prop('disabled', true);
         }
         if (index == 0) {
             $(this).find('.moveup').prop('disabled', true);
         } else {
             $(this).find('.moveup').prop('disabled', false);
         }
-        if ((index + 1) == found.length) {
+        if ((index + 1) == finded.length) { // if max count?
             $(this).find('.movedown').prop('disabled', true);
         } else {
             $(this).find('.movedown').prop('disabled', false);
@@ -252,36 +281,23 @@ function mblock_remove(element) {
 function mblock_sort_it(element) {
     try {
         if (!MBlockUtils.is.validElement(element) || !element.length || !element.get) {
-            console.warn('MBlock: Invalid element passed to mblock_sort_it');
+            console.warn('MBlock: Ungültiges Element für mblock_sort_it');
             return false;
         }
 
         const domElement = element.get(0);
         if (!document.contains(domElement)) {
-            console.warn('MBlock: Element not in DOM, skipping sortable initialization');
+            console.warn('MBlock: Element nicht mehr im DOM');
             return false;
         }
 
         // Use centralized sortable management
         if (typeof Sortable !== 'undefined' && Sortable.create) {
-            // Use SortableJS library if available
-            const sortableInstance = Sortable.create(domElement, {
-                handle: '.mblock-handle',
-                animation: 150,
-                ghostClass: 'mblock-sortable-ghost',
-                chosenClass: 'mblock-sortable-chosen',
-                dragClass: 'mblock-sortable-drag',
-                onStart: function(evt) {
-                    MBlockSortable._handleStart(evt);
-                },
-                onEnd: function(evt) {
-                    MBlockSortable._handleEnd(evt, element);
-                }
-            });
-            element.data('sortable-instance', sortableInstance);
+            MBlockSortable.reinitialize(element);
+            return true;
         } else {
-            // Fallback to jQuery UI sortable
-            MBlockSortable.create(element);
+            console.error('MBlock: Sortable.js ist nicht verfügbar');
+            return false;
         }
         
     } catch (error) {
@@ -293,13 +309,14 @@ function mblock_sort_it(element) {
 function mblock_reindex(element) {
     try {
         if (!mblock_validate_element(element)) {
-            console.warn('MBlock: Invalid element passed to mblock_reindex');
+            console.warn('MBlock: Ungültiges Element bei mblock_reindex');
             return false;
         }
 
         const mblock_count = element.data('mblock_count') || 0;
         const sortItems = element.find('> div.sortitem');
-        if (!sortItems.length) {return true;
+        if (!sortItems.length) {
+            return true;
         }
 
         // Performance-Optimierung: Batch DOM-Updates
@@ -307,14 +324,11 @@ function mblock_reindex(element) {
             const $sortItem = $(this);
             const sindex = index + 1;
             
-            // Update data attributes
+            // Set index attribute
             $sortItem.attr('data-mblock_index', sindex);
-            $sortItem.data('mblock_index', sindex);
             
-            // Reindex form elements
+            // Optimierte Element-Behandlung
             mblock_reindex_form_elements($sortItem, index, sindex, mblock_count);
-            
-            // Reindex special elements
             mblock_reindex_special_elements($sortItem, index, sindex, mblock_count);
         });
 
@@ -334,26 +348,36 @@ function mblock_reindex_form_elements($sortItem, index, sindex, mblock_count) {
     try {
         $sortItem.find('input,textarea,select,button').each(function (key) {
             const $element = $(this);
-            const elementId = $element.attr('id');
-            const elementName = $element.attr('name');
-            if (!elementId && !elementName) return;
+            const eindex = key + 1;
+            const attr = $element.attr('name');
             
-            // Update IDs and names with new index
-            if (elementId) {
-                const newId = elementId.replace(/_\d+/, '_' + sindex);
-                $element.attr('id', newId);
+            // Name-Attribut aktualisieren
+            if (attr && typeof attr !== 'undefined') {
+                const nameMatches = attr.match(/\]\[\d+\]\[/g);
+                if (nameMatches) {
+                    const newValue = attr.replace(nameMatches, '][' + index + '][').replace('mblock_new_', '');
+                    $element.attr('name', newValue);
+                }
             }
-            
-            if (elementName) {
-                // Remove mblock_new_ prefix and update index
-                let newName = elementName.replace(/^mblock_new_/, '');
-                newName = newName.replace(/\[(\d+)\]/, '[' + sindex + ']');
-                $element.attr('name', newName);
+
+            // Event-Handler für Checkboxen optimieren
+            const elementType = $element.attr('type');
+            if (elementType === 'checkbox') {
+                $element.off('change.mblock').on('change.mblock', function () {
+                    $(this).val($(this).is(':checked') ? 1 : 0);
+                });
             }
-            
-            // Handle REX fields
-            mblock_update_rex_ids($element, sindex, mblock_count, key);
-            mblock_update_rex_buttons($element, sindex, mblock_count, key);
+
+            // Radio-Button Werte wiederherstellen
+            if (elementType === 'radio') {
+                const dataValue = $element.attr('data-value');
+                if (dataValue) {
+                    $element.val(dataValue);
+                }
+            }
+
+            // REX-spezifische IDs aktualisieren
+            mblock_update_rex_ids($element, sindex, mblock_count, eindex);
         });
     } catch (error) {
         console.error('MBlock: Fehler in mblock_reindex_form_elements:', error);
@@ -375,15 +399,21 @@ function mblock_update_rex_ids($element, sindex, mblock_count, eindex) {
                 type: 'SELECT',
                 patterns: ['REX_MEDIALIST_SELECT_', 'REX_LINKLIST_SELECT_'],
                 handler: (newId, nameAttr) => {
+                    $element.parent().data('eindex', eindex);
                     $element.attr('id', newId);
-                    if (nameAttr) $element.attr('name', nameAttr);
+                    if (nameAttr) {
+                        $element.attr('name', nameAttr.replace(/_\d+/, '_' + sindex + mblock_count + '00' + eindex));
+                    }
                 }
             },
             {
                 type: 'INPUT',
                 patterns: ['REX_MEDIA_', 'REX_LINKLIST_', 'REX_MEDIALIST_'],
                 handler: (newId) => {
-                    $element.attr('id', newId);
+                    const parentEindex = $element.parent().data('eindex') || eindex;
+                    const actualNewId = elementId.replace(/\d+/, sindex + mblock_count + '00' + parentEindex);
+                    $element.attr('id', actualNewId);
+                    mblock_update_rex_buttons($element, sindex, mblock_count, parentEindex);
                 }
             }
         ];
@@ -394,8 +424,8 @@ function mblock_update_rex_ids($element, sindex, mblock_count, eindex) {
             cfg.patterns.some(pattern => elementId.indexOf(pattern) >= 0)
         );
         if (config) {
-            const newId = elementId.replace(/_\d+/, '_' + sindex);
-            const nameAttr = $element.attr('name')?.replace(/\[(\d+)\]/, '[' + sindex + ']');
+            const newId = elementId.replace(/_\d+/, '_' + sindex + mblock_count + '00' + eindex);
+            const nameAttr = $element.attr('name');
             config.handler(newId, nameAttr);
         }
 
@@ -411,11 +441,13 @@ function mblock_update_rex_buttons($element, sindex, mblock_count, eindex) {
     try {
         const $parent = $element.parent();
         $parent.find('a.btn-popup').each(function () {
-            const $button = $(this);
-            const onclick = $button.attr('onclick');
+            const $btn = $(this);
+            const onclick = $btn.attr('onclick');
             if (onclick) {
-                const newOnclick = onclick.replace(/_\d+/, '_' + sindex);
-                $button.attr('onclick', newOnclick);
+                const newOnclick = onclick
+                    .replace(/\('?\d+/, '(\'' + sindex + mblock_count + '00' + eindex)
+                    .replace(/_\d+/, '_' + sindex + mblock_count + '00' + eindex);
+                $btn.attr('onclick', newOnclick);
             }
         });
     } catch (error) {
@@ -430,32 +462,87 @@ function mblock_reindex_special_elements($sortItem, index, sindex, mblock_count)
     try {
         // Bootstrap Tabs
         $sortItem.find('a[data-toggle="tab"]').each(function (key) {
+            const eindex = key + 1;
             const $tab = $(this);
             const href = $tab.attr('href');
             if (href) {
-                const newHref = href.replace(/_\d+/, '_' + sindex);
+                const newHref = href.replace(/_\d+/, '_' + sindex + mblock_count + '00' + eindex);
                 $tab.attr('href', newHref);
+                
+                // Update corresponding tab content
+                const $container = $tab.parent().parent().parent().find('.tab-content ' + href);
+                if ($container.length) {
+                    $container.attr('id', newHref.replace('#', ''));
+                }
+
+                // LocalStorage tab handling mit Error-Handling
+                $tab.off('shown.bs.tab.mblock').on('shown.bs.tab.mblock', function (e) {
+                    try {
+                        const id = $(e.target).attr('href');
+                        if (id && typeof localStorage !== 'undefined') {
+                            localStorage.setItem('selectedTab', id);
+                        }
+                    } catch (storageError) {
+                        console.warn('MBlock: LocalStorage nicht verfügbar:', storageError);
+                    }
+                });
             }
         });
 
         // Bootstrap Collapse/Accordion
         $sortItem.find('a[data-toggle="collapse"]').each(function (key) {
+            const eindex = key + 1;
             const $collapse = $(this);
-            const target = $collapse.attr('href') || $collapse.attr('data-target');
-            if (target) {
-                const newTarget = target.replace(/_\d+/, '_' + sindex);
-                $collapse.attr('href', newTarget);
-                $collapse.attr('data-target', newTarget);
+            if (!$collapse.attr('data-ignore-mblock')) {
+                const href = $collapse.attr('data-target');
+                if (href) {
+                    const newHref = href.replace(/_\d+/, '_' + sindex + mblock_count + '00' + eindex);
+                    $collapse.attr('data-target', newHref);
+                    
+                    // Update collapse content
+                    const $container = $collapse.parent().find(href);
+                    if ($container.length) {
+                        $container.attr('id', newHref.replace('#', ''));
+                    }
+                    
+                    // Update group parent if exists
+                    const $group = $collapse.parent().parent().parent().find('.panel-group');
+                    if ($group.length) {
+                        const parentId = 'accgr_' + sindex + mblock_count + '00';
+                        $group.attr('id', parentId);
+                        $collapse.attr('data-parent', '#' + parentId);
+                    }
+                }
             }
         });
 
         // Custom Links (MForm)
         $sortItem.find('.custom-link').each(function (key) {
-            const $link = $(this);
-            const href = $link.attr('href');
-            if (href) {
-                const newHref = href.replace(/_\d+/, '_' + sindex);
-                $link.attr('href', newHref);
+            const eindex = key + 1;
+            const $customlink = $(this);
+            $customlink.find('input').each(function () {
+                const $input = $(this);
+                const inputId = $input.attr('id');
+                if (inputId) {
+                    $input.attr('id', inputId.replace(/\d+/, sindex + mblock_count + '00' + eindex));
+                }
+            });
+            $customlink.find('a.btn-popup').each(function () {
+                const $btn = $(this);
+                const btnId = $btn.attr('id');
+                if (btnId) {
+                    $btn.attr('id', btnId.replace(/\d+/, sindex + mblock_count + '00' + eindex));
+                }
+            });
+            $customlink.attr('data-id', sindex + mblock_count + '00' + eindex);
+            
+            // Trigger MForm custom link function if available
+            if (typeof window.mform_custom_link === 'function') {
+                try {
+                    window.mform_custom_link($customlink);
+                } catch (mformError) {
+                    console.warn('MBlock: MForm custom link Fehler:', mformError);
+                }
             }
         });
     } catch (error) {
@@ -464,14 +551,23 @@ function mblock_reindex_special_elements($sortItem, index, sindex, mblock_count)
 }
 
 function mblock_replace_for(element) {
+
     element.find('> div.sortitem').each(function (index) {
         var mblock = $(this);
         mblock.find('input:not(:checkbox):not(:radio),textarea,select').each(function (key) {
-            var forAttr = $(this).attr('id');
-            if (forAttr) {
-                var label = mblock.find('label[for="' + forAttr + '"]');
-                if (label.length > 0) {
-                    label.attr('for', forAttr);
+            var el = $(this),
+                id = el.attr('id'),
+                name = el.attr('name');
+            if ((typeof id !== typeof undefined && id !== false) && (typeof name !== typeof undefined && name !== false)) {
+                if (!(id.indexOf("REX_MEDIA") >= 0 ||
+                    id.indexOf("REX_LINK") >= 0 ||
+                    id.indexOf("redactor") >= 0 ||
+                    id.indexOf("markitup") >= 0)
+                ) {
+                    var label = mblock.find('label[for="' + id + '"]');
+                    name = name.replace(/(\[|\])/gm, '');
+                    el.attr('id', name);
+                    label.attr('for', name);
                 }
             }
         });
@@ -498,7 +594,13 @@ function mblock_add_item(element, item) {
         // add clone
         element.prepend(iClone);
     } else if (item.parent().hasClass(element.attr('class'))) {
+        // Destroy sortable before manipulation
+        MBlockSortable.destroy(element);
+        
+        // add clone
         item.after(iClone);
+        // set count
+        mblock_set_count(element, item);
     }
 
     // add unique id
@@ -517,12 +619,20 @@ function mblock_add_item(element, item) {
         // specific component reinitialization
         // Initialize selectpicker with REDAXO core method for new items
         if (typeof $.fn.selectpicker === 'function') {
-            iClone.find('select.selectpicker').selectpicker('refresh');
+            var selects = iClone.find('select.selectpicker');
+            if (selects.length) {
+                selects.selectpicker({
+                    noneSelectedText: '—'
+                }).on('rendered.bs.select', function () {
+                    $(this).parent().removeClass('bs3-has-addon');
+                });
+                selects.selectpicker('refresh');
+            }
         }
         
         // reinitialize other common components
         if (typeof $.fn.chosen === 'function') {
-            iClone.find('select').chosen('destroy').chosen();
+            iClone.find('select.chosen').chosen();
         }
         
         // CRITICAL FIX: Reinitialize REDAXO Media and Link functionality for new blocks
@@ -537,14 +647,15 @@ function mblock_add_item(element, item) {
     // scroll to item with slight delay to ensure DOM is ready
     setTimeout(function() {
         if (iClone && iClone.length && iClone.is(':visible')) {
-            mblock_smooth_scroll_to_element(iClone.get(0));
+            mblock_scroll(element, iClone);
         }
     }, 100);
-
-    // ✨ Add glow effect to new item using utility (same as paste effect)
+    
+    // ✨ Add glow effect to new item (same animation as paste)
     setTimeout(() => {
-        MBlockUtils.animation.flashEffect(iClone);
-        mblock_show_message(mblock_get_text('mblock_toast_add_success', 'Block erfolgreich hinzugefügt!'), 'success', 3000);
+        if (iClone && iClone.length && iClone.is(':visible')) {
+            MBlockUtils.animation.addGlowEffect(iClone, 'mblock-paste-glow', 1200);
+        }
     }, 150);
 }
 
@@ -600,7 +711,7 @@ function mblock_set_count(element, item) {
 function mblock_remove_item(element, item) {
     try {
         if (!MBlockUtils.is.validElement(element) || !element.length || !item || !item.length) {
-            console.warn('MBlock: Invalid parameters passed to mblock_remove_item');
+            console.warn('MBlock: Ungültige Parameter bei mblock_remove_item');
             return false;
         }
 
@@ -614,11 +725,31 @@ function mblock_remove_item(element, item) {
         const itemParent = item.parent();
         const elementClass = element.attr('class');
         if (itemParent.length && elementClass && itemParent.hasClass(elementClass)) {
-            // Remove item safely
-            MBlockUtils.dom.safeRemove(item);
-            mblock_reindex(element);
-            mblock_remove(element);
-            return true;
+            // Destroy sortable before manipulation
+            MBlockSortable.destroy(element);
+
+            // set prev item
+            let prevItem = item.prev();
+            // is prev exist?
+            if (!prevItem.length || !prevItem.hasClass('sortitem')) {
+                prevItem = item.next(); // go to next
+            }
+
+            // Safe element removal with event cleanup using utilities
+            if (MBlockUtils.dom.safeRemove(item)) {
+                // reinit
+                mblock_init_sort(element);
+                // scroll to item (falls ein vorheriges Element existiert)
+                if (prevItem && prevItem.length) {
+                    mblock_scroll(element, prevItem);
+                }
+                // add add button
+                mblock_add_plus(element);
+                return true;
+            } else {
+                console.error('MBlock: Fehler beim Entfernen des Items');
+                return false;
+            }
         }
         
         return false;
@@ -659,7 +790,6 @@ function mblock_movedown(element, item) {
 function mblock_scroll(element, item) {
     try {
         if (!element || !element.length || !item || !item.length) {
-            console.warn('MBlock: Invalid parameters passed to mblock_scroll');
             return false;
         }
 
@@ -667,13 +797,27 @@ function mblock_scroll(element, item) {
         
         // Wenn smooth_scroll aktiviert ist, verwende die smooth scroll Funktion
         if (elementData && elementData.hasOwnProperty('smooth_scroll') && elementData.smooth_scroll === true) {
-            mblock_smooth_scroll_to_element(item.get(0));
+            if (typeof $.mblockSmoothScroll === 'function') {
+                $.mblockSmoothScroll({
+                    scrollTarget: item,
+                    speed: 500
+                });
+                return true;
+            }
         }
         
         // Fallback: Standard-Browser-Scrolling zu dem Element
         if (item.length && item.offset()) {
-            const offset = item.offset().top - 100; // 100px offset from top
-            $('html, body').animate({ scrollTop: offset }, 500);
+            const itemOffset = item.offset().top;
+            const windowHeight = $(window).height();
+            const scrollTop = $(window).scrollTop();
+            
+            // Nur scrollen wenn Element nicht bereits sichtbar ist
+            if (itemOffset < scrollTop || itemOffset > (scrollTop + windowHeight - 200)) {
+                $('html, body').animate({
+                    scrollTop: itemOffset - 100 // 100px Abstand vom oberen Rand
+                }, 300);
+            }
         }
         
         return true;
@@ -686,7 +830,7 @@ function mblock_scroll(element, item) {
 function mblock_add(element) {
     try {
         if (!MBlockUtils.is.validElement(element) || !element.length) {
-            console.warn('MBlock: Invalid element passed to mblock_add');
+            console.warn('MBlock: Ungültiges Element bei mblock_add');
             return false;
         }
 
@@ -697,8 +841,21 @@ function mblock_add(element) {
                 event: 'click',
                 handler: function (e) {
                     e.preventDefault();
-                    const $wrapper = $(this).closest('.mblock_wrapper');
-                    mblock_add_item($wrapper, $(this).closest('.sortitem'));
+                    try {
+                        const $this = $(this);
+                        if (!MBlockUtils.state.isDisabled($this)) {
+                            const $item = $this.parents('.sortitem');
+                            const itemIndex = $item.attr('data-mblock_index');
+                            if (itemIndex) {
+                                element.attr('data-mblock_clicked_add_item', itemIndex);
+                            }
+                            const $targetItem = $this.closest('div[class^="sortitem"]');
+                            mblock_add_item(element, $targetItem);
+                        }
+                    } catch (error) {
+                        console.error('MBlock: Fehler in addme click handler:', error);
+                    }
+                    return false;
                 }
             },
             {
@@ -706,9 +863,16 @@ function mblock_add(element) {
                 event: 'click',
                 handler: function (e) {
                     e.preventDefault();
-                    const $wrapper = $(this).closest('.mblock_wrapper');
-                    const $item = $(this).closest('.sortitem');
-                    mblock_remove_item($wrapper, $item);
+                    try {
+                        const $this = $(this);
+                        if (!MBlockUtils.state.isDisabled($this)) {
+                            const $targetItem = $this.closest('div[class^="sortitem"]');
+                            mblock_remove_item(element, $targetItem);
+                        }
+                    } catch (error) {
+                        console.error('MBlock: Fehler in removeme click handler:', error);
+                    }
+                    return false;
                 }
             },
             {
@@ -716,9 +880,16 @@ function mblock_add(element) {
                 event: 'click',
                 handler: function (e) {
                     e.preventDefault();
-                    const $wrapper = $(this).closest('.mblock_wrapper');
-                    const $item = $(this).closest('.sortitem');
-                    mblock_moveup($wrapper, $item);
+                    try {
+                        const $this = $(this);
+                        if (!MBlockUtils.state.isDisabled($this)) {
+                            const $targetItem = $this.closest('div[class^="sortitem"]');
+                            mblock_moveup(element, $targetItem);
+                        }
+                    } catch (error) {
+                        console.error('MBlock: Fehler in moveup click handler:', error);
+                    }
+                    return false;
                 }
             },
             {
@@ -726,16 +897,24 @@ function mblock_add(element) {
                 event: 'click',
                 handler: function (e) {
                     e.preventDefault();
-                    const $wrapper = $(this).closest('.mblock_wrapper');
-                    const $item = $(this).closest('.sortitem');
-                    mblock_movedown($wrapper, $item);
+                    try {
+                        const $this = $(this);
+                        if (!MBlockUtils.state.isDisabled($this)) {
+                            const $targetItem = $this.closest('div[class^="sortitem"]');
+                            mblock_movedown(element, $targetItem);
+                        }
+                    } catch (error) {
+                        console.error('MBlock: Fehler in movedown click handler:', error);
+                    }
+                    return false;
                 }
             }
         ];
 
         // Bind all basic event handlers
         eventHandlers.forEach(({selector, event, handler}) => {
-            MBlockUtils.events.bindSafe(MBlockUtils.dom.findElement(element, selector), event, handler);
+            const elements = MBlockUtils.dom.findElement(element, `${MBlockUtils.selectors.sortitem} ${selector}`);
+            MBlockUtils.events.bindSafe(elements, event, handler);
         });
 
         // Handle copy/paste buttons only if enabled
@@ -768,11 +947,16 @@ mblock_add._bindCopyPasteHandlers = function(element) {
     if (copyButtons.length > 0) {
         MBlockUtils.events.bindSafe(copyButtons, 'click', function (e) {
             e.preventDefault();
-            const $wrapper = $(this).closest('.mblock_wrapper');
-            const $item = $(this).closest('.sortitem');
-            if (typeof MBlockClipboard !== 'undefined') {
-                MBlockClipboard.copy($wrapper, $item);
+            try {
+                const $this = $(this);
+                const $targetItem = $this.closest('div[class^="sortitem"]');
+                if (typeof MBlockClipboard !== 'undefined') {
+                    MBlockClipboard.copy(element, $targetItem);
+                }
+            } catch (error) {
+                console.error('MBlock: Fehler in copy click handler:', error);
             }
+            return false;
         });
     }
 
@@ -781,11 +965,18 @@ mblock_add._bindCopyPasteHandlers = function(element) {
     if (pasteButtons.length > 0) {
         MBlockUtils.events.bindSafe(pasteButtons, 'click', function (e) {
             e.preventDefault();
-            const $wrapper = $(this).closest('.mblock_wrapper');
-            const $item = $(this).closest('.sortitem');
-            if (typeof MBlockClipboard !== 'undefined') {
-                MBlockClipboard.paste($wrapper, $item);
+            try {
+                const $this = $(this);
+                if (!MBlockUtils.state.isDisabled($this)) {
+                    const $targetItem = $this.closest('div[class^="sortitem"]');
+                    if (typeof MBlockClipboard !== 'undefined') {
+                        MBlockClipboard.paste(element, $targetItem);
+                    }
+                }
+            } catch (error) {
+                console.error('MBlock: Fehler in paste click handler:', error);
             }
+            return false;
         });
     }
 };
@@ -795,13 +986,13 @@ mblock_add._bindToggleHandlers = function(element) {
     MBlockUtils.events.bindSafe(toggleButtons, 'click', function (e) {
         e.preventDefault();
         try {
-            const $wrapper = $(this).closest('.mblock_wrapper');
-            const $item = $(this).closest('.sortitem');
+            const $this = $(this);
+            const $targetItem = $this.closest('div[class^="sortitem"]');
             if (typeof MBlockOnlineToggle !== 'undefined') {
-                MBlockOnlineToggle.toggle($wrapper, $item);
+                MBlockOnlineToggle.toggle(element, $targetItem);
             }
         } catch (error) {
-            console.error('MBlock: Error in toggle handler:', error);
+            console.error('MBlock: Fehler in online/offline toggle handler:', error);
         }
         return false;
     });
@@ -811,14 +1002,13 @@ mblock_add._bindToggleHandlers = function(element) {
     MBlockUtils.events.bindSafe(autoToggleButtons, 'click', function (e) {
         e.preventDefault();
         try {
-            const $wrapper = $(this).closest('.mblock_wrapper');
-            const $item = $(this).closest('.sortitem');
-            const $button = $(this);
+            const $this = $(this);
+            const $targetItem = $this.closest('div[class^="sortitem"]');
             if (typeof MBlockOnlineToggle !== 'undefined') {
-                MBlockOnlineToggle.toggleAutoDetected($wrapper, $item, $button);
+                MBlockOnlineToggle.toggleAutoDetected(element, $targetItem, $this);
             }
         } catch (error) {
-            console.error('MBlock: Error in auto toggle handler:', error);
+            console.error('MBlock: Fehler in auto-detected toggle handler:', error);
         }
         return false;
     });
@@ -828,7 +1018,8 @@ mblock_add._bindToggleHandlers = function(element) {
 function mblock_init_toolbar(element) {
     try {
         // Nur initialisieren wenn Copy/Paste aktiviert ist
-        if (!checkCopyPasteEnabled()) {return;
+        if (!checkCopyPasteEnabled()) {
+            return;
         }
         
         // Centralized toolbar event configuration
@@ -837,27 +1028,39 @@ function mblock_init_toolbar(element) {
                 selector: '.mblock-copy-paste-toolbar .mblock-paste-btn',
                 handler: function (e) {
                     e.preventDefault();
-                    const $wrapper = $(this).closest('.mblock_wrapper');
-                    if (typeof MBlockClipboard !== 'undefined') {
-                        MBlockClipboard.paste($wrapper, false);
+                    try {
+                        const $this = $(this);
+                        if (!MBlockUtils.state.isDisabled($this)) {
+                            if (typeof MBlockClipboard !== 'undefined') {
+                                MBlockClipboard.paste(element, false); // false = am Anfang einfügen
+                            }
+                        }
+                    } catch (error) {
+                        console.error('MBlock: Fehler in toolbar paste click handler:', error);
                     }
+                    return false;
                 }
             },
             {
                 selector: '.mblock-copy-paste-toolbar .mblock-clear-clipboard',
                 handler: function (e) {
                     e.preventDefault();
-                    if (typeof MBlockClipboard !== 'undefined') {
-                        MBlockClipboard.clear();
-                        mblock_show_message('Zwischenablage geleert', 'info', 2000);
+                    try {
+                        if (typeof MBlockClipboard !== 'undefined') {
+                            MBlockClipboard.clear();
+                        }
+                    } catch (error) {
+                        console.error('MBlock: Fehler in clear clipboard click handler:', error);
                     }
+                    return false;
                 }
             }
         ];
 
         // Bind all toolbar events
         toolbarEvents.forEach(({selector, handler}) => {
-            MBlockUtils.events.bindSafe(MBlockUtils.dom.findElement(element, selector), 'click', handler);
+            const elements = MBlockUtils.dom.findElement(element, selector);
+            MBlockUtils.events.bindSafe(elements, 'click', handler);
         });
             
     } catch (error) {
@@ -869,3 +1072,5 @@ function mblock_init_toolbar(element) {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { MBlockSortable };
 }
+
+

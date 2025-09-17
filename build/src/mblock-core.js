@@ -1,3 +1,5 @@
+
+// ==================== MBLOCK CORE MODULE ====================
 /**
  * MBlock Core - Base functionality and utilities
  * 
@@ -85,10 +87,16 @@ const MBlockUtils = {
             try {
                 if (!container || !container.length) return;
                 container.find('.mblock_wrapper').each(function() {
-                    const $nestedWrapper = $(this);
-                    // Remove duplicate initialization
-                    if ($nestedWrapper.data('mblock_initialized')) {
-                        $nestedWrapper.removeData('mblock_initialized');
+                    const $wrapper = $(this);
+                    
+                    // Remove duplicate single-add buttons
+                    const $addButtons = $wrapper.find('> .mblock-single-add');
+                    if ($addButtons.length > 1) {$addButtons.slice(1).remove(); // Keep first, remove rest
+                    }
+                    
+                    // Remove single-add button if there are sortitems
+                    const $sortItems = $wrapper.find('> .sortitem');
+                    if ($sortItems.length > 0 && $addButtons.length > 0) {$addButtons.remove();
                     }
                 });
             } catch (error) {
@@ -105,9 +113,14 @@ const MBlockUtils = {
                 if (!container || !container.length) return;
                 container.find('.mblock_wrapper').each(function() {
                     const $nestedWrapper = $(this);
-                    if (!$nestedWrapper.data('mblock_initialized')) {
-                        mblock_init($nestedWrapper);
-                        $nestedWrapper.data('mblock_initialized', true);
+                    if ($nestedWrapper.length) {
+                        // Clean up first
+                        MBlockUtils.nested.cleanupDuplicates($nestedWrapper.parent());
+                        
+                        // Reset initialization flag
+                        $nestedWrapper.removeData('mblock_run');
+                        
+                        // Initializemblock_init($nestedWrapper);
                     }
                 });
             } catch (error) {
@@ -158,6 +171,7 @@ function mblock_show_message(message, type = 'warning', duration = 5000) {
         // Use internal toast fallback if available
         if (typeof MBLOCK_TOAST !== 'undefined' && MBLOCK_TOAST.show) {
             MBLOCK_TOAST.show(message, type, duration);
+            return;
         }
 
         // Fallback to console
@@ -207,15 +221,10 @@ const MBLOCK_TOAST = (function () {
             toast.innerText = message;
             cont.appendChild(toast);
             setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.style.opacity = '0';
-                    toast.style.transform = 'translateX(100%)';
-                }
+                try { toast.style.opacity = '0'; toast.style.transition = 'opacity 250ms ease'; } catch (e) {}
             }, Math.max(50, duration - 250));
             setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.parentNode.removeChild(toast);
-                }
+                try { if (toast.parentNode) toast.parentNode.removeChild(toast); } catch (e) {}
             }, duration + 100);
             return id;
         } catch (e) {
@@ -235,7 +244,7 @@ function mblock_get_text(key, fallback = '') {
     }
     
     // Secondary: Try rex_i18n if available
-    if (typeof rex !== 'undefined' && rex.i18n && typeof rex.i18n.msg === 'function') {
+    if (typeof rex !== 'undefined' && rex.i18n) {
         const text = rex.i18n.msg(key);
         return text !== key ? text : fallback; // Return fallback if key not found
     }
@@ -347,7 +356,7 @@ function checkCopyPasteEnabled() {
         if ($wrapper.length) {
             const copyPasteAttr = $wrapper.attr('data-copy_paste');
             if (copyPasteAttr !== undefined) {
-                return copyPasteAttr === 'true' || copyPasteAttr === '1';
+                return (copyPasteAttr === '1' || copyPasteAttr === 'true' || copyPasteAttr === true);
             }
         }
         
@@ -398,14 +407,18 @@ function mblock_smooth_scroll_to_element(element, options = {}) {
             });
         } else {
             // Fallback for very old browsers
-            element.scrollIntoView(config);
+            element.scrollIntoView({
+                behavior: config.behavior,
+                block: config.block,
+                inline: config.inline
+            });
         }
     } catch (error) {
         // Ultimate fallback
         try {
             element.scrollIntoView();
         } catch (fallbackError) {
-            console.warn('MBlock: Scroll fallback failed:', fallbackError);
+            console.warn('MBlock: Smooth scroll nicht verfügbar:', fallbackError);
         }
     }
 }
@@ -414,3 +427,5 @@ function mblock_smooth_scroll_to_element(element, options = {}) {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { MBlockUtils, mblock_show_message, mblock_get_text, mblock_validate_element };
 }
+
+
