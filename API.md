@@ -343,108 +343,518 @@ window.mblock_gridblock_hooks.push(function(container) {
 
 ### Events
 
-MBlock feuert verschiedene Events für erweiterte Integration:
+MBlock bietet ein **umfassendes Event-System** für erweiterte Integration mit Texteditoren und anderen AddOns:
 
-#### Tatsächlich verfügbare Events
+#### 🔥 NEW: Vollständiges MBlock Event-System
 
-**⚠️ Wichtiger Hinweis**: Viele dokumentierte MBlock-Events existieren **nicht** im Code! Verwenden Sie nur die folgenden **bestätigten Events**:
+**Alle neuen Events** sind sowohl **lokal** (auf dem Element) als auch **global** (auf document) verfügbar:
+
+#### Block-Erstellung Events
 
 ```javascript
-// ✅ Das einzige echte MBlock-Event  
-$(document).on('mblock:change', function(e, element) {
-    console.log('Block-Änderung (Sortierung/Verschiebung):', element);
-    // Wird bei Drag & Drop und Move-Buttons ausgelöst
+// Block wurde erstellt (vor jeder Initialisierung)
+$(document).on('mblock:item:created', function(e, item, wrapper) {
+    console.log('Neuer Block erstellt:', item);
+    // Perfekt für erste Widget-Setup, bevor rex:ready feuert
 });
 
-// ✅ Standard REDAXO-Event für neue Blöcke
+// Initialisierung startet (nach rex:ready, vor Widget-Setup)
+$(document).on('mblock:item:init:start', function(e, item, wrapper) {
+    console.log('Block-Initialisierung startet:', item);
+    // Für pre-widget Setup-Logik
+});
+
+// REX-Widgets sind fertig initialisiert
+$(document).on('mblock:item:widgets:ready', function(e, item, wrapper) {
+    console.log('REX-Widgets bereit:', item);
+    // REX_MEDIA, REX_LINK, etc. sind nun funktional
+});
+
+// Block ist vollständig bereit für Third-Party AddOns
+$(document).on('mblock:item:ready', function(e, item, wrapper) {
+    console.log('Block bereit für Third-Party Integration:', item);
+    // ⭐ HAUPTEVENT für Texteditor-Integration!
+});
+
+// Animation ist abgeschlossen
+$(document).on('mblock:item:animated', function(e, item, wrapper) {
+    console.log('Block-Animation abgeschlossen:', item);
+    // Für Animationen die nach dem Glow-Effekt starten sollen
+});
+
+// Block ist vollständig fertig (gescrollt, animiert, alles)
+$(document).on('mblock:item:complete', function(e, item, wrapper) {
+    console.log('Block vollständig abgeschlossen:', item);
+    // Für finale Cleanup- oder Analyse-Tasks
+});
+```
+
+#### Block-Löschung Events
+
+```javascript
+// Vor dem Löschen (kann Cancel-Logic enthalten)
+$(document).on('mblock:item:before:remove', function(e, item, wrapper) {
+    console.log('Block wird gelöscht:', item);
+    // Cleanup von Third-Party Widgets vor Löschung
+    item.find('.ckeditor').each(function() {
+        if (this.ckeditorInstance) {
+            this.ckeditorInstance.destroy();
+        }
+    });
+});
+
+// Nach dem Löschen
+$(document).on('mblock:item:removed', function(e, wrapper, prevItem) {
+    console.log('Block wurde gelöscht, Focus auf:', prevItem);
+    // Für Reindexierung oder Cleanup nach Löschung
+});
+```
+
+#### Copy & Paste Events
+
+```javascript
+// Vor dem Kopieren
+$(document).on('mblock:item:before:copy', function(e, item, wrapper) {
+    console.log('Block wird kopiert:', item);
+    // Texteditor-Inhalte für Copy vorbereiten
+});
+
+// Nach erfolgreichem Kopieren  
+$(document).on('mblock:item:copied', function(e, item, wrapper, clipboardData) {
+    console.log('Block kopiert, Clipboard:', clipboardData);
+    // Copy-Feedback oder Analytics
+});
+
+// Vor dem Einfügen
+$(document).on('mblock:item:before:paste', function(e, wrapper, afterItem) {
+    console.log('Block wird eingefügt nach:', afterItem);
+    // Pre-Paste Setup
+});
+
+// Nach erfolgreichem Einfügen
+$(document).on('mblock:item:pasted', function(e, pastedItem, wrapper, clipboardData) {
+    console.log('Block eingefügt:', pastedItem);
+    // ⭐ WICHTIG für Texteditor nach Paste-Operation!
+});
+```
+
+#### Legacy Events (weiterhin verfügbar)
+
+```javascript
+// Block-Änderung (Sortierung/Verschiebung) - bestehendes Event
+$(document).on('mblock:change', function(e, element) {
+    console.log('Block-Sortierung:', element);
+});
+
+// Standard REDAXO-Event (funktioniert weiterhin)
 $(document).on('rex:ready', function(e, container) {
     if (container) {
-        console.log('Neue Inhalte hinzugefügt:', container);
-        // Wird bei Add-Button und initialer Seitenladung ausgelöst
+        console.log('REX-Ready Event:', container);
     }
 });
 ```
 
-#### Copy & Paste Detection (über DOM Events)
+## 💡 Integration mit Texteditoren
 
-Da MBlock **keine nativen Copy/Paste Events** hat, verwenden Sie DOM-Events:
+### CKEditor 4/5 Integration
+
+**⭐ NEU: Verwende die spezifischen MBlock-Events für optimale Integration:**
 
 ```javascript
-// Copy & Paste Detection über DOM-Änderungen
-$(document).on('change input', '.mblock_wrapper textarea, .mblock_wrapper input', function() {
-    const $wrapper = $(this).closest('.mblock_wrapper');
-    if ($wrapper.length) {
-        console.log('Mögliche Copy/Paste Operation erkannt');
+// ✅ BESTE PRAXIS: Neue Texteditor-Integration
+$(document).on('mblock:item:ready', function(e, item, wrapper) {
+    console.log('Block bereit für Texteditor-Setup:', item);
+    
+    // CKEditor 4 - Item ist komplett initialisiert
+    item.find('textarea.ckeditor').each(function() {
+        if (!this.ckeditorInstance && this.id) {
+            CKEDITOR.replace(this.id, {
+                // Deine CKEditor Config
+                height: 200,
+                toolbar: 'Basic'
+            });
+            this.ckeditorInstance = CKEDITOR.instances[this.id];
+        }
+    });
+    
+    // CKEditor 5 - Item ist komplett initialisiert
+    item.find('.ckeditor5').each(function() {
+        if (!this.ckeditorInstance) {
+            ClassicEditor.create(this, {
+                // Deine CKEditor 5 Config
+            }).then(editor => {
+                this.ckeditorInstance = editor;
+            });
+        }
+    });
+});
+
+// ✅ BESTE PRAXIS: Texteditor nach Copy & Paste neu initialisieren
+$(document).on('mblock:item:pasted', function(e, pastedItem, wrapper, clipboardData) {
+    console.log('Eingefügten Block für Texteditoren setup:', pastedItem);
+    
+    // CKEditor für kopierten Block neu initialisieren
+    pastedItem.find('textarea.ckeditor').each(function() {
+        // Neue eindeutige ID generieren
+        const newId = this.id + '_copy_' + Date.now();
+        this.id = newId;
         
-        // Debounce für bessere Performance
-        clearTimeout($wrapper.data('reinit-timeout'));
-        $wrapper.data('reinit-timeout', setTimeout(() => {
-            // Komponenten reinitialisieren
-            reinitializeComponents($wrapper);
-        }, 300));
-    }
+        CKEDITOR.replace(newId);
+        this.ckeditorInstance = CKEDITOR.instances[newId];
+    });
+});
+
+// ✅ BESTE PRAXIS: Cleanup bei Block-Löschung
+$(document).on('mblock:item:before:remove', function(e, item, wrapper) {
+    console.log('Cleanup Texteditoren vor Löschung:', item);
+    
+    // CKEditor 4 Instances zerstören
+    item.find('.ckeditor').each(function() {
+        if (this.ckeditorInstance) {
+            this.ckeditorInstance.destroy();
+            this.ckeditorInstance = null;
+        }
+    });
+    
+    // CKEditor 5 Instances zerstören  
+    item.find('.ckeditor5').each(function() {
+        if (this.ckeditorInstance) {
+            this.ckeditorInstance.destroy();
+            this.ckeditorInstance = null;
+        }
+    });
 });
 ```
 
-#### ❌ Diese Events existieren NICHT:
-
-- `mblock:add` - **Nicht vorhanden**
-- `mblock:remove` - **Nicht vorhanden**  
-- `mblock:sort` - **Nicht vorhanden**
-- `mblock:ready` - **Nicht vorhanden**
-- `mblock:copy` - **Nicht vorhanden**
-- `mblock:paste` - **Nicht vorhanden**
-- `mblock:clipboard-clear` - **Nicht vorhanden**
-- `mblock:status-change` - **Nicht vorhanden**
-
-#### Korrekte Integration Pattern
+### Form Builder & Custom Widget Integration
 
 ```javascript
-// Universal MBlock-Integration - funktioniert für alle Szenarien
+// Multi-Select, Datepicker, Custom Komponenten
+$(document).on('mblock:item:ready', function(e, item, wrapper) {
+    
+    // Select2 / Chosen Reinitialisiern
+    item.find('.select2').each(function() {
+        $(this).select2('destroy').select2();
+    });
+    
+    // Datepicker
+    item.find('.datepicker').datepicker({
+        format: 'dd.mm.yyyy'
+    });
+    
+    // Custom Form Components
+    item.find('.custom-widget').each(function() {
+        $(this).customWidget({
+            // Config
+        });
+    });
+});
+
+// Color Picker, File Uploader, etc.
+$(document).on('mblock:item:widgets:ready', function(e, item, wrapper) {
+    
+    // Color Picker nach REX-Widgets
+    item.find('.colorpicker').colorpicker();
+    
+    // File Uploader
+    item.find('.file-uploader').fileupload({
+        // Uploader Config
+    });
+});
+```
+
+### Third-Party AddOn Integration Pattern
+
+```javascript
+// Vollständige AddOn-Integration
+(function($) {
+    'use strict';
+    
+    // Dein AddOn Namespace  
+    const MyAddOn = {
+        
+        // Komponente initialisieren
+        init: function(container) {
+            container.find('.my-component').each(function() {
+                const $elem = $(this);
+                if (!$elem.data('my-addon-ready')) {
+                    $elem.myPlugin();
+                    $elem.data('my-addon-ready', true);
+                }
+            });
+        },
+        
+        // Cleanup vor Löschung
+        cleanup: function(container) {
+            container.find('.my-component').each(function() {
+                const $elem = $(this);
+                if ($elem.data('my-addon-ready')) {
+                    $elem.myPlugin('destroy');
+                    $elem.removeData('my-addon-ready');
+                }
+            });
+        }
+    };
+    
+    // Event Bindings
+    $(document).on('mblock:item:ready', function(e, item) {
+        MyAddOn.init(item);
+    });
+    
+    $(document).on('mblock:item:pasted', function(e, item) {
+        MyAddOn.init(item);
+    });
+    
+    $(document).on('mblock:item:before:remove', function(e, item) {
+        MyAddOn.cleanup(item);
+    });
+    
+})(jQuery);
+```
+
+
+### 🔄 Legacy Integration (rex:ready)
+
+**Für bestehende AddOns ohne Event-Update:**
+
+```javascript
+// 🔄 LEGACY: Alte rex:ready Integration (funktioniert weiterhin)
 $(document).on('rex:ready', function(e, container) {
-    // Neue Blöcke (Add-Button, initiale Ladung)
-    if (container && container.length) {
-        initializeMyComponents(container);
+    if (container) {
+        // Fallback für existierende Implementierungen
+        container.find('textarea.ckeditor').each(function() {
+            if (!this.ckeditorInstance) {
+                CKEDITOR.replace(this.id);
+                this.ckeditorInstance = CKEDITOR.instances[this.id];
+            }
+        });
     }
 });
 
+// Alte Universal-Integration
 $(document).on('mblock:change', function(e, element) {
-    // Sortierte/verschobene Blöcke
+    // Sortierte/verschobene Blöcke (Legacy Event)
     if (element && element.length) {
         reinitializeMyComponents(element);
     }
 });
+```
 
-// Copy & Paste Detection
-$(document).on('change input', '.mblock_wrapper textarea, .mblock_wrapper input', function() {
-    const $wrapper = $(this).closest('.mblock_wrapper');
-    if ($wrapper.length) {
-        debouncedReinit($wrapper);
-    }
+### Event-Parameter Referenz
+
+#### Neue Events Parameter
+
+```javascript
+### Event-Parameter Referenz
+
+#### Alle Event-Parameter im Detail
+
+```javascript
+// mblock:item:created - Block wurde erstellt (vor rex:ready)
+function(event, item, wrapper) {
+    // item: jQuery-Element des neuen Blocks (<div class="mblock_item">)
+    // wrapper: jQuery-Element des mblock_wrapper
+}
+
+// mblock:item:init:start - Initialisierung startet (nach rex:ready)
+function(event, item, wrapper) {
+    // item: Block nach rex:ready Event
+    // wrapper: Parent mblock_wrapper  
+}
+
+// mblock:item:widgets:ready - REX-Widgets sind initialisiert
+function(event, item, wrapper) {
+    // item: Block mit funktionalen REX_MEDIA/REX_LINK Widgets
+    // wrapper: Parent Container
+}
+
+// ⭐ mblock:item:ready - HAUPTEVENT für Third-Party Integration
+function(event, item, wrapper) {
+    // item: Vollständig initialisierter Block, bereit für Texteditoren
+    // wrapper: Parent mblock_wrapper  
+}
+
+// mblock:item:animated - Animation abgeschlossen
+function(event, item, wrapper) {
+    // item: Block nach Glow-Animation
+    // wrapper: Parent Container
+}
+
+// mblock:item:complete - Block vollständig fertig
+function(event, item, wrapper) {
+    // item: Block komplett initialisiert, animiert, gescrollt
+    // wrapper: Parent Container
+}
+
+// mblock:item:before:remove - Vor Block-Löschung
+function(event, item, wrapper) {
+    // item: Block der gelöscht wird (für Cleanup)
+    // wrapper: Parent Container
+}
+
+// mblock:item:removed - Nach Block-Löschung
+function(event, wrapper, prevItem) {
+    // wrapper: Parent Container nach Löschung
+    // prevItem: Vorheriger Block (für Focus-Management)
+}
+
+// mblock:item:before:copy - Vor Copy-Operation
+function(event, item, wrapper) {
+    // item: Block der kopiert wird
+    // wrapper: Source Container
+}
+
+// mblock:item:copied - Nach Copy-Operation  
+function(event, item, wrapper, clipboardData) {
+    // item: Kopierter Block
+    // wrapper: Source Container
+    // clipboardData: Clipboard-Inhalt als String
+}
+
+// mblock:item:before:paste - Vor Paste-Operation
+function(event, wrapper, afterItem) {
+    // wrapper: Ziel-Container
+    // afterItem: Block nach dem eingefügt wird (oder null für Ende)
+}
+
+// ⭐ mblock:item:pasted - WICHTIG für Texteditor nach Paste
+function(event, pastedItem, wrapper, clipboardData) {
+    // pastedItem: Eingefügter Block (neue IDs!)
+    // wrapper: Ziel-Container
+    // clipboardData: Original Clipboard-Daten
+}
+```
+
+## 🚀 Quick Start Guide
+
+### Für Texteditor-Integration
+
+```javascript
+// Minimaler Setup für CKEditor/TinyMCE
+$(document).on('mblock:item:ready mblock:item:pasted', function(e, item) {
+    item.find('.wysiwyg').each(function() {
+        if (!this.editorReady) {
+            // Dein Editor Setup
+            CKEDITOR.replace(this.id);
+            this.editorReady = true;
+        }
+    });
 });
 
-function initializeMyComponents(container) {
-    container.find('.my-component').each(function() {
-        const $element = $(this);
-        if (!$element.data('my-component-ready')) {
-            $element.myPlugin();
-            $element.data('my-component-ready', true);
+// Cleanup bei Löschung
+$(document).on('mblock:item:before:remove', function(e, item) {
+    item.find('.wysiwyg').each(function() {
+        if (this.editorReady && CKEDITOR.instances[this.id]) {
+            CKEDITOR.instances[this.id].destroy();
         }
     });
-}
+});
+```
 
-function reinitializeMyComponents(container) {
-    // Destroy und Reinit nach Sortierung
-    container.find('.my-component').each(function() {
-        const $element = $(this);
-        $element.removeData('my-component-ready');
-        if (typeof $element.myPlugin === 'function') {
-            $element.myPlugin('destroy'); // Falls unterstützt
-        }
-        $element.myPlugin();
-        $element.data('my-component-ready', true);
+### Für Custom Widget Integration
+
+```javascript
+// Setup für Select2, Datepicker, etc.
+$(document).on('mblock:item:ready', function(e, item) {
+    // Select2
+    item.find('.select2').select2();
+    
+    // Datepicker  
+    item.find('.datepicker').datepicker();
+    
+    // Custom Widgets
+    item.find('.my-widget').myWidget();
+});
+```
+
+### Für Analytics & Tracking
+
+```javascript
+// Event-Tracking
+$(document).on('mblock:item:created mblock:item:copied mblock:item:removed', 
+function(e, item) {
+    gtag('event', 'mblock_' + e.type.split(':').pop(), {
+        'event_category': 'MBlock'
     });
-}
+});
+```
+```
+
+## 🎯 Callbacks & Hooks
+
+### Callback-Funktionen für PHP
+
+```php
+// settings.php - Globale MBlock-Callbacks
+rex_mblock::addCallback('beforeAdd', function($mblockName, $data) {
+    // Vor dem Hinzufügen eines Blocks
+    return $data; // Modifizierte Daten zurückgeben
+});
+
+rex_mblock::addCallback('afterAdd', function($mblockName, $data) {
+    // Nach dem Hinzufügen
+    // Logging, Analytics, etc.
+});
+
+rex_mblock::addCallback('beforeSave', function($mblockName, $allData) {
+    // Vor dem Speichern aller Blöcke
+    return $allData; // Validation, Sanitizing
+});
+
+rex_mblock::addCallback('afterSave', function($mblockName, $allData) {
+    // Nach dem Speichern
+    // Cache-Invalidierung, Webhook-Calls
+});
+```
+
+### JavaScript Event-Callbacks
+
+```javascript
+// Callback-Funktionen für Events registrieren
+const MBlockCallbacks = {
+    
+    // Texteditor-Integration
+    setupTexteditors: function(item) {
+        item.find('.wysiwyg').each(function() {
+            if (!this.editorInstance) {
+                this.editorInstance = new WYSIWYG(this);
+            }
+        });
+    },
+    
+    // Analytics & Tracking  
+    trackBlockAction: function(action, item, data = {}) {
+        gtag('event', 'mblock_action', {
+            'event_category': 'MBlock',
+            'event_label': action,
+            'custom_data': data
+        });
+    },
+    
+    // Form Validation
+    validateBlock: function(item) {
+        const isValid = item.find('input[required]').every(function() {
+            return $(this).val().trim() !== '';
+        });
+        
+        item.toggleClass('has-errors', !isValid);
+        return isValid;
+    }
+};
+
+// Event-Bindings mit Callbacks
+$(document).on('mblock:item:ready', function(e, item, wrapper) {
+    MBlockCallbacks.setupTexteditors(item);
+    MBlockCallbacks.validateBlock(item);
+});
+
+$(document).on('mblock:item:created', function(e, item, wrapper) {
+    MBlockCallbacks.trackBlockAction('created', item);
+});
+
+$(document).on('mblock:item:pasted', function(e, item, wrapper, data) {
+    MBlockCallbacks.trackBlockAction('pasted', item, data);
+});
 ```
 
 ### Methoden
