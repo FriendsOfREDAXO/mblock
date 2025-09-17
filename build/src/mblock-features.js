@@ -250,6 +250,9 @@ var MBlockClipboard = {
                 return false;
             }
             
+            // 🔥 NEW: Trigger event before copying
+            item.trigger('mblock:item:before:copy', [item, element]);
+            $(document).trigger('mblock:item:before:copy', [item, element]);
             
             // Get module type from the closest mblock wrapper
             const wrapper = item.closest('.mblock_wrapper');
@@ -278,6 +281,10 @@ var MBlockClipboard = {
             
             // Save to storage
             const saved = this.saveToStorage();
+            
+            // 🔥 NEW: Trigger event after copying
+            item.trigger('mblock:item:copied', [item, element, this.data]);
+            $(document).trigger('mblock:item:copied', [item, element, this.data]);
             
             // Update paste button states
             this.updatePasteButtons();
@@ -450,6 +457,10 @@ var MBlockClipboard = {
     },
     paste: function(element, afterItem) {
         try {
+            // 🔥 NEW: Trigger event before pasting
+            element.trigger('mblock:item:before:paste', [element, afterItem]);
+            $(document).trigger('mblock:item:before:paste', [element, afterItem]);
+            
             // Load fresh data from storage in case it was updated in another tab
             this.loadFromStorage();
             if (!this.data) {
@@ -572,6 +583,10 @@ var MBlockClipboard = {
             setTimeout(() => {
                 if (pastedItem && pastedItem.length && pastedItem.is(':visible')) {
                     MBlockUtils.animation.addGlowEffect(pastedItem, 'mblock-paste-glow', 1200);
+                    
+                    // 🔥 NEW: Trigger event after pasting complete
+                    pastedItem.trigger('mblock:item:pasted', [pastedItem, element, this.data]);
+                    $(document).trigger('mblock:item:pasted', [pastedItem, element, this.data]);
                     
                     // Centralized success feedback (uses BLOECKS when available, otherwise MBLOCK fallback)
                     const message = '✅ ' + mblock_get_text('mblock_toast_paste_success', 'Block erfolgreich eingefügt!');

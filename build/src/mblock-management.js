@@ -622,11 +622,18 @@ function mblock_add_item(element, item) {
     // reinit first
     mblock_init_sort(element);
     
+    // 🔥 NEW: Trigger event for block created (before any initialization)
+    iClone.trigger('mblock:item:created', [iClone, element]);
+    $(document).trigger('mblock:item:created', [iClone, element]);
+    
     // trigger rex:ready event only on the new item for component initialization
     iClone.trigger('rex:ready', [iClone]);
     
     // CRITICAL: Initialize nested MBlocks BEFORE other components to prevent duplicate initialization
     setTimeout(function() {
+        // 🔥 NEW: Trigger event for initialization start
+        iClone.trigger('mblock:item:init:start', [iClone, element]);
+        $(document).trigger('mblock:item:init:start', [iClone, element]);
         // Use utility function for safe nested MBlock initialization
         MBlockUtils.nested.initializeNested(iClone);
         
@@ -654,18 +661,35 @@ function mblock_add_item(element, item) {
             mblock_reinitialize_redaxo_widgets(iClone);
         }
         
+        // 🔥 NEW: Trigger event for widgets initialized
+        iClone.trigger('mblock:item:widgets:ready', [iClone, element]);
+        $(document).trigger('mblock:item:widgets:ready', [iClone, element]);
+        
         // trigger change events to update any dependent elements
         iClone.find('input, select, textarea').trigger('change');
+        
+        // 🔥 NEW: Trigger event for third-party addons (Texteditoren, etc.)
+        iClone.trigger('mblock:item:ready', [iClone, element]);
+        $(document).trigger('mblock:item:ready', [iClone, element]);
         
         // Add glow animation for new blocks (same as paste operation)
         if (typeof MBlockUtils !== 'undefined' && MBlockUtils.animation && MBlockUtils.animation.addGlowEffect) {
             MBlockUtils.animation.addGlowEffect(iClone);
         }
         
+        // 🔥 NEW: Trigger event for animation complete
+        setTimeout(function() {
+            iClone.trigger('mblock:item:animated', [iClone, element]);
+            $(document).trigger('mblock:item:animated', [iClone, element]);
+        }, 150);
+        
         // scroll to item after animation starts (longer delay to ensure animation and DOM are ready)
         setTimeout(function() {
             if (iClone && iClone.length && iClone.is(':visible')) {
                 mblock_scroll(element, iClone);
+                // 🔥 NEW: Trigger event for completely ready (scrolled, animated, everything done)
+                iClone.trigger('mblock:item:complete', [iClone, element]);
+                $(document).trigger('mblock:item:complete', [iClone, element]);
             }
         }, 200);
     }, 50);
@@ -737,6 +761,10 @@ function mblock_remove_item(element, item) {
         const itemParent = item.parent();
         const elementClass = element.attr('class');
         if (itemParent.length && elementClass && itemParent.hasClass(elementClass)) {
+            // 🔥 NEW: Trigger event before removal
+            item.trigger('mblock:item:before:remove', [item, element]);
+            $(document).trigger('mblock:item:before:remove', [item, element]);
+            
             // Destroy sortable before manipulation
             MBlockSortable.destroy(element);
 
@@ -749,6 +777,10 @@ function mblock_remove_item(element, item) {
 
             // Safe element removal with event cleanup using utilities
             if (MBlockUtils.dom.safeRemove(item)) {
+                // 🔥 NEW: Trigger event after removal
+                element.trigger('mblock:item:removed', [element, prevItem]);
+                $(document).trigger('mblock:item:removed', [element, prevItem]);
+                
                 // reinit
                 mblock_init_sort(element);
                 // scroll to item (falls ein vorheriges Element existiert)
