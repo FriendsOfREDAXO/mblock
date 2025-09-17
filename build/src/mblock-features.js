@@ -1,3 +1,5 @@
+
+
 // ================== MBLOCK FEATURES MODULE ==================
 /**
  * MBlock Features - Advanced functionality
@@ -1066,6 +1068,7 @@ var MBlockClipboard = {
     },
     updatePasteButtons: function() {
         const hasData = !!this.data;
+        
         if (hasData) {
             // Prüfe Modulkompatibilität für alle sichtbaren MBlock-Wrapper
             $('.mblock_wrapper').each((index, wrapperElement) => {

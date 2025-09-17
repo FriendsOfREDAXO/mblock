@@ -1,3 +1,5 @@
+
+
 // ================== MBLOCK MANAGEMENT MODULE ================
 /**
  * MBlock Management - DOM manipulation and sortable handling
@@ -650,13 +652,6 @@ function mblock_add_item(element, item) {
             mblock_scroll(element, iClone);
         }
     }, 100);
-    
-    // ✨ Add glow effect to new item (same animation as paste)
-    setTimeout(() => {
-        if (iClone && iClone.length && iClone.is(':visible')) {
-            MBlockUtils.animation.addGlowEffect(iClone, 'mblock-paste-glow', 1200);
-        }
-    }, 150);
 }
 
 function mblock_set_unique_id(item, input_delete) {
@@ -849,8 +844,7 @@ function mblock_add(element) {
                             if (itemIndex) {
                                 element.attr('data-mblock_clicked_add_item', itemIndex);
                             }
-                            const $targetItem = $this.closest('div[class^="sortitem"]');
-                            mblock_add_item(element, $targetItem);
+                            mblock_add_item(element, $this.closest('div[class^="sortitem"]'));
                         }
                     } catch (error) {
                         console.error('MBlock: Fehler in addme click handler:', error);
@@ -866,8 +860,7 @@ function mblock_add(element) {
                     try {
                         const $this = $(this);
                         if (!MBlockUtils.state.isDisabled($this)) {
-                            const $targetItem = $this.closest('div[class^="sortitem"]');
-                            mblock_remove_item(element, $targetItem);
+                            mblock_remove_item(element, $this.closest('div[class^="sortitem"]'));
                         }
                     } catch (error) {
                         console.error('MBlock: Fehler in removeme click handler:', error);
@@ -883,8 +876,7 @@ function mblock_add(element) {
                     try {
                         const $this = $(this);
                         if (!MBlockUtils.state.isDisabled($this)) {
-                            const $targetItem = $this.closest('div[class^="sortitem"]');
-                            mblock_moveup(element, $targetItem);
+                            mblock_moveup(element, $this.closest('div[class^="sortitem"]'));
                         }
                     } catch (error) {
                         console.error('MBlock: Fehler in moveup click handler:', error);
@@ -900,8 +892,7 @@ function mblock_add(element) {
                     try {
                         const $this = $(this);
                         if (!MBlockUtils.state.isDisabled($this)) {
-                            const $targetItem = $this.closest('div[class^="sortitem"]');
-                            mblock_movedown(element, $targetItem);
+                            mblock_movedown(element, $this.closest('div[class^="sortitem"]'));
                         }
                     } catch (error) {
                         console.error('MBlock: Fehler in movedown click handler:', error);
@@ -949,9 +940,9 @@ mblock_add._bindCopyPasteHandlers = function(element) {
             e.preventDefault();
             try {
                 const $this = $(this);
-                const $targetItem = $this.closest('div[class^="sortitem"]');
+                const $item = $this.closest('div[class^="sortitem"]');
                 if (typeof MBlockClipboard !== 'undefined') {
-                    MBlockClipboard.copy(element, $targetItem);
+                    MBlockClipboard.copy(element, $item);
                 }
             } catch (error) {
                 console.error('MBlock: Fehler in copy click handler:', error);
@@ -968,9 +959,9 @@ mblock_add._bindCopyPasteHandlers = function(element) {
             try {
                 const $this = $(this);
                 if (!MBlockUtils.state.isDisabled($this)) {
-                    const $targetItem = $this.closest('div[class^="sortitem"]');
+                    const $item = $this.closest('div[class^="sortitem"]');
                     if (typeof MBlockClipboard !== 'undefined') {
-                        MBlockClipboard.paste(element, $targetItem);
+                        MBlockClipboard.paste(element, $item);
                     }
                 }
             } catch (error) {
@@ -987,9 +978,9 @@ mblock_add._bindToggleHandlers = function(element) {
         e.preventDefault();
         try {
             const $this = $(this);
-            const $targetItem = $this.closest('div[class^="sortitem"]');
+            const $item = $this.closest('div[class^="sortitem"]');
             if (typeof MBlockOnlineToggle !== 'undefined') {
-                MBlockOnlineToggle.toggle(element, $targetItem);
+                MBlockOnlineToggle.toggle(element, $item);
             }
         } catch (error) {
             console.error('MBlock: Fehler in online/offline toggle handler:', error);
@@ -1003,9 +994,9 @@ mblock_add._bindToggleHandlers = function(element) {
         e.preventDefault();
         try {
             const $this = $(this);
-            const $targetItem = $this.closest('div[class^="sortitem"]');
+            const $item = $this.closest('div[class^="sortitem"]');
             if (typeof MBlockOnlineToggle !== 'undefined') {
-                MBlockOnlineToggle.toggleAutoDetected(element, $targetItem, $this);
+                MBlockOnlineToggle.toggleAutoDetected(element, $item, $this);
             }
         } catch (error) {
             console.error('MBlock: Fehler in auto-detected toggle handler:', error);
@@ -1072,5 +1063,3 @@ function mblock_init_toolbar(element) {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { MBlockSortable };
 }
-
-

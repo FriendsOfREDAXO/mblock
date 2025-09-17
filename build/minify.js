@@ -28,30 +28,30 @@ const terserOptions = {
         pure_funcs: ['console.log', 'console.debug', 'console.info'],
         drop_console: false, // Keep console.error/warn but remove others
         drop_debugger: true,
-        passes: 2,
+        passes: 1,
         unsafe_arrows: false,
         unsafe_methods: false,
-        hoist_funs: true,
-        hoist_vars: true,
+        hoist_funs: false,
+        hoist_vars: false,
         if_return: true,
-        join_vars: true,
-        collapse_vars: true,
-        reduce_vars: true,
+        join_vars: false,
+        collapse_vars: false,
+        reduce_vars: false,
         warnings: false,
         negate_iife: true,
         pure_getters: false,
         keep_fargs: false,
         keep_fnames: false,
         keep_infinity: true,
-        sequences: true,
+        sequences: false,
         dead_code: true,
-        conditionals: true,
-        comparisons: true,
-        evaluate: true,
+        conditionals: false,
+        comparisons: false,
+        evaluate: false,
         booleans: true,
         loops: true,
-        unused: true,
-        toplevel: true
+        unused: false,
+        toplevel: false
     },
     mangle: {
         // Preserve specific function names that might be called externally
@@ -74,15 +74,22 @@ const terserOptions = {
             'removeClass',
             '$this',
             '$targetItem',
-            '$item'
+            '$item',
+            'jQuery',
+            '$',
+            'element',
+            'item',
+            'targetItem',
+            'mblock_add_item',
+            'mblock_remove_item',
+            'mblock_moveup',
+            'mblock_movedown'
         ],
-        toplevel: true,
-        eval: true,
-        keep_fnames: false,
+        toplevel: false,
+        eval: false,
+        keep_fnames: true,
         safari10: true,
-        properties: {
-            regex: /^_[A-Z]/ // Preserve private properties starting with underscore
-        }
+        properties: false // Disable property mangling completely
     },
     format: {
         comments: false, // Remove all comments
