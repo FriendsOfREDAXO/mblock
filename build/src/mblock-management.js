@@ -345,7 +345,9 @@ function mblock_reindex_form_elements($sortItem, index, sindex, mblock_count) {
             }
             
             if (elementName) {
-                const newName = elementName.replace(/\[(\d+)\]/, '[' + sindex + ']');
+                // Remove mblock_new_ prefix and update index
+                let newName = elementName.replace(/^mblock_new_/, '');
+                newName = newName.replace(/\[(\d+)\]/, '[' + sindex + ']');
                 $element.attr('name', newName);
             }
             
