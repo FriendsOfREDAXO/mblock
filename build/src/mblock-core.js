@@ -235,7 +235,7 @@ function mblock_get_text(key, fallback = '') {
     }
     
     // Secondary: Try rex_i18n if available
-    if (typeof rex !== 'undefined' && rex.i18n) {
+    if (typeof rex !== 'undefined' && rex.i18n && typeof rex.i18n.msg === 'function') {
         const text = rex.i18n.msg(key);
         return text !== key ? text : fallback; // Return fallback if key not found
     }

@@ -551,24 +551,32 @@ function mblock_add_item(element, item) {
 function mblock_set_unique_id(item, input_delete) {
     try {
         if (!item || !item.length || typeof item.find !== 'function') {
-            console.warn('MBlock: Invalid item passed to mblock_set_unique_id');
+            console.warn('MBlock: Ungültiges Item bei mblock_set_unique_id');
             return false;
         }
 
         item.find('input').each(function () {
-            const $input = $(this);
-            const name = $input.attr('name');
-            if (name && input_delete) {
-                // Remove old unique ID from name
-                const cleanName = name.replace(/_unique_\w+/, '');
-                $input.attr('name', cleanName);
-            }
-            
-            // Add new unique ID
-            if (name && !name.includes('_unique_')) {
-                const uniqueId = Date.now() + Math.random().toString(36).substring(2, 11);
-                const newName = name.replace(/(\w+)(\[.*\])?$/, '$1_unique_' + uniqueId + '$2');
-                $input.attr('name', newName);
+            try {
+                const $input = $(this);
+                const isUniqueInt = $input.attr('data-unique-int') == 1;
+                const isUnique = $input.attr('data-unique') == 1 || isUniqueInt;
+                if (isUnique) {
+                    let unique_id;
+                    if (isUniqueInt) {
+                        unique_id = Math.floor(Math.random() * 1000000000000);
+                    } else {
+                        unique_id = Math.random().toString(16).slice(2);
+                    }
+
+                    if (input_delete === true) {
+                        $input.val('');
+                    }
+                    if ($input.val() === '' || $input.val() === null) {
+                        $input.val(unique_id);
+                    }
+                }
+            } catch (error) {
+                console.error('MBlock: Fehler bei unique_id Generierung:', error);
             }
         });
         return true;
