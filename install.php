@@ -20,6 +20,9 @@ if (!$this->hasConfig('mblock_delete_confirm')) {
 if (!$this->hasConfig('mblock_copy_paste')) {
     $this->setConfig('mblock_copy_paste', 1); // Default: aktiviert
 }
+if (!$this->hasConfig('mblock_replace_language_placeholders')) {
+    $this->setConfig('mblock_replace_language_placeholders', 0); // Default: deaktiviert
+}
 
 // copy data directory
 rex_dir::copy($this->getPath('data'), $this->getDataPath());
