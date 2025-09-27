@@ -9,11 +9,13 @@
 * **Automatic Updates**: Templates are refreshed on every addon update
 * **Default Configuration**: `standard` theme is always set on install/update
 * **Simplified Management**: Only built-in templates are available, no custom template support
+* **Language Placeholder Control**: New optional automatic replacement of `{{language_key}}` placeholders in templates
 
 ### Configuration
 * **Standard Theme**: Default theme is now called `standard` instead of `default_theme`
 * **Theme Reset**: Theme configuration is reset to `standard` on every update/install
 * **Package Config**: Added default `mblock_theme: 'standard'` to package.yml
+* **Language Placeholder Configuration**: New `mblock_replace_language_placeholders` option to control automatic language placeholder replacement (default: disabled)
 
 ## Version 4.0.0 - 2025-01-18
 

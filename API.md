@@ -15,6 +15,7 @@ MBlock bietet eine umfassende API für PHP und JavaScript zur Verwaltung und Man
 ### Advanced Features
 - **Online/Offline Toggle** - Blöcke aktivieren/deaktivieren ohne löschen
 - **Copy & Paste** - Komfortable Duplizierung von Inhalten
+- **Sprach-Platzhalter** - Optionale automatische Ersetzung von {{language_key}} in Templates
 - **Frontend API Methoden** - `filterByField()`, `sortByField()`, `groupByField()`
 - **Schema.org Support** - SEO-optimierte JSON-LD Generierung
 - **Erweiterte Datenabfrage** - Online/Offline/All Modi
@@ -241,6 +242,7 @@ echo MBlock::show(1, $mform->show(), [
 - `max` (int): Maximale Item-Anzahl
 - `template` (string): Template-Name aus `data/templates/`
 - `copy_paste` (bool): Copy & Paste Feature
+- `replace_language_placeholders` (bool): Automatische Ersetzung von Sprach-Platzhaltern ({{language_key}})
 - `online_offline` (bool): Online/Offline Toggle
 - `delete_confirm` (bool): Lösch-Bestätigung
 - `sort_handle` (bool): Sortier-Handle anzeigen
@@ -255,6 +257,7 @@ Ruft MBlock-Konfiguration ab.
 <?php
 $currentTheme = MBlock::getConfig('mblock_theme', 'standard');
 $copyPasteEnabled = MBlock::getConfig('mblock_copy_paste', true);
+$languagePlaceholdersEnabled = MBlock::getConfig('mblock_replace_language_placeholders', false);
 ```
 
 #### `MBlock::setConfig(string $key, mixed $value): void`
@@ -265,6 +268,35 @@ Setzt MBlock-Konfiguration.
 <?php
 MBlock::setConfig('mblock_theme', 'modern');
 MBlock::setConfig('mblock_delete_confirm', false);
+MBlock::setConfig('mblock_replace_language_placeholders', true);
+```
+
+#### Sprach-Platzhalter System
+
+Das Sprach-Platzhalter System ermöglicht die automatische Ersetzung von Übersetzungsschlüsseln in Templates.
+
+**Aktivierung:**
+```php
+<?php
+// In Modul-Ausgabe oder Boot-Datei
+MBlock::setConfig('mblock_replace_language_placeholders', true);
+
+// Oder über Backend-Einstellungen: AddOns > MBlock > Einstellungen
+```
+
+**Template-Syntax:**
+```html
+<button type="button">{{save}}</button>
+<p>{{welcome_message}}</p>
+<span class="label">{{status_active}}</span>
+```
+
+**Funktionsweise:**
+- Platzhalter im Format `{{language_key}}` werden automatisch ersetzt
+- Verwendet `rex_i18n::msg()` für Übersetzungen
+- Fallback auf den ursprünglichen Schlüssel bei fehlenden Übersetzungen
+- Ersetzung erfolgt sowohl im Template als auch im generierten Output
+- **Standard: deaktiviert** (kann über Backend aktiviert werden)
 ```
 
 ---
