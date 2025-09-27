@@ -6,6 +6,7 @@ yarn-error.log*
 
 # Build artifacts
 *.map
+*.min.js
 
 # IDE files
 .vscode/
