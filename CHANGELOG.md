@@ -42,7 +42,7 @@
 
 #### Internationalization & UX
 * **Multi-language Support**: Extended language files for German and English
-* **Template Translation**: New `{{language_key}}` syntax in templates
+* **Template Translation**: New `{{mblock::language_key}}` syntax in templates
 * **Enhanced Parser**: `MBlockParser` supports automatic language placeholder replacement
 * **Modern UI**: Updated to use bloecks ^5.2.0 for consistent drag & drop
 * **Dark Mode**: Full compatibility with REDAXO dark theme

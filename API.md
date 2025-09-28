@@ -655,8 +655,8 @@ MBlock-Templates unterstützen spezielle Tags für dynamische Inhalte:
 Templates unterstützen Sprachvariablen:
 
 ```html
-<button title="{{mblock_add_element}}">+</button>
-<button title="{{mblock_delete_confirm}}">×</button>
+<button title="{{mblock::mblock_add_element}}">+</button>
+<button title="{{mblock::mblock_delete_confirm}}">×</button>
 ```
 
 ### Custom Template Entwicklung

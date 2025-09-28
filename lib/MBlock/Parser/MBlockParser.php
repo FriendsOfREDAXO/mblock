@@ -47,8 +47,8 @@ class MBlockParser
      */
     private static function replaceLanguagePlaceholders($template)
     {
-        // Find all {{language_key}} patterns
-        if (preg_match_all('/\{\{([a-zA-Z_]+)\}\}/', $template, $matches)) {
+        // Find all {{mblock::language_key}} patterns
+        if (preg_match_all('/\{\{mblock::([a-zA-Z_]+)\}\}/', $template, $matches)) {
             foreach ($matches[1] as $index => $langKey) {
                 $langValue = rex_i18n::msg($langKey, $langKey); // fallback to key if not found
                 $template = str_replace($matches[0][$index], $langValue, $template);
