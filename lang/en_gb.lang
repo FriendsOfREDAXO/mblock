@@ -55,11 +55,6 @@ rex_form_mblock_demo_entries_add = Add demo entry
 rex_form_mblock_demo_entries_edit = Edit demo entry
 
 # Clipboard functionality
-mblock_copy_paste = Copy & Paste
-mblock_replace_language_placeholders = Replace Language Placeholders
-mblock_online_offline = Online/Offline Toggle
-mblock_enabled = Enabled
-mblock_disabled = Disabled
 mblock_add_element = Add new element
 mblock_copy_element = Copy element
 mblock_paste_element = Paste element

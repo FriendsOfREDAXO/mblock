@@ -17,7 +17,6 @@ mblock_theme_custom = Benutzerdefiniert
 mblock_smooth_scroll = Smooth Scroll
 mblock_nested_support = Verschachtelte Blöcke
 mblock_copy_paste = Copy & Paste
-mblock_replace_language_placeholders = Sprach-Platzhalter ersetzen
 mblock_offline_toggle = Offline Toggle
 mblock_online_offline = Online/Offline Toggle
 mblock_online_offline_info = Aktiviert/deaktiviert den Online/Offline-Button global für alle MBlocks mit mblock_offline Hidden-Field

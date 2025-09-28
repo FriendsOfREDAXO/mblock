@@ -12,7 +12,6 @@ namespace FriendsOfRedaxo\MBlock\Parser;
 use FriendsOfRedaxo\MBlock\DTO\MBlockElement;
 use FriendsOfRedaxo\MBlock\Provider\MBlockTemplateFileProvider;
 use rex_i18n;
-use rex_addon;
 
 class MBlockParser
 {
@@ -27,10 +26,8 @@ class MBlockParser
     {
         $template = MBlockTemplateFileProvider::loadTemplate($templateType, '', $theme);
         
-        // Replace language placeholders first (only if enabled)
-        if (rex_addon::get('mblock')->getConfig('mblock_replace_language_placeholders', 0)) {
-            $template = self::replaceLanguagePlaceholders($template);
-        }
+        // Replace language placeholders first
+        $template = self::replaceLanguagePlaceholders($template);
         
         // Replace element placeholders
         $output = str_replace(
@@ -38,12 +35,8 @@ class MBlockParser
             array_merge(array('/>'), $element->getValues()),
             $template);
             
-        // Replace language placeholders in the output again (only if enabled)
-        if (rex_addon::get('mblock')->getConfig('mblock_replace_language_placeholders', 0)) {
-            $output = self::replaceLanguagePlaceholders($output);
-        }
-        
-        return $output;
+        // Replace language placeholders in the output again (for dynamic content like buttons)
+        return self::replaceLanguagePlaceholders($output);
     }
     
     /**
@@ -54,8 +47,8 @@ class MBlockParser
      */
     private static function replaceLanguagePlaceholders($template)
     {
-        // Find all {{language_key}} patterns
-        if (preg_match_all('/\{\{([a-zA-Z_]+)\}\}/', $template, $matches)) {
+        // Find all {{mblock::language_key}} patterns
+        if (preg_match_all('/\{\{mblock::([a-zA-Z_]+)\}\}/', $template, $matches)) {
             foreach ($matches[1] as $index => $langKey) {
                 $langValue = rex_i18n::msg($langKey, $langKey); // fallback to key if not found
                 $template = str_replace($matches[0][$index], $langValue, $template);

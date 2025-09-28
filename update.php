@@ -20,10 +20,6 @@ if (!$this->hasConfig('mblock_delete_confirm')) {
 if (!$this->hasConfig('mblock_copy_paste')) {
     $this->setConfig('mblock_copy_paste', 1); // Default: aktiviert
 }
-// Language Placeholder replacement - Default deaktiviert für neue und bestehende Installationen
-if (!$this->hasConfig('mblock_replace_language_placeholders')) {
-    $this->setConfig('mblock_replace_language_placeholders', 0); // Default: deaktiviert
-}
 
 // MBlock 4.0 - Template System Update
 // Löscht alte Default-Templates aus dem data/ Ordner
