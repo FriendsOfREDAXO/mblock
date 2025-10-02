@@ -60,4 +60,9 @@ mblock_clipboard_empty = El portapapeles está vacío
 mblock_toast_copy_success = ¡Bloque copiado con éxito!
 mblock_toast_paste_success = ¡Bloque pegado con éxito!
 mblock_toast_clipboard_empty = No hay datos en el portapapeles
+
+# Package suggestions
+mblock_suggests_headline = Paquetes recomendados
+mblock_suggests_intro = Los siguientes paquetes opcionales pueden mejorar la funcionalidad:
+mblock_suggests_not_available = no disponible
 mblock_toast_module_type_mismatch = No coincide el tipo de módulo

@@ -25,6 +25,9 @@ page:
 requires:
     redaxo: ^5.18.0
 
+suggests:
+    packages:
+        mform: Provides form builder functionality for easier MBlock field creation
 
 # Default addon configuration
 default_config:

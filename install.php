@@ -44,3 +44,36 @@ if (is_dir($addonDataTemplatesPath) && is_dir($userDataTemplatesPath)) {
         }
     }
 }
+
+// Check and display package suggestions
+$packageConfig = rex_file::getConfig($this->getPath('package.yml'));
+if (isset($packageConfig['suggests']['packages']) && is_array($packageConfig['suggests']['packages'])) {
+    $suggestions = [];
+    foreach ($packageConfig['suggests']['packages'] as $package => $description) {
+        $addon = rex_addon::get($package);
+        if (!$addon->isAvailable()) {
+            $suggestions[] = [
+                'package' => $package,
+                'description' => $description
+            ];
+        }
+    }
+    
+    if (!empty($suggestions)) {
+        $message = '<div class="alert alert-info">';
+        $message .= '<h4>' . $this->i18n('suggests_headline') . '</h4>';
+        $message .= '<p>' . $this->i18n('suggests_intro') . '</p>';
+        $message .= '<ul>';
+        foreach ($suggestions as $suggestion) {
+            $message .= '<li><strong>' . htmlspecialchars($suggestion['package']) . '</strong>';
+            if (!empty($suggestion['description'])) {
+                $message .= ': ' . htmlspecialchars($suggestion['description']);
+            }
+            $message .= ' <em>(' . $this->i18n('suggests_not_available') . ')</em></li>';
+        }
+        $message .= '</ul>';
+        $message .= '</div>';
+        
+        echo rex_view::info($message);
+    }
+}

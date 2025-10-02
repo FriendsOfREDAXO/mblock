@@ -60,4 +60,9 @@ mblock_clipboard_empty = Klembord is leeg
 mblock_toast_copy_success = Blok succesvol gekopieerd!
 mblock_toast_paste_success = Blok succesvol geplakt!
 mblock_toast_clipboard_empty = Geen gegevens in klembord
+
+# Package suggestions
+mblock_suggests_headline = Aanbevolen pakketten
+mblock_suggests_intro = De volgende optionele pakketten kunnen de functionaliteit verbeteren:
+mblock_suggests_not_available = niet beschikbaar
 mblock_toast_module_type_mismatch = Moduletype komt niet overeen

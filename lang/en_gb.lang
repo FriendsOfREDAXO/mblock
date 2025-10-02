@@ -75,3 +75,8 @@ mblock_theme_standard = Standard Template
 mblock_theme_info = Here you can choose between the available MBlock templates. Available templates are stored in the <code>data/templates/</code> folder. Each template can include its own CSS file that will be loaded automatically.
 mblock_theme_css_copied = Template CSS was successfully copied
 mblock_theme_saved = Template selection was saved
+
+# Package suggestions
+mblock_suggests_headline = Recommended Packages
+mblock_suggests_intro = The following optional packages can enhance functionality:
+mblock_suggests_not_available = not available

@@ -60,4 +60,9 @@ mblock_clipboard_empty = Urklipp är tomt
 mblock_toast_copy_success = Block kopierat framgångsrikt!
 mblock_toast_paste_success = Block inklistrat framgångsrikt!
 mblock_toast_clipboard_empty = Inga data i urklipp
+
+# Package suggestions
+mblock_suggests_headline = Rekommenderade paket
+mblock_suggests_intro = Följande valfria paket kan förbättra funktionaliteten:
+mblock_suggests_not_available = inte tillgänglig
 mblock_toast_module_type_mismatch = Modultyp matchar inte
