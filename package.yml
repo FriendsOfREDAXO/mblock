@@ -25,6 +25,9 @@ page:
 requires:
     redaxo: ^5.18.0
 
+suggests:
+    packages:
+        mform: ^6.0
 
 # Default addon configuration
 default_config:
