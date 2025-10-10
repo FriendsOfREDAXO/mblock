@@ -8,6 +8,11 @@
  * 
  * Usage: node minify.js
  * 
+ * IMPORTANT: toplevel mangling is DISABLED to prevent global variable
+ * name conflicts with other scripts (e.g., search_it plugin).
+ * When enabled, Terser mangles global variables to short names like 'h',
+ * which can cause "redeclaration of let h" errors with other scripts.
+ * 
  * @author MBlock Development Team
  * @version 1.0.0
  */
@@ -55,7 +60,7 @@ const terserOptions = {
             'MBlockOnlineToggle',
             'mblock_smooth_scroll_to_element'
         ],
-        toplevel: true,
+        toplevel: false, // Disabled to prevent global variable name conflicts with other scripts
         eval: true,
         keep_fnames: false,
         safari10: true
@@ -70,7 +75,7 @@ const terserOptions = {
         filename: path.basename(outputFile),
         url: path.basename(sourceMapFile)
     },
-    toplevel: true,
+    toplevel: false, // Disabled to prevent global variable name conflicts with other scripts
     ie8: false,
     safari10: true,
     keep_classnames: false,
