@@ -55,7 +55,7 @@ const terserOptions = {
             'MBlockOnlineToggle',
             'mblock_smooth_scroll_to_element'
         ],
-        toplevel: true,
+        toplevel: false, // Disabled to prevent global variable name conflicts with other scripts
         eval: true,
         keep_fnames: false,
         safari10: true
@@ -70,7 +70,7 @@ const terserOptions = {
         filename: path.basename(outputFile),
         url: path.basename(sourceMapFile)
     },
-    toplevel: true,
+    toplevel: false, // Disabled to prevent global variable name conflicts with other scripts
     ie8: false,
     safari10: true,
     keep_classnames: false,
