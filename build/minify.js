@@ -8,6 +8,11 @@
  * 
  * Usage: node minify.js
  * 
+ * IMPORTANT: toplevel mangling is DISABLED to prevent global variable
+ * name conflicts with other scripts (e.g., search_it plugin).
+ * When enabled, Terser mangles global variables to short names like 'h',
+ * which can cause "redeclaration of let h" errors with other scripts.
+ * 
  * @author MBlock Development Team
  * @version 1.0.0
  */
