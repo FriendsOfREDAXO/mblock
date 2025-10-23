@@ -21,14 +21,21 @@ if (rex::isBackend() && is_object(rex::getUser())) {
     });
 
     // Prefer Bloecks styles if available, but do NOT require bloecks for functionality.
-    // MBlock ships its own Sortable.js and will only load it when bloecks is NOT available.
+    // MBlock ships its own Sortable.js and will only load it when bloecks is NOT available
+    // or when bloecks has drag & drop disabled.
     $bloecksAddon = rex_addon::get('bloecks');
+    $bloecksDragDropEnabled = false;
+    
     if ($bloecksAddon && $bloecksAddon->isAvailable()) {
-        // Use bloecks CSS for consistent styling when present. Do NOT auto-load bloecks' Sortable
-        // to avoid duplicate global Sortable registrations.
+        // Use bloecks CSS for consistent styling when present
         rex_view::addCssFile($bloecksAddon->getAssetsUrl('css/bloecks.css'));
-    } else {
-        // Bloecks not available — register our bundled Sortable implementation.
+        
+        // Check if drag & drop is enabled in bloecks
+        $bloecksDragDropEnabled = (bool) $bloecksAddon->getConfig('enable_drag_drop', false);
+    }
+    
+    // Load our bundled Sortable.js if bloecks is not available OR if drag & drop is disabled in bloecks
+    if (!$bloecksAddon || !$bloecksAddon->isAvailable() || !$bloecksDragDropEnabled) {
         rex_view::addJsFile($this->getAssetsUrl('sortable.min.js'));
     }
 
