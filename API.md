@@ -228,7 +228,7 @@ Hauptmethode zur Anzeige von MBlock-Instanzen.
 ```php
 <?php
 echo MBlock::show(1, $mform->show(), [
-    'min' => 1,              // Minimale Anzahl Items
+    'min' => 1,              // Minimale Anzahl Items (werden initial angezeigt)
     'max' => 10,             // Maximale Anzahl Items  
     'template' => 'modern',  // Template-Name
     'copy_paste' => true,    // Copy & Paste aktivieren
@@ -237,7 +237,7 @@ echo MBlock::show(1, $mform->show(), [
 ```
 
 **Optionen:**
-- `min` (int): Minimale Item-Anzahl
+- `min` (int): Minimale Item-Anzahl (wird initial angezeigt)
 - `max` (int): Maximale Item-Anzahl
 - `template` (string): Template-Name aus `data/templates/`
 - `copy_paste` (bool): Copy & Paste Feature
