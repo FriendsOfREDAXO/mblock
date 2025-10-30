@@ -198,16 +198,25 @@ class MBlock
             }
         }
 
-        // create first element
+        // create first element(s)
         // don't loaded?
         if (!self::$items && (!isset($settings['initial_hidden']) or $settings['initial_hidden'] != 1)) {
             // set plain item for add
             $plain = true;
-            self::$items[0] = new MBlockItem();
-            self::$items[0]->setId(0)
-                ->setValueId($id)
-                ->setResult(array())
-                ->setForm($form);
+            
+            // Determine how many initial blocks to create based on 'min' setting
+            $minBlocks = isset($settings['min']) && is_numeric($settings['min']) && $settings['min'] > 0 
+                ? (int)$settings['min'] 
+                : 1;
+            
+            // Create the minimum number of initial blocks
+            for ($i = 0; $i < $minBlocks; $i++) {
+                self::$items[$i] = new MBlockItem();
+                self::$items[$i]->setId($i)
+                    ->setValueId($id)
+                    ->setResult(array())
+                    ->setForm($form);
+            }
         }
 
 
