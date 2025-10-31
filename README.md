@@ -22,7 +22,7 @@ Es sollte in den betreffenden Modulen deaktiviert werden.
 Beispiel 
 ```
 echo MBlock::show(1, $form, [
-    'min' => 1,              // Minimale Anzahl Items
+    'min' => 1,              // Minimale Anzahl Items (werden initial angezeigt)
     'max' => 10,             // Maximale Anzahl Items  
     'template' => 'modern',  // Template-Name
     'copy_paste' => false,    // Copy & Paste aktivieren
