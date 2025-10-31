@@ -204,10 +204,16 @@ class MBlock
             // set plain item for add
             $plain = true;
             
-            // Determine how many initial blocks to create based on 'min' setting
-            $minBlocks = isset($settings['min']) && is_numeric($settings['min']) && $settings['min'] > 0 
-                ? (int)$settings['min'] 
-                : 1;
+            // Determine how many initial blocks to create based on 'min' setting, but cap to a reasonable upper bound
+            $hardMax = 100; // Reasonable upper bound to prevent performance issues
+            $minBlocks = 1;
+            if (isset($settings['min']) && is_numeric($settings['min']) && $settings['min'] > 0) {
+                $minBlocks = (int)$settings['min'];
+            }
+            if (isset($settings['max']) && is_numeric($settings['max']) && $settings['max'] > 0) {
+                $minBlocks = min($minBlocks, (int)$settings['max']);
+            }
+            $minBlocks = min($minBlocks, $hardMax);
             
             // Create the minimum number of initial blocks
             for ($i = 0; $i < $minBlocks; $i++) {
