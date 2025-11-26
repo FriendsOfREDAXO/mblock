@@ -2327,6 +2327,69 @@ function mblock_init_toolbar(element) {
     }
 }
 
+// Synchronisiere CKEditor5 Inhalte zurück in versteckte Textareas bevor ein Formular abgesendet wird
+function mblock_sync_all_cke5_to_textareas(context) {
+    try {
+        const scope = context && context.length ? context : $(document);
+
+        // Find all cke5-editor textarea placeholders inside scope
+        scope.find('.cke5-editor').each(function () {
+            try {
+                const $textarea = $(this);
+                const editorId = $textarea.attr('id');
+
+                // Prefer CKEDITOR global API if available (setData/getData pair)
+                if (editorId && typeof window.CKEDITOR !== 'undefined' && window.CKEDITOR.instances && window.CKEDITOR.instances[editorId]) {
+                    try {
+                        const data = window.CKEDITOR.instances[editorId].getData();
+                        $textarea.val(data);
+                        return; // next
+                    } catch (e) {
+                        // continue to DOM fallback
+                    }
+                }
+
+                // DOM fallback: try to find the editable area that CKEditor5 renders
+                // and copy its innerHTML back to the hidden textarea
+                let content = $textarea.val() || '';
+                // look for nearby ck-editor editable content
+                const $editable = $textarea.siblings('.ck, .ck-editor__main').find('.ck-editor__editable, .ck-content').first();
+                if (!$editable.length) {
+                    // try a wider search within the same parent
+                    const $container = $textarea.closest('.mform, .mblock_wrapper, form, body');
+                    if ($container.length) {
+                        $editable = $container.find('.ck-editor__editable, .ck-content').first();
+                    }
+                }
+                if ($editable && $editable.length) {
+                    content = $editable.html();
+                }
+
+                // write value into textarea (keep HTML encoded/unencoded exactly as editor provides)
+                $textarea.val(content);
+
+            } catch (err) {
+                // keep best-effort sync, don't break submit flow
+                console.warn('MBlock: Fehler beim Synchronisieren eines CKE5-Editors in Textarea:', err);
+            }
+        });
+
+        return true;
+    } catch (error) {
+        console.error('MBlock: Fehler in mblock_sync_all_cke5_to_textareas:', error);
+        return false;
+    }
+}
+
+// Hook into all form submits to ensure ckeditor content is persisted to textareas before saving
+$(document).on('submit', 'form', function (e) {
+    try {
+        mblock_sync_all_cke5_to_textareas($(this));
+    } catch (err) {
+        // fall back silently
+    }
+});
+
 function mblock_moveup(element, item) {
     var prev = item.prev();
     if (prev.length == 0) return;
