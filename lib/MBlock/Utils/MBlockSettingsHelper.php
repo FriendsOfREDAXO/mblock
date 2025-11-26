@@ -58,17 +58,15 @@ class MBlockSettingsHelper
                 }
 
                 // Min/Max Unterstützung
-                if (!array_key_exists('min', $settings)) {
-                    $min = (int)$addon->getConfig('mblock_min', 0);
-                    $settings['min'] = max(0, $min);
-                } else {
+                // NOTE: Do not auto-apply global addon config values here. We only
+                // want to set 'min' / 'max' when the caller explicitly provided them
+                // in $settings — otherwise the presence of data-min / data-max can
+                // unintentionally disable remove/add buttons in the UI.
+                if (array_key_exists('min', $settings)) {
                     $settings['min'] = max(0, (int)$settings['min']);
                 }
 
-                if (!array_key_exists('max', $settings)) {
-                    $max = $addon->getConfig('mblock_max', 0);
-                    $settings['max'] = max(0, (int)$max);
-                } else {
+                if (array_key_exists('max', $settings)) {
                     $settings['max'] = max(0, (int)$settings['max']);
                 }
         
