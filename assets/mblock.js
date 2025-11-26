@@ -2314,9 +2314,25 @@ function mblock_add(element) {
                 e.preventDefault();
                 try {
                     const $this = $(this);
-                    if (!$this.prop('disabled')) {
-                        mblock_remove_item(element, $this.closest('div.sortitem'));
+                    if ($this.prop('disabled')) return false;
+
+                    const $item = $this.closest('div.sortitem');
+                    const elementData = element.data() || {};
+
+                    // If there's a configured confirmation message, show non-blocking modal
+                    if (elementData.hasOwnProperty('delete_confirm') && elementData.delete_confirm) {
+                        mblock_show_confirm(element, $item, elementData.delete_confirm).then((confirmed) => {
+                            if (confirmed) {
+                                // mark temporarily so mblock_remove_item will proceed synchronously
+                                $item.data('__mblock_confirmed', true);
+                                mblock_remove_item(element, $item);
+                            }
+                        });
+                    } else {
+                        // No confirmation required — remove immediately
+                        mblock_remove_item(element, $item);
                     }
+
                 } catch (error) {
                     console.error('MBlock: Fehler in removeme click handler:', error);
                 }
