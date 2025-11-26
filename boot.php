@@ -20,15 +20,19 @@ if (rex::isBackend() && is_object(rex::getUser())) {
             return $params->getSubject();
     });
 
-    // Use Sortable.js from bloecks addon (required dependency)
+    // Sortable.js handling:
+    // - Prefer the Sortable.js from the `bloecks` addon if it is available (avoids duplicate libs)
+    // - Otherwise fall back to the bundled Sortable placed in this addon's assets folder
     $bloecksAddon = rex_addon::get('bloecks');
     if ($bloecksAddon && $bloecksAddon->isAvailable()) {
-        // Use bloecks Sortable.js
+        // Use bloecks Sortable.js when bloecks is present
         rex_view::addJsFile($bloecksAddon->getAssetsUrl('js/sortable.min.js'));
-        // Add bloecks CSS for consistent styling
-        rex_view::addCssFile($bloecksAddon->getAssetsUrl('css/bloecks.css'));
+        rex_view::setJsProperty('mblock_sortable_source', 'bloecks');
+    } else {
+        // fall back to bundled Sortable (inside this addon's assets)
+        rex_view::addJsFile($this->getAssetsUrl('sortable.min.js'));
+        rex_view::setJsProperty('mblock_sortable_source', 'mblock');
     }
-    // Note: bloecks Addon is required for MBlock functionality
 
     // 🔧 Development/Production Asset Management
     // 
@@ -54,6 +58,11 @@ if (rex::isBackend() && is_object(rex::getUser())) {
     $jsFile = $useMinified ? 'mblock.min.js' : 'mblock.js';
     $debugInfo = $useMinified ? 'Production (minified)' : 'Development (source)';
     
+    // Expose the local sortable asset URL so the client can dynamically load it
+    // when a runtime fallback is needed (prevents duplicate loads when other addons
+    // already provide Sortable.js).
+    rex_view::setJsProperty('mblock_sortable_local_url', $this->getAssetsUrl('sortable.min.js'));
+
     // Add debug comment for developers
     if (rex::isDebugMode()) {
         rex_view::setJsProperty('mblock_asset_mode', $debugInfo);

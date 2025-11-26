@@ -260,6 +260,57 @@ function mblock_sort(element) {
     }
 }
 
+/**
+ * Ensure Sortable.js is available at runtime — dynamically load local fallback if needed.
+ * Calls callback once Sortable is ready (or immediately if already available).
+ * Uses `rex.mblock_sortable_local_url` if set by server boot.php, otherwise falls back to known asset path.
+ */
+function mblock_ensure_sortable(callback) {
+    try {
+        if (typeof Sortable !== 'undefined' && Sortable.create) {
+            if (typeof callback === 'function') callback();
+            return true;
+        }
+
+        // Avoid loading twice
+        var existingScript = document.querySelector('script[data-mblock-sortable]');
+        if (existingScript) {
+            if (typeof callback === 'function') {
+                existingScript.addEventListener('load', function() {
+                    setTimeout(function() { callback(); }, 5);
+                });
+            }
+            return true;
+        }
+
+        var scriptUrl = null;
+        if (typeof rex !== 'undefined' && rex.mblock_sortable_local_url) {
+            scriptUrl = rex.mblock_sortable_local_url;
+        } else {
+            // fallback relative path inside addon assets (best-effort)
+            scriptUrl = window.location.origin + '/redaxo/src/addons/mblock/assets/sortable.min.js';
+        }
+
+        var script = document.createElement('script');
+        script.setAttribute('src', scriptUrl);
+        script.setAttribute('data-mblock-sortable', '1');
+        script.async = true;
+        script.onload = function() {
+            if (typeof callback === 'function') callback();
+        };
+        script.onerror = function(e) {
+            console.error('MBlock: Fehler beim Laden von Sortable.js:', e);
+            if (typeof callback === 'function') callback();
+        };
+        (document.head || document.documentElement).appendChild(script);
+        return true;
+    } catch (e) {
+        console.error('MBlock: mblock_ensure_sortable failed', e);
+        if (typeof callback === 'function') callback();
+        return false;
+    }
+}
+
 function mblock_add_plus(element) {
     if (!element.find('> div.sortitem').length) {
 
@@ -333,7 +384,7 @@ function mblock_sort_it(element) {
             return false;
         }
 
-        // Sortable.js API (from bloecks addon - required)
+        // Sortable.js API (from bloecks addon or dynamically loaded fallback)
         if (typeof Sortable !== 'undefined' && Sortable.create) {
             // Destroy existing sortable if it exists - with better error handling
             try {
@@ -409,8 +460,22 @@ function mblock_sort_it(element) {
             return true;
             
         } else {
-            console.error('MBlock: Sortable.js (bloecks Addon) ist erforderlich aber nicht verfügbar');
-            return false;
+            // Try runtime fallback: load local sortable.min.js and retry
+            try {
+                mblock_ensure_sortable(function() {
+                    if (typeof Sortable !== 'undefined' && Sortable.create) {
+                        // Retry initialization once Sortable is available
+                        mblock_sort_it(element);
+                    } else {
+                        console.error('MBlock: Sortable.js ist auch nach dem dynamischen Laden nicht verfügbar');
+                    }
+                });
+            } catch (e) {
+                console.error('MBlock: Fehler beim Versuch, Sortable runtime zu laden:', e);
+            }
+
+            // We attempted a dynamic load — return true to indicate an async retry is ongoing
+            return true;
         }
         
     } catch (error) {

@@ -5,10 +5,8 @@
  * @license MIT
  */
 
-// set default template
-if (!$this->hasConfig('mblock_theme')) {
-    $this->setConfig('mblock_theme', 'default_theme');
-}
+// set default template - always reset to standard on update
+$this->setConfig('mblock_theme', 'standard');
 if (!$this->hasConfig('mblock_delete')) {
     $this->setConfig('mblock_delete', 1);
 }
@@ -55,39 +53,33 @@ if (is_dir($dataTemplatesPath)) {
     }
 }
 
-// copy data directory (für neue Installationen)
+// copy data directory (für neue Installationen) oder aktualisiere Templates (bei Updates)
 if (!is_dir($this->getDataPath())) {
     rex_dir::copy($this->getPath('data'), $this->getDataPath());
-} else {
-    // Bei Updates: Mitgelieferte Templates aktualisieren
-    $addonDataTemplatesPath = $this->getPath('data/templates/');
-    $userDataTemplatesPath = $this->getDataPath('templates/');
+}
+
+// Bei jedem Update: Mitgelieferte Templates immer aktualisieren
+$addonDataTemplatesPath = $this->getPath('data/templates/');
+$userDataTemplatesPath = $this->getDataPath('templates/');
+
+if (is_dir($addonDataTemplatesPath)) {
+    // Erstelle templates Ordner im data-Verzeichnis falls nicht vorhanden
+    if (!is_dir($userDataTemplatesPath)) {
+        rex_dir::create($userDataTemplatesPath);
+    }
     
-    if (is_dir($addonDataTemplatesPath)) {
-        // Erstelle templates Ordner im data-Verzeichnis falls nicht vorhanden
-        if (!is_dir($userDataTemplatesPath)) {
-            rex_dir::create($userDataTemplatesPath);
-        }
+    // Kopiere/aktualisiere mitgelieferte Templates - immer überschreiben bei Update
+    $addonTemplates = glob($addonDataTemplatesPath . '*', GLOB_ONLYDIR);
+    foreach ($addonTemplates as $templateDir) {
+        $templateName = basename($templateDir);
+        $targetDir = $userDataTemplatesPath . $templateName;
         
-        // Kopiere/aktualisiere mitgelieferte Templates
-        $addonTemplates = glob($addonDataTemplatesPath . '*', GLOB_ONLYDIR);
-        foreach ($addonTemplates as $templateDir) {
-            $templateName = basename($templateDir);
-            $targetDir = $userDataTemplatesPath . $templateName;
-            
-            // Überschreibe mitgelieferte Templates immer (für Updates)
-            if (is_dir($templateDir)) {
-                if (is_dir($targetDir)) {
-                    rex_dir::delete($targetDir);
-                }
-                rex_dir::copy($templateDir, $targetDir);
+        // Überschreibe mitgelieferte Templates immer (für Updates)
+        if (is_dir($templateDir)) {
+            if (is_dir($targetDir)) {
+                rex_dir::delete($targetDir);
             }
-        }
-        
-        // Kopiere auch die README.md
-        $readmePath = $addonDataTemplatesPath . 'README.md';
-        if (file_exists($readmePath)) {
-            copy($readmePath, $userDataTemplatesPath . 'README.md');
+            rex_dir::copy($templateDir, $targetDir);
         }
     }
 }
