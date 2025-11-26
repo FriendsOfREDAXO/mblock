@@ -1304,6 +1304,16 @@ var MBlockClipboard = {
                 $editor.css('visibility', '');
                 $editor.removeAttr('style');
             });
+
+            // Remove TinyMCE instances from clone to ensure clean state
+            clonedItem.find('.tiny-editor').each(function() {
+                const $editor = $(this);
+                $editor.next('.tox-tinymce').remove();
+                $editor.show();
+                $editor.css('visibility', '');
+                $editor.removeAttr('style');
+                $editor.removeClass('mce-initialized');
+            });
             
             // Convert selectpicker elements back to plain select elements for clean copying
             this.convertSelectpickerToPlainSelect(clonedItem);
@@ -1382,6 +1392,26 @@ var MBlockClipboard = {
                 }
             });
             
+            // TinyMCE content
+            item.find('.tiny-editor').each(function() {
+                const $editor = $(this);
+                const name = $editor.attr('name');
+                const editorId = $editor.attr('id');
+                let content = $editor.val();
+
+                if (editorId && typeof tinymce !== 'undefined' && tinymce.get(editorId)) {
+                    content = tinymce.get(editorId).getContent();
+                }
+
+                if (name) {
+                    formData[name] = {
+                        type: 'tinymce',
+                        value: content,
+                        profile: $editor.attr('data-profile')
+                    };
+                }
+            });
+
             // CKEditor content (CKE5)
             // Collect CKEditor5 entries in order so we can restore positional (unsaved/new) editors
             const _cke5_array = [];
@@ -1815,6 +1845,20 @@ var MBlockClipboard = {
                         }
                         break;
                         
+                    case 'tinymce':
+                        if (fieldData.value) {
+                            $field.val(fieldData.value);
+                            
+                            // If TinyMCE instance exists, set data
+                            const editorId = $field.attr('id');
+                            if (editorId && typeof tinymce !== 'undefined' && tinymce.get(editorId)) {
+                                setTimeout(() => {
+                                    tinymce.get(editorId).setContent(fieldData.value);
+                                }, 200);
+                            }
+                        }
+                        break;
+
                     case 'ckeditor':
                         if (fieldData.value) {
                             $field.val(fieldData.value);

@@ -5,9 +5,18 @@
  * @license MIT
  */
 
-
+declare(strict_types=1);
 
 namespace FriendsOfRedaxo\MBlock\Processor;
+
+use rex_clang;
+use rex_extension;
+use rex_extension_point;
+use rex_form;
+use rex_form_element;
+use rex_request;
+use rex_sql;
+use rex_sql_exception;
 
 class mblock_rex_form extends rex_form
 {
@@ -19,7 +28,7 @@ class mblock_rex_form extends rex_form
      * Gibt true zurück wenn alles ok war, false bei einem allgemeinen Fehler,
      * einen String mit einer Fehlermeldung oder den von der Datenbank gelieferten ErrorCode.
      *
-     * @return bool
+     * @return bool|string|int
      */
     protected function save()
     {
@@ -58,7 +67,7 @@ class mblock_rex_form extends rex_form
                 $sql->setWhere($this->whereCondition);
                 $sql->update();
             } else {
-                if (count($this->languageSupport)) {
+                if (count($this->languageSupport) > 0) {
                     foreach (rex_clang::getAllIds() as $clang_id) {
                         $sql->setTable($this->tableName);
                         $sql->addGlobalCreateFields();
@@ -83,7 +92,7 @@ class mblock_rex_form extends rex_form
         }
 
         // ----- EXTENSION POINT
-        if ($saved) {
+        if ($saved === true) {
             $saved = rex_extension::registerPoint(new rex_extension_point('REX_FORM_SAVED', $saved, ['form' => $this, 'sql' => $sql]));
         } else {
             $saved = $sql->getMysqlErrno();
@@ -102,11 +111,13 @@ class mblock_rex_form extends rex_form
             $list_name = rex_request::get('list', 'string');
             $message = rex_request::get($list_name . '_msg', 'string');
 
-            if ($message)
-                if (rex_request::get('msg_is_warning', 'int', 0) == 1)
+            if ($message) {
+                if (rex_request::get('msg_is_warning', 'int', 0) == 1) {
                     $this->setWarning($message);
-                else
+                } else {
                     $this->setMessage($message);
+                }
+            }
         }
         return parent::get();
     }
