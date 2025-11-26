@@ -1821,9 +1821,41 @@ var MBlockClipboard = {
             const wrapper = item.closest('.mblock_wrapper');
             const moduleType = this.getModuleType(wrapper);
             
+            // 🔧 FIX: Preserve CKEditor5 instances in original block during copy
+            // Store references to CKE5 editor UI elements that need to be preserved
+            const cke5Editors = [];
+            item.find('.cke5-editor').each(function() {
+                const $textarea = $(this);
+                const $ckeUI = $textarea.next('.ck-editor');
+                
+                if ($ckeUI.length) {
+                    // Store reference to the CKE UI element and its position
+                    cke5Editors.push({
+                        textarea: $textarea,
+                        ckeUI: $ckeUI,
+                        parent: $ckeUI.parent(),
+                        nextSibling: $ckeUI.next()
+                    });
+                    
+                    // Temporarily detach the CKE UI from DOM (but don't destroy it)
+                    $ckeUI.detach();
+                    console.log('MBlock Copy: Temporarily detached CKE5 UI for', $textarea.attr('id'));
+                }
+            });
             
-            // Clone item completely
+            // Clone item completely (now without CKE5 UI elements)
             const clonedItem = item.clone(true, true);
+            
+            // 🔧 FIX: Restore CKEditor5 UI elements to original block
+            cke5Editors.forEach(editor => {
+                // Reattach the CKE UI element to its original position
+                if (editor.nextSibling.length) {
+                    editor.ckeUI.insertBefore(editor.nextSibling);
+                } else {
+                    editor.parent.append(editor.ckeUI);
+                }
+                console.log('MBlock Copy: Restored CKE5 UI for', editor.textarea.attr('id'));
+            });
             
             // Convert selectpicker elements back to plain select elements for clean copying
             this.convertSelectpickerToPlainSelect(clonedItem);
