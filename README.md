@@ -13,11 +13,13 @@ _English:_ MBlock lets you create an unlimited number of data blocks within a si
 
 > Please note: The examples are valid for MForm version 8 and higher. MBlock now requires the bloecks addon (^5.2.0) for modern drag & drop functionality.
 
-## 🚨 Hinweis für markitup- und ckeditor-Nutzer 
+## 🚨 Hinweis für markitup- und ckeditor4-Nutzer 
 
-Copy & Paste funktioniert leider nicht! 
+Copy & Paste funktioniert leider nicht mit markitup und CKEditor 4! 
 
-Es sollte in den betreffenden Modulen deaktiviert werden. 
+**Gut zu wissen:** CKEditor 5 (CKE5) wird vollständig unterstützt und funktioniert einwandfrei mit Copy & Paste.
+
+Für markitup und CKEditor 4 sollte Copy & Paste in den betreffenden Modulen deaktiviert werden: 
 
 Beispiel 
 ```
@@ -25,7 +27,7 @@ echo MBlock::show(1, $form, [
     'min' => 1,              // Minimale Anzahl Items (werden initial angezeigt)
     'max' => 10,             // Maximale Anzahl Items  
     'template' => 'modern',  // Template-Name
-    'copy_paste' => false,    // Copy & Paste aktivieren
+    'copy_paste' => false,    // Copy & Paste deaktivieren für markitup/CKEditor4
     'online_offline' => true // Online/Offline Toggle , hidden field muss angelegt sein. 
 ]);
 ```
