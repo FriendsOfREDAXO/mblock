@@ -211,6 +211,24 @@ class MBlock
         }
 
 
+        // Ensure at least the minimum number of items is present if configured
+        if (array_key_exists('min', $settings) && (int)$settings['min'] > 0) {
+            $min = (int)$settings['min'];
+            $current = count(self::$items);
+            if ($current < $min) {
+                for ($i = $current; $i < $min; $i++) {
+                    $newItem = new MBlockItem();
+                    $newItem->setId($i)
+                        ->setValueId($id)
+                        ->setResult(array())
+                        ->setForm($form)
+                        ->addPayload('plain_item', true);
+
+                    self::$items[$i] = $newItem;
+                }
+            }
+        }
+
         // foreach rex value json items
         /** @var MBlockItem $item */
         foreach (static::$items as $count => $item) {
