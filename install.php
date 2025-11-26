@@ -5,10 +5,8 @@
  * @license MIT
  */
 
-// set default template
-if (!$this->hasConfig('mblock_theme')) {
-    $this->setConfig('mblock_theme', 'default_theme');
-}
+// set default template - always set to standard on install
+$this->setConfig('mblock_theme', 'standard');
 if (!$this->hasConfig('mblock_delete')) {
     $this->setConfig('mblock_delete', 1);
 }
@@ -44,11 +42,5 @@ if (is_dir($addonDataTemplatesPath) && is_dir($userDataTemplatesPath)) {
             }
             rex_dir::copy($templateDir, $targetDir);
         }
-    }
-    
-    // Kopiere auch die README.md
-    $readmePath = $addonDataTemplatesPath . 'README.md';
-    if (file_exists($readmePath)) {
-        copy($readmePath, $userDataTemplatesPath . 'README.md');
     }
 }

@@ -8,6 +8,8 @@
 
 namespace FriendsOfRedaxo\MBlock\Provider;
 
+use FriendsOfRedaxo\MBlock\Utils\TemplateManager;
+
 /**
  * Template Provider for MBlock
  * Provides template content based on selected theme
@@ -25,21 +27,13 @@ class TemplateProvider
     {
         if ($templateName === null) {
             $addon = \rex_addon::get('mblock');
-            $templateName = $addon->getConfig('mblock_theme', 'default_theme');
+            $templateName = $addon->getConfig('mblock_theme', 'standard');
         }
         
-        // Default theme comes from main templates/ directory
-        if ($templateName === 'default_theme') {
-            $defaultTemplatePath = \rex_path::addon('mblock', 'templates/default_theme/mblock_' . $type . '.ini');
-            if (file_exists($defaultTemplatePath)) {
-                return file_get_contents($defaultTemplatePath);
-            }
-        } else {
-            // Custom templates come from data/templates/ directory
-            $customTemplatePath = \rex_path::addon('mblock', 'data/templates/' . $templateName . '/mblock_' . $type . '.ini');
-            if (file_exists($customTemplatePath)) {
-                return file_get_contents($customTemplatePath);
-            }
+        // All templates come from data/templates/ directory
+        $templatePath = \rex_path::addon('mblock', 'data/templates/' . $templateName . '/mblock_' . $type . '.ini');
+        if (file_exists($templatePath)) {
+            return file_get_contents($templatePath);
         }
         
         // Fallback if nothing is found
@@ -69,15 +63,7 @@ class TemplateProvider
      */
     public static function templateExists($templateName)
     {
-        if ($templateName === 'default_theme') {
-            // Default theme should exist in main templates/ directory
-            $templatePath = \rex_path::addon('mblock', 'templates/default_theme/');
-            return is_dir($templatePath) && 
-                   file_exists($templatePath . 'mblock_element.ini') && 
-                   file_exists($templatePath . 'mblock_wrapper.ini');
-        }
-        
-        // Custom templates in data/templates/ directory
+        // All templates in data/templates/ directory
         $templatePath = \rex_path::addon('mblock', 'data/templates/' . $templateName . '/');
         return is_dir($templatePath) && 
                file_exists($templatePath . 'mblock_element.ini') && 

@@ -3,6 +3,7 @@ mblock_help = Hilfe
 mblock_configuration = Konfiguration
 mblock_settings = Einstellungen
 mblock_best_practices = Best Practices
+mblock_changelog = Changelog
 
 mblock_overview = Übersicht
 mblock_config_save = Einstellungen speichern
@@ -11,12 +12,14 @@ mblock_api = API-Dokumenta
 mblock_config_label_template = Theme für MBlock Sort-Fields
 mblock_config_saved = Einstellungen wurden gespeichert
 mblock_theme = Theme
-mblock_theme_default = Standard Theme
+mblock_theme_standard = Standard Theme
 mblock_theme_custom = Benutzerdefiniert
 mblock_smooth_scroll = Smooth Scroll
 mblock_nested_support = Verschachtelte Blöcke
 mblock_copy_paste = Copy & Paste
 mblock_offline_toggle = Offline Toggle
+mblock_online_offline = Online/Offline Toggle
+mblock_online_offline_info = Aktiviert/deaktiviert den Online/Offline-Button global für alle MBlocks mit mblock_offline Hidden-Field
 mblock_enabled = Aktiviert
 mblock_disabled = Deaktiviert
 mblock_config = Konfiguration
@@ -30,7 +33,8 @@ mblock_example_base_teammember_example = Teammitglieder
 mblock_example_base_link_example = Link und Linklist
 mblock_example_base_media_example = Media und Medialist
 mblock_example_base_defaults_example = Diverse Formularelemente
-mblock_example_base_cardgrid_example = Cardgrid mit Tabs (erweitert)
+mblock_example_base_cardgrid_example = Cardgrid Basis-Layout
+mblock_example_extended_cardgrid_example = Cardgrid mit Tabs (erweitert)
 mblock_example_base_cards_api_example = Content Cards mit API Features
 
 mblock_example_html_teammember_example = Teammitglieder
@@ -81,7 +85,7 @@ mblock_toast_module_type_mismatch = Modultyp stimmt nicht überein
 
 # Template selection
 mblock_theme_label = Template-Auswahl
-mblock_theme_default = Standard Template
-mblock_theme_info = Hier können Sie ein eigenes mblock-Template auswählen. Legen Sie dazu einen Ordner in <code>data/templates/</code> an. Jedes Template kann eine eigene CSS-Datei mit dem Prefix des Template-Namens enthalten (z.B. <code>mytemplate.css</code>). Diese wird bei Auswahl automatisch nach <code>assets/</code> kopiert und nach der Standard-CSS geladen, sodass Sie Defaults überschreiben können. Das Default-Template bleibt immer verfügbar.
+mblock_theme_standard = Standard Template
+mblock_theme_info = Hier können Sie zwischen den verfügbaren MBlock-Templates wählen. Verfügbare Templates sind im <code>data/templates/</code> Ordner gespeichert. Jedes Template kann eine eigene CSS-Datei enthalten, die automatisch geladen wird.
 mblock_theme_css_copied = Template-CSS wurde erfolgreich kopiert
 mblock_theme_saved = Template-Auswahl wurde gespeichert

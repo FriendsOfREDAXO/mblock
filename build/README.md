@@ -1,6 +1,6 @@
-# MBlock Build System
+# MBlock Build System - Simplified Minification
 
-Automatisierte Minification für MBlock JavaScript Assets
+Automatisierte Minification für MBlock JavaScript mit optimaler Performance
 
 ## 🚀 Quick Start
 
@@ -8,6 +8,25 @@ Automatisierte Minification für MBlock JavaScript Assets
 cd build/
 ./build.sh
 ```
+
+## 🏗️ Vereinfachte Build-Architektur
+
+Das Build-System erstellt aus der bestehenden `mblock.js` eine optimierte minifizierte Version:
+
+### Build Structure
+```
+../assets/
+├── mblock.js         # ~142 KB - Source (Development & Editing)
+├── mblock.min.js     # ~45 KB - Production (minifiziert) ✨
+├── mblock.min.js.map # ~50 KB - Source Map für Debugging
+└── mblock.css        # 🎨 Stylesheet
+```
+
+### Performance Stats
+- **Input:** `mblock.js` (~142 KB)
+- **Output:** `mblock.min.js` (~45 KB)  
+- **Ersparnis:** ~68% kleinere Dateigröße
+- **Build Zeit:** ~200-300ms
 
 ## 📋 Voraussetzungen
 
@@ -34,46 +53,78 @@ cd build/
    npm run build
    ```
 
-## 📊 Build-Ergebnis
+## ⚙️ Build-Prozess
 
-- **Input:** `../assets/mblock.js` (~84 KB)
-- **Output:** `../assets/mblock.min.js` (~30 KB)
-- **Ersparnis:** ~64% kleinere Dateigröße
-- **Source Map:** `../assets/mblock.min.js.map`
+### 1. Source Validation
+```bash
+📖 Quelldatei gefunden: ../assets/mblock.js
+📏 Quelldatei Größe: 141 KB
+```
 
-## ⚙️ Konfiguration
+### 2. Minification
+```bash
+⚙️ Starte Minification von mblock.js...
+🗜️ Minified Größe: 45.21 KB
+💾 Ersparnis: 96.67 KB (68.13%)
+⏱️ Verarbeitungszeit: 231ms
+```
 
-### Preserved Function Names
-Diese Funktionen werden **nicht** umbenannt:
-- `mblock_init`
-- `mblock_init_sort` 
-- `mblock_sort`
-- `mblock_add`
-- `MBlockClipboard`
-- `MBlockOnlineToggle`
-- `mblock_smooth_scroll_to_element`
+### 3. Output
+```bash
+💾 Minified Datei erstellt: mblock.min.js
+🗺️ Source Map erstellt: mblock.min.js.map
+```
 
-### Entfernte Debug-Codes
-- `console.log()` Statements werden entfernt
-- `console.error()` und `console.warn()` bleiben erhalten
-- Alle Kommentare werden entfernt
-- Debugger-Statements werden entfernt
+## 🎯 Asset Loading
+
+Die `boot.php` lädt automatisch die optimierte Version:
+
+```php
+// Automatisches Laden der minimizierten Version
+rex_view::addJsFile($this->getAssetsUrl('mblock.min.js'));
+rex_view::addCssFile($this->getAssetsUrl('mblock.css'));
+```
+
+**Vorteile:**
+- ✅ **68% kleinere Dateigröße** für bessere Performance
+- ✅ **Source Maps** für einfaches Debugging  
+- ✅ **Automatische Compression** von Console-Ausgaben
+- ✅ **Preserved Function Names** für externe API-Calls
+
+## 🔧 Preserved Function Names
+
+Diese **kritischen Funktionen** werden nicht umbenannt:
+
+```javascript
+// Core Functions
+'mblock_init',
+'mblock_init_sort', 
+'mblock_sort',
+'mblock_add',
+
+// Clipboard & Toggle Functions  
+'MBlockClipboard',
+'MBlockOnlineToggle',
+
+// Utility Functions
+'mblock_smooth_scroll_to_element'
+```
 
 ## 📁 Datei-Struktur
 
 ```
 build/
-├── build.sh           # Shell-Script für automatisierten Build
-├── minify.js          # Node.js Minification-Script  
-├── package.json       # NPM Dependencies
-├── node_modules/      # Installierte Packages
-└── README.md          # Diese Datei
+├── build.sh           # 🔧 Shell-Script für automatisierten Build
+├── minify.js          # ⚙️ Node.js Minification-Script  
+├── package.json       # 📦 NPM Dependencies (Terser)
+├── node_modules/      # 🗂️ Installierte Packages
+└── README.md          # 📖 Diese Datei
 
 ../assets/
-├── mblock.js          # Original Source (Development)
-├── mblock.min.js      # Minified Version (Production) ✨
-├── mblock.min.js.map  # Source Map für Debugging
-└── mblock.css         # Stylesheet
+├── mblock.js            # 🛠️ Source (bearbeiten hier)
+├── mblock.min.js        # 🚀 Production Version ✨ (automatisch generiert)
+├── mblock.min.js.map    # 🗺️ Source Map für Debugging
+└── mblock.css           # 🎨 Stylesheet
 ```
 
 ## 🎯 NPM Scripts
@@ -84,53 +135,70 @@ npm run minify    # Alias für build
 npm run clean     # Minified Dateien löschen
 ```
 
-## 🔧 Development vs Production
+## 🛠️ Development Workflow
 
-### Asset-Modus in boot.php
+### Für MBlock-Entwicklung:
 
-Die `boot.php` unterstützt intelligentes Asset-Management:
+1. **Bearbeite Source-Datei:**
+   ```bash
+   assets/mblock.js        # Hauptdatei bearbeiten
+   ```
 
-```php
-// In boot.php - Asset Management Konfiguration
-$assetMode = 'auto'; // Optionen: 'auto', 'dev', 'prod'
-```
+2. **Build nach Änderungen:**
+   ```bash
+   cd build && ./build.sh
+   ```
 
-**Modi:**
-- **`'auto'`** (empfohlen) - Automatische Erkennung
-  - **Production:** `mblock.min.js` wenn Debug-Modus deaktiviert
-  - **Development:** `mblock.js` wenn Debug-Modus aktiv
-- **`'dev'`** - Immer `mblock.js` (Development/Debugging)
-- **`'prod'`** - Immer `mblock.min.js` (Production/Performance)
-
-### Lokale Entwicklung
-1. Setze `$assetMode = 'dev';` in boot.php
-2. Verwende `mblock.js` für besseres Debugging
-3. Console-Logs und Source-Code sind verfügbar
-
-### Produktion
-1. Setze `$assetMode = 'prod';` oder lasse `'auto'` 
-2. Verwende `mblock.min.js` für bessere Performance
-3. Führe nach Änderungen `./build.sh` aus
-
-### Auto-Detection (Empfohlen)
-Lasse `$assetMode = 'auto';` für automatische Erkennung:
-- **REDAXO Debug-Modus AN:** Verwendet `mblock.js`
-- **REDAXO Debug-Modus AUS:** Verwendet `mblock.min.js`
+3. **Testing:**
+   - Production nutzt automatisch `mblock.min.js` (optimiert)
+   - Source Maps ermöglichen Debugging der Original-Zeilen
 
 ## 🚨 Wichtige Hinweise
 
-1. **Nach jeder Änderung** an `mblock.js` muss das Build-Script ausgeführt werden
-2. **boot.php** ist bereits konfiguriert für `mblock.min.js`
-3. **Source Maps** helfen beim Debugging der Production-Version
-4. **Preserved Functions** können weiterhin extern aufgerufen werden
+1. **⚠️ Bearbeite NIE `mblock.min.js` direkt!**
+   - Ändere nur `mblock.js`
+   - Build-System überschreibt minifizierte Datei
 
-## 🔄 Workflow
+2. **🔄 Nach jeder Änderung** an `mblock.js` muss Build ausgeführt werden
 
-1. Entwickle in `mblock.js`
-2. Führe `./build.sh` aus
-3. Teste `mblock.min.js` in REDAXO
-4. Deploye in die Produktion
+3. **📍 Source Maps** helfen beim Debugging der Production-Version
+
+4. **🔗 Preserved Functions** können weiterhin extern aufgerufen werden
+
+## 🚨 Troubleshooting
+
+### Build-Fehler beheben:
+```bash
+# Node.js Version prüfen  
+node --version  # sollte >= 14.0.0 sein
+
+# Dependencies neu installieren
+rm -rf node_modules
+npm install
+
+# Source-Datei validieren
+ls -la ../assets/mblock.js  
+# Sollte mblock.js zeigen
+
+# Manuelle Terser Installation
+npm install terser
+```
+
+### Syntax-Fehler in Source-Datei:
+```bash
+# JavaScript-Syntax prüfen
+node -c ../assets/mblock.js
+```
+
+### Asset-Loading-Probleme:
+```bash
+# Prüfe ob mblock.min.js existiert
+ls -la ../assets/mblock.min.js
+
+# Browser-Konsole für Debugging
+# Source Maps zeigen Original-Zeilen bei Fehlern
+```
 
 ---
 
-**💡 Tipp:** Nutze ein Watch-System für automatische Builds bei Dateiänderungen!
+**💡 Tip:** Die Source Maps ermöglichen es, auch in der minimizierten Production-Version die Original-Zeilennummern zu sehen!

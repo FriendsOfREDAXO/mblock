@@ -71,7 +71,7 @@ mblock_toast_module_type_mismatch = Module type mismatch
 
 # Template selection
 mblock_theme_label = Template Selection
-mblock_theme_default = Default Template
-mblock_theme_info = Here you can select a custom mblock template. Create a folder in <code>data/templates/</code> for this. Each template can include its own CSS file with the template name as prefix (e.g. <code>mytemplate.css</code>). This CSS will be automatically copied to <code>assets/</code> when selected and loaded after the standard CSS, allowing you to override defaults. The default template remains always available.
+mblock_theme_standard = Standard Template
+mblock_theme_info = Here you can choose between the available MBlock templates. Available templates are stored in the <code>data/templates/</code> folder. Each template can include its own CSS file that will be loaded automatically.
 mblock_theme_css_copied = Template CSS was successfully copied
 mblock_theme_saved = Template selection was saved

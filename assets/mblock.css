@@ -1,3 +1,36 @@
+/* Intelligentes Fallback-System für Copy/Paste-Icons */
+
+/* Falls Bloecks-Addon aktiv ist: HTML rex-icons bevorzugen, CSS-Icons verstecken */
+body.rex-addon-bloecks .mblock-copy-btn::before,
+body.rex-addon-bloecks .mblock-paste-btn::before {
+    display: none !important;
+}
+
+/* Falls Bloecks-Addon nicht aktiv: Font Awesome CSS-Icons als Fallback verwenden */
+.mblock-copy-btn::before {
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    content: '\f0c5'; /* fa-copy */
+    font-size: 16px;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+.mblock-paste-btn::before {
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    content: '\f0ea'; /* fa-paste */
+    font-size: 16px;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+/* Falls rex-icons vorhanden sind: CSS-Icons verstecken um Dopplung zu vermeiden */
+.mblock-copy-btn .rex-icon ~ *::before,
+.mblock-paste-btn .rex-icon ~ *::before,
+.mblock-copy-btn:has(.rex-icon)::before,
+.mblock-paste-btn:has(.rex-icon)::before {
+    display: none !important;
+}
 /* 🎨 MBlock Theme Variables - Customizable Design System
  * ========================================================
  * Diese CSS-Variablen ermöglichen einfache Theme-Anpassungen.
@@ -146,6 +179,18 @@
     padding-top: 60px;
 }
 
+/* Specific icon codes for FontAwesome 6 Regular */
+.rex-icon-copy::before {
+    content: "\f0c5" !important; /* fa-regular fa-copy */
+}
+
+.rex-icon-cut::before {
+    content: "\f0c4" !important; /* fa-regular fa-scissors */
+}
+
+.rex-icon-paste::before {
+    content: "\f0ea" !important; /* fa-regular fa-paste */
+}
 
 /* 🎨 Dark Mode Consistency - REDAXO Dark Theme + Bootstrap 5 */
 body.rex-theme-dark .mblock_wrapper,
@@ -425,7 +470,7 @@ div.sortable-ghost::before {
 }
 
 /* Add Button (Bloecks-Style) */
-.btn.addme {
+.sortitem .btn.addme {
     background: var(--mblock-add-background);
     border-color: var(--mblock-add-border);
     color: var(--mblock-add-color);
@@ -439,7 +484,7 @@ div.sortable-ghost::before {
     text-decoration: none;
 }
 
-.btn.addme:hover:not([disabled]) {
+.sortitem .btn.addme:hover:not([disabled]) {
     background: var(--mblock-add-background-hover);
     border-color: var(--mblock-add-border-hover);
     transform: var(--mblock-add-transform-hover);
@@ -448,12 +493,12 @@ div.sortable-ghost::before {
     text-decoration: none;
 }
 
-.btn.addme:active {
+.sortitem .btn.addme:active {
     transform: translateY(0);
     box-shadow: 0 2px 6px rgba(40, 167, 69, 0.4);
 }
 
-.btn.addme[disabled] {
+.sortitem .btn.addme[disabled] {
     background: #6c757d;
     border-color: #6c757d;
     opacity: 0.5;

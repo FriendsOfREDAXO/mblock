@@ -53,8 +53,12 @@ fi
 
 echo "📖 Quelldatei gefunden: $SOURCE_FILE"
 
-# Run minification
-echo "⚙️  Starte Minification..."
+# Get file size for statistics
+SOURCE_SIZE=$(stat -f%z "$SOURCE_FILE" 2>/dev/null || stat -c%s "$SOURCE_FILE" 2>/dev/null || echo "unknown")
+echo "📏 Quelldatei Größe: $([ "$SOURCE_SIZE" != "unknown" ] && echo "$((SOURCE_SIZE / 1024)) KB" || echo "unbekannt")"
+
+echo "⚙️  Starte Minification von mblock.js..."
+# Use the existing mblock.js as source
 node minify.js
 
 # Verify output
@@ -67,7 +71,7 @@ if [ -f "$OUTPUT_FILE" ]; then
     echo ""
     echo "🎯 Nächste Schritte:"
     echo "   1. Teste mblock.min.js in deiner REDAXO-Installation"
-    echo "   2. Update boot.php um mblock.min.js zu verwenden"
+    echo "   2. boot.php lädt automatisch mblock.min.js"
     echo "   3. Deploye in die Produktion"
 else
     echo "❌ Build fehlgeschlagen - Output Datei nicht erstellt"

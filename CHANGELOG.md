@@ -11,6 +11,27 @@
 * **Performance**: Optimized JavaScript for better editor initialization and cleanup.
 * **Cleanup**: Removed debug code and unnecessary files.
 
+## Version 4.2.0-dev
+
+### Bug Fixes
+* **Media Field ID Mismatch**: Fixed issue where media field IDs became inconsistent after moving blocks, causing media selection from media pool to fail ([#issue](https://github.com/FriendsOfREDAXO/mblock/issues/XXX))
+  - Root cause: Inconsistent string concatenation in ID generation
+  - Input field IDs and button onclick handlers now use identical ID values
+  - Affects REX_MEDIA, REX_LINK, REX_MEDIALIST, and REX_LINKLIST fields
+
+### Template System Improvements
+* **Template Migration**: `default_theme` renamed to `standard` for consistency
+* **Template Location**: All templates now in `data/templates/` directory for unified handling
+* **Template Selection**: Simplified dropdown selection in addon settings
+* **Automatic Updates**: Templates are refreshed on every addon update
+* **Default Configuration**: `standard` theme is always set on install/update
+* **Simplified Management**: Only built-in templates are available, no custom template support
+
+### Configuration
+* **Standard Theme**: Default theme is now called `standard` instead of `default_theme`
+* **Theme Reset**: Theme configuration is reset to `standard` on every update/install
+* **Package Config**: Added default `mblock_theme: 'standard'` to package.yml
+
 ## Version 4.0.0 - 2025-01-18
 
 ### Major New Features
@@ -38,7 +59,7 @@
 
 #### Internationalization & UX
 * **Multi-language Support**: Extended language files for German and English
-* **Template Translation**: New `{{language_key}}` syntax in templates
+* **Template Translation**: New `{{mblock::language_key}}` syntax in templates
 * **Enhanced Parser**: `MBlockParser` supports automatic language placeholder replacement
 * **Modern UI**: Updated to use bloecks ^5.2.0 for consistent drag & drop
 * **Dark Mode**: Full compatibility with REDAXO dark theme
