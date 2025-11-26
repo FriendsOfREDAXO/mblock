@@ -1374,19 +1374,21 @@ var MBlockClipboard = {
             });
             
             // CKEditor content (CKE5)
+            // Collect CKEditor5 entries in order so we can restore positional (unsaved/new) editors
+            const _cke5_array = [];
             item.find('.cke5-editor').each(function() {
                 const $editor = $(this);
                 const name = $editor.attr('name');
+
+                // Try to get CKEditor content for all editors (named or not)
+                let content = $editor.val();
+                const editorId = $editor.attr('id');
+                if (editorId && window.CKEDITOR && window.CKEDITOR.instances && window.CKEDITOR.instances[editorId]) {
+                    content = window.CKEDITOR.instances[editorId].getData();
+                }
+
+                // Only set named entries directly in formData
                 if (name) {
-                    // Try to get CKEditor content
-                    let content = $editor.val();
-                    
-                    // Check if there's a CKEditor instance
-                    const editorId = $editor.attr('id');
-                    if (editorId && window.CKEDITOR && window.CKEDITOR.instances[editorId]) {
-                        content = window.CKEDITOR.instances[editorId].getData();
-                    }
-                    
                     formData[name] = {
                         type: 'ckeditor',
                         value: content,
@@ -1396,7 +1398,23 @@ var MBlockClipboard = {
                         }
                     };
                 }
+
+                // Always collect a positional entry to support unsaved/new editors without a proper name
+                _cke5_array.push({
+                    name: name || null,
+                    value: content || '',
+                    config: {
+                        lang: $editor.attr('data-lang') || null,
+                        profile: $editor.attr('data-profile') || null
+                    }
+                });
             });
+            });
+
+            // If we captured any CKEditor5 entries, expose them as a positional array for fallback restores
+            if (_cke5_array.length) {
+                formData._cke5_array = _cke5_array;
+            }
             
             // REX Media widgets
             item.find('.rex-js-widget-media').each(function() {
@@ -1790,10 +1808,21 @@ var MBlockClipboard = {
                             
                             // If CKEditor instance exists, set data
                             const editorId = $field.attr('id');
-                            if (editorId && window.CKEDITOR && window.CKEDITOR.instances[editorId]) {
+                            if (editorId && window.CKEDITOR && window.CKEDITOR.instances && window.CKEDITOR.instances[editorId]) {
                                 setTimeout(() => {
                                     window.CKEDITOR.instances[editorId].setData(fieldData.value);
                                 }, 200);
+                            }
+                            // Also set a data-attribute for CKEditor5 instances or initialization handlers
+                            try {
+                                $field.attr('data-cke5-restore-content', fieldData.value);
+                                if (fieldData.config) {
+                                    Object.keys(fieldData.config).forEach(k => {
+                                        if (fieldData.config[k]) $field.attr('data-' + k, fieldData.config[k]);
+                                    });
+                                }
+                            } catch (e) {
+                                // ignore attribute setting errors
                             }
                         }
                         break;
@@ -1877,6 +1906,25 @@ var MBlockClipboard = {
                         break;
                 }
             });
+
+            // positional fallback: if _cke5_array exists, assign its entries to .cke5-editor
+            // elements in order when name-based mapping failed (fixes unsaved/new blocks)
+            if (formData._cke5_array && Array.isArray(formData._cke5_array) && formData._cke5_array.length) {
+                let _idx = 0;
+                pastedItem.find('.cke5-editor').each(function() {
+                    const el = $(this);
+                    if (el.attr('data-cke5-restore-content')) { _idx++; return; }
+                    const data = formData._cke5_array[_idx++];
+                    if (!data) return;
+                    const nm = data.name;
+                    if (nm) {
+                        let maybe = pastedItem.find('[name="' + nm + '"], [name="mblock_new_' + nm + '"]');
+                        if (maybe.length) { return; }
+                    }
+                    el.attr('data-cke5-restore-content', data.value || '');
+                    if (data.config) Object.keys(data.config).forEach(k => { data.config[k] && el.attr('data-' + k, data.config[k]) });
+                });
+            }
             
             
         } catch (error) {
