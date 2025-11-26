@@ -1296,6 +1296,15 @@ var MBlockClipboard = {
             // Clone item completely
             const clonedItem = item.clone(true, true);
             
+            // Remove CKE5 instances from clone to ensure clean state
+            clonedItem.find('.cke5-editor').each(function() {
+                const $editor = $(this);
+                $editor.next('.ck').remove();
+                $editor.show();
+                $editor.css('visibility', '');
+                $editor.removeAttr('style');
+            });
+            
             // Convert selectpicker elements back to plain select elements for clean copying
             this.convertSelectpickerToPlainSelect(clonedItem);
             
@@ -1385,6 +1394,11 @@ var MBlockClipboard = {
                 const editorId = $editor.attr('id');
                 if (editorId && window.CKEDITOR && window.CKEDITOR.instances && window.CKEDITOR.instances[editorId]) {
                     content = window.CKEDITOR.instances[editorId].getData();
+                } else if (editorId && typeof window.cke5_get_editors === 'function') {
+                    const editors = window.cke5_get_editors();
+                    if (editors && editors[editorId]) {
+                        content = editors[editorId].getData();
+                    }
                 }
 
                 // Only set named entries directly in formData
@@ -1408,7 +1422,6 @@ var MBlockClipboard = {
                         profile: $editor.attr('data-profile') || null
                     }
                 });
-            });
             });
 
             // If we captured any CKEditor5 entries, expose them as a positional array for fallback restores
@@ -1812,6 +1825,13 @@ var MBlockClipboard = {
                                 setTimeout(() => {
                                     window.CKEDITOR.instances[editorId].setData(fieldData.value);
                                 }, 200);
+                            } else if (editorId && typeof window.cke5_get_editors === 'function') {
+                                const editors = window.cke5_get_editors();
+                                if (editors && editors[editorId]) {
+                                    setTimeout(() => {
+                                        editors[editorId].setData(fieldData.value);
+                                    }, 200);
+                                }
                             }
                             // Also set a data-attribute for CKEditor5 instances or initialization handlers
                             try {
