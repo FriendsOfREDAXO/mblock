@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 * **Double Icons**: Fixed duplicate icons in copy/paste buttons when Bloecks addon is active.
+* **TinyMCE Drag & Drop**: Fixed issue where TinyMCE editors became unresponsive after moving blocks (Drag & Drop or Arrow Buttons).
 
 ## Version 4.5.0 - 2025-11-26
 
