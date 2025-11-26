@@ -1007,7 +1007,8 @@ html[data-bs-theme="dark"] .mblock_wrapper span.removeadded .btn.mblock-offline-
     }
 }
 
-.mblock_wrapper > div.mblock-paste-glow {
+.mblock_wrapper > div.mblock-paste-glow,
+.mblock_wrapper > div.mblock-add-glow {
     animation: mblockPasteGlow 1.2s ease-out;
     border-color: rgba(40, 167, 69, 0.6) !important;
     background: rgba(40, 167, 69, 0.03) !important;
@@ -1037,14 +1038,17 @@ html[data-bs-theme="dark"] .mblock_wrapper span.removeadded .btn.mblock-offline-
 }
 
 body.rex-theme-dark .mblock_wrapper > div.mblock-paste-glow,
-html[data-bs-theme="dark"] .mblock_wrapper > div.mblock-paste-glow {
+html[data-bs-theme="dark"] .mblock_wrapper > div.mblock-paste-glow,
+body.rex-theme-dark .mblock_wrapper > div.mblock-add-glow,
+html[data-bs-theme="dark"] .mblock_wrapper > div.mblock-add-glow {
     animation: mblockPasteGlowDark 1.2s ease-out;
     border-color: rgba(25, 135, 84, 0.7) !important;
     background: rgba(25, 135, 84, 0.05) !important;
 }
 
 @media (prefers-color-scheme: dark) {
-    body.rex-has-theme:not(.rex-theme-light) .mblock_wrapper > div.mblock-paste-glow {
+    body.rex-has-theme:not(.rex-theme-light) .mblock_wrapper > div.mblock-paste-glow,
+    body.rex-has-theme:not(.rex-theme-light) .mblock_wrapper > div.mblock-add-glow {
         animation: mblockPasteGlowDark 1.2s ease-out;
         border-color: rgba(25, 135, 84, 0.7) !important;
         background: rgba(25, 135, 84, 0.05) !important;
