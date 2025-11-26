@@ -720,7 +720,7 @@ function mblock_add_item(element, item) {
         }
         
         // add clone
-        item.after(iClone);
+                            item.after(iClone);
         // set count
         mblock_set_count(element, item);
     }
@@ -828,10 +828,19 @@ function mblock_remove_item(element, item) {
         }
 
         const elementData = element.data();
+        // Use non-blocking custom confirm UI if a confirmation message is configured
+        // We keep the old confirm() fallback for environments where dialogs are fine,
+        // but Safari sometimes blocks native alerts/confirms — avoid using them.
         if (elementData && elementData.hasOwnProperty('delete_confirm')) {
-            if (!confirm(elementData.delete_confirm)) {
+            // If a custom modal is present, removal should have been handled by
+            // the click handler's confirmation flow. If we get here synchronously
+            // (e.g. called directly), fall back to browser confirm.
+            // Return false to indicate caller should open the confirmation.
+            if (!item.data('__mblock_confirmed')) {
                 return false;
             }
+            // clear the flag for subsequent operations
+            item.removeData('__mblock_confirmed');
         }
 
         const itemParent = item.parent();
@@ -893,6 +902,88 @@ function mblock_remove_item(element, item) {
         return false;
     }
 }
+
+        // Show a non-blocking confirmation dialog (Bootstrap or custom) for an item removal.
+        // Returns a Promise that resolves true/false depending on user choice.
+        function mblock_show_confirm(element, item, message) {
+                return new Promise((resolve) => {
+                        try {
+                                // Prefer Bootstrap modal if available
+                                if (typeof $().modal === 'function') {
+                                        let $modal = $('#mblock-confirm-modal');
+                                        if (!$modal.length) {
+                                                const markup = `
+                                                <div id="mblock-confirm-modal" class="modal fade" tabindex="-1" role="dialog">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">${rex && rex.i18n ? rex.i18n.msg('mblock_confirm_title') || 'Bestätigen' : 'Bestätigen'}</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                            </div>
+                                                            <div class="modal-body"><p class="mblock-confirm-text"></p></div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">${rex && rex.i18n ? rex.i18n.msg('mblock_confirm_cancel') || 'Abbrechen' : 'Abbrechen'}</button>
+                                                                <button type="button" class="btn btn-danger mblock-confirm-ok">${rex && rex.i18n ? rex.i18n.msg('mblock_confirm_ok') || 'Löschen' : 'Löschen'}</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>`;
+                                                $('body').append(markup);
+                                                $modal = $('#mblock-confirm-modal');
+                                        }
+
+                                        $modal.find('.mblock-confirm-text').text(message || 'Sind Sie sicher?');
+                                        $modal.off('click.mblock_confirm', '.mblock-confirm-ok');
+                                        $modal.on('click.mblock_confirm', '.mblock-confirm-ok', function () {
+                                                $modal.modal('hide');
+                                                resolve(true);
+                                        });
+                                        $modal.off('hidden.bs.modal.mblock_confirm');
+                                        $modal.on('hidden.bs.modal.mblock_confirm', function () {
+                                                // If hidden without OK-click, it's considered cancelled
+                                                resolve(false);
+                                        });
+                                        $modal.modal('show');
+                                        return;
+                                }
+
+                                // Fallback custom DOM modal for environments without Bootstrap
+                                let $overlay = $('#mblock-confirm-overlay');
+                                if (!$overlay.length) {
+                                        const html = `
+                                        <div id="mblock-confirm-overlay" class="mblock-confirm-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:2000;">
+                                            <div class="mblock-confirm" style="background:#fff;padding:18px;border-radius:6px;max-width:520px;width:90%;box-shadow:0 6px 24px rgba(0,0,0,0.25);">
+                                                <div style="margin-bottom:12px;font-weight:600;">${rex && rex.i18n ? rex.i18n.msg('mblock_confirm_title') || 'Bestätigen' : 'Bestätigen'}</div>
+                                                <div style="margin-bottom:18px;">${message || 'Sind Sie sicher, dass Sie dieses Element löschen möchten?'}</div>
+                                                <div style="text-align:right;display:flex;gap:8px;justify-content:flex-end;">
+                                                    <button class="btn btn-secondary mblock-confirm-cancel">Abbrechen</button>
+                                                    <button class="btn btn-danger mblock-confirm-ok">Löschen</button>
+                                                </div>
+                                            </div>
+                                        </div>`;
+                                        $('body').append(html);
+                                        $overlay = $('#mblock-confirm-overlay');
+                                } else {
+                                        $overlay.find('.mblock-confirm').find('div:nth-child(2)').text(message || 'Sind Sie sicher, dass Sie dieses Element löschen möchten?');
+                                        $overlay.show();
+                                }
+
+                                $overlay.off('click.mblock_confirm');
+                                $overlay.on('click.mblock_confirm', '.mblock-confirm-ok', function () {
+                                        $overlay.hide();
+                                        resolve(true);
+                                });
+                                $overlay.on('click.mblock_confirm', '.mblock-confirm-cancel', function () {
+                                        $overlay.hide();
+                                        resolve(false);
+                                });
+
+                        } catch (err) {
+                                // last resort: browser confirm
+                                resolve(confirm(message || 'Sind Sie sicher?'));
+                        }
+                });
+        }
 
 // Copy & Paste Funktionalität mit Session/Local Storage
 var MBlockClipboard = {
@@ -2204,12 +2295,12 @@ function mblock_add(element) {
                 try {
                     const $this = $(this);
                     if (!$this.prop('disabled')) {
-                        const $item = $this.parents('.sortitem');
+                            const $item = $this.parents('.sortitem');
                         const itemIndex = $item.attr('data-mblock_index');
                         if (itemIndex) {
                             element.attr('data-mblock_clicked_add_item', itemIndex);
                         }
-                        mblock_add_item(element, $this.closest('div[class^="sortitem"]'));
+                            mblock_add_item(element, $this.closest('div.sortitem'));
                     }
                 } catch (error) {
                     console.error('MBlock: Fehler in addme click handler:', error);
@@ -2224,7 +2315,7 @@ function mblock_add(element) {
                 try {
                     const $this = $(this);
                     if (!$this.prop('disabled')) {
-                        mblock_remove_item(element, $this.closest('div[class^="sortitem"]'));
+                        mblock_remove_item(element, $this.closest('div.sortitem'));
                     }
                 } catch (error) {
                     console.error('MBlock: Fehler in removeme click handler:', error);
@@ -2239,7 +2330,7 @@ function mblock_add(element) {
                 try {
                     const $this = $(this);
                     if (!$this.prop('disabled')) {
-                        mblock_moveup(element, $this.closest('div[class^="sortitem"]'));
+                        mblock_moveup(element, $this.closest('div.sortitem'));
                     }
                 } catch (error) {
                     console.error('MBlock: Fehler in moveup click handler:', error);
@@ -2254,7 +2345,7 @@ function mblock_add(element) {
                 try {
                     const $this = $(this);
                     if (!$this.prop('disabled')) {
-                        mblock_movedown(element, $this.closest('div[class^="sortitem"]'));
+                        mblock_movedown(element, $this.closest('div.sortitem'));
                     }
                 } catch (error) {
                     console.error('MBlock: Fehler in movedown click handler:', error);
@@ -2272,7 +2363,7 @@ function mblock_add(element) {
                     e.preventDefault();
                     try {
                         const $this = $(this);
-                        const $item = $this.closest('div[class^="sortitem"]');
+                        const $item = $this.closest('div.sortitem');
                         MBlockClipboard.copy(element, $item);
                     } catch (error) {
                         console.error('MBlock: Fehler in copy click handler:', error);
@@ -2292,7 +2383,7 @@ function mblock_add(element) {
                     try {
                         const $this = $(this);
                         if (!$this.hasClass('disabled') && !$this.prop('disabled')) {
-                            const $item = $this.closest('div[class^="sortitem"]');
+                            const $item = $this.closest('div.sortitem');
                             MBlockClipboard.paste(element, $item);
                         }
                     } catch (error) {
@@ -2309,7 +2400,7 @@ function mblock_add(element) {
                 e.preventDefault();
                 try {
                     const $this = $(this);
-                    const $item = $this.closest('div[class^="sortitem"]');
+                    const $item = $this.closest('div.sortitem');
                     MBlockOnlineToggle.toggle(element, $item);
                 } catch (error) {
                     console.error('MBlock: Fehler in online/offline toggle handler:', error);
@@ -2324,7 +2415,7 @@ function mblock_add(element) {
                 e.preventDefault();
                 try {
                     const $this = $(this);
-                    const $item = $this.closest('div[class^="sortitem"]');
+                    const $item = $this.closest('div.sortitem');
                     MBlockOnlineToggle.toggleAutoDetected(element, $item, $this);
                 } catch (error) {
                     console.error('MBlock: Fehler in auto-detected toggle handler:', error);
