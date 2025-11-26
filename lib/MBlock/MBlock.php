@@ -38,6 +38,7 @@ use rex_string;
 use rex_url;
 use rex_var;
 use rex_yform;
+use rex_i18n;
 
 class MBlock
 {
@@ -440,8 +441,8 @@ class MBlock
             // Copy/Paste ist aktiviert - Toolbar anzeigen
                 $copyPasteToolbar = '<div class="mblock-copy-paste-toolbar">'
                     . '<div class="btn-group btn-group-xs">'
-                    . '<button type="button" class="btn btn-default mblock-clear-clipboard mblock-has-icon" title="{{mblock_clear_clipboard}}">'
-                    . '<i class="rex-icon fa-solid fa-trash"></i> {{mblock_clear_clipboard}}'
+                    . '<button type="button" class="btn btn-default mblock-clear-clipboard mblock-has-icon" title="' . \rex_i18n::msg('mblock_clear_clipboard') . '">'
+                    . '<i class="rex-icon fa-solid fa-trash"></i> ' . \rex_i18n::msg('mblock_clear_clipboard')
                     . '</button>'
                     . '</div></div>';
         } else {

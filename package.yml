@@ -1,5 +1,5 @@
 package: mblock
-version: 4.5.1
+version: 4.5.2
 name: MBlock
 author: Friends Of REDAXO
 supportpage: https://github.com/FriendsOfREDAXO/mblock
@@ -8,9 +8,9 @@ page:
     title: translate:title
     pjax: true
     perm: mblock[]
-    icon: fa-solid fa-train
+    icon: rex-icon fa-layer-group
     subpages:
-        overview: { title: 'MBlock 4.0' }
+        overview: { title: 'MBlock' }
         demo:
             title: translate:demo_base
             subpages:

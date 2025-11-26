@@ -849,6 +849,12 @@ function mblock_add_item(element, item) {
     setTimeout(function() {
         if (iClone && iClone.length && iClone.is(':visible')) {
             mblock_scroll(element, iClone);
+            
+            // ✨ Add glow effect to new item
+            iClone.addClass('mblock-add-glow');
+            setTimeout(function() {
+                iClone.removeClass('mblock-add-glow');
+            }, 1200);
         }
     }, 100);
 }
