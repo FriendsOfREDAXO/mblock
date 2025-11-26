@@ -530,7 +530,7 @@ function mblock_update_rex_ids($element, sindex, mblock_count, eindex) {
              elementId.indexOf('REX_MEDIALIST_') >= 0)) {
             
             const parentEindex = $element.parent().data('eindex') || eindex;
-            const newId = elementId.replace(/\d+/, sindex + mblock_count + '00' + parentEindex);
+                const newId = elementId.replace(/\d+/, '' + sindex + mblock_count + '00' + parentEindex);
             $element.attr('id', newId);
 
             // Button-Updates für Popup-Funktionen
@@ -634,7 +634,7 @@ function mblock_reindex_special_elements($sortItem, index, sindex, mblock_count)
                 const $input = $(this);
                 const inputId = $input.attr('id');
                 if (inputId) {
-                    $input.attr('id', inputId.replace(/\d+/, sindex + mblock_count + '00' + eindex));
+                    $input.attr('id', inputId.replace(/\d+/, '' + sindex + mblock_count + '00' + eindex));
                 }
             });
             
@@ -642,11 +642,11 @@ function mblock_reindex_special_elements($sortItem, index, sindex, mblock_count)
                 const $btn = $(this);
                 const btnId = $btn.attr('id');
                 if (btnId) {
-                    $btn.attr('id', btnId.replace(/\d+/, sindex + mblock_count + '00' + eindex));
+                    $btn.attr('id', btnId.replace(/\d+/, '' + sindex + mblock_count + '00' + eindex));
                 }
             });
             
-            $customlink.attr('data-id', sindex + mblock_count + '00' + eindex);
+            $customlink.attr('data-id', '' + sindex + mblock_count + '00' + eindex);
             
             // Trigger MForm custom link function if available
             if (typeof window.mform_custom_link === 'function') {
