@@ -19,6 +19,8 @@ Copy & Paste funktioniert leider nicht mit markitup und CKEditor 4!
 
 **Gut zu wissen:** CKEditor 5 (CKE5) wird vollständig unterstützt und funktioniert einwandfrei mit Copy & Paste.
 
+**Technischer Hintergrund:** CKEditor 4 und markitup verwenden ältere Initialisierungsmechanismen, die beim Klonen von Blöcken nicht korrekt repliziert werden können. CKEditor 5 hingegen nutzt eine moderne API, die eine vollständige Wiederherstellung nach dem Kopieren ermöglicht.
+
 Für markitup und CKEditor 4 sollte Copy & Paste in den betreffenden Modulen deaktiviert werden: 
 
 Beispiel 

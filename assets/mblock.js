@@ -1821,7 +1821,28 @@ var MBlockClipboard = {
             const wrapper = item.closest('.mblock_wrapper');
             const moduleType = this.getModuleType(wrapper);
             
-            // 🔧 FIX: Preserve CKEditor5 instances in original block during copy
+            /**
+             * 🔧 FIX FOR ISSUE: CKE5 Problem beim Kopieren
+             * 
+             * Problem: When copying a block with CKEditor5, the editor UI is removed from
+             * the original block and not restored, breaking the editor functionality.
+             * 
+             * Root Cause: jQuery's clone(true, true) clones the entire DOM structure including
+             * the CKEditor5 UI elements (.ck-editor), which interferes with the editor instance.
+             * 
+             * Solution: Temporarily detach CKEditor5 UI elements before cloning, then reattach
+             * them after cloning completes. This ensures:
+             * - The original block's CKEditor5 instance remains intact
+             * - The clone only contains the textarea (which gets reinitialized on paste)
+             * - Other blocks are not affected
+             * 
+             * Technical Details:
+             * - CKEditor5 replaces textareas with a complex UI structure (.ck-editor)
+             * - We use jQuery's .detach() to temporarily remove UI (preserves events/data)
+             * - After cloning, we reattach UI to original position using stored references
+             * - Error handling ensures graceful failure if DOM structure changes
+             */
+            
             // Store references to CKE5 editor UI elements that need to be preserved
             const cke5Editors = [];
             item.find('.cke5-editor').each(function() {
@@ -1846,10 +1867,10 @@ var MBlockClipboard = {
             // Clone item completely (now without CKE5 UI elements)
             const clonedItem = item.clone(true, true);
             
-            // 🔧 FIX: Restore CKEditor5 UI elements to original block
+            // Restore CKEditor5 UI elements to original block
             cke5Editors.forEach(editor => {
                 try {
-                    // Verify parent still exists and is in the DOM
+                    // Verify parent still exists and is in the DOM before reattachment
                     if (editor.parent && editor.parent.length && document.contains(editor.parent[0])) {
                         // Reattach the CKE UI element to its original position
                         if (editor.nextSibling && editor.nextSibling.length) {
