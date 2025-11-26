@@ -21,11 +21,11 @@ if (rex::isBackend() && is_object(rex::getUser())) {
     });
 
     // Sortable.js handling:
-    // - Prefer the Sortable.js from the `bloecks` addon if it is available (avoids duplicate libs)
+    // - Prefer the Sortable.js from the `bloecks` addon if it is available AND drag&drop is enabled there
     // - Otherwise fall back to the bundled Sortable placed in this addon's assets folder
     $bloecksAddon = rex_addon::get('bloecks');
-    if ($bloecksAddon && $bloecksAddon->isAvailable()) {
-        // Use bloecks Sortable.js when bloecks is present
+    if ($bloecksAddon && $bloecksAddon->isAvailable() && $bloecksAddon->getConfig('drag_drop', true)) {
+        // Use bloecks Sortable.js when bloecks is present and d&d is enabled
         rex_view::addJsFile($bloecksAddon->getAssetsUrl('js/sortable.min.js'));
         rex_view::setJsProperty('mblock_sortable_source', 'bloecks');
     } else {
