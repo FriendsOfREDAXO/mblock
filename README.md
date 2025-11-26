@@ -28,6 +28,11 @@ _English:_ MBlock lets you create an unlimited number of data blocks within a si
 - [x] **Template-Priorität** - Custom templates überschreiben defaults
 - [x] **Media-ID Konflikt-Schutz** - Bessere Warnung bei ID-Überschneidungen
 
+### Editor Support (MBlock 4.5)
+
+- [x] **TinyMCE Support** - Volle Unterstützung für TinyMCE (v4-v8)
+- [x] **CKEditor 5** - Verbesserte Copy & Paste Funktionalität
+
 ## Namespace Migration (Version 4.0)
 
 ** 🙋‍♂️ MBlock 4.0 führt Namespaces ein!** Für neue Projekte wird die Verwendung des Namespace empfohlen:
