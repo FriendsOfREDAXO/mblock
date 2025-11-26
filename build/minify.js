@@ -55,7 +55,10 @@ const terserOptions = {
             'MBlockOnlineToggle',
             'mblock_smooth_scroll_to_element'
         ],
-        toplevel: true,
+        // Disable toplevel mangling to avoid name collisions with other scripts
+        // (see upstream fix: disabling top-level mangling prevents accidental
+        // variable/function redeclarations in the global scope)
+        toplevel: false,
         eval: true,
         keep_fnames: false,
         safari10: true
@@ -70,7 +73,8 @@ const terserOptions = {
         filename: path.basename(outputFile),
         url: path.basename(sourceMapFile)
     },
-    toplevel: true,
+    // Avoid global toplevel mangling; keep top-level names stable
+    toplevel: false,
     ie8: false,
     safari10: true,
     keep_classnames: false,
