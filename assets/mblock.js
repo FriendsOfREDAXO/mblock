@@ -1848,13 +1848,22 @@ var MBlockClipboard = {
             
             // 🔧 FIX: Restore CKEditor5 UI elements to original block
             cke5Editors.forEach(editor => {
-                // Reattach the CKE UI element to its original position
-                if (editor.nextSibling.length) {
-                    editor.ckeUI.insertBefore(editor.nextSibling);
-                } else {
-                    editor.parent.append(editor.ckeUI);
+                try {
+                    // Verify parent still exists and is in the DOM
+                    if (editor.parent && editor.parent.length && document.contains(editor.parent[0])) {
+                        // Reattach the CKE UI element to its original position
+                        if (editor.nextSibling && editor.nextSibling.length) {
+                            editor.ckeUI.insertBefore(editor.nextSibling);
+                        } else {
+                            editor.parent.append(editor.ckeUI);
+                        }
+                        console.log('MBlock Copy: Restored CKE5 UI for', editor.textarea.attr('id'));
+                    } else {
+                        console.warn('MBlock Copy: Parent element no longer exists, cannot restore CKE5 UI');
+                    }
+                } catch (error) {
+                    console.error('MBlock Copy: Error restoring CKE5 UI:', error);
                 }
-                console.log('MBlock Copy: Restored CKE5 UI for', editor.textarea.attr('id'));
             });
             
             // Convert selectpicker elements back to plain select elements for clean copying
