@@ -1,5 +1,11 @@
 # MBlock - REDAXO Addon für Modul-Input-Blöcke
 
+## Version 4.5.1 - 2025-11-26
+
+### Bug Fixes
+* **Double Icons**: Fixed duplicate icons in copy/paste buttons when Bloecks addon is active.
+* **TinyMCE Drag & Drop**: Fixed issue where TinyMCE editors became unresponsive after moving blocks (Drag & Drop or Arrow Buttons).
+
 ## Version 4.5.0 - 2025-11-26
 
 ### Features

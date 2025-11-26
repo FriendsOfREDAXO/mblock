@@ -25,6 +25,8 @@ body.rex-addon-bloecks .mblock-paste-btn::before {
 }
 
 /* Falls rex-icons vorhanden sind: CSS-Icons verstecken um Dopplung zu vermeiden */
+.mblock-has-icon::before,
+.mblock-has-icon::after,
 .mblock-copy-btn .rex-icon ~ *::before,
 .mblock-paste-btn .rex-icon ~ *::before,
 .mblock-copy-btn:has(.rex-icon)::before,

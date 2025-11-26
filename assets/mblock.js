@@ -414,6 +414,19 @@ function mblock_sort_it(element) {
                                 if (evt.item) {
                                     evt.item.classList.add('mblock-dragging');
                                 }
+                                
+                                // Destroy TinyMCE instances in the list to prevent ID conflicts during reindex
+                                element.find('.tiny-editor').each(function() {
+                                    var editorId = $(this).attr('id');
+                                    if (editorId && typeof tinymce !== 'undefined' && tinymce.get(editorId)) {
+                                        try {
+                                            tinymce.get(editorId).save(); // Save content to textarea first
+                                            tinymce.get(editorId).remove();
+                                        } catch(e) {
+                                            console.warn('MBlock: TinyMCE remove error:', e);
+                                        }
+                                    }
+                                });
                             } catch (error) {
                                 console.error('MBlock: Fehler in sortable onStart:', error);
                             }
@@ -439,6 +452,12 @@ function mblock_sort_it(element) {
                                 if (iClone.length) {
                                     iClone.trigger('mblock:change', [iClone]);
                                 }
+                                
+                                // Re-initialize widgets for ALL items since IDs have changed
+                                element.find('> div.sortitem').each(function() {
+                                    $(this).trigger('rex:ready', [$(this)]);
+                                });
+                                
                             } catch (error) {
                                 console.error('MBlock: Fehler in sortable onEnd:', error);
                             }
@@ -2458,6 +2477,17 @@ function mblock_moveup(element, item) {
     var prev = item.prev();
     if (prev.length == 0) return;
 
+    // Destroy TinyMCE instances before moving
+    element.find('.tiny-editor').each(function() {
+        var editorId = $(this).attr('id');
+        if (editorId && typeof tinymce !== 'undefined' && tinymce.get(editorId)) {
+            try {
+                tinymce.get(editorId).save();
+                tinymce.get(editorId).remove();
+            } catch(e) { console.warn(e); }
+        }
+    });
+
     setTimeout(function () {
         item.insertBefore(prev);
         // set last user action
@@ -2466,12 +2496,28 @@ function mblock_moveup(element, item) {
         // trigger event
         let iClone = prev;
         iClone.trigger('mblock:change', [iClone]);
+        
+        // Re-init widgets
+        element.find('> div.sortitem').each(function() {
+            $(this).trigger('rex:ready', [$(this)]);
+        });
     }, 150);
 }
 
 function mblock_movedown(element, item) {
     var next = item.next();
     if (next.length == 0) return;
+
+    // Destroy TinyMCE instances before moving
+    element.find('.tiny-editor').each(function() {
+        var editorId = $(this).attr('id');
+        if (editorId && typeof tinymce !== 'undefined' && tinymce.get(editorId)) {
+            try {
+                tinymce.get(editorId).save();
+                tinymce.get(editorId).remove();
+            } catch(e) { console.warn(e); }
+        }
+    });
 
     setTimeout(function () {
         item.insertAfter(next);
@@ -2481,6 +2527,11 @@ function mblock_movedown(element, item) {
         // trigger event
         let iClone = next;
         iClone.trigger('mblock:change', [iClone]);
+        
+        // Re-init widgets
+        element.find('> div.sortitem').each(function() {
+            $(this).trigger('rex:ready', [$(this)]);
+        });
     }, 150);
 }
 
