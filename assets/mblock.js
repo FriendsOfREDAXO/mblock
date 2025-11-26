@@ -837,7 +837,15 @@ function mblock_remove_item(element, item) {
         const itemParent = item.parent();
         const elementClass = element.attr('class');
         
-        if (itemParent.length && elementClass && itemParent.hasClass(elementClass)) {
+            // Ensure the item actually belongs to the given wrapper element.
+            // Older code relied on hasClass(elementClass) which fails when the
+            // wrapper has multiple classes (space-separated). Be robust: check
+            // direct parent equality or whether the item is a descendant of
+            // the provided element.
+            if (itemParent.length && element && element.length && (
+                itemParent[0] === element[0] || // direct parent === wrapper
+                item.parents().filter(function() { return this === element.get(0); }).length > 0
+            )) {
             // Sichere Sortable-Deaktivierung (für beide Sortable-Typen)
             try {
                 const domElement = element.get(0);
