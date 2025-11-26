@@ -411,11 +411,11 @@ class MBlock
             if ($copyPasteEnabled) {
             // Copy/Paste ist aktiviert - Buttons anzeigen
                 $copyPasteButtons = '<div class="btn-group btn-group-xs">'
-                    . '<button type="button" class="btn btn-default mblock-copy-btn" title="{{mblock_copy_element}}">'
-                    . '<i class="fa-solid fa-copy"></i>'
+                    . '<button type="button" class="btn btn-default mblock-copy-btn mblock-has-icon" title="{{mblock_copy_element}}">'
+                    . '<i class="rex-icon fa-solid fa-copy"></i>'
                     . '</button>'
-                    . '<button type="button" class="btn btn-default mblock-paste-btn" title="{{mblock_paste_element}}">'
-                    . '<i class="fa-solid fa-clipboard"></i>'
+                    . '<button type="button" class="btn btn-default mblock-paste-btn mblock-has-icon" title="{{mblock_paste_element}}">'
+                    . '<i class="rex-icon fa-solid fa-clipboard"></i>'
                     . '</button>'
                     . '</div>';
         } else {
@@ -440,8 +440,8 @@ class MBlock
             // Copy/Paste ist aktiviert - Toolbar anzeigen
                 $copyPasteToolbar = '<div class="mblock-copy-paste-toolbar">'
                     . '<div class="btn-group btn-group-xs">'
-                    . '<button type="button" class="btn btn-default mblock-clear-clipboard" title="{{mblock_clear_clipboard}}">'
-                    . '<i class="fa-solid fa-trash"></i> {{mblock_clear_clipboard}}'
+                    . '<button type="button" class="btn btn-default mblock-clear-clipboard mblock-has-icon" title="{{mblock_clear_clipboard}}">'
+                    . '<i class="rex-icon fa-solid fa-trash"></i> {{mblock_clear_clipboard}}'
                     . '</button>'
                     . '</div></div>';
         } else {
