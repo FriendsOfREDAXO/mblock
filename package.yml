@@ -8,7 +8,7 @@ page:
     title: translate:title
     pjax: true
     perm: mblock[]
-    icon: rex-icon fa-train
+    icon: fa-solid fa-train
     subpages:
         overview: { title: 'MBlock 4.0' }
         demo:

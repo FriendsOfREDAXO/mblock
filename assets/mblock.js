@@ -2050,9 +2050,10 @@ var MBlockOnlineToggle = {
                 
                 // Change icon
                 if ($icon.length) {
-                    $icon.removeClass('rex-icon-online').addClass('rex-icon-offline');
+                    $icon.removeClass('fa-toggle-on fa-toggle-off').addClass('fa-toggle-off');
+                    if (!$icon.hasClass('fa-solid')) $icon.addClass('fa-solid');
                 } else {
-                    $toggleBtn.html('<i class="rex-icon rex-icon-offline"></i>');
+                    $toggleBtn.html('<i class="fa-solid fa-toggle-off"></i>');
                 }
                 
                 // Add hidden input to store offline state
@@ -2067,9 +2068,10 @@ var MBlockOnlineToggle = {
                 
                 // Change icon
                 if ($icon.length) {
-                    $icon.removeClass('rex-icon-offline').addClass('rex-icon-online');
+                    $icon.removeClass('fa-toggle-on fa-toggle-off').addClass('fa-toggle-on');
+                    if (!$icon.hasClass('fa-solid')) $icon.addClass('fa-solid');
                 } else {
-                    $toggleBtn.html('<i class="rex-icon rex-icon-online"></i>');
+                    $toggleBtn.html('<i class="fa-solid fa-toggle-on"></i>');
                 }
                 
                 // Remove offline state
@@ -2142,22 +2144,24 @@ var MBlockOnlineToggle = {
                         $toggleBtn.removeClass('btn-online').addClass('btn-offline')
                             .attr('title', 'Set online');
                         
-                        if ($icon.length) {
-                            $icon.removeClass('rex-icon-online').addClass('rex-icon-offline');
-                        } else {
-                            $toggleBtn.html('<i class="rex-icon rex-icon-offline"></i>');
-                        }
+                            if ($icon.length) {
+                                $icon.removeClass('fa-toggle-on fa-toggle-off').addClass('fa-toggle-off');
+                                if (!$icon.hasClass('fa-solid')) $icon.addClass('fa-solid');
+                            } else {
+                                $toggleBtn.html('<i class="fa-solid fa-toggle-off"></i>');
+                            }
                     } else {
                         // Item is online (value is 0, empty, or input doesn't exist)
                         $item.removeClass('mblock-offline');
                         $toggleBtn.removeClass('btn-offline').addClass('btn-online')
                             .attr('title', 'Set offline');
                         
-                        if ($icon.length) {
-                            $icon.removeClass('rex-icon-offline').addClass('rex-icon-online');
-                        } else {
-                            $toggleBtn.html('<i class="rex-icon rex-icon-online"></i>');
-                        }
+                            if ($icon.length) {
+                                $icon.removeClass('fa-toggle-on fa-toggle-off').addClass('fa-toggle-on');
+                                if (!$icon.hasClass('fa-solid')) $icon.addClass('fa-solid');
+                            } else {
+                                $toggleBtn.html('<i class="fa-solid fa-toggle-on"></i>');
+                            }
                     }
                 }
             });
@@ -2193,7 +2197,7 @@ var MBlockOnlineToggle = {
             
             // Update button appearance with improved colors
             const buttonClass = newIsOffline ? 'btn-danger' : 'btn-success'; // Red for offline, green for online
-            const iconClass = newIsOffline ? 'rex-icon-offline' : 'rex-icon-online';
+            const iconClass = newIsOffline ? 'fa-toggle-off' : 'fa-toggle-on';
             const buttonTitle = newIsOffline ? 'Set online' : 'Set offline';
             const buttonText = newIsOffline ? 'Offline' : 'Online';
             
@@ -2206,8 +2210,9 @@ var MBlockOnlineToggle = {
             // Update icon and text
             const $icon = button.find('i');
             if ($icon.length) {
-                $icon.removeClass('rex-icon-online rex-icon-offline')
-                     .addClass(iconClass);
+                $icon.removeClass('fa-toggle-on fa-toggle-off')
+                     .addClass(iconClass)
+                     .addClass('fa-solid');
             }
             
             // Update button text

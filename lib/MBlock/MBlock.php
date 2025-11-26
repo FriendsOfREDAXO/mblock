@@ -375,22 +375,22 @@ class MBlock
             // Set offline button HTML with color coding
             if ($isOffline) {
                 $offlineButtonClass = 'btn-danger'; // Red for offline
-                $offlineButtonIcon = 'rex-icon-offline';
+                $offlineButtonFa = 'fa-solid fa-toggle-off';
                 $offlineButtonTitle = 'Set online';
                 $offlineButtonText = 'Offline';
             } else {
                 $offlineButtonClass = 'btn-success'; // Green for online
-                $offlineButtonIcon = 'rex-icon-online';
+                $offlineButtonFa = 'fa-solid fa-toggle-on';
                 $offlineButtonTitle = 'Set offline';
                 $offlineButtonText = 'Online';
             }
-            
-            $offlineButton = '<div class="btn-group btn-group-xs">
-                <button type="button" class="btn ' . $offlineButtonClass . ' mblock-offline-toggle-btn" 
-                        title="' . $offlineButtonTitle . '" data-offline="' . ($isOffline ? '1' : '0') . '">
-                    <i class="rex-icon ' . $offlineButtonIcon . '"></i> ' . $offlineButtonText . '
-                </button>
-            </div>';
+
+            // Build the offline button using Font Awesome 6 icons only (no rex-icon fallback)
+            $offlineButton = '<div class="btn-group btn-group-xs">'
+                . '<button type="button" class="btn ' . $offlineButtonClass . ' mblock-offline-toggle-btn" '
+                . 'title="' . $offlineButtonTitle . '" data-offline="' . ($isOffline ? '1' : '0') . '">'
+                . '<i class="' . $offlineButtonFa . '"></i> ' . $offlineButtonText
+                . '</button></div>';
             
             $element->setOfflineButton($offlineButton);
         } else {
@@ -411,12 +411,16 @@ class MBlock
         // Get copy/paste configuration using rex_config
         $copyPasteEnabled = rex_config::get('mblock', 'copy_paste', 1); // Default: enabled
         
-        if ($copyPasteEnabled) {
+            if ($copyPasteEnabled) {
             // Copy/Paste ist aktiviert - Buttons anzeigen
-            $copyPasteButtons = '<div class="btn-group btn-group-xs">
-                <button type="button" class="btn btn-default mblock-copy-btn" title="{{mblock_copy_element}}"><i class="rex-icon rex-icon-copy"></i></button>
-                <button type="button" class="btn btn-default mblock-paste-btn" title="{{mblock_paste_element}}"><i class="rex-icon rex-icon-paste"></i></button>
-            </div>';
+                $copyPasteButtons = '<div class="btn-group btn-group-xs">'
+                    . '<button type="button" class="btn btn-default mblock-copy-btn" title="{{mblock_copy_element}}">'
+                    . '<i class="fa-solid fa-copy"></i>'
+                    . '</button>'
+                    . '<button type="button" class="btn btn-default mblock-paste-btn" title="{{mblock_paste_element}}">'
+                    . '<i class="fa-solid fa-clipboard"></i>'
+                    . '</button>'
+                    . '</div>';
         } else {
             // Copy/Paste ist deaktiviert - keine Buttons
             $copyPasteButtons = '';
@@ -435,13 +439,14 @@ class MBlock
         // Get copy/paste configuration using rex_config
         $copyPasteEnabled = rex_config::get('mblock', 'copy_paste', 1); // Default: enabled
         
-        if ($copyPasteEnabled) {
+            if ($copyPasteEnabled) {
             // Copy/Paste ist aktiviert - Toolbar anzeigen
-            $copyPasteToolbar = '<div class="mblock-copy-paste-toolbar">
-                <div class="btn-group btn-group-xs">
-                    <button type="button" class="btn btn-default mblock-clear-clipboard" title="{{mblock_clear_clipboard}}"><i class="rex-icon rex-icon-delete"></i> {{mblock_clear_clipboard}}</button>
-                </div>
-            </div>';
+                $copyPasteToolbar = '<div class="mblock-copy-paste-toolbar">'
+                    . '<div class="btn-group btn-group-xs">'
+                    . '<button type="button" class="btn btn-default mblock-clear-clipboard" title="{{mblock_clear_clipboard}}">'
+                    . '<i class="fa-solid fa-trash"></i> {{mblock_clear_clipboard}}'
+                    . '</button>'
+                    . '</div></div>';
         } else {
             // Copy/Paste ist deaktiviert - keine Toolbar
             $copyPasteToolbar = '';
