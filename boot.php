@@ -20,30 +20,56 @@ if (rex::isBackend() && is_object(rex::getUser())) {
             return $params->getSubject();
     });
 
-    // Prefer Bloecks styles if available, but do NOT require bloecks for functionality.
-    // MBlock ships its own Sortable.js and will only load it when bloecks is NOT available
-    // or when bloecks has drag & drop disabled.
+    // Sortable.js handling:
+    // - Prefer the Sortable.js from the `bloecks` addon if it is available AND drag&drop is enabled there
+    // - Otherwise fall back to the bundled Sortable placed in this addon's assets folder
     $bloecksAddon = rex_addon::get('bloecks');
-    $bloecksDragDropEnabled = false;
-    
-    if ($bloecksAddon && $bloecksAddon->isAvailable()) {
-        // Use bloecks CSS for consistent styling when present
-        rex_view::addCssFile($bloecksAddon->getAssetsUrl('css/bloecks.css'));
-        
-        // Check if drag & drop is enabled in bloecks
-        $bloecksDragDropEnabled = (bool) $bloecksAddon->getConfig('enable_drag_drop', false);
-    }
-    
-    // Load our bundled Sortable.js if bloecks is not available OR if drag & drop is disabled in bloecks
-    if (!$bloecksAddon || !$bloecksAddon->isAvailable() || !$bloecksDragDropEnabled) {
+    if ($bloecksAddon && $bloecksAddon->isAvailable() && $bloecksAddon->getConfig('drag_drop', true)) {
+        // Use bloecks Sortable.js when bloecks is present and d&d is enabled
+        rex_view::addJsFile($bloecksAddon->getAssetsUrl('js/sortable.min.js'));
+        rex_view::setJsProperty('mblock_sortable_source', 'bloecks');
+    } else {
+        // fall back to bundled Sortable (inside this addon's assets)
         rex_view::addJsFile($this->getAssetsUrl('sortable.min.js'));
+        rex_view::setJsProperty('mblock_sortable_source', 'mblock');
     }
 
-    // 🔧 MBlock JavaScript Asset Management
-    // Load minified version for optimal performance
-    rex_view::addJsFile($this->getAssetsUrl('mblock.min.js'));
+    // 🔧 Development/Production Asset Management
+    // 
+    // Options:
+    // - 'auto'  : Auto-detect based on environment (recommended)
+    // - 'dev'   : Always use mblock.js (development/debugging)  
+    // - 'prod'  : Always use mblock.min.js (production/performance)
+    //
+    $assetMode = 'auto'; // Change this to 'dev' or 'prod' to override
     
-    // Add CSS
+    // Auto-detection logic
+    if ($assetMode === 'auto') {
+        // Use minified in production, development version otherwise
+        $isProduction = (
+            !rex::isDebugMode() &&                    // Debug mode disabled
+            !rex_addon::get('debug')->isAvailable()   // Debug addon not active
+        );
+        $useMinified = $isProduction;
+    } else {
+        $useMinified = ($assetMode === 'prod');
+    }
+    
+    $jsFile = $useMinified ? 'mblock.min.js' : 'mblock.js';
+    $debugInfo = $useMinified ? 'Production (minified)' : 'Development (source)';
+    
+    // Expose the local sortable asset URL so the client can dynamically load it
+    // when a runtime fallback is needed (prevents duplicate loads when other addons
+    // already provide Sortable.js).
+    rex_view::setJsProperty('mblock_sortable_local_url', $this->getAssetsUrl('sortable.min.js'));
+
+    // Add debug comment for developers
+    if (rex::isDebugMode()) {
+        rex_view::setJsProperty('mblock_asset_mode', $debugInfo);
+    }
+    
+    // Always add our assets
+    rex_view::addJsFile($this->getAssetsUrl($jsFile));
     rex_view::addCssFile($this->getAssetsUrl('mblock.css'));
     
     // Add custom template CSS if selected and available

@@ -14,6 +14,7 @@
 
 namespace FriendsOfRedaxo\MBlock\Utils;
 
+use FriendsOfRedaxo\MBlock\Utils\MBlockSessionHelper;
 use rex_addon;
 use rex_i18n;
 
@@ -50,11 +51,24 @@ class MBlockSettingsHelper
         }
 
                 // Copy/Paste-Konfiguration hinzufügen
-        if (!array_key_exists('copy_paste', $settings)) {
-            // Use addon->getConfig to get the copy_paste setting from the settings system
-            $copyPasteEnabled = $addon->getConfig('mblock_copy_paste', 1); // Default: enabled
-            $settings['copy_paste'] = (bool) $copyPasteEnabled;
-        }
+                if (!array_key_exists('copy_paste', $settings)) {
+                    // Use addon->getConfig to get the copy_paste setting from the settings system
+                    $copyPasteEnabled = $addon->getConfig('mblock_copy_paste', 1); // Default: enabled
+                    $settings['copy_paste'] = (bool) $copyPasteEnabled;
+                }
+
+                // Min/Max Unterstützung
+                // NOTE: Do not auto-apply global addon config values here. We only
+                // want to set 'min' / 'max' when the caller explicitly provided them
+                // in $settings — otherwise the presence of data-min / data-max can
+                // unintentionally disable remove/add buttons in the UI.
+                if (array_key_exists('min', $settings)) {
+                    $settings['min'] = max(0, (int)$settings['min']);
+                }
+
+                if (array_key_exists('max', $settings)) {
+                    $settings['max'] = max(0, (int)$settings['max']);
+                }
         
         // Sichere Session-basierte mblock_count mit MBlockSessionHelper
         $settings['mblock_count'] = MBlockSessionHelper::getCurrentCount();

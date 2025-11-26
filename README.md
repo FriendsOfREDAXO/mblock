@@ -1,13 +1,7 @@
 REDAXO AddOn :: MBlock
 ======
 
-Mit MBlock ist es möglich, innerhalb eines Moduls beliebig viele Unerblöcke zu erzeugen. Diese können dann einfach per But# Online/Offline Check
-foreach ($data as $item) {
-    if (MBlock::isOnline($item)) {
-        // Item ist online
-        echo rex_escape($item['title']);
-    }
-}r Drag & Drop sortiert werden. Die erweiterte Version bietet Copy & Paste Funktionalität und einen Offline/Online Toggle für einzelne Blöcke.
+Mit MBlock ist es möglich, innerhalb eines Moduls beliebig viele Datenblöcke zu erzeugen. Diese können dann einfach per Button oder Drag & Drop sortiert werden. Die erweiterte Version bietet Copy & Paste Funktionalität und einen Offline/Online Toggle für einzelne Blöcke.
 
 _English:_ MBlock lets you create an unlimited number of data blocks within a single module. These data blocks can be sorted per click or drag & drop. The enhanced version provides copy & paste functionality and an offline/online toggle for individual blocks.
 
@@ -51,7 +45,12 @@ echo MBlock::show(1, $form, [
 - [x] **Template-Priorität** - Custom templates überschreiben defaults
 - [x] **Media-ID Konflikt-Schutz** - Bessere Warnung bei ID-Überschneidungen
 
-## Namespace Migration
+### Editor Support (MBlock 4.5)
+
+- [x] **TinyMCE Support** - Volle Unterstützung für TinyMCE (v4-v8)
+- [x] **CKEditor 5** - Verbesserte Copy & Paste Funktionalität
+
+## Namespace Migration (Version 4.0)
 
 **MBlock führt Namespaces ein!** Für neue Projekte wird die Verwendung des Namespace empfohlen:
 

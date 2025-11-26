@@ -5,7 +5,7 @@
  * @license MIT
  */
 
-
+declare(strict_types=1);
 
 namespace FriendsOfRedaxo\MBlock\Processor;
 
@@ -17,7 +17,7 @@ use rex_sql_exception;
 class MBlockRexFormProcessor
 {
     /**
-     * @param $status
+     * @param mixed $status
      * @param mblock_rex_form $form
      * @param array $post
      * @return mixed
@@ -30,15 +30,18 @@ class MBlockRexFormProcessor
         $processIt = false;
 
         foreach ($post as $fieldRow => $fields) {
-            if (strpos($fieldRow, '_save') !== false OR strpos($fieldRow, '_apply') !== false)
+            if (strpos($fieldRow, '_save') !== false || strpos($fieldRow, '_apply') !== false) {
                 $processIt = true;
+            }
 
-            if (strpos($fieldRow, '_apply') !== false)
+            if (strpos($fieldRow, '_apply') !== false) {
                 $redirect = true;
+            }
         }
 
-        if ($processIt)
-            self::update($form, $post, $form->getSql()->getLastId());
+        if ($processIt) {
+            self::update($form, $post, (int) $form->getSql()->getLastId());
+        }
 
         if ($redirect) {
             if (($result = $form->validate()) === true) {
@@ -56,45 +59,55 @@ class MBlockRexFormProcessor
     /**
      * @param mblock_rex_form $form
      * @param array $post
-     * @param null $id
+     * @param int|null $id
      * @author Joachim Doerr
      * @throws rex_sql_exception
      */
-    private static function update(mblock_rex_form $form, array $post, $id = null)
+    private static function update(mblock_rex_form $form, array $post, ?int $id = null): void
     {
         $sql = rex_sql::factory();
-        $sql->setDebug(0);
+        $sql->setDebug(false);
         $sql->setTable($form->getTableName());
 
-        if (!is_null($id) && $id != 0)
+        if ($id !== null && $id !== 0) {
             $sql->setWhere('id = ' . $id);
-        else
+        } else {
             $sql->setWhere($form->getWhereCondition());
+        }
 
-        $updateValues = array();
-        $rows = array();
+        $updateValues = [];
+        $rows = [];
 
         $result = $form->getSql()->getRow();
 
-        if (is_array($result) && sizeof($result) > 0)
-            foreach ($result as $row => $value)
+        if (is_array($result) && count($result) > 0) {
+            foreach ($result as $row => $value) {
                 if (MBlockJsonHelper::isValid($value)) {
                     $newRow = explode('.', $row);
                     $rows[] = array_pop($newRow);
                 }
+            }
+        }
 
-        if (isset($post[$form->getName()]))
-            foreach ($post[$form->getName()] as $row => $field)
-                if (is_array($field))
+        if (isset($post[$form->getName()])) {
+            foreach ($post[$form->getName()] as $row => $field) {
+                if (is_array($field)) {
                     $updateValues[$row] = MBlockJsonHelper::encodeMBlockData($field);
+                }
+            }
+        }
 
         // is row not in update list?
-        if (sizeof($rows) > 0)
-            foreach ($rows as $row)
-                if (!array_key_exists($row, $updateValues))
-                    $updateValues[$row] = NULL;
+        if (count($rows) > 0) {
+            foreach ($rows as $row) {
+                if (!array_key_exists($row, $updateValues)) {
+                    $updateValues[$row] = null;
+                }
+            }
+        }
 
-        if (sizeof($updateValues) > 0)
+        if (count($updateValues) > 0) {
             $sql->setValues($updateValues)->update();
+        }
     }
 }

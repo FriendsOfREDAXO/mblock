@@ -198,33 +198,36 @@ class MBlock
             }
         }
 
-        // create first element(s)
+        // create first element
         // don't loaded?
         if (!self::$items && (!isset($settings['initial_hidden']) or $settings['initial_hidden'] != 1)) {
             // set plain item for add
             $plain = true;
-            
-            // Determine how many initial blocks to create based on 'min' setting, but cap to a reasonable upper bound
-            $hardMax = 100; // Reasonable upper bound to prevent performance issues
-            $minBlocks = 1;
-            if (isset($settings['min']) && is_numeric($settings['min']) && $settings['min'] > 0) {
-                $minBlocks = (int)$settings['min'];
-            }
-            if (isset($settings['max']) && is_numeric($settings['max']) && $settings['max'] > 0) {
-                $minBlocks = min($minBlocks, (int)$settings['max']);
-            }
-            $minBlocks = min($minBlocks, $hardMax);
-            
-            // Create the minimum number of initial blocks
-            for ($i = 0; $i < $minBlocks; $i++) {
-                self::$items[$i] = new MBlockItem();
-                self::$items[$i]->setId($i)
-                    ->setValueId($id)
-                    ->setResult(array())
-                    ->setForm($form);
-            }
+            self::$items[0] = new MBlockItem();
+            self::$items[0]->setId(0)
+                ->setValueId($id)
+                ->setResult(array())
+                ->setForm($form);
         }
 
+
+        // Ensure at least the minimum number of items is present if configured
+        if (array_key_exists('min', $settings) && (int)$settings['min'] > 0) {
+            $min = (int)$settings['min'];
+            $current = count(self::$items);
+            if ($current < $min) {
+                for ($i = $current; $i < $min; $i++) {
+                    $newItem = new MBlockItem();
+                    $newItem->setId($i)
+                        ->setValueId($id)
+                        ->setResult(array())
+                        ->setForm($form)
+                        ->addPayload('plain_item', true);
+
+                    self::$items[$i] = $newItem;
+                }
+            }
+        }
 
         // foreach rex value json items
         /** @var MBlockItem $item */
@@ -283,7 +286,7 @@ class MBlock
      * @author Joachim Doerr
      */
     private static function createOutput(MBlockItem $item, $count, $theme = null)
-    {       
+    {
         $item->setForm(MBlockSystemButtonReplacer::replaceSystemButtons($item, $count));
         $item->setForm(MBlockCountReplacer::replaceCountKeys($item, $count));
         $item->setForm(MBlockBootstrapReplacer::replaceTabIds($item, $count));
@@ -336,10 +339,8 @@ class MBlock
     {
         $form = $item->getForm();
         
-        // Check if online/offline feature is enabled AND form contains mblock_offline field
-        $onlineOfflineEnabled = rex_config::get('mblock', 'mblock_online_offline', true);
-        $hasOfflineField = $onlineOfflineEnabled && 
-                          (strpos($form, 'name="mblock_offline"') !== false || 
+        // Check if form contains mblock_offline field
+        $hasOfflineField = (strpos($form, 'name="mblock_offline"') !== false || 
                            strpos($form, "name='mblock_offline'") !== false ||
                            preg_match('/name=.*mblock_offline.*\[/', $form));
         
@@ -371,22 +372,22 @@ class MBlock
             // Set offline button HTML with color coding
             if ($isOffline) {
                 $offlineButtonClass = 'btn-danger'; // Red for offline
-                $offlineButtonIcon = 'rex-icon-offline';
+                $offlineButtonFa = 'fa-solid fa-toggle-off';
                 $offlineButtonTitle = 'Set online';
                 $offlineButtonText = 'Offline';
             } else {
                 $offlineButtonClass = 'btn-success'; // Green for online
-                $offlineButtonIcon = 'rex-icon-online';
+                $offlineButtonFa = 'fa-solid fa-toggle-on';
                 $offlineButtonTitle = 'Set offline';
                 $offlineButtonText = 'Online';
             }
-            
-            $offlineButton = '<div class="btn-group btn-group-xs">
-                <button type="button" class="btn ' . $offlineButtonClass . ' mblock-offline-toggle-btn" 
-                        title="' . $offlineButtonTitle . '" data-offline="' . ($isOffline ? '1' : '0') . '">
-                    <i class="rex-icon ' . $offlineButtonIcon . '"></i> ' . $offlineButtonText . '
-                </button>
-            </div>';
+
+            // Build the offline button using Font Awesome 6 icons only (no rex-icon fallback)
+            $offlineButton = '<div class="btn-group btn-group-xs">'
+                . '<button type="button" class="btn ' . $offlineButtonClass . ' mblock-offline-toggle-btn" '
+                . 'title="' . $offlineButtonTitle . '" data-offline="' . ($isOffline ? '1' : '0') . '">'
+                . '<i class="' . $offlineButtonFa . '"></i> ' . $offlineButtonText
+                . '</button></div>';
             
             $element->setOfflineButton($offlineButton);
         } else {
@@ -407,12 +408,16 @@ class MBlock
         // Get copy/paste configuration using rex_config
         $copyPasteEnabled = rex_config::get('mblock', 'copy_paste', 1); // Default: enabled
         
-        if ($copyPasteEnabled) {
+            if ($copyPasteEnabled) {
             // Copy/Paste ist aktiviert - Buttons anzeigen
-            $copyPasteButtons = '<div class="btn-group btn-group-xs">
-                <button type="button" class="btn btn-default mblock-copy-btn" title="{{mblock::mblock_copy_element}}"><i class="rex-icon rex-icon-copy"></i></button>
-                <button type="button" class="btn btn-default mblock-paste-btn" title="{{mblock::mblock_paste_element}}"><i class="rex-icon rex-icon-paste"></i></button>
-            </div>';
+                $copyPasteButtons = '<div class="btn-group btn-group-xs">'
+                    . '<button type="button" class="btn btn-default mblock-copy-btn" title="{{mblock_copy_element}}">'
+                    . '<i class="fa-solid fa-copy"></i>'
+                    . '</button>'
+                    . '<button type="button" class="btn btn-default mblock-paste-btn" title="{{mblock_paste_element}}">'
+                    . '<i class="fa-solid fa-clipboard"></i>'
+                    . '</button>'
+                    . '</div>';
         } else {
             // Copy/Paste ist deaktiviert - keine Buttons
             $copyPasteButtons = '';
@@ -431,13 +436,14 @@ class MBlock
         // Get copy/paste configuration using rex_config
         $copyPasteEnabled = rex_config::get('mblock', 'copy_paste', 1); // Default: enabled
         
-        if ($copyPasteEnabled) {
+            if ($copyPasteEnabled) {
             // Copy/Paste ist aktiviert - Toolbar anzeigen
-            $copyPasteToolbar = '<div class="mblock-copy-paste-toolbar">
-                <div class="btn-group btn-group-xs">
-                    <button type="button" class="btn btn-default mblock-clear-clipboard" title="{{mblock::mblock_clear_clipboard}}"><i class="rex-icon rex-icon-delete"></i> {{mblock::mblock_clear_clipboard}}</button>
-                </div>
-            </div>';
+                $copyPasteToolbar = '<div class="mblock-copy-paste-toolbar">'
+                    . '<div class="btn-group btn-group-xs">'
+                    . '<button type="button" class="btn btn-default mblock-clear-clipboard" title="{{mblock_clear_clipboard}}">'
+                    . '<i class="fa-solid fa-trash"></i> {{mblock_clear_clipboard}}'
+                    . '</button>'
+                    . '</div></div>';
         } else {
             // Copy/Paste ist deaktiviert - keine Toolbar
             $copyPasteToolbar = '';

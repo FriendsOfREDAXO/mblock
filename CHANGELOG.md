@@ -1,5 +1,16 @@
 # MBlock - REDAXO Addon für Modul-Input-Blöcke
 
+## Version 4.5.0 - 2025-11-26
+
+### Features
+* **TinyMCE Support**: Added full support for TinyMCE (v4, v5, v6, v7, v8) in MBlock instances.
+* **CKEditor 5 Improvements**: Enhanced copy & paste functionality for CKEditor 5, ensuring content is correctly preserved and restored.
+
+### Improvements
+* **Code Modernization**: Updated PHP classes to use strict types and modern array syntax.
+* **Performance**: Optimized JavaScript for better editor initialization and cleanup.
+* **Cleanup**: Removed debug code and unnecessary files.
+
 ## Version 4.2.0-dev
 
 ### Bug Fixes
