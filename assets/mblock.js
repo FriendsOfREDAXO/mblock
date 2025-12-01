@@ -3044,3 +3044,149 @@ function mblock_smooth_scroll_to_element(element, options = {}) {
         }
     }
 }
+
+// ==================== CKEditor5 Data Cleanup ====================
+/**
+ * Clean CKEditor5 artifacts before form submission
+ * Removes internal markup that should not be saved:
+ * - ck-list-bogus-paragraph spans (CKEditor5 internal list markup)
+ * - Fixes internal links that were converted to # by RexLink plugin
+ * This runs on every form submit to ensure clean data storage
+ */
+$(document).on('submit', 'form', function(e) {
+    try {
+        // Store original internal links before CKEditor5 processes them
+        const internalLinksMap = new Map();
+        
+        // Get CKEditor5 editors via the global function
+        if (typeof window.cke5_get_editors === 'function') {
+            const editors = window.cke5_get_editors();
+            
+            if (editors && typeof editors === 'object') {
+                Object.keys(editors).forEach(function(editorId) {
+                    const editor = editors[editorId];
+                    
+                    if (editor && editor.sourceElement) {
+                        try {
+                            // Get current data from editor
+                            let data = editor.getData();
+                            
+                            if (data && typeof data === 'string') {
+                                // Step 1: Remove ck-list-bogus-paragraph spans
+                                data = data.replace(/<span class="ck-list-bogus-paragraph">(.*?)<\/span>/gi, '$1');
+                                
+                                // Step 2: Try to restore internal links
+                                // Check if we have the model data with proper link attributes
+                                if (editor.model && editor.model.document) {
+                                    const root = editor.model.document.getRoot();
+                                    const range = editor.model.createRangeIn(root);
+                                    
+                                    // Collect all links with their attributes from the model
+                                    for (const value of range.getWalker({ ignoreElementEnd: true })) {
+                                        if (value.item.is('element', 'link')) {
+                                            const linkHref = value.item.getAttribute('linkHref');
+                                            
+                                            // If we find a redaxo:// link in the model, store it
+                                            if (linkHref && linkHref.startsWith('redaxo://')) {
+                                                // Get the text content
+                                                const textContent = Array.from(value.item.getChildren())
+                                                    .map(child => child.data || '')
+                                                    .join('');
+                                                
+                                                if (textContent) {
+                                                    internalLinksMap.set(textContent, linkHref);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                // Step 3: Replace # links that should be internal links
+                                // This fixes the RexLink plugin issue where internal links become #
+                                if (internalLinksMap.size > 0) {
+                                    internalLinksMap.forEach((href, text) => {
+                                        // Find <a href="#">text</a> and replace with proper redaxo:// link
+                                        const escapedText = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                                        const pattern = new RegExp(`<a href="#">([^<]*${escapedText}[^<]*)</a>`, 'gi');
+                                        data = data.replace(pattern, `<a href="${href}">$1</a>`);
+                                    });
+                                }
+                                
+                                // Fallback: If no model data available, try to detect patterns
+                                // Look for data-link-id attributes that might be in the DOM
+                                const $temp = $('<div>').html(data);
+                                let hasChanges = false;
+                                
+                                $temp.find('a[href="#"]').each(function() {
+                                    const $link = $(this);
+                                    const linkId = $link.attr('data-link-id') || $link.attr('data-rex-link');
+                                    
+                                    if (linkId) {
+                                        // Restore internal link
+                                        $link.attr('href', 'redaxo://' + linkId);
+                                        hasChanges = true;
+                                    }
+                                });
+                                
+                                if (hasChanges) {
+                                    data = $temp.html();
+                                }
+                                
+                                // Update the textarea with cleaned data
+                                const originalValue = editor.sourceElement.value;
+                                if (data !== originalValue) {
+                                    editor.sourceElement.value = data;
+                                    console.log('MBlock: Cleaned CKEditor5 data for', editorId);
+                                }
+                            }
+                        } catch (error) {
+                            console.warn('MBlock: Error cleaning CKEditor5 data for', editorId, error);
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Also handle textareas directly (backup method)
+        $(this).find('textarea.cke5-editor').each(function() {
+            try {
+                const $textarea = $(this);
+                let value = $textarea.val();
+                
+                if (value && typeof value === 'string') {
+                    // Remove ck-list-bogus-paragraph spans
+                    value = value.replace(/<span class="ck-list-bogus-paragraph">(.*?)<\/span>/gi, '$1');
+                    
+                    // Try to fix # links by looking for data attributes
+                    const $temp = $('<div>').html(value);
+                    let hasChanges = false;
+                    
+                    $temp.find('a[href="#"]').each(function() {
+                        const $link = $(this);
+                        const linkId = $link.attr('data-link-id') || $link.attr('data-rex-link');
+                        
+                        if (linkId) {
+                            $link.attr('href', 'redaxo://' + linkId);
+                            hasChanges = true;
+                        }
+                    });
+                    
+                    if (hasChanges) {
+                        value = $temp.html();
+                    }
+                    
+                    if (value !== $textarea.val()) {
+                        $textarea.val(value);
+                        console.log('MBlock: Cleaned textarea CKE5 data for', $textarea.attr('id') || 'unnamed');
+                    }
+                }
+            } catch (error) {
+                console.warn('MBlock: Error cleaning textarea CKE5 data:', error);
+            }
+        });
+        
+    } catch (error) {
+        console.error('MBlock: Error in CKEditor5 cleanup:', error);
+        // Don't prevent form submission even if cleanup fails
+    }
+});
