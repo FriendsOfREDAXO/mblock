@@ -1456,6 +1456,15 @@ var MBlockClipboard = {
                     }
                 }
 
+                // Clean CKEditor5 artifacts from content
+                if (content) {
+                    // Remove ck-list-bogus-paragraph spans (CKEditor5 internal markup)
+                    content = content.replace(/<span class="ck-list-bogus-paragraph">(.*?)<\/span>/gi, '$1');
+                    
+                    // Note: Internal links with href="#" cannot be fixed here without context
+                    // They need to be handled at the RexLink plugin level
+                }
+
                 // Only set named entries directly in formData
                 if (name) {
                     formData[name] = {
@@ -1886,22 +1895,50 @@ var MBlockClipboard = {
 
                     case 'ckeditor':
                         if (fieldData.value) {
+                            // Always set the textarea value first
                             $field.val(fieldData.value);
                             
-                            // If CKEditor instance exists, set data
+                            // Enhanced restoration with retry mechanism (like v4.3.8)
                             const editorId = $field.attr('id');
-                            if (editorId && window.CKEDITOR && window.CKEDITOR.instances && window.CKEDITOR.instances[editorId]) {
-                                setTimeout(() => {
-                                    window.CKEDITOR.instances[editorId].setData(fieldData.value);
-                                }, 200);
-                            } else if (editorId && typeof window.cke5_get_editors === 'function') {
-                                const editors = window.cke5_get_editors();
-                                if (editors && editors[editorId]) {
-                                    setTimeout(() => {
-                                        editors[editorId].setData(fieldData.value);
-                                    }, 200);
-                                }
+                            if (editorId) {
+                                const restoreCKE5Content = function(attempt = 0) {
+                                    const maxAttempts = 15;
+                                    
+                                    // Try CKEditor5 first (via cke5_get_editors)
+                                    if (typeof window.cke5_get_editors === 'function') {
+                                        const editors = window.cke5_get_editors();
+                                        if (editors && editors[editorId]) {
+                                            try {
+                                                editors[editorId].setData(fieldData.value);
+                                                return; // Success!
+                                            } catch (e) {
+                                                console.warn('MBlock Restore: Failed to restore CKEditor5 content:', e);
+                                            }
+                                        }
+                                    }
+                                    
+                                    // Try CKEditor4 fallback
+                                    if (window.CKEDITOR && window.CKEDITOR.instances && window.CKEDITOR.instances[editorId]) {
+                                        try {
+                                            window.CKEDITOR.instances[editorId].setData(fieldData.value);
+                                            return; // Success!
+                                        } catch (e) {
+                                            console.warn('MBlock Restore: Failed to restore CKEditor4 content:', e);
+                                        }
+                                    }
+                                    
+                                    // If editor is not ready yet and we haven't exceeded max attempts
+                                    if (attempt < maxAttempts) {
+                                        setTimeout(() => restoreCKE5Content(attempt + 1), 300);
+                                    } else {
+                                        console.warn('MBlock Restore: Timeout restoring content for', editorId, 'after', maxAttempts, 'attempts');
+                                    }
+                                };
+                                
+                                // Start the restoration process with initial delay
+                                setTimeout(() => restoreCKE5Content(0), 100);
                             }
+                            
                             // Also set a data-attribute for CKEditor5 instances or initialization handlers
                             try {
                                 $field.attr('data-cke5-restore-content', fieldData.value);
