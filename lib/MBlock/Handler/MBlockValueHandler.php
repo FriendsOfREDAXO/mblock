@@ -42,46 +42,6 @@ class MBlockValueHandler
                 $prevent_action = true; 
             }
         }
-        
-        // GRIDBLOCK INTEGRATION: Check for sql_fake_result
-        // Gridblock sets this property when rendering a module inside gridblock (especially for copy operations)
-        if (rex_addon::get('gridblock')->isAvailable()) {
-            $fakeResult = rex::getProperty('sql_fake_result');
-            if ($fakeResult !== null && is_array($fakeResult)) {
-                // Gridblock has set fake data - use it directly
-                for ($i = 1; $i <= 20; $i++) {
-                    $valueKey = 'value' . $i;
-                    if (isset($fakeResult[$valueKey])) {
-                        $result['value'][$i] = $fakeResult[$valueKey];
-                        
-                        // Decode JSON if it's a string (MBlock data is stored as JSON)
-                        if (is_string($result['value'][$i]) && !empty($result['value'][$i])) {
-                            $jsonResult = MBlockJsonHelper::decodeFromHtml($result['value'][$i], true, false);
-                            if (is_array($jsonResult) && !empty($jsonResult)) {
-                                $result['value'][$i] = $jsonResult;
-                            }
-                        }
-                    }
-                    
-                    if ($i <= 10) {
-                        if (isset($fakeResult['medialist' . $i])) {
-                            $result['filelist'][$i] = $fakeResult['medialist' . $i];
-                        }
-                        if (isset($fakeResult['linklist' . $i])) {
-                            $result['linklist'][$i] = $fakeResult['linklist' . $i];
-                        }
-                        if (isset($fakeResult['media' . $i])) {
-                            $result['file'][$i] = $fakeResult['media' . $i];
-                        }
-                        if (isset($fakeResult['link' . $i])) {
-                            $result['link'][$i] = $fakeResult['link' . $i];
-                        }
-                    }
-                }
-                return $result;
-            }
-        }
-        
          // Get data from $_POST and ignore gridblock addon 
          // Should be chenged when https://github.com/redaxo/redaxo/issues/5298 is fixed. 
         if (rex_request('save', 'int') == 1 && $prevent_action == false) {
