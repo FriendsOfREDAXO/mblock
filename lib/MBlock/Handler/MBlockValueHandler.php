@@ -30,6 +30,35 @@ class MBlockValueHandler
         $sliceId = rex_request('slice_id', 'int', false);
         $result = array();
 
+        // Check for fake result from Gridblock or other addons
+        $fakeResult = rex::getProperty('sql_fake_result');
+        if ($fakeResult && is_array($fakeResult)) {
+            for ($i = 1; $i <= 20; $i++) {
+                if (isset($fakeResult['value' . $i])) {
+                    $result['value'][$i] = $fakeResult['value' . $i];
+                    
+                    // Robuste JSON-Dekodierung mit MBlockJsonHelper
+                    $valueString = (string) $result['value'][$i];
+                    if (!empty($valueString)) {
+                        $jsonResult = MBlockJsonHelper::decodeFromHtml($valueString, true, false);
+                        
+                        // Nur gültige Arrays als Ergebnis verwenden
+                        if (is_array($jsonResult) && !empty($jsonResult)) {
+                            $result['value'][$i] = $jsonResult;
+                        }
+                    }
+                }
+                
+                if ($i <= 10) {
+                    if (isset($fakeResult['medialist' . $i])) $result['filelist'][$i] = $fakeResult['medialist' . $i];
+                    if (isset($fakeResult['linklist' . $i])) $result['linklist'][$i] = $fakeResult['linklist' . $i];
+                    if (isset($fakeResult['media' . $i])) $result['file'][$i] = $fakeResult['media' . $i];
+                    if (isset($fakeResult['link' . $i])) $result['link'][$i] = $fakeResult['link' . $i];
+                }
+            }
+            return $result;
+        }
+
         if (rex_get('function') == 'add') {
             return $result;
         }
