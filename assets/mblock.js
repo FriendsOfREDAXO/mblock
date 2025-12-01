@@ -174,6 +174,10 @@ $(document).on('rex:ready', function (e, container) {
                 const $element = $(this);
                 if ($element.length) {
                     try {
+                        // GRIDBLOCK FIX: Reset mblock_run flag to force reinitialization after copy/paste
+                        // Gridblock copies slices including the mblock_run=1 flag, which prevents reinitialization
+                        $element.removeData('mblock_run');
+                        
                         mblock_init($element);
                     } catch (initError) {
                         console.error('MBlock: Fehler beim Initialisieren eines einzelnen MBlock-Elements:', initError);
@@ -186,6 +190,9 @@ $(document).on('rex:ready', function (e, container) {
             $(mblock).each(function () {
                 const $element = $(this);
                 if ($element.length) {
+                    // GRIDBLOCK FIX: Reset mblock_run flag
+                    $element.removeData('mblock_run');
+                    
                     mblock_init($element);
                 }
             });
