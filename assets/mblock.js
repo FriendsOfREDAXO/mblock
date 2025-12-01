@@ -3045,16 +3045,22 @@ function mblock_smooth_scroll_to_element(element, options = {}) {
     }
 }
 
-// ==================== CKEditor5 Data Cleanup ====================
+// ==================== CKEditor5 & TinyMCE Data Cleanup ====================
 /**
- * Clean CKEditor5 artifacts before form submission
- * Removes internal markup that should not be saved:
- * - ck-list-bogus-paragraph spans (CKEditor5 internal list markup)
- * - Fixes internal links that were converted to # by RexLink plugin
+ * Clean editor artifacts before form submission
+ * - CKEditor5: Removes ck-list-bogus-paragraph spans and fixes internal links
+ * - TinyMCE: Ensures content is properly saved to textarea
  * This runs on every form submit to ensure clean data storage
  */
 $(document).on('submit', 'form', function(e) {
     try {
+        // ========== TinyMCE Handling ==========
+        // Ensure all TinyMCE editors save their content to textareas
+        if (typeof tinymce !== 'undefined') {
+            tinymce.triggerSave();
+        }
+        
+        // ========== CKEditor5 Handling ==========
         // Store original internal links before CKEditor5 processes them
         const internalLinksMap = new Map();
         
@@ -3186,7 +3192,7 @@ $(document).on('submit', 'form', function(e) {
         });
         
     } catch (error) {
-        console.error('MBlock: Error in CKEditor5 cleanup:', error);
+        console.error('MBlock: Error in editor cleanup:', error);
         // Don't prevent form submission even if cleanup fails
     }
 });
