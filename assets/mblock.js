@@ -161,8 +161,494 @@ function checkCopyPasteEnabled() {
     }
 }
 
+/**
+ * MBlock-only Bridge fuer klassische Linklist-Aktionen.
+ * Faengt Klicks in der Capture-Phase ab und ruft open/move/deleteREXLinklist
+ * mit der tatsaechlich vorhandenen Feld-ID im selben Widget auf.
+ */
+function mblock_install_linklist_popup_bridge() {
+    try {
+        if (typeof window !== 'undefined' && window.mblockLinklistPopupBridgeInstalled) {
+            return;
+        }
+
+        if (typeof window !== 'undefined') {
+            window.mblockLinklistPopupBridgeInstalled = true;
+        }
+
+        document.addEventListener('click', function (event) {
+            const target = event.target && typeof event.target.closest === 'function'
+                ? event.target.closest('[onclick*="openREXLinklist"], [onclick*="moveREXLinklist"], [onclick*="deleteREXLinklist"]')
+                : null;
+
+            if (!target) {
+                return;
+            }
+
+            // Nur innerhalb von MBlock eingreifen.
+            const wrapper = target.closest('.mblock_wrapper');
+            if (!wrapper) {
+                return;
+            }
+
+            const onclick = target.getAttribute('onclick') || '';
+            const action = onclick.includes('moveREXLinklist')
+                ? 'move'
+                : (onclick.includes('deleteREXLinklist') ? 'delete' : 'open');
+
+            if ((action === 'open' && typeof window.openREXLinklist !== 'function') ||
+                (action === 'move' && typeof window.moveREXLinklist !== 'function') ||
+                (action === 'delete' && typeof window.deleteREXLinklist !== 'function')) {
+                return;
+            }
+
+            const findSourceId = function (scopeElement) {
+                if (!scopeElement || typeof scopeElement.querySelector !== 'function') {
+                    return '';
+                }
+                const select = scopeElement.querySelector('select[id^="REX_LINKLIST_SELECT_"]');
+                const hidden = scopeElement.querySelector('input[id^="REX_LINKLIST_"]');
+                return (select && select.id) || (hidden && hidden.id) || '';
+            };
+
+            const candidateScopes = [
+                target.closest('.rex-js-widget-linklist'),
+                target.closest('.rex-js-widget'),
+                target.closest('.input-group'),
+                target.closest('.form-group'),
+                target.parentElement
+            ];
+
+            let sourceId = '';
+            for (let i = 0; i < candidateScopes.length; i++) {
+                sourceId = findSourceId(candidateScopes[i]);
+                if (sourceId) {
+                    break;
+                }
+            }
+
+            if (!sourceId) {
+                const rawIdMatch = onclick.match(/openREXLinklist\(\s*['"]?(\d+)['"]?/);
+                if (rawIdMatch) {
+                    const rawId = rawIdMatch[1];
+                    const selectExists = !!document.getElementById('REX_LINKLIST_SELECT_' + rawId);
+                    const hiddenExists = !!document.getElementById('REX_LINKLIST_' + rawId);
+                    if (selectExists || hiddenExists) {
+                        sourceId = hiddenExists ? ('REX_LINKLIST_' + rawId) : ('REX_LINKLIST_SELECT_' + rawId);
+                    }
+                }
+            }
+
+            const idMatch = sourceId.match(/REX_LINKLIST_(?:SELECT_)?(\d+)/);
+
+            if (!idMatch) {
+                console.warn('MBlock: Keine gueltige Linklist-ID im Widget gefunden.');
+                return;
+            }
+
+            // Erst nach erfolgreicher ID-Ermittlung das native Inline-Handling unterdruecken.
+            event.preventDefault();
+            event.stopPropagation();
+            if (typeof event.stopImmediatePropagation === 'function') {
+                event.stopImmediatePropagation();
+            }
+
+            if (action === 'open') {
+                let param = '';
+                const paramMatch = onclick.match(/openREXLinklist\([^,]+,\s*(['"])(.*?)\1/);
+                if (paramMatch) {
+                    param = paramMatch[2];
+                }
+                window.openREXLinklist(idMatch[1], param);
+                return;
+            }
+
+            if (action === 'move') {
+                let moveParam = '';
+                const moveMatch = onclick.match(/moveREXLinklist\([^,]+,\s*(['"]?)([^'")]+)\1/);
+                if (moveMatch) {
+                    moveParam = moveMatch[2];
+                }
+                window.moveREXLinklist(idMatch[1], moveParam);
+                return;
+            }
+
+            window.deleteREXLinklist(idMatch[1]);
+        }, true);
+    } catch (error) {
+        console.warn('MBlock: Fehler beim Installieren der Linklist Popup Bridge:', error);
+    }
+}
+
+/**
+ * MBlock-only Bridge fuer klassische Medialist-Aktionen.
+ * Faengt Klicks in der Capture-Phase ab und ruft open/view/move/deleteREXMedialist
+ * mit der tatsaechlich vorhandenen Feld-ID im selben Widget auf.
+ */
+function mblock_install_medialist_popup_bridge() {
+    try {
+        if (typeof window !== 'undefined' && window.mblockMedialistPopupBridgeInstalled) {
+            return;
+        }
+
+        if (typeof window !== 'undefined') {
+            window.mblockMedialistPopupBridgeInstalled = true;
+        }
+
+        document.addEventListener('click', function (event) {
+            const target = event.target && typeof event.target.closest === 'function'
+                ? event.target.closest('[onclick*="openREXMedialist"], [onclick*="viewREXMedialist"], [onclick*="moveREXMedialist"], [onclick*="deleteREXMedialist"]')
+                : null;
+
+            if (!target) {
+                return;
+            }
+
+            // Nur innerhalb von MBlock eingreifen.
+            const wrapper = target.closest('.mblock_wrapper');
+            if (!wrapper) {
+                return;
+            }
+
+            const onclick = target.getAttribute('onclick') || '';
+            const action = onclick.includes('moveREXMedialist')
+                ? 'move'
+                : (onclick.includes('deleteREXMedialist') ? 'delete' : (onclick.includes('viewREXMedialist') ? 'view' : 'open'));
+
+            if ((action === 'open' && typeof window.openREXMedialist !== 'function') ||
+                (action === 'view' && typeof window.viewREXMedialist !== 'function') ||
+                (action === 'move' && typeof window.moveREXMedialist !== 'function') ||
+                (action === 'delete' && typeof window.deleteREXMedialist !== 'function')) {
+                return;
+            }
+
+            const findSourceId = function (scopeElement) {
+                if (!scopeElement || typeof scopeElement.querySelector !== 'function') {
+                    return '';
+                }
+                const select = scopeElement.querySelector('select[id^="REX_MEDIALIST_SELECT_"]');
+                const hidden = scopeElement.querySelector('input[id^="REX_MEDIALIST_"]');
+                return (select && select.id) || (hidden && hidden.id) || '';
+            };
+
+            const candidateScopes = [
+                target.closest('.rex-js-widget-medialist'),
+                target.closest('.rex-js-widget'),
+                target.closest('.input-group'),
+                target.closest('.form-group'),
+                target.parentElement
+            ];
+
+            let sourceId = '';
+            for (let i = 0; i < candidateScopes.length; i++) {
+                sourceId = findSourceId(candidateScopes[i]);
+                if (sourceId) {
+                    break;
+                }
+            }
+
+            if (!sourceId) {
+                const rawIdMatch = onclick.match(/(?:open|view|move|delete)REXMedialist\(\s*['"]?(\d+)['"]?/);
+                if (rawIdMatch) {
+                    const rawId = rawIdMatch[1];
+                    const selectExists = !!document.getElementById('REX_MEDIALIST_SELECT_' + rawId);
+                    const hiddenExists = !!document.getElementById('REX_MEDIALIST_' + rawId);
+                    if (selectExists || hiddenExists) {
+                        sourceId = hiddenExists ? ('REX_MEDIALIST_' + rawId) : ('REX_MEDIALIST_SELECT_' + rawId);
+                    }
+                }
+            }
+
+            const idMatch = sourceId.match(/REX_MEDIALIST_(?:SELECT_)?(\d+)/);
+
+            if (!idMatch) {
+                console.warn('MBlock: Keine gueltige Medialist-ID im Widget gefunden.');
+                return;
+            }
+
+            // Erst nach erfolgreicher ID-Ermittlung das native Inline-Handling unterdruecken.
+            event.preventDefault();
+            event.stopPropagation();
+            if (typeof event.stopImmediatePropagation === 'function') {
+                event.stopImmediatePropagation();
+            }
+
+            if (action === 'open') {
+                let param = '';
+                const paramMatch = onclick.match(/openREXMedialist\([^,]+,\s*(['"])(.*?)\1/);
+                if (paramMatch) {
+                    param = paramMatch[2];
+                }
+                window.openREXMedialist(idMatch[1], param);
+                return;
+            }
+
+            if (action === 'view') {
+                let viewParam = '';
+                const viewMatch = onclick.match(/viewREXMedialist\([^,]+,\s*(['"])(.*?)\1/);
+                if (viewMatch) {
+                    viewParam = viewMatch[2];
+                }
+                window.viewREXMedialist(idMatch[1], viewParam);
+                return;
+            }
+
+            if (action === 'move') {
+                let moveParam = '';
+                const moveMatch = onclick.match(/moveREXMedialist\([^,]+,\s*(['"]?)([^'")]+)\1/);
+                if (moveMatch) {
+                    moveParam = moveMatch[2];
+                }
+                window.moveREXMedialist(idMatch[1], moveParam);
+                return;
+            }
+
+            window.deleteREXMedialist(idMatch[1]);
+        }, true);
+    } catch (error) {
+        console.warn('MBlock: Fehler beim Installieren der Medialist Popup Bridge:', error);
+    }
+}
+
+/**
+ * MBlock-only Bridge fuer klassische Media-Aktionen.
+ * Faengt Klicks in der Capture-Phase ab und ruft open/view/delete/addREXMedia
+ * mit der tatsaechlich vorhandenen Feld-ID im selben Widget auf.
+ */
+function mblock_install_media_popup_bridge() {
+    try {
+        if (typeof window !== 'undefined' && window.mblockMediaPopupBridgeInstalled) {
+            return;
+        }
+
+        if (typeof window !== 'undefined') {
+            window.mblockMediaPopupBridgeInstalled = true;
+        }
+
+        document.addEventListener('click', function (event) {
+            const target = event.target && typeof event.target.closest === 'function'
+                ? event.target.closest('[onclick*="openREXMedia"], [onclick*="viewREXMedia"], [onclick*="deleteREXMedia"], [onclick*="addREXMedia"]')
+                : null;
+
+            if (!target) {
+                return;
+            }
+
+            const wrapper = target.closest('.mblock_wrapper');
+            if (!wrapper) {
+                return;
+            }
+
+            const onclick = target.getAttribute('onclick') || '';
+            const action = onclick.includes('viewREXMedia')
+                ? 'view'
+                : (onclick.includes('deleteREXMedia') ? 'delete' : (onclick.includes('addREXMedia') ? 'add' : 'open'));
+
+            if ((action === 'open' && typeof window.openREXMedia !== 'function') ||
+                (action === 'view' && typeof window.viewREXMedia !== 'function') ||
+                (action === 'delete' && typeof window.deleteREXMedia !== 'function') ||
+                (action === 'add' && typeof window.addREXMedia !== 'function')) {
+                return;
+            }
+
+            const findSourceId = function (scopeElement) {
+                if (!scopeElement || typeof scopeElement.querySelector !== 'function') {
+                    return '';
+                }
+                const hidden = scopeElement.querySelector('input[id^="REX_MEDIA_"]');
+                return (hidden && hidden.id) || '';
+            };
+
+            const candidateScopes = [
+                target.closest('.rex-js-widget-media'),
+                target.closest('.rex-js-widget'),
+                target.closest('.input-group'),
+                target.closest('.form-group'),
+                target.parentElement
+            ];
+
+            let sourceId = '';
+            for (let i = 0; i < candidateScopes.length; i++) {
+                sourceId = findSourceId(candidateScopes[i]);
+                if (sourceId) {
+                    break;
+                }
+            }
+
+            if (!sourceId) {
+                const rawIdMatch = onclick.match(/(?:open|view|delete|add)REXMedia\(\s*['"]?(\d+)['"]?/);
+                if (rawIdMatch) {
+                    const rawId = rawIdMatch[1];
+                    if (document.getElementById('REX_MEDIA_' + rawId)) {
+                        sourceId = 'REX_MEDIA_' + rawId;
+                    }
+                }
+            }
+
+            const idMatch = sourceId.match(/REX_MEDIA_(\d+)/);
+            if (!idMatch) {
+                console.warn('MBlock: Keine gueltige Media-ID im Widget gefunden.');
+                return;
+            }
+
+            // Erst nach erfolgreicher ID-Ermittlung das native Inline-Handling unterdruecken.
+            event.preventDefault();
+            event.stopPropagation();
+            if (typeof event.stopImmediatePropagation === 'function') {
+                event.stopImmediatePropagation();
+            }
+
+            if (action === 'open') {
+                let param = '';
+                const paramMatch = onclick.match(/openREXMedia\([^,]+,\s*(['"])(.*?)\1/);
+                if (paramMatch) {
+                    param = paramMatch[2];
+                }
+                window.openREXMedia(idMatch[1], param);
+                return;
+            }
+
+            if (action === 'view') {
+                let viewParam = '';
+                const viewMatch = onclick.match(/viewREXMedia\([^,]+,\s*(['"])(.*?)\1/);
+                if (viewMatch) {
+                    viewParam = viewMatch[2];
+                }
+                window.viewREXMedia(idMatch[1], viewParam);
+                return;
+            }
+
+            if (action === 'add') {
+                let addParam = '';
+                const addMatch = onclick.match(/addREXMedia\([^,]+,\s*(['"])(.*?)\1/);
+                if (addMatch) {
+                    addParam = addMatch[2];
+                }
+                window.addREXMedia(idMatch[1], addParam);
+                return;
+            }
+
+            window.deleteREXMedia(idMatch[1]);
+        }, true);
+    } catch (error) {
+        console.warn('MBlock: Fehler beim Installieren der Media Popup Bridge:', error);
+    }
+}
+
+/**
+ * MBlock-only Bridge fuer klassische Link-Aktionen.
+ * Faengt Klicks in der Capture-Phase ab und ruft openLinkMap/deleteREXLink
+ * mit der tatsaechlich vorhandenen Feld-ID im selben Widget auf.
+ */
+function mblock_install_link_popup_bridge() {
+    try {
+        if (typeof window !== 'undefined' && window.mblockLinkPopupBridgeInstalled) {
+            return;
+        }
+
+        if (typeof window !== 'undefined') {
+            window.mblockLinkPopupBridgeInstalled = true;
+        }
+
+        document.addEventListener('click', function (event) {
+            const target = event.target && typeof event.target.closest === 'function'
+                ? event.target.closest('[onclick*="openLinkMap"], [onclick*="deleteREXLink"]')
+                : null;
+
+            if (!target) {
+                return;
+            }
+
+            const wrapper = target.closest('.mblock_wrapper');
+            if (!wrapper) {
+                return;
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+            if (typeof event.stopImmediatePropagation === 'function') {
+                event.stopImmediatePropagation();
+            }
+
+            const onclick = target.getAttribute('onclick') || '';
+            const action = onclick.includes('deleteREXLink') ? 'delete' : 'open';
+
+            if ((action === 'open' && typeof window.openLinkMap !== 'function') ||
+                (action === 'delete' && typeof window.deleteREXLink !== 'function')) {
+                return;
+            }
+
+            const findSourceId = function (scopeElement) {
+                if (!scopeElement || typeof scopeElement.querySelector !== 'function') {
+                    return '';
+                }
+                const hidden = scopeElement.querySelector('input[id^="REX_LINK_"]:not([id$="_NAME"])');
+                return (hidden && hidden.id) || '';
+            };
+
+            const candidateScopes = [
+                target.closest('.rex-js-widget-link'),
+                target.closest('.rex-js-widget'),
+                target.closest('.input-group'),
+                target.closest('.form-group'),
+                target.parentElement
+            ];
+
+            let sourceId = '';
+            for (let i = 0; i < candidateScopes.length; i++) {
+                sourceId = findSourceId(candidateScopes[i]);
+                if (sourceId) {
+                    break;
+                }
+            }
+
+            if (!sourceId) {
+                const rawIdMatch = onclick.match(/(?:openLinkMap\(\s*['"]REX_LINK_|deleteREXLink\(\s*['"]?)(\d+)/);
+                if (rawIdMatch) {
+                    const rawId = rawIdMatch[1];
+                    if (document.getElementById('REX_LINK_' + rawId)) {
+                        sourceId = 'REX_LINK_' + rawId;
+                    }
+                }
+            }
+
+            const idMatch = sourceId.match(/REX_LINK_(\d+)/);
+            if (!idMatch) {
+                console.warn('MBlock: Keine gueltige Link-ID im Widget gefunden.');
+                return;
+            }
+
+            // Erst nach erfolgreicher ID-Ermittlung das native Inline-Handling unterdruecken.
+            event.preventDefault();
+            event.stopPropagation();
+            if (typeof event.stopImmediatePropagation === 'function') {
+                event.stopImmediatePropagation();
+            }
+
+            if (action === 'open') {
+                let param = '';
+                const paramMatch = onclick.match(/openLinkMap\([^,]+,\s*(['"])(.*?)\1/);
+                if (paramMatch) {
+                    param = paramMatch[2];
+                }
+                window.openLinkMap('REX_LINK_' + idMatch[1], param);
+                return;
+            }
+
+            window.deleteREXLink(idMatch[1]);
+        }, true);
+    } catch (error) {
+        console.warn('MBlock: Fehler beim Installieren der Link Popup Bridge:', error);
+    }
+}
+
 $(document).on('rex:ready', function (e, container) {
     try {
+        mblock_install_linklist_popup_bridge();
+        mblock_install_medialist_popup_bridge();
+        mblock_install_media_popup_bridge();
+        mblock_install_link_popup_bridge();
+
         // Initialize clipboard system only if copy/paste is enabled
         const isCopyPasteEnabled = checkCopyPasteEnabled();
         if (isCopyPasteEnabled) {

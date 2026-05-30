@@ -420,10 +420,10 @@ class MBlock
             if ($copyPasteEnabled) {
             // Copy/Paste ist aktiviert - Buttons anzeigen
                 $copyPasteButtons = '<div class="btn-group btn-group-xs">'
-                    . '<button type="button" class="btn btn-default mblock-copy-btn mblock-has-icon" title="{{mblock_copy_element}}">'
+                    . '<button type="button" class="btn btn-default mblock-copy-btn mblock-has-icon" title="{{mblock::mblock_copy_element}}">'
                     . '<i class="rex-icon fa-solid fa-copy"></i>'
                     . '</button>'
-                    . '<button type="button" class="btn btn-default mblock-paste-btn mblock-has-icon" title="{{mblock_paste_element}}">'
+                    . '<button type="button" class="btn btn-default mblock-paste-btn mblock-has-icon" title="{{mblock::mblock_paste_element}}">'
                     . '<i class="rex-icon fa-solid fa-clipboard"></i>'
                     . '</button>'
                     . '</div>';
