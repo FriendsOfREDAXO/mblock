@@ -1947,10 +1947,19 @@ var MBlockClipboard = {
             // Remove CKE5 instances from clone to ensure clean state
             clonedItem.find('.cke5-editor').each(function() {
                 const $editor = $(this);
-                $editor.next('.ck').remove();
+                // Remove all CK-generated siblings (editor UI)
+                let $next = $editor.next();
+                while ($next.length && ($next.hasClass('ck-editor') || $next.hasClass('ck'))) {
+                    const $cur = $next;
+                    $next = $cur.next();
+                    $cur.remove();
+                }
                 $editor.show();
                 $editor.css('visibility', '');
                 $editor.removeAttr('style');
+                // Critical: reset init-state so CKE5 re-initializes this editor in the clone
+                $editor.removeAttr('data-cke5-init-state');
+                $editor.removeAttr('id');
             });
 
             // Remove TinyMCE instances from clone to ensure clean state
@@ -2356,6 +2365,22 @@ var MBlockClipboard = {
             
             // Remove mblock-specific data attributes
             item.removeAttr('data-mblock_index');
+
+            // Remove CKE5 editor UI and reset init-state so CKE5 re-initializes after paste
+            item.find('.cke5-editor').each(function() {
+                const $editor = $(this);
+                let $next = $editor.next();
+                while ($next.length && ($next.hasClass('ck-editor') || $next.hasClass('ck'))) {
+                    const $cur = $next;
+                    $next = $cur.next();
+                    $cur.remove();
+                }
+                $editor.show();
+                $editor.css('visibility', '');
+                $editor.removeAttr('style');
+                $editor.removeAttr('data-cke5-init-state');
+                $editor.removeAttr('id');
+            });
             
             // Clean form elements
             item.find('input, textarea, select').each(function() {
