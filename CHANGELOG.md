@@ -1,5 +1,10 @@
 # MBlock - REDAXO Addon für Modul-Input-Blöcke
 
+## Version 4.6.4 - 2026-06-16
+
+### Bug Fixes
+* **CKEditor 5 Sync-Fehler beim Formular-Submit behoben**: In `mblock_sync_all_cke5_to_textareas()` wurde im DOM-Fallback eine Variable als `const` deklariert und anschließend neu zugewiesen. Das konnte in der Browser-Konsole zu `TypeError: invalid assignment to const` führen und die Synchronisierung von Editor-Inhalten in die Textarea stören. Die Variable ist nun korrekt als `let` definiert.
+
 ## Version 4.6.2 - 2026-05-30
 
 ### Bug Fixes

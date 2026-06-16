@@ -3150,7 +3150,7 @@ function mblock_sync_all_cke5_to_textareas(context) {
                 // and copy its innerHTML back to the hidden textarea
                 let content = $textarea.val() || '';
                 // look for nearby ck-editor editable content
-                const $editable = $textarea.siblings('.ck, .ck-editor__main').find('.ck-editor__editable, .ck-content').first();
+                let $editable = $textarea.siblings('.ck, .ck-editor__main').find('.ck-editor__editable, .ck-content').first();
                 if (!$editable.length) {
                     // try a wider search within the same parent
                     const $container = $textarea.closest('.mform, .mblock_wrapper, form, body');
