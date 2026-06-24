@@ -485,7 +485,7 @@ function mblock_install_media_popup_bridge() {
                 }
             }
 
-            const idMatch = sourceId.match(/REX_MEDIA_(\d+)/);
+            const idMatch = sourceId.match(/^REX_MEDIA_(.+)$/);
             if (!idMatch) {
                 console.warn('MBlock: Keine gueltige Media-ID im Widget gefunden.');
                 return;
@@ -698,6 +698,9 @@ function mblock_init(element) {
         if (!element.data('mblock_run')) {
             element.data('mblock_run', 1);
             mblock_sort(element);
+            // Initial render can contain pre-cloned/min blocks with duplicate [0] names.
+            // Reindex once during init so each block posts with its own array index.
+            mblock_reindex(element);
             mblock_set_unique_id(element, false);
 
             const minValue = element.data('min');
@@ -3490,8 +3493,8 @@ function mblock_reinitialize_redaxo_widgets(container) {
                         const onclick = $btn.attr('onclick');
                         
                         if (onclick) {
-                            // Extract the media ID from the input ID (REX_MEDIA_123456 -> 123456)
-                            const mediaIdMatch = inputId.match(/REX_MEDIA_(\d+)/);
+                            // Preserve full REX_MEDIA suffix (can contain hash fragments, not only digits)
+                            const mediaIdMatch = inputId.match(/^REX_MEDIA_(.+)$/);
                             if (mediaIdMatch) {
                                 const mediaId = mediaIdMatch[1];
                                 

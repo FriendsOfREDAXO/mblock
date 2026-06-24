@@ -1,5 +1,11 @@
 # MBlock - REDAXO Addon für Modul-Input-Blöcke
 
+## Version 4.6.5 - 2026-06-24
+
+### Bug Fixes
+* **Media-Popup mit langer Widget-ID wieder korrekt**: In der MBlock-Bridge und beim Reinitialisieren der REDAXO-Widgets wurde die `REX_MEDIA_*`-ID bisher auf reine Ziffern gekürzt. Bei IDs wie `REX_MEDIA_1GBS...` führte das zu falschem `opener_input_field=REX_MEDIA_1`. Der vollständige ID-Suffix wird jetzt erhalten und an `openREXMedia`/`viewREXMedia`/`addREXMedia`/`deleteREXMedia` weitergegeben.
+* **Nur erstes MBlock-Element wurde gespeichert**: Beim Initial-Render konnten mehrere Blöcke denselben Feldnamen-Index `[0]` behalten. Dadurch kollidierten POST-Keys und spätere Elemente wurden überschrieben. Beim ersten `mblock_init()` wird jetzt ein zusätzlicher `mblock_reindex()` ausgeführt, sodass Namen sofort korrekt auf `[0]`, `[1]`, ... verteilt sind.
+
 ## Version 4.6.4 - 2026-06-16
 
 ### Bug Fixes
