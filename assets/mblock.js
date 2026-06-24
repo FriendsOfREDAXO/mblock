@@ -1159,16 +1159,16 @@ function mblock_update_rex_buttons($element, sindex, mblock_count, eindex) {
             if (onclick) {
                 let newOnclick = onclick;
                 // openLinkMap('REX_LINK_X', ...) -> _X ersetzen
-                newOnclick = newOnclick.replace(/(openLinkMap\('REX_LINK_)\d+/, '$1' + newIdPart);
+                newOnclick = newOnclick.replace(/(openLinkMap\('REX_LINK_)[^'\"]+/, '$1' + newIdPart);
                 // deleteREXLink('X') oder deleteREXLink(X) -> korrekt mit Quotes
                 newOnclick = newOnclick.replace(/deleteREXLink\([^)]+\)/, "deleteREXLink('" + newIdPart + "')");
                 // openREXMedia('X', ...) und ähnliche
-                newOnclick = newOnclick.replace(/(_)\d+([',)])/, '$1' + newIdPart + '$2');
+                newOnclick = newOnclick.replace(/(_)[^'\",)]+([',)])/, '$1' + newIdPart + '$2');
                 // Fallback: erste Ziffernfolge nach ( ersetzen (für unbekannte Patterns)
                 if (newOnclick === onclick) {
                     newOnclick = newOnclick
                         .replace(/\('?\d+'?/, "('" + newIdPart + "'")
-                        .replace(/_\d+/, '_' + newIdPart);
+                        .replace(/_[^'\",)]+/, '_' + newIdPart);
                 }
                 $btn.attr('onclick', newOnclick);
             }
