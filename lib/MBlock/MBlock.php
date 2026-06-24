@@ -408,7 +408,7 @@ class MBlock
     {
         // Get copy/paste configuration using rex_config
         $copyPasteEnabled = rex_config::get('mblock', 'copy_paste', 1); // Default: enabled
-        
+
         // GRIDBLOCK INTEGRATION: Deaktiviere Copy/Paste wenn Gridblock aktiv ist
         // Gridblock hat sein eigenes Copy/Paste-System für komplette Slices
         if (rex_addon::get('gridblock')->isAvailable() && class_exists('rex_gridblock')) {
@@ -444,7 +444,7 @@ class MBlock
     {
         // Get copy/paste configuration using rex_config
         $copyPasteEnabled = rex_config::get('mblock', 'copy_paste', 1); // Default: enabled
-        
+
         // GRIDBLOCK INTEGRATION: Deaktiviere Copy/Paste wenn Gridblock aktiv ist
         // Gridblock hat sein eigenes Copy/Paste-System für komplette Slices
         if (rex_addon::get('gridblock')->isAvailable() && class_exists('rex_gridblock')) {

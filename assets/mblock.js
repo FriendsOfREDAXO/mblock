@@ -603,7 +603,7 @@ function mblock_install_link_popup_bridge() {
             }
 
             if (!sourceId) {
-                const rawIdMatch = onclick.match(/(?:openLinkMap\(\s*['"]REX_LINK_|deleteREXLink\(\s*['"]?)(\d+)/);
+                const rawIdMatch = onclick.match(/(?:openLinkMap\(\s*['"]REX_LINK_|deleteREXLink\(\s*['"]?)([^'"\),\s]+)/);
                 if (rawIdMatch) {
                     const rawId = rawIdMatch[1];
                     if (document.getElementById('REX_LINK_' + rawId)) {
@@ -612,7 +612,7 @@ function mblock_install_link_popup_bridge() {
                 }
             }
 
-            const idMatch = sourceId.match(/REX_LINK_(\d+)/);
+            const idMatch = sourceId.match(/^REX_LINK_(.+)$/);
             if (!idMatch) {
                 console.warn('MBlock: Keine gueltige Link-ID im Widget gefunden.');
                 return;
@@ -631,7 +631,7 @@ function mblock_install_link_popup_bridge() {
                 if (paramMatch) {
                     param = paramMatch[2];
                 }
-                window.openLinkMap('REX_LINK_' + idMatch[1], param);
+                    window.openLinkMap('REX_LINK_' + idMatch[1], param);
                 return;
             }
 
@@ -901,7 +901,6 @@ function mblock_sort_it(element) {
                     const sortableInstance = Sortable.create(domElement, {
                         handle: '.sorthandle',
                         animation: 150,
-                        ghostClass: 'sortable-ghost',
                         chosenClass: 'mblock-sortable-chosen',
                         dragClass: 'mblock-dragging',
                         onStart: function (evt) {
@@ -2464,7 +2463,7 @@ var MBlockClipboard = {
         }
         
         // REX_LINK_11001_NAME -> ["REX_LINK", "_NAME"]  
-        const linkMatch = fieldName.match(/REX_LINK_(\d+)(_\w+)?/);
+        const linkMatch = fieldName.match(/REX_LINK_(.+?)(_\w+)?$/);
         if (linkMatch) {
             patterns.push('REX_LINK');
             if (linkMatch[2]) {
@@ -2473,7 +2472,7 @@ var MBlockClipboard = {
         }
         
         // REX_MEDIA_1_NAME -> ["REX_MEDIA", "_NAME"]
-        const mediaMatch = fieldName.match(/REX_MEDIA_(\d+)(_\w+)?/);
+        const mediaMatch = fieldName.match(/REX_MEDIA_(.+?)(_\w+)?$/);
         if (mediaMatch) {
             patterns.push('REX_MEDIA');
             if (mediaMatch[2]) {
@@ -3569,7 +3568,7 @@ function mblock_reinitialize_redaxo_widgets(container) {
             
             if (inputId && !inputId.includes('_NAME')) {
                 // Extract link ID
-                const linkIdMatch = inputId.match(/REX_LINK_(\d+)$/);
+                const linkIdMatch = inputId.match(/^REX_LINK_(.+)$/);
                 if (linkIdMatch) {
                     const linkId = linkIdMatch[1];
                     
