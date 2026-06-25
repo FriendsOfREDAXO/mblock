@@ -1054,11 +1054,37 @@ function mblock_reindex_form_elements($sortItem, index, sindex, mblock_count) {
                 }
             }
 
-            // Event-Handler für Checkboxen optimieren
+            // Event-Handler fuer Checkboxen rueckwaertskompatibel halten.
+            // Custom-Values (z.B. "checked") duerfen nicht auf 1/0 ueberschrieben werden.
             const elementType = $element.attr('type');
             if (elementType === 'checkbox') {
+                const currentValue = $element.val();
+                if (!$element.attr('data-value')) {
+                    $element.attr('data-value', currentValue);
+                }
+
                 $element.off('change.mblock').on('change.mblock', function () {
-                    $(this).val($(this).is(':checked') ? 1 : 0);
+                    const $checkbox = $(this);
+                    const baseValue = String($checkbox.attr('data-value') ?? $checkbox.val() ?? '1');
+                    const normalizedBaseValue = baseValue.toLowerCase();
+                    const isBooleanStyleValue = normalizedBaseValue === ''
+                        || normalizedBaseValue === '1'
+                        || normalizedBaseValue === '0'
+                        || normalizedBaseValue === 'on'
+                        || normalizedBaseValue === 'true'
+                        || normalizedBaseValue === 'false';
+
+                    if ($checkbox.is(':checked')) {
+                        $checkbox.val(baseValue);
+                        return;
+                    }
+
+                    if (isBooleanStyleValue) {
+                        $checkbox.val('0');
+                        return;
+                    }
+
+                    $checkbox.val(baseValue);
                 });
             }
 

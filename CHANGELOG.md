@@ -1,5 +1,10 @@
 # MBlock - REDAXO Addon für Modul-Input-Blöcke
 
+## Version 4.6.6 - 2026-06-25
+
+### Bug Fixes
+* **Checkbox-Werte bleiben rückwärtskompatibel**: Beim Reindexing wurden Checkbox-Values clientseitig auf `1`/`0` normalisiert. Dadurch gingen benutzerdefinierte Werte wie `checked` verloren und bestehende Modul-Logik konnte brechen. MBlock erhält nun den ursprünglichen Basiswert pro Checkbox und überschreibt nur noch echte boolesche Werte kontrolliert.
+
 ## Version 4.6.5 - 2026-06-24
 
 ### Bug Fixes
