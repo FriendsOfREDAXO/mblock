@@ -228,7 +228,7 @@ function mblock_install_linklist_popup_bridge() {
             }
 
             if (!sourceId) {
-                const rawIdMatch = onclick.match(/openREXLinklist\(\s*['"]?(\d+)['"]?/);
+                const rawIdMatch = onclick.match(/(?:openREXLinklist|moveREXLinklist|deleteREXLinklist)\(\s*['"]?([^'"\),\s]+)['"]?/);
                 if (rawIdMatch) {
                     const rawId = rawIdMatch[1];
                     const selectExists = !!document.getElementById('REX_LINKLIST_SELECT_' + rawId);
@@ -239,7 +239,7 @@ function mblock_install_linklist_popup_bridge() {
                 }
             }
 
-            const idMatch = sourceId.match(/REX_LINKLIST_(?:SELECT_)?(\d+)/);
+            const idMatch = sourceId.match(/^REX_LINKLIST_(?:SELECT_)?(.+)$/);
 
             if (!idMatch) {
                 console.warn('MBlock: Keine gueltige Linklist-ID im Widget gefunden.');
@@ -3601,7 +3601,7 @@ function mblock_reinitialize_redaxo_widgets(container) {
             
             if (elementId) {
                 // Extract linklist ID
-                const linklistIdMatch = elementId.match(/REX_LINKLIST_(?:SELECT_)?(\d+)/);
+                const linklistIdMatch = elementId.match(/^REX_LINKLIST_(?:SELECT_)?(.+)$/);
                 if (linklistIdMatch) {
                     const linklistId = linklistIdMatch[1];
                     
