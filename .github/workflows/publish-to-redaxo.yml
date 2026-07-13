@@ -9,7 +9,7 @@ jobs:
   redaxo_publish:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v6
     - uses: FriendsOfREDAXO/installer-action@v1
       with:
         myredaxo-username: ${{ secrets.MYREDAXO_USERNAME }}
