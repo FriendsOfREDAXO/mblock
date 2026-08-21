@@ -1359,7 +1359,36 @@ function mblock_reindex_special_elements($sortItem, index, sindex, mblock_count)
     }
 }
 
+let mblock_editor_id_seq = 0;
+
+/**
+ * Generates a client-side unique id for rich-text editor fields (TinyMCE, CKEditor5).
+ * Never derived from position/name - see mblock_replace_for() for why.
+ */
+function mblock_generate_unique_editor_id() {
+    var id;
+    do {
+        mblock_editor_id_seq += 1;
+        id = 'mblock_editor_' + Date.now().toString(36) + '_' + mblock_editor_id_seq;
+    } while (document.getElementById(id));
+    return id;
+}
+
 function mblock_replace_for(element) {
+
+    // Rich-text editor fields (TinyMCE via .tiny-editor, CKEditor5 via .cke5-editor)
+    // need a STABLE id across reindexing. Their JS-side EditorManager tracks a live
+    // editor instance by an internal id captured once at init and never updated
+    // afterwards. The id rewrite below derives ids from the (position-based,
+    // reindexed) name, so an insert/remove/reorder can hand a block's id to a
+    // DIFFERENT physical block. A later tinymce.get(id) lookup then resolves to
+    // the stale editor instance instead of the current one, and its content gets
+    // saved into the wrong block. This is the exact same class of bug the
+    // "redactor"/"markitup" exclusion below already guards against for older
+    // WYSIWYG editors - editor fields just keep whatever id they already have,
+    // and only get a fresh one if it's missing or duplicated (e.g. a freshly
+    // cloned block, which starts out sharing the static template's id).
+    var seenEditorIds = {};
 
     element.find('> div.sortitem').each(function (index) {
         var mblock = $(this);
@@ -1367,6 +1396,16 @@ function mblock_replace_for(element) {
             var el = $(this),
                 id = el.attr('id'),
                 name = el.attr('name');
+
+            if (el.hasClass('tiny-editor') || el.hasClass('cke5-editor')) {
+                if (!id || seenEditorIds[id]) {
+                    id = mblock_generate_unique_editor_id();
+                    el.attr('id', id);
+                }
+                seenEditorIds[id] = true;
+                return;
+            }
+
             if ((typeof id !== typeof undefined && id !== false) && (typeof name !== typeof undefined && name !== false)) {
                 if (!(id.indexOf("REX_MEDIA") >= 0 ||
                     id.indexOf("REX_LINK") >= 0 ||

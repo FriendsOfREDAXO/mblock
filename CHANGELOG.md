@@ -1,5 +1,10 @@
 # MBlock - REDAXO Addon für Modul-Input-Blöcke
 
+## Version 4.6.7 - 2026-08-21
+
+### Bug Fixes
+* **TinyMCE/CKEditor5-Inhalte wurden beim Einfügen eines Blocks vertauscht**: `mblock_replace_for()` hat die `id` von Editor-Feldern bislang aus dem (positionsbasiert reindizierten) `name` neu berechnet - wie bei allen anderen Feldern auch. TinyMCE identifiziert eine laufende Editor-Instanz aber über eine interne `id`, die einmalig beim Init gesetzt und danach nie aktualisiert wird. Da sich die Positionen beim Einfügen eines Blocks verschieben, bekam ein späterer Block die alte `id` eines früheren Blocks zugewiesen; nachfolgende `tinymce.get(id)`-Aufrufe griffen dadurch auf die falsche, veraltete Editor-Instanz zu und deren Inhalt landete im falschen Block. Editor-Felder (`.tiny-editor`, `.cke5-editor`) behalten ihre `id` jetzt stabil bei und bekommen nur dann eine neue, garantiert eindeutige `id`, wenn sie fehlt oder dupliziert ist - analog zur bestehenden Ausnahme für `redactor`/`markitup`.
+
 ## Version 4.6.6 - 2026-06-25
 
 ### Bug Fixes
