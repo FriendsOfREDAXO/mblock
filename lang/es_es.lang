@@ -49,6 +49,13 @@ rex_form_mblock_demo_entries = Entradas de demostración
 rex_form_mblock_demo_entries_add = Agregue una entrada de demostración
 rex_form_mblock_demo_entries_edit = Editar una entrada de demostración
 
+# Element controls
+mblock_delete_element = Eliminar elemento
+mblock_move_up = Mover hacia arriba
+mblock_move_down = Mover hacia abajo
+mblock_set_online = Poner en línea
+mblock_set_offline = Poner fuera de línea
+
 # Clipboard functionality
 mblock_add_element = Agregar nuevo elemento
 mblock_copy_element = Copiar elemento

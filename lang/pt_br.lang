@@ -44,6 +44,13 @@ mblock_ok_delete_confirm = Ativada a confirmação antes da exclusão de Blocos
 mblock_delete_confirm_label = Confirmação antes da exclusão
 mblock_delete_confirm = Deletar o bloco?
 
+# Element controls
+mblock_delete_element = Excluir elemento
+mblock_move_up = Mover para cima
+mblock_move_down = Mover para baixo
+mblock_set_online = Colocar online
+mblock_set_offline = Colocar offline
+
 # Clipboard functionality
 mblock_add_element = Adicionar novo elemento
 mblock_copy_element = Copiar elemento

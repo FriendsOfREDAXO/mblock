@@ -49,6 +49,13 @@ rex_form_mblock_demo_entries = Demo inlägg
 rex_form_mblock_demo_entries_add = Tillfoga demo inlägg
 rex_form_mblock_demo_entries_edit = Redigera demo inlägg
 
+# Element controls
+mblock_delete_element = Ta bort element
+mblock_move_up = Flytta upp
+mblock_move_down = Flytta ner
+mblock_set_online = Sätt online
+mblock_set_offline = Sätt offline
+
 # Clipboard functionality
 mblock_add_element = Lägg till nytt element
 mblock_copy_element = Kopiera element

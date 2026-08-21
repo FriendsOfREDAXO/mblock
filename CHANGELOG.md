@@ -1,5 +1,13 @@
 # MBlock - REDAXO Addon für Modul-Input-Blöcke
 
+## Version 4.6.8 - 2026-08-21
+
+### Bug Fixes
+* **Tabs in kopierten Blöcken nicht mehr nutzbar**: Beim Einfügen eines kopierten Blocks (Copy/Paste) hat `cleanupPastedItem()` die `id` jedes Elements entfernt, dessen `id` nicht mit `REX_` beginnt - darunter auch die `id` von Bootstrap-Tab-Panes/Collapse-Zielen. Dadurch fand `href="#..."`/`data-target="#..."` nach dem Einfügen kein Ziel mehr und Tabs bzw. Accordions in kopierten Blöcken reagierten nicht mehr. Beim Hinzufügen per "+" trat das Problem nicht auf, da dort keine bestehenden IDs entfernt werden. IDs, auf die innerhalb desselben Blocks per `href`, `data-target` oder `aria-controls` verwiesen wird, werden jetzt von der Bereinigung ausgenommen. Danke an @iceman-fx für den Report ([#230](https://github.com/FriendsOfREDAXO/mblock/issues/230)).
+* **Online/Offline-Button erschien nicht trotz aktivierter Einstellung**: Die Erkennung des `mblock_offline`-Feldes prüfte nur auf `name="mblock_offline"` oder ein `[` direkt nach `mblock_offline` im Namen. MBlock rendert Feldnamen aber üblicherweise verschachtelt als z. B. `name="REX_INPUT_VALUE[20][0][mblock_offline]"` - dort folgt kein `[` mehr, wodurch das Feld nie erkannt wurde und der Button unabhängig von der Konfiguration nie erschien. Außerdem wurde die globale Einstellung "Online/Offline Toggle" bislang gar nicht ausgewertet. Beides ist jetzt korrigiert.
+* **Copy/Paste-Einstellung ohne Wirkung**: Die Anzeige der Copy/Paste-Buttons/-Toolbar prüfte den Konfigurationsschlüssel `copy_paste`, gespeichert wird die Einstellung aber unter `mblock_copy_paste`. Dadurch griff immer der Default (aktiviert) und der Schalter in den Einstellungen hatte keine Wirkung. Danke an @ischfr für den Report ([#232](https://github.com/FriendsOfREDAXO/mblock/issues/232)).
+* **Button-Titles uneinheitlich/unvollständig**: Der Tooltip des Add-Buttons war als `{{mblock_add_element}}` ohne den nötigen `mblock::`-Präfix hinterlegt und wurde dadurch nie übersetzt - sichtbar war der rohe Platzhalter. Die Tooltips für Löschen/Nach oben/Nach unten waren zusätzlich hart auf Englisch kodiert, während Copy/Paste bereits korrekt übersetzt war. Alle Button-Tooltips (in allen vier mitgelieferten Themes: `standard`, `modern`, `akg_skin`, `retro_8bit`) nutzen jetzt konsistent das Sprachsystem. Danke an @ischfr für den Report ([#233](https://github.com/FriendsOfREDAXO/mblock/issues/233)).
+
 ## Version 4.6.7 - 2026-08-21
 
 ### Bug Fixes

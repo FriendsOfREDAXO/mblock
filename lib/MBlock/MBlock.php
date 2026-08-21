@@ -340,12 +340,21 @@ class MBlock
     {
         $form = $item->getForm();
         
-        // Check if form contains mblock_offline field
-        $hasOfflineField = (strpos($form, 'name="mblock_offline"') !== false || 
+        // Check if form contains mblock_offline field. Field names are usually wrapped
+        // by MBlock as e.g. name="REX_INPUT_VALUE[20][0][mblock_offline]", i.e. as the
+        // LAST bracket segment with no "[" following it - the previous regex required a
+        // "[" after "mblock_offline" and therefore never matched that (most common) case.
+        $hasOfflineField = (strpos($form, 'name="mblock_offline"') !== false ||
                            strpos($form, "name='mblock_offline'") !== false ||
-                           preg_match('/name=.*mblock_offline.*\[/', $form));
-        
-        if ($hasOfflineField) {
+                           preg_match('/name=["\'][^"\']*\[mblock_offline\][^"\']*["\']/', $form));
+
+        // Respect the global "Online/Offline Toggle" setting (pages/settings.php,
+        // stored under 'mblock_online_offline'). This was never checked here before,
+        // so the button always showed regardless of the setting. Default: enabled,
+        // so existing installations keep working until they explicitly disable it.
+        $offlineToggleEnabled = rex_config::get('mblock', 'mblock_online_offline', 1);
+
+        if ($hasOfflineField && $offlineToggleEnabled) {
             // Get the current value of mblock_offline field
             $isOffline = false;
             
@@ -374,12 +383,12 @@ class MBlock
             if ($isOffline) {
                 $offlineButtonClass = 'btn-danger'; // Red for offline
                 $offlineButtonFa = 'fa-solid fa-toggle-off';
-                $offlineButtonTitle = 'Set online';
+                $offlineButtonTitle = rex_i18n::msg('mblock_set_online');
                 $offlineButtonText = 'Offline';
             } else {
                 $offlineButtonClass = 'btn-success'; // Green for online
                 $offlineButtonFa = 'fa-solid fa-toggle-on';
-                $offlineButtonTitle = 'Set offline';
+                $offlineButtonTitle = rex_i18n::msg('mblock_set_offline');
                 $offlineButtonText = 'Online';
             }
 
@@ -406,8 +415,10 @@ class MBlock
      */
     private static function setCopyPasteProperties(MBlockElement $element, MBlockItem $item)
     {
-        // Get copy/paste configuration using rex_config
-        $copyPasteEnabled = rex_config::get('mblock', 'copy_paste', 1); // Default: enabled
+        // Get copy/paste configuration using rex_config. Settings page (pages/settings.php)
+        // stores this under the 'mblock_copy_paste' key - reading plain 'copy_paste' here
+        // always fell through to the default (enabled), so the toggle had no effect.
+        $copyPasteEnabled = rex_config::get('mblock', 'mblock_copy_paste', 1); // Default: enabled
 
         // GRIDBLOCK INTEGRATION: Deaktiviere Copy/Paste wenn Gridblock aktiv ist
         // Gridblock hat sein eigenes Copy/Paste-System für komplette Slices
@@ -442,8 +453,10 @@ class MBlock
      */
     private static function setCopyPasteToolbar(MBlockElement $wrapper)
     {
-        // Get copy/paste configuration using rex_config
-        $copyPasteEnabled = rex_config::get('mblock', 'copy_paste', 1); // Default: enabled
+        // Get copy/paste configuration using rex_config. Settings page (pages/settings.php)
+        // stores this under the 'mblock_copy_paste' key - reading plain 'copy_paste' here
+        // always fell through to the default (enabled), so the toggle had no effect.
+        $copyPasteEnabled = rex_config::get('mblock', 'mblock_copy_paste', 1); // Default: enabled
 
         // GRIDBLOCK INTEGRATION: Deaktiviere Copy/Paste wenn Gridblock aktiv ist
         // Gridblock hat sein eigenes Copy/Paste-System für komplette Slices

@@ -55,6 +55,13 @@ rex_form_mblock_demo_entries = Demo entries
 rex_form_mblock_demo_entries_add = Add demo entry
 rex_form_mblock_demo_entries_edit = Edit demo entry
 
+# Element controls
+mblock_delete_element = Delete element
+mblock_move_up = Move up
+mblock_move_down = Move down
+mblock_set_online = Set online
+mblock_set_offline = Set offline
+
 # Clipboard functionality
 mblock_add_element = Add new element
 mblock_copy_element = Copy element

@@ -2472,11 +2472,32 @@ var MBlockClipboard = {
                 }
             });
             
-            // Clean IDs that might cause conflicts
+            // Clean IDs that might cause conflicts - but keep ids that other elements
+            // inside this same item point to via href="#id"/data-target="#id"/aria-controls
+            // (e.g. Bootstrap tab panes, collapse/accordion targets). Stripping those breaks
+            // the tab/collapse link after paste, since "+"-added blocks never had this id
+            // removed in the first place (see FriendsOfREDAXO/mblock#230).
+            const referencedIds = {};
+            item.find('[href^="#"], [data-target^="#"], [aria-controls]').each(function() {
+                const $ref = $(this);
+                ['href', 'data-target'].forEach(function(attr) {
+                    const val = $ref.attr(attr);
+                    if (val && val.charAt(0) === '#' && val.length > 1) {
+                        referencedIds[val.slice(1)] = true;
+                    }
+                });
+                const controls = $ref.attr('aria-controls');
+                if (controls) {
+                    controls.split(/\s+/).forEach(function(controlId) {
+                        if (controlId) referencedIds[controlId] = true;
+                    });
+                }
+            });
+
             item.find('[id]').each(function() {
                 const $el = $(this);
                 const id = $el.attr('id');
-                if (id && !id.match(/^REX_/)) {
+                if (id && !id.match(/^REX_/) && !referencedIds[id]) {
                     $el.removeAttr('id');
                 }
             });
