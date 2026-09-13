@@ -118,23 +118,6 @@ function mblock_validate_element(element) {
 }
 
 /**
- * Sichere Event-Cleanup-Funktion für besseres Memory-Management
- * @param {jQuery} element - Element dessen Events bereinigt werden sollen
- * @param {string} namespace - Event-Namespace (optional)
- */
-function mblock_cleanup_events(element, namespace = '.mblock') {
-    try {
-        if (mblock_validate_element(element) && element.jquery) {
-            // Alle Event-Listener mit Namespace entfernen
-            element.find('*').off(namespace);
-            element.off(namespace);
-        }
-    } catch (error) {
-        console.error('MBlock: Fehler bei Event-Cleanup:', error);
-    }
-}
-
-/**
  * Prüft ob Copy/Paste in der Konfiguration aktiviert ist
  * @returns {boolean} True wenn aktiviert
  */

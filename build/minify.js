@@ -4,7 +4,7 @@
  * MBlock JavaScript Minification Script
  * 
  * Minifies mblock.js using Terser for production use
- * Creates mblock.min.js with source maps
+ * Creates mblock.min.js (no source map, the readable mblock.js ships alongside)
  * 
  * Usage: node minify.js
  * 
@@ -19,7 +19,6 @@ const { minify } = require('terser');
 // Configuration
 const sourceFile = '../assets/mblock.js';
 const outputFile = '../assets/mblock.min.js';
-const sourceMapFile = '../assets/mblock.min.js.map';
 
 // Terser options for optimal minification
 const terserOptions = {
@@ -69,10 +68,6 @@ const terserOptions = {
         beautify: false,
         ascii_only: true
     },
-    sourceMap: {
-        filename: path.basename(outputFile),
-        // url: path.basename(sourceMapFile)
-    },
     // Avoid global toplevel mangling; keep top-level names stable
     toplevel: false,
     ie8: false,
@@ -117,13 +112,6 @@ async function minifyMBlock() {
         const outputFilePath = path.resolve(__dirname, outputFile);
         fs.writeFileSync(outputFilePath, result.code, 'utf8');
         console.log(`💾 Minified Datei erstellt: ${outputFilePath}`);
-        
-        // Write source map
-        if (result.map) {
-            const sourceMapFilePath = path.resolve(__dirname, sourceMapFile);
-            fs.writeFileSync(sourceMapFilePath, result.map, 'utf8');
-            console.log(`🗺️  Source Map erstellt: ${sourceMapFilePath}`);
-        }
         
         // Statistics
         const compressionRatio = ((originalSize - minifiedSize) / originalSize * 100);
@@ -182,4 +170,4 @@ if (require.main === module) {
     }
 }
 
-module.exports = { minifyMBlock, sourceFile, outputFile, sourceMapFile, terserOptions };
+module.exports = { minifyMBlock, sourceFile, outputFile, terserOptions };
