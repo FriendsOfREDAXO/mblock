@@ -52,7 +52,7 @@ class MBlockSystemButtonReplacer
             }
             foreach ($match->getElementsByTagName('input') as $child) {
                 if ('text' === $child->getAttribute('type')) {
-                    $child->setAttribute('value', is_numeric($value) ? self::getLinkInfo($value)['art_name'] : $value);
+                    $child->setAttribute('value', is_numeric($value) ? self::getLinkInfo((string) $value)['art_name'] : $value);
                     break;
                 }
             }
@@ -208,7 +208,7 @@ class MBlockSystemButtonReplacer
                     continue;
                 }
             }
-            $onclick = preg_replace('/(' . preg_quote($function, '/') . '\(\'?)\d+(\'?[,)])/', '${1}' . $id . '${2}', $onclick);
+            $onclick = (string) preg_replace('/(' . preg_quote($function, '/') . '\(\'?)\d+(\'?[,)])/', '${1}' . $id . '${2}', (string) $onclick);
             if ('REXLink' === $function) {
                 $onclick = preg_replace('/(openLinkMap\(\'REX_LINK_)\d+(\')/', '${1}' . $id . '${2}', $onclick);
             }

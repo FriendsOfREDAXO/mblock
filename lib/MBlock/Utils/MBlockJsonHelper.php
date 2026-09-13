@@ -19,6 +19,7 @@ class MBlockJsonHelper
     private const MAX_DEPTH = 512;
 
     /**
+     * @param mixed $data
      * @return string|false JSON oder false, wenn die Daten nicht kodierbar sind (ohne Exception)
      */
     public static function encode($data, bool $throwOnError = false)
@@ -76,6 +77,7 @@ class MBlockJsonHelper
 
     /**
      * MBlock-Daten kodieren: nur Skalare, null und Arrays bleiben erhalten, Objekte und Ressourcen entfallen.
+     * @param array<mixed> $data
      */
     public static function encodeMBlockData(array $data): string
     {
@@ -86,6 +88,7 @@ class MBlockJsonHelper
 
     /**
      * MBlock-Daten aus dem gespeicherten Wert lesen; liefert immer ein Array.
+     * @return array<mixed>
      */
     public static function decodeMBlockData(string $json): array
     {
@@ -97,6 +100,10 @@ class MBlockJsonHelper
         return is_array($decoded) ? self::cleanData($decoded) : [];
     }
 
+    /**
+     * @param array<mixed> $data
+     * @return array<mixed>
+     */
     private static function cleanData(array $data): array
     {
         $clean = [];

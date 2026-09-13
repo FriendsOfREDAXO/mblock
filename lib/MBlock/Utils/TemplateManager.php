@@ -64,7 +64,7 @@ class TemplateManager
         
         // If no CSS file exists, that's okay
         $cssContent = \rex_file::get($cssFile);
-        if ($cssContent === false) {
+        if (null === $cssContent) {
             return true;
         }
         
@@ -143,7 +143,7 @@ class TemplateManager
         $templatePath = \rex_path::addon('mblock', 'data/templates/' . $templateName . '/');
         $cssFile = $templatePath . $templateName . '.css';
         
-        return \rex_file::get($cssFile) !== false;
+        return null !== \rex_file::get($cssFile);
     }
     
     /**
