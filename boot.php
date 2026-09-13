@@ -90,5 +90,32 @@ if (rex::isBackend() && is_object(rex::getUser())) {
     ]);
 }
 
+// Alte globale Klassennamen (MBlock 3.x) als Aliase auf die Namespace-Klassen, damit
+// bestehender Projektcode weiterlaeuft. Ersetzt die frueheren Shim-Dateien in lib/deprecated.
+foreach ([
+    'MBlock' => \FriendsOfRedaxo\MBlock\MBlock::class,
+    'MBlockBootstrapReplacer' => \FriendsOfRedaxo\MBlock\Replacer\MBlockBootstrapReplacer::class,
+    'MBlockCheckboxReplacer' => \FriendsOfRedaxo\MBlock\Replacer\MBlockCheckboxReplacer::class,
+    'MBlockCountReplacer' => \FriendsOfRedaxo\MBlock\Replacer\MBlockCountReplacer::class,
+    'MBlockSystemButtonReplacer' => \FriendsOfRedaxo\MBlock\Replacer\MBlockSystemButtonReplacer::class,
+    'MBlockValueReplacer' => \FriendsOfRedaxo\MBlock\Replacer\MBlockValueReplacer::class,
+    'MBlockElement' => \FriendsOfRedaxo\MBlock\DTO\MBlockElement::class,
+    'MBlockItem' => \FriendsOfRedaxo\MBlock\DTO\MBlockItem::class,
+    'MBlockFormItemDecorator' => \FriendsOfRedaxo\MBlock\Decorator\MBlockFormItemDecorator::class,
+    'MBlockJsonHelper' => \FriendsOfRedaxo\MBlock\Utils\MBlockJsonHelper::class,
+    'MBlockPageHelper' => \FriendsOfRedaxo\MBlock\Utils\MBlockPageHelper::class,
+    'MBlockSessionHelper' => \FriendsOfRedaxo\MBlock\Utils\MBlockSessionHelper::class,
+    'MBlockSettingsHelper' => \FriendsOfRedaxo\MBlock\Utils\MBlockSettingsHelper::class,
+    'MBlockParser' => \FriendsOfRedaxo\MBlock\Parser\MBlockParser::class,
+    'MBlockRexFormProcessor' => \FriendsOfRedaxo\MBlock\Processor\MBlockRexFormProcessor::class,
+    'mblock_rex_form' => \FriendsOfRedaxo\MBlock\Processor\mblock_rex_form::class,
+    'MBlockTemplateFileProvider' => \FriendsOfRedaxo\MBlock\Provider\MBlockTemplateFileProvider::class,
+    'MBlockValueHandler' => \FriendsOfRedaxo\MBlock\Handler\MBlockValueHandler::class,
+] as $legacyClass => $class) {
+    if (!class_exists($legacyClass, false)) {
+        class_alias($class, $legacyClass);
+    }
+}
+
 // Sichere Session-Reset mit optimiertem MBlockSessionHelper
 \FriendsOfRedaxo\MBlock\Utils\MBlockSessionHelper::resetCountIfNeeded();

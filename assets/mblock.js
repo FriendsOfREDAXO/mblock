@@ -145,492 +145,120 @@ function checkCopyPasteEnabled() {
 }
 
 /**
- * MBlock-only Bridge fuer klassische Linklist-Aktionen.
- * Faengt Klicks in der Capture-Phase ab und ruft open/move/deleteREXLinklist
- * mit der tatsaechlich vorhandenen Feld-ID im selben Widget auf.
+ * MBlock-only Bridges fuer die klassischen REDAXO-Widgets (Linklist, Medialist, Media, Link).
+ * Faengt Klicks auf die Widget-Buttons in der Capture-Phase ab und ruft die Kernfunktion
+ * mit der tatsaechlich vorhandenen Feld-Id im selben Widget auf: Nach dem Klonen eines Blocks
+ * stimmt die Id im inline onclick sonst nicht mehr mit dem Hidden-Input ueberein.
+ *
+ * Eine Tabelle je Widget: Flag (einmalige Installation), Widget-Klasse, Id-Praefix des
+ * Hidden-Inputs (optional mit Select), Kernfunktionen je Aktion. Die Reihenfolge ist wichtig:
+ * "openREXMedia" steckt auch in "openREXMedialist", die Medialist-Bridge muss zuerst greifen.
  */
-function mblock_install_linklist_popup_bridge() {
-    try {
-        if (typeof window !== 'undefined' && window.mblockLinklistPopupBridgeInstalled) {
-            return;
-        }
-
-        if (typeof window !== 'undefined') {
-            window.mblockLinklistPopupBridgeInstalled = true;
-        }
-
-        document.addEventListener('click', function (event) {
-            const target = event.target && typeof event.target.closest === 'function'
-                ? event.target.closest('[onclick*="openREXLinklist"], [onclick*="moveREXLinklist"], [onclick*="deleteREXLinklist"]')
-                : null;
-
-            if (!target) {
-                return;
-            }
-
-            // Nur innerhalb von MBlock eingreifen.
-            const wrapper = target.closest('.mblock_wrapper');
-            if (!wrapper) {
-                return;
-            }
-
-            const onclick = target.getAttribute('onclick') || '';
-            const action = onclick.includes('moveREXLinklist')
-                ? 'move'
-                : (onclick.includes('deleteREXLinklist') ? 'delete' : 'open');
-
-            if ((action === 'open' && typeof window.openREXLinklist !== 'function') ||
-                (action === 'move' && typeof window.moveREXLinklist !== 'function') ||
-                (action === 'delete' && typeof window.deleteREXLinklist !== 'function')) {
-                return;
-            }
-
-            const findSourceId = function (scopeElement) {
-                if (!scopeElement || typeof scopeElement.querySelector !== 'function') {
-                    return '';
-                }
-                const select = scopeElement.querySelector('select[id^="REX_LINKLIST_SELECT_"]');
-                const hidden = scopeElement.querySelector('input[id^="REX_LINKLIST_"]');
-                return (select && select.id) || (hidden && hidden.id) || '';
-            };
-
-            const candidateScopes = [
-                target.closest('.rex-js-widget-linklist'),
-                target.closest('.rex-js-widget'),
-                target.closest('.input-group'),
-                target.closest('.form-group'),
-                target.parentElement
-            ];
-
-            let sourceId = '';
-            for (let i = 0; i < candidateScopes.length; i++) {
-                sourceId = findSourceId(candidateScopes[i]);
-                if (sourceId) {
-                    break;
-                }
-            }
-
-            if (!sourceId) {
-                const rawIdMatch = onclick.match(/(?:openREXLinklist|moveREXLinklist|deleteREXLinklist)\(\s*['"]?([^'"\),\s]+)['"]?/);
-                if (rawIdMatch) {
-                    const rawId = rawIdMatch[1];
-                    const selectExists = !!document.getElementById('REX_LINKLIST_SELECT_' + rawId);
-                    const hiddenExists = !!document.getElementById('REX_LINKLIST_' + rawId);
-                    if (selectExists || hiddenExists) {
-                        sourceId = hiddenExists ? ('REX_LINKLIST_' + rawId) : ('REX_LINKLIST_SELECT_' + rawId);
-                    }
-                }
-            }
-
-            const idMatch = sourceId.match(/^REX_LINKLIST_(?:SELECT_)?(.+)$/);
-
-            if (!idMatch) {
-                console.warn('MBlock: Keine gueltige Linklist-ID im Widget gefunden.');
-                return;
-            }
-
-            // Erst nach erfolgreicher ID-Ermittlung das native Inline-Handling unterdruecken.
-            event.preventDefault();
-            event.stopPropagation();
-            if (typeof event.stopImmediatePropagation === 'function') {
-                event.stopImmediatePropagation();
-            }
-
-            if (action === 'open') {
-                let param = '';
-                const paramMatch = onclick.match(/openREXLinklist\([^,]+,\s*(['"])(.*?)\1/);
-                if (paramMatch) {
-                    param = paramMatch[2];
-                }
-                window.openREXLinklist(idMatch[1], param);
-                return;
-            }
-
-            if (action === 'move') {
-                let moveParam = '';
-                const moveMatch = onclick.match(/moveREXLinklist\([^,]+,\s*(['"]?)([^'")]+)\1/);
-                if (moveMatch) {
-                    moveParam = moveMatch[2];
-                }
-                window.moveREXLinklist(idMatch[1], moveParam);
-                return;
-            }
-
-            window.deleteREXLinklist(idMatch[1]);
-        }, true);
-    } catch (error) {
-        console.warn('MBlock: Fehler beim Installieren der Linklist Popup Bridge:', error);
-    }
-}
+const MBLOCK_POPUP_BRIDGES = [
+    { flag: 'mblockLinklistPopupBridgeInstalled', widget: '.rex-js-widget-linklist', prefix: 'REX_LINKLIST_', hasSelect: true,
+        fns: { open: 'openREXLinklist', move: 'moveREXLinklist', delete: 'deleteREXLinklist' } },
+    { flag: 'mblockMedialistPopupBridgeInstalled', widget: '.rex-js-widget-medialist', prefix: 'REX_MEDIALIST_', hasSelect: true,
+        fns: { open: 'openREXMedialist', view: 'viewREXMedialist', move: 'moveREXMedialist', delete: 'deleteREXMedialist' } },
+    { flag: 'mblockMediaPopupBridgeInstalled', widget: '.rex-js-widget-media', prefix: 'REX_MEDIA_',
+        fns: { open: 'openREXMedia', view: 'viewREXMedia', add: 'addREXMedia', delete: 'deleteREXMedia' } },
+    { flag: 'mblockLinkPopupBridgeInstalled', widget: '.rex-js-widget-link', prefix: 'REX_LINK_', idExclude: '_NAME', openWithPrefix: true,
+        fns: { open: 'openLinkMap', delete: 'deleteREXLink' } }
+];
 
 /**
- * MBlock-only Bridge fuer klassische Medialist-Aktionen.
- * Faengt Klicks in der Capture-Phase ab und ruft open/view/move/deleteREXMedialist
- * mit der tatsaechlich vorhandenen Feld-ID im selben Widget auf.
+ * Argumente eines Funktionsaufrufs aus einem inline onclick lesen: fn('1', '&args') -> ['1', '&args'].
  */
-function mblock_install_medialist_popup_bridge() {
-    try {
-        if (typeof window !== 'undefined' && window.mblockMedialistPopupBridgeInstalled) {
-            return;
+function mblock_onclick_args(onclick, fnName) {
+    const start = onclick.indexOf(fnName + '(');
+    if (start === -1) return [];
+    const args = [];
+    let current = '', quote = '', depth = 0;
+    for (let i = start + fnName.length + 1; i < onclick.length; i++) {
+        const ch = onclick[i];
+        if (quote) {
+            if (ch === '\\' && i + 1 < onclick.length) { current += onclick[++i]; continue; }
+            if (ch === quote) { quote = ''; continue; }
+            current += ch;
+            continue;
         }
-
-        if (typeof window !== 'undefined') {
-            window.mblockMedialistPopupBridgeInstalled = true;
+        if (ch === '"' || ch === "'") { quote = ch; continue; }
+        if (ch === '(') { depth++; current += ch; continue; }
+        if (ch === ')') {
+            if (depth === 0) { args.push(current.trim()); break; }
+            depth--; current += ch; continue;
         }
-
-        document.addEventListener('click', function (event) {
-            const target = event.target && typeof event.target.closest === 'function'
-                ? event.target.closest('[onclick*="openREXMedialist"], [onclick*="viewREXMedialist"], [onclick*="moveREXMedialist"], [onclick*="deleteREXMedialist"]')
-                : null;
-
-            if (!target) {
-                return;
-            }
-
-            // Nur innerhalb von MBlock eingreifen.
-            const wrapper = target.closest('.mblock_wrapper');
-            if (!wrapper) {
-                return;
-            }
-
-            const onclick = target.getAttribute('onclick') || '';
-            const action = onclick.includes('moveREXMedialist')
-                ? 'move'
-                : (onclick.includes('deleteREXMedialist') ? 'delete' : (onclick.includes('viewREXMedialist') ? 'view' : 'open'));
-
-            if ((action === 'open' && typeof window.openREXMedialist !== 'function') ||
-                (action === 'view' && typeof window.viewREXMedialist !== 'function') ||
-                (action === 'move' && typeof window.moveREXMedialist !== 'function') ||
-                (action === 'delete' && typeof window.deleteREXMedialist !== 'function')) {
-                return;
-            }
-
-            const findSourceId = function (scopeElement) {
-                if (!scopeElement || typeof scopeElement.querySelector !== 'function') {
-                    return '';
-                }
-                const select = scopeElement.querySelector('select[id^="REX_MEDIALIST_SELECT_"]');
-                const hidden = scopeElement.querySelector('input[id^="REX_MEDIALIST_"]');
-                return (select && select.id) || (hidden && hidden.id) || '';
-            };
-
-            const candidateScopes = [
-                target.closest('.rex-js-widget-medialist'),
-                target.closest('.rex-js-widget'),
-                target.closest('.input-group'),
-                target.closest('.form-group'),
-                target.parentElement
-            ];
-
-            let sourceId = '';
-            for (let i = 0; i < candidateScopes.length; i++) {
-                sourceId = findSourceId(candidateScopes[i]);
-                if (sourceId) {
-                    break;
-                }
-            }
-
-            if (!sourceId) {
-                const rawIdMatch = onclick.match(/(?:open|view|move|delete)REXMedialist\(\s*['"]?(\d+)['"]?/);
-                if (rawIdMatch) {
-                    const rawId = rawIdMatch[1];
-                    const selectExists = !!document.getElementById('REX_MEDIALIST_SELECT_' + rawId);
-                    const hiddenExists = !!document.getElementById('REX_MEDIALIST_' + rawId);
-                    if (selectExists || hiddenExists) {
-                        sourceId = hiddenExists ? ('REX_MEDIALIST_' + rawId) : ('REX_MEDIALIST_SELECT_' + rawId);
-                    }
-                }
-            }
-
-            const idMatch = sourceId.match(/REX_MEDIALIST_(?:SELECT_)?(\d+)/);
-
-            if (!idMatch) {
-                console.warn('MBlock: Keine gueltige Medialist-ID im Widget gefunden.');
-                return;
-            }
-
-            // Erst nach erfolgreicher ID-Ermittlung das native Inline-Handling unterdruecken.
-            event.preventDefault();
-            event.stopPropagation();
-            if (typeof event.stopImmediatePropagation === 'function') {
-                event.stopImmediatePropagation();
-            }
-
-            if (action === 'open') {
-                let param = '';
-                const paramMatch = onclick.match(/openREXMedialist\([^,]+,\s*(['"])(.*?)\1/);
-                if (paramMatch) {
-                    param = paramMatch[2];
-                }
-                window.openREXMedialist(idMatch[1], param);
-                return;
-            }
-
-            if (action === 'view') {
-                let viewParam = '';
-                const viewMatch = onclick.match(/viewREXMedialist\([^,]+,\s*(['"])(.*?)\1/);
-                if (viewMatch) {
-                    viewParam = viewMatch[2];
-                }
-                window.viewREXMedialist(idMatch[1], viewParam);
-                return;
-            }
-
-            if (action === 'move') {
-                let moveParam = '';
-                const moveMatch = onclick.match(/moveREXMedialist\([^,]+,\s*(['"]?)([^'")]+)\1/);
-                if (moveMatch) {
-                    moveParam = moveMatch[2];
-                }
-                window.moveREXMedialist(idMatch[1], moveParam);
-                return;
-            }
-
-            window.deleteREXMedialist(idMatch[1]);
-        }, true);
-    } catch (error) {
-        console.warn('MBlock: Fehler beim Installieren der Medialist Popup Bridge:', error);
+        if (ch === ',' && depth === 0) { args.push(current.trim()); current = ''; continue; }
+        current += ch;
     }
+    return args;
 }
 
-/**
- * MBlock-only Bridge fuer klassische Media-Aktionen.
- * Faengt Klicks in der Capture-Phase ab und ruft open/view/delete/addREXMedia
- * mit der tatsaechlich vorhandenen Feld-ID im selben Widget auf.
- */
-function mblock_install_media_popup_bridge() {
-    try {
-        if (typeof window !== 'undefined' && window.mblockMediaPopupBridgeInstalled) {
+function mblock_install_popup_bridge(bridge) {
+    if (window[bridge.flag]) return;
+    window[bridge.flag] = true;
+    const actions = Object.keys(bridge.fns);
+    const selector = actions.map(function (a) { return '[onclick*="' + bridge.fns[a] + '"]'; }).join(', ');
+
+    document.addEventListener('click', function (event) {
+        const target = event.target && typeof event.target.closest === 'function' ? event.target.closest(selector) : null;
+        if (!target || !target.closest('.mblock_wrapper')) return;
+
+        const onclick = target.getAttribute('onclick') || '';
+        // spezifischere Aktionen zuerst (delete/move/view/add), "open" zuletzt
+        const action = actions.filter(function (a) { return a !== 'open'; }).find(function (a) { return onclick.includes(bridge.fns[a]); }) || 'open';
+        const fnName = bridge.fns[action];
+        if (typeof window[fnName] !== 'function') return;
+
+        // Feld-Id aus dem Widget lesen, das den Button enthaelt
+        const findSourceId = function (scope) {
+            if (!scope || typeof scope.querySelector !== 'function') return '';
+            const select = bridge.hasSelect ? scope.querySelector('select[id^="' + bridge.prefix + 'SELECT_"]') : null;
+            const hidden = scope.querySelector('input[id^="' + bridge.prefix + '"]' + (bridge.idExclude ? ':not([id$="' + bridge.idExclude + '"])' : ''));
+            return (select && select.id) || (hidden && hidden.id) || '';
+        };
+        const scopes = [target.closest(bridge.widget), target.closest('.rex-js-widget'), target.closest('.input-group'), target.closest('.form-group'), target.parentElement];
+        let sourceId = '';
+        for (let i = 0; i < scopes.length && !sourceId; i++) sourceId = findSourceId(scopes[i]);
+
+        const args = mblock_onclick_args(onclick, fnName);
+        if (!sourceId && args.length) {
+            const rawId = String(args[0]).replace(bridge.prefix, '');
+            if (document.getElementById(bridge.prefix + rawId)) sourceId = bridge.prefix + rawId;
+            else if (bridge.hasSelect && document.getElementById(bridge.prefix + 'SELECT_' + rawId)) sourceId = bridge.prefix + 'SELECT_' + rawId;
+        }
+        const idMatch = sourceId.match(new RegExp('^' + bridge.prefix + '(?:SELECT_)?(.+)$'));
+        if (!idMatch) {
+            console.warn('MBlock: Keine gueltige Widget-Id gefunden (' + bridge.prefix + ').');
             return;
         }
 
-        if (typeof window !== 'undefined') {
-            window.mblockMediaPopupBridgeInstalled = true;
+        // Erst nach erfolgreicher Id-Ermittlung das native Inline-Handling unterdruecken.
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+
+        const id = idMatch[1];
+        if (action === 'delete') {
+            window[fnName](id);
+            return;
         }
-
-        document.addEventListener('click', function (event) {
-            const target = event.target && typeof event.target.closest === 'function'
-                ? event.target.closest('[onclick*="openREXMedia"], [onclick*="viewREXMedia"], [onclick*="deleteREXMedia"], [onclick*="addREXMedia"]')
-                : null;
-
-            if (!target) {
-                return;
-            }
-
-            const wrapper = target.closest('.mblock_wrapper');
-            if (!wrapper) {
-                return;
-            }
-
-            const onclick = target.getAttribute('onclick') || '';
-            const action = onclick.includes('viewREXMedia')
-                ? 'view'
-                : (onclick.includes('deleteREXMedia') ? 'delete' : (onclick.includes('addREXMedia') ? 'add' : 'open'));
-
-            if ((action === 'open' && typeof window.openREXMedia !== 'function') ||
-                (action === 'view' && typeof window.viewREXMedia !== 'function') ||
-                (action === 'delete' && typeof window.deleteREXMedia !== 'function') ||
-                (action === 'add' && typeof window.addREXMedia !== 'function')) {
-                return;
-            }
-
-            const findSourceId = function (scopeElement) {
-                if (!scopeElement || typeof scopeElement.querySelector !== 'function') {
-                    return '';
-                }
-                const hidden = scopeElement.querySelector('input[id^="REX_MEDIA_"]');
-                return (hidden && hidden.id) || '';
-            };
-
-            const candidateScopes = [
-                target.closest('.rex-js-widget-media'),
-                target.closest('.rex-js-widget'),
-                target.closest('.input-group'),
-                target.closest('.form-group'),
-                target.parentElement
-            ];
-
-            let sourceId = '';
-            for (let i = 0; i < candidateScopes.length; i++) {
-                sourceId = findSourceId(candidateScopes[i]);
-                if (sourceId) {
-                    break;
-                }
-            }
-
-            if (!sourceId) {
-                const rawIdMatch = onclick.match(/(?:open|view|delete|add)REXMedia\(\s*['"]?(\d+)['"]?/);
-                if (rawIdMatch) {
-                    const rawId = rawIdMatch[1];
-                    if (document.getElementById('REX_MEDIA_' + rawId)) {
-                        sourceId = 'REX_MEDIA_' + rawId;
-                    }
-                }
-            }
-
-            const idMatch = sourceId.match(/^REX_MEDIA_(.+)$/);
-            if (!idMatch) {
-                console.warn('MBlock: Keine gueltige Media-ID im Widget gefunden.');
-                return;
-            }
-
-            // Erst nach erfolgreicher ID-Ermittlung das native Inline-Handling unterdruecken.
-            event.preventDefault();
-            event.stopPropagation();
-            if (typeof event.stopImmediatePropagation === 'function') {
-                event.stopImmediatePropagation();
-            }
-
-            if (action === 'open') {
-                let param = '';
-                const paramMatch = onclick.match(/openREXMedia\([^,]+,\s*(['"])(.*?)\1/);
-                if (paramMatch) {
-                    param = paramMatch[2];
-                }
-                window.openREXMedia(idMatch[1], param);
-                return;
-            }
-
-            if (action === 'view') {
-                let viewParam = '';
-                const viewMatch = onclick.match(/viewREXMedia\([^,]+,\s*(['"])(.*?)\1/);
-                if (viewMatch) {
-                    viewParam = viewMatch[2];
-                }
-                window.viewREXMedia(idMatch[1], viewParam);
-                return;
-            }
-
-            if (action === 'add') {
-                let addParam = '';
-                const addMatch = onclick.match(/addREXMedia\([^,]+,\s*(['"])(.*?)\1/);
-                if (addMatch) {
-                    addParam = addMatch[2];
-                }
-                window.addREXMedia(idMatch[1], addParam);
-                return;
-            }
-
-            window.deleteREXMedia(idMatch[1]);
-        }, true);
-    } catch (error) {
-        console.warn('MBlock: Fehler beim Installieren der Media Popup Bridge:', error);
-    }
+        window[fnName](bridge.openWithPrefix && action === 'open' ? bridge.prefix + id : id, args.length > 1 ? args[1] : '');
+    }, true);
 }
 
-/**
- * MBlock-only Bridge fuer klassische Link-Aktionen.
- * Faengt Klicks in der Capture-Phase ab und ruft openLinkMap/deleteREXLink
- * mit der tatsaechlich vorhandenen Feld-ID im selben Widget auf.
- */
-function mblock_install_link_popup_bridge() {
-    try {
-        if (typeof window !== 'undefined' && window.mblockLinkPopupBridgeInstalled) {
-            return;
+function mblock_install_popup_bridges() {
+    MBLOCK_POPUP_BRIDGES.forEach(function (bridge) {
+        try {
+            mblock_install_popup_bridge(bridge);
+        } catch (error) {
+            console.warn('MBlock: Fehler beim Installieren der Popup-Bridge ' + bridge.prefix + ':', error);
         }
-
-        if (typeof window !== 'undefined') {
-            window.mblockLinkPopupBridgeInstalled = true;
-        }
-
-        document.addEventListener('click', function (event) {
-            const target = event.target && typeof event.target.closest === 'function'
-                ? event.target.closest('[onclick*="openLinkMap"], [onclick*="deleteREXLink"]')
-                : null;
-
-            if (!target) {
-                return;
-            }
-
-            const wrapper = target.closest('.mblock_wrapper');
-            if (!wrapper) {
-                return;
-            }
-
-            event.preventDefault();
-            event.stopPropagation();
-            if (typeof event.stopImmediatePropagation === 'function') {
-                event.stopImmediatePropagation();
-            }
-
-            const onclick = target.getAttribute('onclick') || '';
-            const action = onclick.includes('deleteREXLink') ? 'delete' : 'open';
-
-            if ((action === 'open' && typeof window.openLinkMap !== 'function') ||
-                (action === 'delete' && typeof window.deleteREXLink !== 'function')) {
-                return;
-            }
-
-            const findSourceId = function (scopeElement) {
-                if (!scopeElement || typeof scopeElement.querySelector !== 'function') {
-                    return '';
-                }
-                const hidden = scopeElement.querySelector('input[id^="REX_LINK_"]:not([id$="_NAME"])');
-                return (hidden && hidden.id) || '';
-            };
-
-            const candidateScopes = [
-                target.closest('.rex-js-widget-link'),
-                target.closest('.rex-js-widget'),
-                target.closest('.input-group'),
-                target.closest('.form-group'),
-                target.parentElement
-            ];
-
-            let sourceId = '';
-            for (let i = 0; i < candidateScopes.length; i++) {
-                sourceId = findSourceId(candidateScopes[i]);
-                if (sourceId) {
-                    break;
-                }
-            }
-
-            if (!sourceId) {
-                const rawIdMatch = onclick.match(/(?:openLinkMap\(\s*['"]REX_LINK_|deleteREXLink\(\s*['"]?)([^'"\),\s]+)/);
-                if (rawIdMatch) {
-                    const rawId = rawIdMatch[1];
-                    if (document.getElementById('REX_LINK_' + rawId)) {
-                        sourceId = 'REX_LINK_' + rawId;
-                    }
-                }
-            }
-
-            const idMatch = sourceId.match(/^REX_LINK_(.+)$/);
-            if (!idMatch) {
-                console.warn('MBlock: Keine gueltige Link-ID im Widget gefunden.');
-                return;
-            }
-
-            // Erst nach erfolgreicher ID-Ermittlung das native Inline-Handling unterdruecken.
-            event.preventDefault();
-            event.stopPropagation();
-            if (typeof event.stopImmediatePropagation === 'function') {
-                event.stopImmediatePropagation();
-            }
-
-            if (action === 'open') {
-                let param = '';
-                const paramMatch = onclick.match(/openLinkMap\([^,]+,\s*(['"])(.*?)\1/);
-                if (paramMatch) {
-                    param = paramMatch[2];
-                }
-                    window.openLinkMap('REX_LINK_' + idMatch[1], param);
-                return;
-            }
-
-            window.deleteREXLink(idMatch[1]);
-        }, true);
-    } catch (error) {
-        console.warn('MBlock: Fehler beim Installieren der Link Popup Bridge:', error);
-    }
+    });
 }
 
 $(document).on('rex:ready', function (e, container) {
     try {
-        mblock_install_linklist_popup_bridge();
-        mblock_install_medialist_popup_bridge();
-        mblock_install_media_popup_bridge();
-        mblock_install_link_popup_bridge();
+        mblock_install_popup_bridges();
 
         // Initialize clipboard system only if copy/paste is enabled
         const isCopyPasteEnabled = checkCopyPasteEnabled();

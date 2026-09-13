@@ -5,545 +5,338 @@
  * @license MIT
  */
 
-
-
 namespace FriendsOfRedaxo\MBlock\Replacer;
 
 use FriendsOfRedaxo\MBlock\Decorator\MBlockReplacerTrait;
 use FriendsOfRedaxo\MBlock\Decorator\MBlockFormItemDecorator;
 use FriendsOfRedaxo\MBlock\DTO\MBlockItem;
 use FriendsOfRedaxo\MBlock\Utils\MBlockSessionHelper;
-use DOMDocument;
 use DOMElement;
-use rex;
 use rex_article;
-use rex_version;
 
+/**
+ * Schreibt die REDAXO-Kern-Widgets (Media, Medialist, Link, Linklist) und das MForm-Custom-Link
+ * in einem Block-Formular um: eindeutige Widget-Ids, Feldnamen im MBlock-Format
+ * (REX_INPUT_VALUE[id][0][REX_MEDIA_1]) und die gespeicherten Werte in Select-Listen bzw. Artikelnamen.
+ */
 class MBlockSystemButtonReplacer
 {
     use MBlockReplacerTrait;
-    const REX_VERSION = '5.12.1';
 
     /**
-     * @param MBlockItem $item
-     * @return String
-     * @author Joachim Doerr
+     * Widget-Typen: Input-Name, Praefix der Select-Id, Art der Werte-Ausgabe (media|link),
+     * onclick-Funktion, deren numerische Id ersetzt wird, und Sonderfaelle.
+     */
+    private const WIDGETS = [
+        'REX_MEDIA' => ['input' => 'REX_INPUT_MEDIA', 'select' => null, 'options' => null, 'onclick' => 'REXMedia', 'firstChildOnly' => true, 'hiddenOnly' => false, 'artName' => false],
+        'REX_MEDIALIST' => ['input' => 'REX_INPUT_MEDIALIST', 'select' => 'REX_MEDIALIST_SELECT_', 'options' => 'media', 'onclick' => 'REXMedialist', 'firstChildOnly' => false, 'hiddenOnly' => false, 'artName' => false],
+        'REX_LINK' => ['input' => 'REX_INPUT_LINK', 'select' => null, 'options' => null, 'onclick' => 'REXLink', 'firstChildOnly' => false, 'hiddenOnly' => false, 'artName' => true],
+        'REX_LINKLIST' => ['input' => 'REX_INPUT_LINKLIST', 'select' => 'REX_LINKLIST_SELECT_', 'options' => 'link', 'onclick' => 'REXLinklist', 'firstChildOnly' => false, 'hiddenOnly' => true, 'artName' => false],
+    ];
+
+    /**
+     * Custom-Link (MForm): sichtbares Textfeld mit dem gespeicherten Wert bzw. Artikelnamen fuellen.
+     *
+     * @return string
      */
     public static function replaceCustomLinkText(MBlockItem $item)
     {
-        // set dom document
         $dom = self::createDom($item->getForm());
-        // find custom-link
-        if ($matches = self::getElementsByClass($dom, 'div.custom-link')) {
-            /** @var DOMElement $match */
-            foreach ($matches as $key => $match) {
-                if ($match->hasChildNodes()) {
-                    $value = '';
-                    /** @var DOMElement $child */
-                    foreach ($match->getElementsByTagName('input') as $child) {
-                        if ($child->getAttribute('type') == 'hidden') {
-                            $value = $child->getAttribute('value');
-                            break;
-                        }
-                    }
-                    /** @var DOMElement $child */
-                    foreach ($match->getElementsByTagName('input') as $child) {
-                        if ($child->getAttribute('type') == 'text') {
-                            // is numeric also link
-                            if (is_numeric($value)) {
-                                // add link art name
-                                $linkInfo = self::getLinkInfo($value);
-                                $child->setAttribute('value', $linkInfo['art_name']);
-                            } else {
-                                $child->setAttribute('value', $value);
-                            }
-                            break;
-                        }
-                    }
+        foreach (self::getElementsByClass($dom, 'div.custom-link') as $match) {
+            $value = '';
+            foreach ($match->getElementsByTagName('input') as $child) {
+                if ('hidden' === $child->getAttribute('type')) {
+                    $value = $child->getAttribute('value');
+                    break;
+                }
+            }
+            foreach ($match->getElementsByTagName('input') as $child) {
+                if ('text' === $child->getAttribute('type')) {
+                    $child->setAttribute('value', is_numeric($value) ? self::getLinkInfo($value)['art_name'] : $value);
+                    break;
                 }
             }
         }
-        // return the manipulated html output
+
         return self::saveHtml($dom);
     }
 
     /**
-     * @param MBlockItem $item
-     * @param $count
-     * @return String
-     * @author Joachim Doerr
+     * @param int $count
+     * @return string
      */
     public static function replaceSystemButtons(MBlockItem $item, $count)
     {
-        // set dom document
         $dom = self::createDom($item->getForm());
         $item->addPayload('count-id', $count);
-        // find input group
-        if ($matches = self::getElementsByClass($dom, 'div.input-group')) {
-            /** @var DOMElement $match */
-            foreach ($matches as $key => $match) {
-                $item->addPayload('replace-id', $key);
-                if ($match->hasChildNodes()) {
-                    /** @var DOMElement $child */
-                    foreach ($match->getElementsByTagName('input') as $child) {
-                        if ($child instanceof DOMElement) { // && $child->getAttribute('type') == 'hidden') {
-                            // set id and name
-                            $id = $child->getAttribute('id');
-                            $name = $child->getAttribute('name');
-                            $type = $child->getAttribute('type');
+        foreach (self::getElementsByClass($dom, 'div.input-group') as $key => $match) {
+            $item->addPayload('replace-id', $key);
+            foreach ($match->getElementsByTagName('input') as $child) {
+                $id = $child->getAttribute('id');
+                $name = $child->getAttribute('name');
+                $type = $child->getAttribute('type');
 
-                            // process by type
-                            if (strpos($id, 'REX_MEDIA_') !== false && $type == 'text') {
-                                // media button
-                                self::processMedia($match, $item);
-                            }
-                            if (strpos($id, 'REX_MEDIALIST_') !== false) {
-                                // medialist button
-                                self::processMediaList($match, $item);
-                            }
-                            if (strpos($name, 'REX_LINK_') !== false && $type == 'text') {
-                                // link button
-                                if (strpos($match->getAttribute('class'), 'custom-link') !== false) {
-                                    self::processCustomLink($match, $item);
-                                } else {
-                                    self::processLink($match, $item);
-                                }
-                            }
-                            if (strpos($id, 'REX_LINKLIST_') !== false) {
-                                // linklist button
-                                self::processLinkList($match, $item);
-                            }
-                        }
+                if (str_contains($id, 'REX_MEDIA_') && 'text' === $type) {
+                    self::processWidget($match, $item, 'REX_MEDIA');
+                }
+                if (str_contains($id, 'REX_MEDIALIST_')) {
+                    self::processWidget($match, $item, 'REX_MEDIALIST');
+                }
+                if (str_contains($name, 'REX_LINK_') && 'text' === $type) {
+                    if (str_contains($match->getAttribute('class'), 'custom-link')) {
+                        self::processCustomLink($match, $item);
+                    } else {
+                        self::processWidget($match, $item, 'REX_LINK');
                     }
+                }
+                if (str_contains($id, 'REX_LINKLIST_')) {
+                    self::processWidget($match, $item, 'REX_LINKLIST');
                 }
             }
         }
-        // return the manipulated html output
+
         return self::saveHtml($dom);
     }
 
     /**
-     * @param DOMElement $dom
-     * @param MBlockItem $item
-     * @author Joachim Doerr
+     * Kern-Widget nach der Tabelle WIDGETS umschreiben.
      */
-    protected static function processMedia(DOMElement $dom, MBlockItem $item)
+    protected static function processWidget(DOMElement $group, MBlockItem $item, string $system): void
     {
-        // set system name
-        $item->setSystemName('REX_MEDIA');
-        // has children ?
-        if ($dom->hasChildNodes()) {
-            // replace name first child is input
-            if (strrpos($dom->firstChild->getAttribute('name'), 'REX_INPUT_MEDIA') !== false) {
-                self::replaceName($dom->firstChild, $item, 'REX_INPUT_MEDIA');
-            }
-            // change for id
-            self::replaceId($dom->firstChild, $item);
-            // change onclick id
-            if (rex_version::compare(rex::getVersion(),self::REX_VERSION, '>=')) {
-                self::replaceOnClick($dom, $item, 'REXMedia(', '(\'?', '\'?,', '(\'', '\',');
-                self::replaceOnClick($dom, $item, 'REXMedia(', '(\'?', '\'?\)', '(\'', '\')');
-            } else {
-                self::replaceOnClick($dom, $item, 'REXMedia(', '(', ',', '(', ',');
-                self::replaceOnClick($dom, $item, 'REXMedia(', '(', ')', '(', ')');
-            }
+        $cfg = self::WIDGETS[$system];
+        $item->setSystemName($system);
+        if (!$group->hasChildNodes()) {
+            return;
         }
-    }
+        $first = $group->firstChild;
+        $hiddenName = '';
 
-    /**
-     * @param DOMElement $dom
-     * @param MBlockItem $item
-     * @author Joachim Doerr
-     */
-    protected static function processMediaList(DOMElement $dom, MBlockItem $item)
-    {
-        // set system name
-        $item->setSystemName('REX_MEDIALIST');
-        $name = '';
-        // has children ?
-        if ($dom->hasChildNodes()) {
-            if ($dom->firstChild->hasAttribute('name')) {
-                // remove name
-                // $dom->firstChild->removeAttribute('name');
-                /** @var DOMElement $child */
-                foreach ($dom->getElementsByTagName('input') as $child) {
-                    if (strrpos($child->getAttribute('name'), 'REX_INPUT_MEDIALIST') !== false) {
-                        // replace name
-                        self::replaceName($child, $item, 'REX_INPUT_MEDIALIST');
-                    }
-                    // change id
-                    self::replaceId($child, $item);
-                    if ($child->getAttribute('type') == 'hidden') {
-                        $name = $child->getAttribute('name');
-                    }
+        if ($cfg['firstChildOnly']) {
+            // Media: nur das erste Element (Textfeld) traegt Name und Id
+            if ($first instanceof DOMElement) {
+                if (str_contains($first->getAttribute('name'), $cfg['input'])) {
+                    self::replaceName($first, $item, $cfg['input']);
                 }
-                /** @var DOMElement $child */
-                foreach ($dom->getElementsByTagName('select') as $child) {
-                    if (strpos($child->getAttribute('id'), 'REX_MEDIALIST_SELECT_') !== false) {
-                        // replace name
-                        self::replaceSelectNameWithItemId($child, $item);
-                        // change id
-                        self::replaceId($child, $item);
-                        // add options
-                        self::addMediaSelectOptions($dom->firstChild, $item, $name);
-                    }
-                }
-                // change click id
-                if (rex_version::compare(rex::getVersion(),self::REX_VERSION, '>=')) {
-                    self::replaceOnClick($dom, $item, 'REXMedialist(', '(\'?', '\'?,', '(\'', '\',');
-                    self::replaceOnClick($dom, $item, 'REXMedialist(', '(\'?', '\'?\)', '(\'', '\')');
-                } else {
-                    self::replaceOnClick($dom, $item, 'REXMedialist(', '(', ',', '(', ',');
-                    self::replaceOnClick($dom, $item, 'REXMedialist(', '(', ')', '(', ')');
-                }
+                self::replaceId($first, $item);
             }
-        }
-    }
-
-    /**
-     * @param DOMElement $dom
-     * @param MBlockItem $item
-     * @author Joachim Doerr
-     */
-    protected static function processLink(DOMElement $dom, MBlockItem $item)
-    {
-        // set system name
-        $item->setSystemName('REX_LINK');
-        $name = '';
-        // has children ?
-        if ($dom->hasChildNodes()) {
-            /** @var DOMElement $child */
-            foreach ($dom->getElementsByTagName('input') as $child) {
-                // hidden input
-                if (strrpos($child->getAttribute('name'), 'REX_INPUT_LINK') !== false) {
-                    // replace name
-                    self::replaceName($child, $item, 'REX_INPUT_LINK');
+        } else {
+            foreach ($group->getElementsByTagName('input') as $child) {
+                if ($cfg['hiddenOnly'] && 'hidden' !== $child->getAttribute('type')) {
+                    continue;
                 }
-                // change id
+                if (str_contains($child->getAttribute('name'), $cfg['input'])) {
+                    self::replaceName($child, $item, $cfg['input']);
+                }
+                if ('hidden' === $child->getAttribute('type')) {
+                    $hiddenName = $child->getAttribute('name');
+                }
                 self::replaceId($child, $item);
-                if ($child->getAttribute('type') == 'hidden') {
-                    $name = $child->getAttribute('name');
-                }
-            }
-            // remove name
-            $dom->firstChild->removeAttribute('name');
-            // add link art name
-            self::addArtName($dom->firstChild, $item, $name);
-            // change click id
-            if (rex_version::compare(rex::getVersion(),self::REX_VERSION, '>=')) {
-                self::replaceOnClick($dom, $item, 'REXLink(', '(\'?', '\'?\)','(\'', '\')');
-                self::replaceOnClick($dom, $item, 'openLinkMap(', '_', '\'', '_', '\'');
-            } else {
-                self::replaceOnClick($dom, $item, 'REXLink(', '(', ')', '(', ')');
-                self::replaceOnClick($dom, $item, 'openLinkMap(', '_', '\'', '_', '\'');
             }
         }
+
+        if (null !== $cfg['select']) {
+            foreach ($group->getElementsByTagName('select') as $child) {
+                if (str_contains($child->getAttribute('id'), $cfg['select'])) {
+                    self::replaceSelectNameWithItemId($child, $item);
+                    self::replaceId($child, $item);
+                    self::addSelectOptions('media' === $cfg['options'] && $first instanceof DOMElement ? $first : $child, $item, $hiddenName, 'link' === $cfg['options']);
+                }
+            }
+        }
+
+        if ($cfg['artName'] && $first instanceof DOMElement) {
+            $first->removeAttribute('name');
+            self::addArtName($first, $item, $hiddenName);
+        }
+
+        self::replaceOnClickIds($group, $item, $cfg['onclick']);
     }
 
     /**
-     * @param DOMElement $dom
-     * @param MBlockItem $item
-     * @author Joachim Doerr
+     * MForm-Custom-Link: eigene Id-Vergabe, Name des Hidden-Inputs, Artikelname im Textfeld.
      */
-    protected static function processCustomLink(DOMElement $dom, MBlockItem $item)
+    protected static function processCustomLink(DOMElement $dom, MBlockItem $item): void
     {
         if ($dom->hasAttribute('data-id')) {
-            self::replaceDataId($dom, $item);
+            $dom->setAttribute('data-id', self::widgetId($item));
         }
-        // set system name
         $item->setSystemName('REX_LINK');
-        $mblockCount = MBlockSessionHelper::getCurrentCount();
-        $id = $item->getPayload('count-id') . $mblockCount . '00' . $item->getPayload('replace-id');
-        // has children ?
-        if ($dom->hasChildNodes()) {
-            /** @var DOMElement $child */
-            foreach ($dom->getElementsByTagName('input') as $child) {
-                // hidden input – link
-                if (strpos($child->getAttribute('name'), 'REX_INPUT_LINK') !== false) {
-                    // replace name
-                    self::replaceName($child, $item, 'REX_INPUT_LINK');
-                }
-                // hidden input – media compat (MForm useCustomLinkForClassicWidgets)
-                if (strpos($child->getAttribute('name'), 'REX_INPUT_MEDIA') !== false) {
-                    self::replaceName($child, $item, 'REX_INPUT_MEDIA');
-                }
-                // change id
-                $attrId = preg_replace('/\d+/', $id, $child->getAttribute('id'));
-                $child->setAttribute('id', $attrId);
+        $id = self::widgetId($item);
+        if (!$dom->hasChildNodes()) {
+            return;
+        }
+        foreach ($dom->getElementsByTagName('input') as $child) {
+            $name = $child->getAttribute('name');
+            if (str_contains($name, 'REX_INPUT_LINK')) {
+                self::replaceName($child, $item, 'REX_INPUT_LINK');
             }
-            // remove name
+            // Media-Kompatibilitaet (MForm::useCustomLinkForClassicWidgets)
+            if (str_contains($name, 'REX_INPUT_MEDIA')) {
+                self::replaceName($child, $item, 'REX_INPUT_MEDIA');
+            }
+            $child->setAttribute('id', preg_replace('/\d+/', $id, $child->getAttribute('id')));
+        }
+        if ($dom->firstChild instanceof DOMElement) {
             $dom->firstChild->removeAttribute('name');
-            // add link art name
             self::addArtName($dom->firstChild, $item);
-
-            if ($parent = $dom->parentNode) {
-                if ($parent->hasChildNodes()) {
-                    foreach ($parent->getElementsByTagName('a') as $child) {
-                        $attrId = preg_replace('/\d+/', $id, $child->getAttribute('id'));
-                        $child->setAttribute('id', $attrId);
-                    }
-                }
+        }
+        if (($parent = $dom->parentNode) instanceof DOMElement) {
+            foreach ($parent->getElementsByTagName('a') as $child) {
+                $child->setAttribute('id', preg_replace('/\d+/', $id, $child->getAttribute('id')));
             }
         }
     }
 
     /**
-     * @param DOMElement $dom
-     * @param MBlockItem $item
-     * @author Joachim Doerr
+     * Eindeutige Widget-Id: Block-Nummer, MBlock-Zaehler, "00", Position im Formular.
      */
-    protected static function processLinkList(DOMElement $dom, MBlockItem $item)
+    private static function widgetId(MBlockItem $item): string
     {
-        // set system name
-        $item->setSystemName('REX_LINKLIST');
-        $name = '';
-        // has children ?
-        if ($dom->hasChildNodes()) {
-            /** @var DOMElement $child */
-            foreach ($dom->getElementsByTagName('input') as $child) {
-                if ($child->getAttribute('type') == 'hidden') {
-                    if (strrpos($child->getAttribute('name'), 'REX_INPUT_LINKLIST') !== false) {
-                        // replace name
-                        self::replaceName($child, $item, 'REX_INPUT_LINKLIST');
-                    }
-                    $name = $child->getAttribute('name');
-                    // change id
-                    self::replaceId($child, $item);
-                }
-            }
-            /** @var DOMElement $child */
-            foreach ($dom->getElementsByTagName('select') as $child) {
-                if (strpos($child->getAttribute('id'), 'REX_LINKLIST_SELECT_') !== false) {
-                    // replace name
-                    self::replaceSelectNameWithItemId($child, $item);
-                    // replace id
-                    self::replaceId($child, $item);
-                    // add options
-                    self::addLinkSelectOptions($child, $item, $name);
-                }
-            }
-            if (rex_version::compare(rex::getVersion(),self::REX_VERSION, '>=')) {
-                self::replaceOnClick($dom, $item, 'REXLinklist(', '(\'?', '\'?,','(\'', '\',');
-                self::replaceOnClick($dom, $item, 'deleteREXLinklist(', '(\'?', '\'?', '(\'', '\'');
-            } else {
-                self::replaceOnClick($dom, $item, 'REXLinklist(', '(', ',', '(', ',');
-                self::replaceOnClick($dom, $item, 'deleteREXLinklist(', '(', ')', '(', ')');
-            }
-
-        }
+        return $item->getPayload('count-id') . MBlockSessionHelper::getCurrentCount() . '00' . $item->getPayload('replace-id');
     }
 
     /**
-     * @param DOMElement $dom
-     * @param MBlockItem $item
-     * @param $btnFindKey
-     * @param string $prefix
-     * @param string $suffix
-     * @author Joachim Doerr
+     * Numerische Id im onclick der Widget-Buttons ersetzen: fn('1', ...), fn(1) und openLinkMap('REX_LINK_1', ...).
      */
-    protected static function replaceOnClick(DOMElement $dom, MBlockItem $item, $btnFindKey, $searchPrefix = '', $searchSuffix = '', $prefix = '', $suffix = '')
+    protected static function replaceOnClickIds(DOMElement $group, MBlockItem $item, string $function): void
     {
-        // find a buttons and replace id
-        if ($dom->hasChildNodes()) {
-            /** @var DOMElement $child */
-            foreach($dom->getElementsByTagName('a') as $child) {
-                if ($child->hasAttribute('onclick')) {
-                    if (strpos($child->getAttribute('onclick'), $btnFindKey) !== false) {
-                        $mblockCount = MBlockSessionHelper::getCurrentCount();
-                        $child->setAttribute('onclick', preg_replace('/\\'.$searchPrefix.'\d\\'.$searchSuffix.'/', $prefix . $item->getPayload('count-id') . $mblockCount . '00' . $item->getPayload('replace-id') . $suffix, $child->getAttribute('onclick')));
-                    }
+        $id = self::widgetId($item);
+        foreach ($group->getElementsByTagName('a') as $child) {
+            $onclick = $child->getAttribute('onclick');
+            if ('' === $onclick || !str_contains($onclick, $function . '(')) {
+                if ('' === $onclick || 'REXLink' !== $function || !str_contains($onclick, 'openLinkMap(')) {
+                    continue;
                 }
             }
+            $onclick = preg_replace('/(' . preg_quote($function, '/') . '\(\'?)\d+(\'?[,)])/', '${1}' . $id . '${2}', $onclick);
+            if ('REXLink' === $function) {
+                $onclick = preg_replace('/(openLinkMap\(\'REX_LINK_)\d+(\')/', '${1}' . $id . '${2}', $onclick);
+            }
+            $child->setAttribute('onclick', $onclick);
         }
     }
 
     /**
-     * @param DOMElement $dom
-     * @param MBlockItem $item
-     * @author Joachim Doerr
-     * @return string|null
+     * @return string neue Id
      */
     protected static function replaceId(DOMElement $dom, MBlockItem $item)
     {
-        // get input id
-        $mblockCount = MBlockSessionHelper::getCurrentCount();
-        $dom->setAttribute('id', preg_replace('/\_\d+/', '_' . $item->getPayload('count-id') . $mblockCount . '00' . $item->getPayload('replace-id'), $dom->getAttribute('id')));
+        $dom->setAttribute('id', preg_replace('/\_\d+/', '_' . self::widgetId($item), $dom->getAttribute('id')));
+
         return $dom->getAttribute('id');
     }
 
     /**
-     * @param DOMElement $dom
-     * @param MBlockItem $item
-     * @author Joachim Doerr
-     */
-    protected static function replaceDataId(DOMElement $dom, MBlockItem $item)
-    {
-        // get input id
-        $mblockCount = MBlockSessionHelper::getCurrentCount();
-        $dom->setAttribute('data-id', $item->getPayload('count-id') . $mblockCount . '00' . $item->getPayload('replace-id'));
-    }
-
-    /**
-     * @param DOMElement $dom
-     * @param MBlockItem $item
-     * @param $name
-     * @author Joachim Doerr
+     * Name des Kern-Widgets (REX_INPUT_MEDIA[1]) in das MBlock-Format REX_INPUT_VALUE[id][0][REX_MEDIA_1] umschreiben.
+     *
+     * @param string $name Input-Name des Kern-Widgets, z. B. REX_INPUT_MEDIA
      */
     protected static function replaceName(DOMElement $dom, MBlockItem $item, $name)
     {
-        // get name
         $matches = MBlockFormItemDecorator::getName($dom);
-        // found
         if ($matches) {
-            // set system id
             $item->setSystemId($matches[1]);
-            // and replace name attribute
-            $replaceName = str_replace(strtoupper('_input'), '', $name);
-            $dom->setAttribute('name', str_replace(array($name, '[' . $item->getSystemId() . ']'), array('REX_INPUT_VALUE', '[' . $item->getValueId() . '][0][' . $replaceName . '_' . $item->getSystemId() . ']'), $dom->getAttribute('name')));
+            $replaceName = str_replace('_INPUT', '', $name);
+            $dom->setAttribute('name', str_replace(
+                [$name, '[' . $item->getSystemId() . ']'],
+                ['REX_INPUT_VALUE', '[' . $item->getValueId() . '][0][' . $replaceName . '_' . $item->getSystemId() . ']'],
+                $dom->getAttribute('name'),
+            ));
         }
     }
 
     /**
-     * @param DOMElement $dom
-     * @param MBlockItem $item
-     * @author Joachim Doerr
+     * Gespeicherter Wert des Widgets aus dem Ergebnis (Schluessel REX_MEDIA_1 oder rex_media_1), sonst null.
      */
-    protected static function addMediaSelectOptions(DOMElement $dom, MBlockItem $item, $name)
+    private static function resultValue(MBlockItem $item, string $name): ?string
     {
         self::setSystemIdByName($name, $item);
-
-        if (is_array($item->getResult()) && (
-                array_key_exists($item->getSystemName() . '_' . $item->getSystemId(), $item->getResult()) OR
-                array_key_exists(strtolower($item->getSystemName()) . '_' . $item->getSystemId(), $item->getResult())
-            )
-        ) {
-            $key = (isset($item->getResult()[$item->getSystemName() . '_' . $item->getSystemId()])) ? $item->getSystemName() . '_' . $item->getSystemId() : strtolower($item->getSystemName()) . '_' . $item->getSystemId();
-            $resultItems = explode(',', $item->getResult()[$key]);
-            if (sizeof($resultItems) > 0) {
-                foreach ($resultItems as $resultItem) {
-                    if (!empty($resultItem)) {
-                        $dom->appendChild(new DOMElement('option', $resultItem));
-                    }
-                }
-                /** @var DOMElement $child */
-                foreach ($dom->childNodes as $child) {
-                    if ($child->nodeName != 'option') { // Patch xampp gegen ooops
-                        continue;
-                    }
-                    $child->setAttribute('value', $child->nodeValue);
-                    $child->removeAttribute('selected');
-                }
+        $result = $item->getResult();
+        if (!is_array($result)) {
+            return null;
+        }
+        foreach ([$item->getSystemName() . '_' . $item->getSystemId(), strtolower($item->getSystemName()) . '_' . $item->getSystemId()] as $key) {
+            if (array_key_exists($key, $result)) {
+                return (string) $result[$key];
             }
         }
+
+        return null;
     }
 
     /**
-     * @param DOMElement $dom
-     * @param MBlockItem $item
-     * @param string $name
-     * @author Joachim Doerr
+     * Select-Liste (Medialist/Linklist) mit den gespeicherten Werten fuellen; bei Links steht der Artikelname im Text.
      */
-    protected static function addLinkSelectOptions(DOMElement $dom, MBlockItem $item, $name = '')
+    protected static function addSelectOptions(DOMElement $dom, MBlockItem $item, string $name, bool $isLink): void
     {
-        self::setSystemIdByName($name, $item);
-
-        if (is_array($item->getResult()) && (
-                array_key_exists($item->getSystemName() . '_' . $item->getSystemId(), $item->getResult()) OR
-                array_key_exists(strtolower($item->getSystemName()) . '_' . $item->getSystemId(), $item->getResult())
-            )
-        ) {
-            $key = (isset($item->getResult()[$item->getSystemName() . '_' . $item->getSystemId()])) ? $item->getSystemName() . '_' . $item->getSystemId() : strtolower($item->getSystemName()) . '_' . $item->getSystemId();
-            $resultItems = explode(',', $item->getResult()[$key]);
-            if (sizeof($resultItems) > 0) {
-                foreach ($resultItems as $resultItem) {
-                    if (!empty($resultItem)) {
-                        $dom->appendChild(new DOMElement('option', $resultItem));
-                    }
-                }
-                /** @var DOMElement $child */
-                foreach ($dom->childNodes as $child) {
-                    if ($child->nodeName != 'option') { // Patch xampp gegen ooops
-                       continue;
-                    }                    
-                    $child->setAttribute('value', $child->nodeValue);
-                    $child->nodeValue = htmlentities(self::getLinkInfo($child->getAttribute('value'))['art_name']);
-                    $child->removeAttribute('selected');
-                }
+        $value = self::resultValue($item, $name);
+        if (null === $value) {
+            return;
+        }
+        foreach (explode(',', $value) as $resultItem) {
+            if ('' !== $resultItem) {
+                $dom->appendChild(new DOMElement('option', $resultItem));
             }
+        }
+        foreach ($dom->childNodes as $child) {
+            if ('option' !== $child->nodeName || !$child instanceof DOMElement) { // Patch xampp gegen ooops
+                continue;
+            }
+            $child->setAttribute('value', $child->nodeValue);
+            if ($isLink) {
+                $child->nodeValue = htmlentities(self::getLinkInfo($child->getAttribute('value'))['art_name']);
+            }
+            $child->removeAttribute('selected');
         }
     }
 
     /**
-     * @param DOMElement $dom
-     * @param MBlockItem $item
+     * Artikelname eines gespeicherten Links in das Textfeld schreiben.
+     *
      * @param string $name
-     * @author Joachim Doerr
      */
     protected static function addArtName(DOMElement $dom, MBlockItem $item, $name = '')
     {
-        self::setSystemIdByName($name, $item);
-
-        if (is_array($item->getResult()) && (
-                array_key_exists($item->getSystemName() . '_' . $item->getSystemId(), $item->getResult()) OR
-                array_key_exists(strtolower($item->getSystemName()) . '_' . $item->getSystemId(), $item->getResult())
-            )
-        ) {
-            $key = (isset($item->getResult()[$item->getSystemName() . '_' . $item->getSystemId()])) ? $item->getSystemName() . '_' . $item->getSystemId() : strtolower($item->getSystemName()) . '_' . $item->getSystemId();
-            $linkInfo = self::getLinkInfo($item->getResult()[$key]);
-            $dom->setAttribute('value', $linkInfo['art_name']);
+        $value = self::resultValue($item, $name);
+        if (null !== $value) {
+            $dom->setAttribute('value', self::getLinkInfo($value)['art_name']);
         }
     }
 
     /**
-     * @param $name
-     * @param MBlockItem $item
-     * @author Joachim Doerr
+     * @param string $name
      */
-    private static function setSystemIdByName($name, MBlockItem $item)
+    private static function setSystemIdByName($name, MBlockItem $item): void
     {
-        if ($name != '' && preg_match('/\_\d+/', $name, $matches))
-            $item->setSystemId(str_replace('_','', $matches[0]));
+        if ('' !== $name && preg_match('/\_\d+/', $name, $matches)) {
+            $item->setSystemId(str_replace('_', '', $matches[0]));
+        }
     }
 
     /**
-     * Ersetzt den im Select-Namen enthaltenen System-Identifier robust durch die Item-ID.
-     * Dadurch vermeiden wir Deprecated-Warnungen, wenn getSystemId() noch nicht gesetzt ist.
-     *
-     * @param DOMElement $dom
-     * @param MBlockItem $item
+     * System-Identifier im Select-Namen durch die Item-Id ersetzen.
      */
-    private static function replaceSelectNameWithItemId(DOMElement $dom, MBlockItem $item)
+    private static function replaceSelectNameWithItemId(DOMElement $dom, MBlockItem $item): void
     {
         $name = $dom->getAttribute('name');
         $systemId = $item->getSystemId();
-
         if (null === $systemId || '' === (string) $systemId) {
-            if (preg_match('/\d+/', $name, $matches)) {
-                $systemId = $matches[0];
-            }
+            $systemId = preg_match('/\d+/', $name, $matches) ? $matches[0] : '';
         }
-
-        if (null === $systemId || '' === (string) $systemId) {
+        if ('' === (string) $systemId) {
             return;
         }
-
         $dom->setAttribute('name', str_replace((string) $systemId, (string) $item->getId(), $name));
     }
 
     /**
-     * @param $id
-     * @return array
-     * @author Joachim Doerr
+     * @param int|string $id
+     * @return array{art_name: string, category_id: int}
      */
     private static function getLinkInfo($id)
     {
-        $art_name = '';
-        $category = 0;
-        $art = rex_article::get($id);
-        if ($art instanceof rex_article) {
-            $art_name = $art->getName();
-            $category = $art->getCategoryId();
-        }
-        return array('art_name' => $art_name, 'category_id' => $category);
+        $art = rex_article::get((int) $id);
+
+        return ['art_name' => $art instanceof rex_article ? $art->getName() : '', 'category_id' => $art instanceof rex_article ? $art->getCategoryId() : 0];
     }
 }
