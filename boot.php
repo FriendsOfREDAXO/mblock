@@ -86,7 +86,10 @@ if (rex::isBackend() && is_object(rex::getUser())) {
         'copy_success' => $this->i18n('mblock_toast_copy_success'),
         'paste_success' => $this->i18n('mblock_toast_paste_success'), 
         'clipboard_empty' => $this->i18n('mblock_toast_clipboard_empty'),
-        'module_type_mismatch' => $this->i18n('mblock_toast_module_type_mismatch')
+        'module_type_mismatch' => $this->i18n('mblock_toast_module_type_mismatch'),
+        'confirm_title' => $this->i18n('mblock_confirm_title'),
+        'confirm_cancel' => $this->i18n('mblock_confirm_cancel'),
+        'confirm_ok' => $this->i18n('mblock_confirm_ok'),
     ]);
 }
 

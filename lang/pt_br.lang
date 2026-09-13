@@ -63,3 +63,6 @@ mblock_toast_copy_success = Bloco copiado com sucesso!
 mblock_toast_paste_success = Bloco colado com sucesso!
 mblock_toast_clipboard_empty = Nenhum dado na área de transferência
 mblock_toast_module_type_mismatch = Tipo de módulo não corresponde
+mblock_confirm_title = Confirmar
+mblock_confirm_cancel = Cancelar
+mblock_confirm_ok = Excluir
