@@ -4,6 +4,9 @@
 
 Interne Verschlankung ohne Änderung der öffentlichen API: `MBlock::show()`, die Optionen, das Speicherformat, die Templates und die alten globalen Klassennamen bleiben unverändert. Geprüft mit HTML-Vergleichen und Klickstrecken (Hinzufügen, Verschieben, Kopieren/Einfügen, Online/Offline, Löschen, Speichern) über MForm-, HTML-, TinyMCE-, CKEditor-5- und Gridblock-Module.
 
+### Neu
+* `MBlock::isOnline($item)` und `MBlock::isOffline($item)` prüfen einen einzelnen Block (Offline-Feld `mblock_offline`, optional anderer Feldname). `filterByStatus()` nutzt dieselbe Logik.
+
 ### Entfernt
 * Deprecated-Shims in `lib/deprecated/` - die alten Klassennamen (`MBlock`, `MBlockValueHandler`, `MBlockSystemButtonReplacer`, `mblock_rex_form`, ...) werden jetzt in `boot.php` per `class_alias` bereitgestellt.
 * `MBlockThemeHelper`, die ungenutzte Demo-Seite `demo.demo_html_fixed.php`, die nicht registrierten Seiten `themes.php`, `api.php`, `readme.php` und `demo.demo_nested.php`, `docs/namespace-migration-example.php`, die Source-Map `mblock.min.js.map` und das eingecheckte `build/node_modules`.
@@ -16,7 +19,7 @@ Interne Verschlankung ohne Änderung der öffentlichen API: `MBlock::show()`, di
 * **Stylesheet**: Alle Farben, Abstände und Effekte sind Variablen in `:root`; der Dark Mode (REDAXO-Theme, Bootstrap 5, Systemeinstellung) überschreibt nur die Variablen. Klassen und bisherige `--mblock-*`-Namen bleiben erhalten. Bewusste Korrekturen: deaktivierter Einfügen-Button und Hover-Textfarben sind im Dark Mode jetzt dunkel, die Zwischenablage-Leiste hat eigene Schatten, System-Dark-Mode und REDAXO-Dark-Theme sehen gleich aus.
 * `MBlockJsonHelper` auf die genutzten Methoden reduziert.
 * **rexstan (Level 8)**: 0 Meldungen statt 312. Öffentliche Methoden bekommen nur präzisere Docblocks und verhaltensgleiche Casts, native Typen nur an privaten Methoden; Subklassen und Aufrufer sind nicht betroffen. Dabei behoben: `rex_file::get()` liefert `null` statt `false` (TemplateManager), und Widget-Onclicks mit Gridblock-Ids (`REX_MEDIA_1GBS...`) bekamen beim Reindex ein verirrtes Anführungszeichen und waren kein gültiges JavaScript mehr; der Onclick verwendet jetzt die tatsächliche Input-Id.
-* **Dokumentation**: API.md und README beschreiben jetzt die tatsächlich vorhandene API (u. a. gab es nie `MBlock::isOnline()`, `getConfig()`, die Optionen `template`/`online_offline`, die JavaScript-Events `mblock:add`/`mblock:paste` oder eigene Extension Points). Best Practices sind eine Markdown-Seite (`docs/best_practices.md`).
+* **Dokumentation**: API.md und README beschreiben jetzt die tatsächlich vorhandene API (u. a. gab es `getConfig()`, die Optionen `template`/`online_offline`, die JavaScript-Events `mblock:add`/`mblock:paste` oder eigene Extension Points). Best Practices sind eine Markdown-Seite (`docs/best_practices.md`).
 
 ## Version 4.6.8 - 2026-08-21
 

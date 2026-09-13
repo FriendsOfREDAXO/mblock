@@ -116,6 +116,9 @@ MBlock::getOfflineDataArray(string $rexValue, string $offlineField = 'mblock_off
 MBlock::filterByStatus(array $data, string $filter = 'all', string $offlineField = 'mblock_offline'): array
 MBlock::getOnlineItems(array $data, string $offlineField = 'mblock_offline'): array
 MBlock::getOfflineItems(array $data, string $offlineField = 'mblock_offline'): array
+
+MBlock::isOnline(array $item, string $offlineField = 'mblock_offline'): bool
+MBlock::isOffline(array $item, string $offlineField = 'mblock_offline'): bool
 ```
 
 `$filter` ist `'all'`, `'online'` oder `'offline'`. Ein Block gilt als offline, wenn das Offline-Feld `'1'`, `true` oder `'true'` enthält.
@@ -128,10 +131,14 @@ foreach ($items as $item) {
 }
 ```
 
-Es gibt keine Methode `isOnline()`. Für einzelne Blöcke reicht der Blick auf das Feld:
+Einzelne Blöcke lassen sich mit `isOnline()` und `isOffline()` prüfen (seit 4.7.0):
 
 ```php
-$isOffline = ($item['mblock_offline'] ?? '') === '1';
+foreach (MBlock::getDataArray("REX_VALUE[1]") as $item) {
+    if (MBlock::isOnline($item)) {
+        echo rex_escape($item['name'] ?? '');
+    }
+}
 ```
 
 ### Frontend-Helfer

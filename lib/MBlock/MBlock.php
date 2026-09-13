@@ -534,11 +534,7 @@ class MBlock
                 continue;
             }
             
-            $isOffline = false;
-            if (isset($item[$offlineField])) {
-                $offlineValue = $item[$offlineField];
-                $isOffline = ($offlineValue == '1' || $offlineValue === true || $offlineValue === 'true');
-            }
+            $isOffline = self::isOffline($item, $offlineField);
             
             // Wenn wir offline Items wollen und dieses offline ist, oder
             // wenn wir online Items wollen und dieses online ist
@@ -572,6 +568,33 @@ class MBlock
     public static function getOfflineDataArray($rexValue, $offlineField = 'mblock_offline')
     {
         return self::getDataArray($rexValue, 'offline', $offlineField);
+    }
+
+    /**
+     * Prueft, ob ein einzelner Block online ist (Offline-Feld leer, '0' oder nicht vorhanden)
+     * @param array<string, mixed>|null $item Ein MBlock-Item
+     * @param string $offlineField Name des Offline-Feldes (default: 'mblock_offline')
+     * @return bool
+     */
+    public static function isOnline($item, $offlineField = 'mblock_offline')
+    {
+        return !self::isOffline($item, $offlineField);
+    }
+
+    /**
+     * Prueft, ob ein einzelner Block offline ist (Offline-Feld '1', true oder 'true')
+     * @param array<string, mixed>|null $item Ein MBlock-Item
+     * @param string $offlineField Name des Offline-Feldes (default: 'mblock_offline')
+     * @return bool
+     */
+    public static function isOffline($item, $offlineField = 'mblock_offline')
+    {
+        if (!is_array($item) || !isset($item[$offlineField])) {
+            return false;
+        }
+        $value = $item[$offlineField];
+
+        return $value == '1' || $value === true || $value === 'true';
     }
 
     /**

@@ -112,8 +112,9 @@ $items = MBlock::getOnlineDataArray("REX_VALUE[1]");
 // Bereits geladene Daten filtern
 $online = MBlock::getOnlineItems(rex_var::toArray("REX_VALUE[1]"));
 
-// Einzelnen Block prüfen
-$isOffline = ($item['mblock_offline'] ?? '') === '1';
+// Einzelnen Block prüfen (seit 4.7.0)
+if (MBlock::isOnline($item)) { /* ... */ }
+$isOffline = MBlock::isOffline($item);
 ```
 
 ## MForm Integration
