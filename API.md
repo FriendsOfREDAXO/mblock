@@ -281,6 +281,12 @@ Tags in `mblock_wrapper.ini`:
 | `<mblock:copy_paste_toolbar/>` | Leiste "Zwischenablage leeren" |
 | `<mblock:output/>` | Alle Blöcke |
 
+Optional darf der Wrapper einen Hinzufügen-Streifen unter der Liste enthalten (Templates `modern` und `retro_8bit`); der Button hängt einen neuen Block ans Ende und wird bei `max` gesperrt:
+
+```html
+<div class="mblock-add-bar"><button type="button" class="btn btn-default mblock-add-last">{{mblock::mblock_add_element}}</button></div>
+```
+
 Tags in `mblock_element.ini`:
 
 | Tag | Inhalt |

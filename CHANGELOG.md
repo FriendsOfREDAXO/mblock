@@ -7,6 +7,12 @@ Interne Verschlankung ohne Änderung der öffentlichen API: `MBlock::show()`, di
 ### Neu
 * `MBlock::isOnline($item)` und `MBlock::isOffline($item)` prüfen einen einzelnen Block (Offline-Feld `mblock_offline`, optional anderer Feldname). `filterByStatus()` nutzt dieselbe Logik.
 
+### Templates
+* **modern** neu: Aufbau wie der Flex-Repeater von MForm (Kopfzeile mit Griff, Status-Punkt, Nummer und Aktionen, Inhalt darunter, Hinzufügen-Streifen am Ende); übernimmt die MForm-Farbvariablen, wenn MForm installiert ist, sonst eigene Werte für hell und dunkel.
+* **retro_8bit** neu: Brotkasten-Optik mit beigem Gehäuse, dunklen Tasten mit farbigen Legenden und blauem C64-Bildschirm für Kopfzeile und Eingabefelder; Block-Nummer mit führender Null, `READY.`/`OFFLINE`, `LOAD "BLOCK",8,1` als Hinzufügen-Streifen.
+* Wrapper-Templates dürfen einen Streifen `<div class="mblock-add-bar"><button class="mblock-add-last">` unter der Liste haben; der Button hängt einen Block ans Ende und respektiert `max`.
+* Behoben: In allen Templates außer `standard` wurde der Klon beim Hinzufügen nie eingefügt, weil die Wrapper-Prüfung `hasClass('mblock_wrapper modern')` an der zweiten Klasse scheiterte.
+
 ### Entfernt
 * Deprecated-Shims in `lib/deprecated/` - die alten Klassennamen (`MBlock`, `MBlockValueHandler`, `MBlockSystemButtonReplacer`, `mblock_rex_form`, ...) werden jetzt in `boot.php` per `class_alias` bereitgestellt.
 * `MBlockThemeHelper`, die ungenutzte Demo-Seite `demo.demo_html_fixed.php`, die nicht registrierten Seiten `themes.php`, `api.php`, `readme.php` und `demo.demo_nested.php`, `docs/namespace-migration-example.php`, die Source-Map `mblock.min.js.map` und das eingecheckte `build/node_modules`.

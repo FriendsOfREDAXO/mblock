@@ -443,11 +443,8 @@ function mblock_remove(element) {
 
     // has data?
     if (element.data().hasOwnProperty('max')) {
-        if (finded.length >= element.data('max')) {
-            element.find('.addme').prop('disabled', true);
-        } else {
-            element.find('.addme').prop('disabled', false);
-        }
+        const maxReached = finded.length >= element.data('max');
+        element.find('.addme, > .mblock-add-bar .mblock-add-last').prop('disabled', maxReached);
     }
 
     if (element.data().hasOwnProperty('min')) {
@@ -1096,7 +1093,7 @@ function mblock_add_item(element, item) {
         // add clone
         element.prepend(iClone);
 
-    } else if (item.parent().hasClass(element.attr('class'))) {
+    } else if (item.parent().is(element)) {
         // Destroy sortable before manipulation with better error handling
         try {
             const domElement = element.get(0);
@@ -1866,6 +1863,15 @@ function mblock_add(element) {
     }
 
     bind('.mblock-offline-toggle-btn', function ($btn, $item) { MBlockOnlineToggle.toggleAutoDetected(element, $item, $btn); });
+
+    // Optionaler Streifen am Ende des Wrappers (Template-Tag <div class="mblock-add-bar"><button class="mblock-add-last">)
+    element.find('> .mblock-add-bar .mblock-add-last').off('click.mblock').on('click.mblock', function (e) {
+        e.preventDefault();
+        if ($(this).prop('disabled')) return false;
+        const last = element.find('> div.sortitem').last();
+        mblock_add_item(element, last.length ? last : false);
+        return false;
+    });
 
     return true;
 }
