@@ -165,7 +165,7 @@ echo MBlock::show(1, $mform->show());</code></pre>
             <li><a href="index.php?page=mblock/api" class="btn btn-default btn-sm">API-Dokumentation</a></li>
             <li><a href="index.php?page=mblock/help" class="btn btn-default btn-sm">README</a></li>
             <li><a href="index.php?page=mblock/demo" class="btn btn-default btn-sm">Demos &amp; Beispiele</a></li>
-            <li><a href="index.php?page=mblock/config" class="btn btn-default btn-sm">Konfiguration</a></li>
+            <li><a href="index.php?page=mblock/settings" class="btn btn-default btn-sm">Konfiguration</a></li>
         </ul>
     </div>
 

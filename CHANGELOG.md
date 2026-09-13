@@ -1,5 +1,22 @@
 # MBlock - REDAXO Addon für Modul-Input-Blöcke
 
+## Unreleased - "MBlock light"
+
+Interne Verschlankung ohne Änderung der öffentlichen API: `MBlock::show()`, die Optionen, das Speicherformat, die Templates und die alten globalen Klassennamen bleiben unverändert. Geprüft mit HTML-Vergleichen und Klickstrecken (Hinzufügen, Verschieben, Kopieren/Einfügen, Online/Offline, Löschen, Speichern) über MForm-, HTML-, TinyMCE-, CKEditor-5- und Gridblock-Module.
+
+### Entfernt
+* Deprecated-Shims in `lib/deprecated/` - die alten Klassennamen (`MBlock`, `MBlockValueHandler`, `MBlockSystemButtonReplacer`, `mblock_rex_form`, ...) werden jetzt in `boot.php` per `class_alias` bereitgestellt.
+* `MBlockThemeHelper`, die ungenutzte Demo-Seite `demo.demo_html_fixed.php`, die nicht registrierten Seiten `themes.php`, `api.php` und `readme.php`, die Source-Map `mblock.min.js.map` und das eingecheckte `build/node_modules`.
+* Im JavaScript: die nie gerenderte alte Online/Offline-Variante (`.mblock-online-toggle`), die Widget-Reinitialisierung nach dem Klonen (Reindex und Popup-Bridges decken das ab), das Overlay-Fallback des Löschdialogs sowie `localStorage`-Modus, `getSessionId()`, `getInfo()` und `toggleStorageMode()` der Zwischenablage.
+
+### Geändert
+* **Kopieren/Einfügen**: Der Block wird als HTML mit eingefrorenen Werten in der `sessionStorage` abgelegt (`{html, moduleType, timestamp}`) statt als Feldliste; Editor-Inhalte werden vorher in die Textareas übernommen. Modultyp-Prüfung, Tab-/Collapse-Ids und Selectpicker-Neuinitialisierung bleiben erhalten.
+* **Löschdialog**: Der Bootstrap-Modal-Dialog ist jetzt tatsächlich aktiv. Bisher warf der Code wegen `rex.i18n.msg` einen Fehler und fiel auf das native `confirm()` zurück. Texte über die neuen Sprachschlüssel `mblock_confirm_title`, `mblock_confirm_cancel`, `mblock_confirm_ok`.
+* **Popup-Bridges** für `REX_MEDIA`, `REX_MEDIALIST`, `REX_LINK`, `REX_LINKLIST` sind eine gemeinsame, tabellengesteuerte Funktion; `MBlockSystemButtonReplacer` arbeitet ebenfalls mit einer Widget-Tabelle.
+* **Stylesheet**: Alle Farben, Abstände und Effekte sind Variablen in `:root`; der Dark Mode (REDAXO-Theme, Bootstrap 5, Systemeinstellung) überschreibt nur die Variablen. Klassen und bisherige `--mblock-*`-Namen bleiben erhalten. Bewusste Korrekturen: deaktivierter Einfügen-Button und Hover-Textfarben sind im Dark Mode jetzt dunkel, die Zwischenablage-Leiste hat eigene Schatten, System-Dark-Mode und REDAXO-Dark-Theme sehen gleich aus.
+* `MBlockJsonHelper` auf die genutzten Methoden reduziert.
+* **Dokumentation**: API.md und README beschreiben jetzt die tatsächlich vorhandene API (u. a. gab es nie `MBlock::isOnline()`, `getConfig()`, die Optionen `template`/`online_offline`, die JavaScript-Events `mblock:add`/`mblock:paste` oder eigene Extension Points). Best Practices sind eine Markdown-Seite (`docs/best_practices.md`).
+
 ## Version 4.6.8 - 2026-08-21
 
 ### Bug Fixes

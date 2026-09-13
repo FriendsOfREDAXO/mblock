@@ -1,11 +1,6 @@
 <?php
 /**
- * @author mail[at]joachim-doerr[dot]        // Copy/Paste-Konfiguration hinzufügen
-        if (!array_key_exists('copy_paste', $settings)) {
-            // Use addon->getConfig to get the copy_paste setting from the settings system
-            $copyPasteEnabled = $addon->getConfig('mblock_copy_paste', 1); // Default: enabled
-            $settings['copy_paste'] = (bool) $copyPasteEnabled;
-        }achim Doerr
+ * @author mail[at]joachim-doerr[dot]com Joachim Doerr
  * @package redaxo5
  * @license MIT
  */
