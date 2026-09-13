@@ -6,7 +6,7 @@ Interne Verschlankung ohne Änderung der öffentlichen API: `MBlock::show()`, di
 
 ### Entfernt
 * Deprecated-Shims in `lib/deprecated/` - die alten Klassennamen (`MBlock`, `MBlockValueHandler`, `MBlockSystemButtonReplacer`, `mblock_rex_form`, ...) werden jetzt in `boot.php` per `class_alias` bereitgestellt.
-* `MBlockThemeHelper`, die ungenutzte Demo-Seite `demo.demo_html_fixed.php`, die nicht registrierten Seiten `themes.php`, `api.php` und `readme.php`, die Source-Map `mblock.min.js.map` und das eingecheckte `build/node_modules`.
+* `MBlockThemeHelper`, die ungenutzte Demo-Seite `demo.demo_html_fixed.php`, die nicht registrierten Seiten `themes.php`, `api.php`, `readme.php` und `demo.demo_nested.php`, `docs/namespace-migration-example.php`, die Source-Map `mblock.min.js.map` und das eingecheckte `build/node_modules`.
 * Im JavaScript: die nie gerenderte alte Online/Offline-Variante (`.mblock-online-toggle`), die Widget-Reinitialisierung nach dem Klonen (Reindex und Popup-Bridges decken das ab), das Overlay-Fallback des Löschdialogs sowie `localStorage`-Modus, `getSessionId()`, `getInfo()` und `toggleStorageMode()` der Zwischenablage.
 
 ### Geändert

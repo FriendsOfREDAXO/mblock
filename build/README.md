@@ -16,9 +16,8 @@ Das Build-System erstellt aus der bestehenden `mblock.js` eine optimierte minifi
 ### Build Structure
 ```
 ../assets/
-├── mblock.js         # ~142 KB - Source (Development & Editing)
-├── mblock.min.js     # ~45 KB - Production (minifiziert) ✨
-├── mblock.min.js.map # ~50 KB - Source Map für Debugging
+├── mblock.js         # ~90 KB - Source (Development & Editing)
+├── mblock.min.js     # ~36 KB - Production (minifiziert) ✨
 └── mblock.css        # 🎨 Stylesheet
 ```
 
@@ -72,7 +71,6 @@ Das Build-System erstellt aus der bestehenden `mblock.js` eine optimierte minifi
 ### 3. Output
 ```bash
 💾 Minified Datei erstellt: mblock.min.js
-🗺️ Source Map erstellt: mblock.min.js.map
 ```
 
 ## 🎯 Asset Loading
@@ -123,7 +121,6 @@ build/
 ../assets/
 ├── mblock.js            # 🛠️ Source (bearbeiten hier)
 ├── mblock.min.js        # 🚀 Production Version ✨ (automatisch generiert)
-├── mblock.min.js.map    # 🗺️ Source Map für Debugging
 └── mblock.css           # 🎨 Stylesheet
 ```
 
