@@ -14,7 +14,7 @@ class MBlockElement
     const KEY = "<mblock:%s/>";
 
     /**
-     * @var
+     * @var string
      */
     public $settings;
 
@@ -154,7 +154,7 @@ class MBlockElement
     }
 
     /**
-     * @return array
+     * @return list<string>
      * @author Joachim Doerr
      */
     public function getKeys()
@@ -167,7 +167,7 @@ class MBlockElement
     }
 
     /**
-     * @return array
+     * @return list<mixed>
      * @author Joachim Doerr
      */
     public function getValues()

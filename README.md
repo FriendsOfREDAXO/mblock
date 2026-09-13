@@ -376,7 +376,7 @@ my_theme/
 
 ## Development & Build
 
-Das Verhalten im Backend steckt in einer Datei, `assets/mblock.js`. Im Debug-Modus lädt `boot.php` diese Datei, sonst die minifizierte `mblock.min.js` (über `$assetMode` in `boot.php` mit `'dev'` oder `'prod'` fest vorgebbar).
+Das Verhalten im Backend steckt in einer Datei, `assets/mblock.js`. Solange der Debug-Modus oder das Debug-Addon aktiv ist, lädt `boot.php` diese Datei, sonst die minifizierte `mblock.min.js`.
 
 ```bash
 cd redaxo/src/addons/mblock/build

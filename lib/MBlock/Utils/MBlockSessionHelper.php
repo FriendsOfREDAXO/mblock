@@ -150,7 +150,7 @@ class MBlockSessionHelper
     /**
      * Debug-Information für Session-Status
      * 
-     * @return array
+     * @return array<string, mixed>
      */
     public static function getDebugInfo(): array
     {

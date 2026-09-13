@@ -193,7 +193,7 @@ Für YForm lautet die Id `'yform::tabelle::feld'`; das Formular ist das `rex_yfo
 
 ### Aufbau
 
-Das gesamte Verhalten steckt in `assets/mblock.js` (jQuery). `boot.php` lädt im Debug-Modus `mblock.js`, sonst `mblock.min.js`; über `$assetMode` in `boot.php` lässt sich das mit `'dev'` oder `'prod'` fest vorgeben. Die Datei enthält:
+Das gesamte Verhalten steckt in `assets/mblock.js` (jQuery). `boot.php` lädt `mblock.js`, solange der Debug-Modus oder das Debug-Addon aktiv ist, sonst `mblock.min.js`. Die Datei enthält:
 
 - Initialisierung und Sortable-Anbindung (`mblock_init`, `mblock_init_sort`, `mblock_sort`)
 - Reindex der Feldnamen, Ids und Widget-Buttons je Block (`mblock_reindex`)

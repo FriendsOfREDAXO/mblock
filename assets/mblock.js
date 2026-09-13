@@ -785,7 +785,11 @@ function mblock_update_rex_ids($element, sindex, mblock_count, eindex) {
  */
 function mblock_update_rex_buttons($element, sindex, mblock_count, eindex) {
     try {
-        const newIdPart = '' + sindex + mblock_count + '00' + eindex;
+        // Id-Teil aus der tatsaechlichen Input-Id ableiten, damit onclick und Input auch bei
+        // Gridblock-Ids mit Buchstaben (REX_MEDIA_1GBS...) zusammenpassen
+        const inputId = $element.attr('id') || '';
+        const idSuffix = inputId.replace(/^REX_(MEDIALIST_SELECT|LINKLIST_SELECT|MEDIALIST|LINKLIST|MEDIA|LINK)_/, '').replace(/_NAME$/, '');
+        const newIdPart = idSuffix !== '' && idSuffix !== inputId ? idSuffix : '' + sindex + mblock_count + '00' + eindex;
         // Suche Buttons im nächsten Widget-Container oder im Parent als Fallback
         const $container = $element.closest('.rex-js-widget-link, .rex-js-widget-media, .rex-js-widget-medialist, .rex-js-widget-linklist, .rex-js-widget-customlink, .input-group');
         const $scope = $container.length ? $container : $element.parent();
@@ -803,7 +807,7 @@ function mblock_update_rex_buttons($element, sindex, mblock_count, eindex) {
                 // Fallback: erste Ziffernfolge nach ( ersetzen (für unbekannte Patterns)
                 if (newOnclick === onclick) {
                     newOnclick = newOnclick
-                        .replace(/\('?\d+'?/, "('" + newIdPart + "'")
+                        .replace(/\('?[^'",)]+'?/, "('" + newIdPart + "'")
                         .replace(/_[^'\",)]+/, '_' + newIdPart);
                 }
                 $btn.attr('onclick', newOnclick);

@@ -19,9 +19,9 @@ class MBlockTemplateFileProvider
     const ELEMENTS_PATH = 'elements/';
 
     /**
-     * @param $templateType
+     * @param string $templateType
      * @param string $subPath
-     * @param null $theme
+     * @param string|null $theme
      * @param bool $stop
      * @return string
      * @author Joachim Doerr
@@ -46,12 +46,12 @@ class MBlockTemplateFileProvider
         // Check custom templates first (data folder)
         if (file_exists($dataPath . $file)) {
             // load custom theme file from data folder
-            $templateString = implode(file($dataPath . $file, FILE_USE_INCLUDE_PATH));
+            $templateString = (string) file_get_contents($dataPath . $file);
         } 
         // Check addon templates second (addon folder)
         elseif (file_exists($addonPath . $file)) {
             // load default theme file from addon folder
-            $templateString = implode(file($addonPath . $file, FILE_USE_INCLUDE_PATH));
+            $templateString = (string) file_get_contents($addonPath . $file);
         } 
         else {
             // stop recursion if default theme not found
@@ -64,8 +64,8 @@ class MBlockTemplateFileProvider
 
     /**
      * Get available template paths for debugging/info
-     * @param string $theme
-     * @return array
+     * @param string|null $theme
+     * @return array{custom: string, default: string}
      */
     public static function getTemplatePaths($theme = null)
     {

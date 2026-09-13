@@ -16,7 +16,7 @@ use rex_i18n;
 class MBlockSettingsHelper
 {
     /**
-     * @param array $settings
+     * @param array<string, mixed> $settings
      * @return string
      * @author Joachim Doerr
      */

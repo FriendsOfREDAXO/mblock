@@ -19,7 +19,7 @@ class MBlockRexFormProcessor
     /**
      * @param mixed $status
      * @param mblock_rex_form $form
-     * @param array $post
+     * @param array<string, mixed> $post
      * @return mixed
      * @author Joachim Doerr
      * @throws rex_sql_exception
@@ -58,7 +58,7 @@ class MBlockRexFormProcessor
 
     /**
      * @param mblock_rex_form $form
-     * @param array $post
+     * @param array<string, mixed> $post
      * @param int|null $id
      * @author Joachim Doerr
      * @throws rex_sql_exception

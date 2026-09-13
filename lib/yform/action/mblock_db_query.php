@@ -2,6 +2,8 @@
 
 namespace FriendsOfRedaxo\MBlock\YForm\Action;
 
+use FriendsOfRedaxo\MBlock\Utils\MBlockJsonHelper;
+use rex_request;
 use rex_sql;
 use rex_yform_action_abstract;
 

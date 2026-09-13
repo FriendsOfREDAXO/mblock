@@ -174,7 +174,7 @@ class MBlockSystemButtonReplacer
             if (str_contains($name, 'REX_INPUT_MEDIA')) {
                 self::replaceName($child, $item, 'REX_INPUT_MEDIA');
             }
-            $child->setAttribute('id', preg_replace('/\d+/', $id, $child->getAttribute('id')));
+            $child->setAttribute('id', (string) preg_replace('/\d+/', $id, $child->getAttribute('id')));
         }
         if ($dom->firstChild instanceof DOMElement) {
             $dom->firstChild->removeAttribute('name');
@@ -182,7 +182,7 @@ class MBlockSystemButtonReplacer
         }
         if (($parent = $dom->parentNode) instanceof DOMElement) {
             foreach ($parent->getElementsByTagName('a') as $child) {
-                $child->setAttribute('id', preg_replace('/\d+/', $id, $child->getAttribute('id')));
+                $child->setAttribute('id', (string) preg_replace('/\d+/', $id, $child->getAttribute('id')));
             }
         }
     }
@@ -192,7 +192,7 @@ class MBlockSystemButtonReplacer
      */
     private static function widgetId(MBlockItem $item): string
     {
-        return $item->getPayload('count-id') . MBlockSessionHelper::getCurrentCount() . '00' . $item->getPayload('replace-id');
+        return (string) $item->getPayload('count-id') . MBlockSessionHelper::getCurrentCount() . '00' . (string) $item->getPayload('replace-id');
     }
 
     /**
@@ -210,7 +210,7 @@ class MBlockSystemButtonReplacer
             }
             $onclick = (string) preg_replace('/(' . preg_quote($function, '/') . '\(\'?)\d+(\'?[,)])/', '${1}' . $id . '${2}', (string) $onclick);
             if ('REXLink' === $function) {
-                $onclick = preg_replace('/(openLinkMap\(\'REX_LINK_)\d+(\')/', '${1}' . $id . '${2}', $onclick);
+                $onclick = (string) preg_replace('/(openLinkMap\(\'REX_LINK_)\d+(\')/', '${1}' . $id . '${2}', $onclick);
             }
             $child->setAttribute('onclick', $onclick);
         }
@@ -221,7 +221,7 @@ class MBlockSystemButtonReplacer
      */
     protected static function replaceId(DOMElement $dom, MBlockItem $item)
     {
-        $dom->setAttribute('id', preg_replace('/\_\d+/', '_' . self::widgetId($item), $dom->getAttribute('id')));
+        $dom->setAttribute('id', (string) preg_replace('/\_\d+/', '_' . self::widgetId($item), $dom->getAttribute('id')));
 
         return $dom->getAttribute('id');
     }
@@ -230,6 +230,7 @@ class MBlockSystemButtonReplacer
      * Name des Kern-Widgets (REX_INPUT_MEDIA[1]) in das MBlock-Format REX_INPUT_VALUE[id][0][REX_MEDIA_1] umschreiben.
      *
      * @param string $name Input-Name des Kern-Widgets, z. B. REX_INPUT_MEDIA
+     * @return void
      */
     protected static function replaceName(DOMElement $dom, MBlockItem $item, $name)
     {
@@ -252,11 +253,8 @@ class MBlockSystemButtonReplacer
     {
         self::setSystemIdByName($name, $item);
         $result = $item->getResult();
-        if (!is_array($result)) {
-            return null;
-        }
         foreach ([$item->getSystemName() . '_' . $item->getSystemId(), strtolower($item->getSystemName()) . '_' . $item->getSystemId()] as $key) {
-            if (array_key_exists($key, $result)) {
+            if (array_key_exists($key, $result) && is_scalar($result[$key])) {
                 return (string) $result[$key];
             }
         }
@@ -282,7 +280,7 @@ class MBlockSystemButtonReplacer
             if ('option' !== $child->nodeName || !$child instanceof DOMElement) { // Patch xampp gegen ooops
                 continue;
             }
-            $child->setAttribute('value', $child->nodeValue);
+            $child->setAttribute('value', (string) $child->nodeValue);
             if ($isLink) {
                 $child->nodeValue = htmlentities(self::getLinkInfo($child->getAttribute('value'))['art_name']);
             }
@@ -294,6 +292,7 @@ class MBlockSystemButtonReplacer
      * Artikelname eines gespeicherten Links in das Textfeld schreiben.
      *
      * @param string $name
+     * @return void
      */
     protected static function addArtName(DOMElement $dom, MBlockItem $item, $name = '')
     {
@@ -319,14 +318,14 @@ class MBlockSystemButtonReplacer
     private static function replaceSelectNameWithItemId(DOMElement $dom, MBlockItem $item): void
     {
         $name = $dom->getAttribute('name');
-        $systemId = $item->getSystemId();
-        if (null === $systemId || '' === (string) $systemId) {
+        $systemId = (string) $item->getSystemId();
+        if ('' === $systemId) {
             $systemId = preg_match('/\d+/', $name, $matches) ? $matches[0] : '';
         }
-        if ('' === (string) $systemId) {
+        if ('' === $systemId) {
             return;
         }
-        $dom->setAttribute('name', str_replace((string) $systemId, (string) $item->getId(), $name));
+        $dom->setAttribute('name', str_replace($systemId, (string) $item->getId(), $name));
     }
 
     /**

@@ -41,13 +41,13 @@ class mblock_rex_form extends rex_form
             /** @var rex_form_element $element */
             foreach ($fieldsetElements as $element) {
                 // read-only-fields nicht speichern
-                if (strpos($element->getAttribute('class'), 'form-control-static') !== false) {
+                if (strpos((string) $element->getAttribute('class'), 'form-control-static') !== false) {
                     continue;
                 }
 
                 // add by JD
                 // must have for json array
-                if (strpos($element->getFieldName(), '][') !== false) {
+                if (strpos((string) $element->getFieldName(), '][') !== false) {
                     continue;
                 }
 
@@ -123,7 +123,7 @@ class mblock_rex_form extends rex_form
     }
 
     /**
-     * @return bool
+     * @return bool|string
      * @author Joachim Doerr
      */
     public function validate()
@@ -134,7 +134,8 @@ class mblock_rex_form extends rex_form
     /**
      * @param string $listMessage
      * @param string $listWarning
-     * @param array $params
+     * @param array<string, mixed> $params
+     * @return never
      * @author Joachim Doerr
      */
     public function redirect($listMessage = '', $listWarning = '', array $params = [])
@@ -152,7 +153,7 @@ class mblock_rex_form extends rex_form
     }
 
     /**
-     * @return array
+     * @return list<string>
      * @author Joachim Doerr
      */
     public function getFieldsets()
@@ -161,7 +162,7 @@ class mblock_rex_form extends rex_form
     }
 
     /**
-     * @return array
+     * @return array<string, list<\rex_form_element>>
      * @author Joachim Doerr
      */
     public function getFieldsetElements()
@@ -189,7 +190,7 @@ class mblock_rex_form extends rex_form
                 $s .= '<legend>' . htmlspecialchars($legend) . '</legend>' . "\n";
             }
 
-            if ($i == 0 && $addHeaders) {
+            if ($i == 0) {
                 foreach ($this->getHeaderElements() as $element) {
                     // Callback
                     $element->setValue($this->preView($fieldsetName, $element->getFieldName(), $element->getValue()));

@@ -13,7 +13,7 @@ use DOMElement;
 trait MBlockReplacerTrait
 {
     /**
-     * @param $html
+     * @param mixed $html HTML-String oder Objekt mit __toString()/show()
      * @return DOMDocument
      * @author Joachim Doerr
      */
@@ -30,12 +30,7 @@ trait MBlockReplacerTrait
                 try {
                     $html = $html->show();
                 } catch (\Throwable $e) {
-                    // MForm has compatibility issues with MBlock - fallback to string conversion
-                    if (method_exists($html, '__toString')) {
-                        $html = (string) $html;
-                    } else {
-                        throw new \InvalidArgumentException('MBlock: Could not render MForm object. Error: ' . $e->getMessage() . '. Please ensure MForm compatibility with MBlock.');
-                    }
+                    throw new \InvalidArgumentException('MBlock: Could not render MForm object. Error: ' . $e->getMessage() . '. Please ensure MForm compatibility with MBlock.');
                 }
             } else {
                 throw new \InvalidArgumentException('MBlock: HTML parameter must be a string or an object with __toString() or show() method. Got: ' . get_class($html));
@@ -51,7 +46,7 @@ trait MBlockReplacerTrait
             $utf8 = $match[0];
             return '&#' . \IntlChar::ord($utf8) . ';';
         }, htmlentities($html, ENT_COMPAT, 'UTF-8'));
-        $html = htmlspecialchars_decode($html,ENT_QUOTES);
+        $html = htmlspecialchars_decode((string) $html, ENT_QUOTES);
         @$dom->loadHTML("<html xmlns=\"http://www.w3.org/1999/xhtml\"><body>$html</body></html>");
         $dom->preserveWhiteSpace = false;
         return $dom;
@@ -64,7 +59,7 @@ trait MBlockReplacerTrait
      */
     private static function saveHtml(DOMDocument $dom)
     {
-        $html = $dom->saveHTML();
+        $html = (string) $dom->saveHTML();
         if (strpos($html, '<body') !== false) {
             preg_match("/<body>(.*)<\/body>/ism", $html, $matches);
             if (isset($matches[1])) {
@@ -75,13 +70,11 @@ trait MBlockReplacerTrait
     }
 
     /**
-     * @param DOMDocument $dom
-     * @param $element
-     * @param $class
-     * @return array
+     * @param string $element Tag und Klasse, z. B. "div.form-group"
+     * @return list<DOMElement>
      * @author Joachim Doerr
      */
-    private static function getElementsByClass(DOMDocument $dom, $element)
+    private static function getElementsByClass(DOMDocument $dom, string $element): array
     {
         $elementClass= explode('.', $element);
         $element = $elementClass[0];
@@ -100,14 +93,15 @@ trait MBlockReplacerTrait
     }
 
     /**
-     * @param DOMDocument $dom
-     * @param $element
-     * @return array
+     * @param string $element Tag und Data-Attribut, z. B. 'input[data-x="y"]'
+     * @return list<DOMElement>
      * @author Joachim Doerr
      */
-    private static function getElementsByData(DOMDocument $dom, $element)
+    private static function getElementsByData(DOMDocument $dom, string $element): array
     {
-        preg_match('/^.(\[.*?\])$/m', $element, $matches);
+        if (!preg_match('/^.(\[.*?\])$/m', $element, $matches)) {
+            return [];
+        }
         $element = str_replace($matches[1], '', $matches[0]);
         $data = str_replace(array('[',']','"'), '', $matches[1]);
         $data = explode('=', $data);

@@ -19,8 +19,8 @@ class MBlockCheckboxReplacer
 
     /**
      * @param MBlockItem $item
-     * @param $count
-     * @return String
+     * @param int $count
+     * @return string
      * @author Joachim Doerr
      */
     public static function replaceCheckboxesBlockHolder(MBlockItem $item, $count)
@@ -31,9 +31,8 @@ class MBlockCheckboxReplacer
         $holderName = "REX_INPUT_VALUE[{$item->getValueId()}][{$item->getId()}][checkbox_block_hold]";
 
         // find input group
-        if ($matches = $dom->getElementsByTagName('input')) {
-            /** @var DOMElement $match */
-            foreach ($matches as $key => $match) {
+        {
+            foreach ($dom->getElementsByTagName('input') as $key => $match) {
                 switch ($match->getAttribute('type')) {
                     case 'checkbox':
                         $holderInput = true;

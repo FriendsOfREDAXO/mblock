@@ -5,6 +5,8 @@
  * @license MIT
  */
 
+/** @var rex_addon $this */
+
 use FriendsOfRedaxo\MBlock\Utils\TemplateManager;
 use FriendsOfRedaxo\MBlock\Provider\TemplateProvider;
 
@@ -20,6 +22,7 @@ $config = rex_post('config', array(
 ));
 
 // include info page
+$content = '';
 include rex_path::addon('mblock', 'pages/info.php');
 
 //////////////////////////////////////////////////////////

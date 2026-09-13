@@ -18,7 +18,7 @@ class TemplateManager
      * Get all available templates from data/templates directory
      * Only built-in templates are offered, no custom templates
      * 
-     * @return array Array with template key => display name
+     * @return array<string, string> Array with template key => display name
      */
     public static function getAvailableTemplates()
     {

@@ -19,8 +19,8 @@ use FriendsOfRedaxo\MBlock\Replacer\MBlockSystemButtonReplacer;
 use FriendsOfRedaxo\MBlock\Replacer\MBlockValueReplacer;
 use FriendsOfRedaxo\MBlock\Utils\MBlockSessionHelper;
 use FriendsOfRedaxo\MBlock\Utils\MBlockSettingsHelper;
+use FriendsOfRedaxo\MForm;
 use InvalidArgumentException;
-use MForm;
 use mblock_rex_form;
 use rex;
 use rex_addon;
@@ -44,17 +44,17 @@ class MBlock
 {
 
     /**
-     * @var array
+     * @var array<int, MBlockItem>
      */
     private static $items = array();
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     private static $result = array();
 
     /**
-     * @var array
+     * @var list<string>
      */
     private static $output = array();
 
@@ -69,17 +69,17 @@ class MBlock
     }
 
     /**
-     * @param $id
+     * @param int|string $id REX_VALUE-Nummer oder 'yform::tabelle::feld'
      * @param string|MForm|mblock_rex_form|rex_yform $form
-     * @param array $settings
-     * @param null $theme
-     * @return mixed
+     * @param array<string, mixed>|null $settings
+     * @param string|null $theme
+     * @return string
      * @throws rex_sql_exception
      */
     public static function show($id, $form, $settings = array(), $theme = null)
     {
         // Input-Validierung für kritische Parameter
-        if (($id === '' || $id === null) || (!is_string($id) && !is_numeric($id))) {
+        if ('' === (string) $id) {
             throw new InvalidArgumentException('MBlock: ID muss eine nicht-leere Zeichenkette oder Zahl sein');
         }
 
@@ -165,6 +165,9 @@ class MBlock
             }
         }
 
+        // Ab hier ist das Formular ein HTML-String (MForm, rex_form und YForm sind oben gerendert)
+        /** @var string $form */
+
         // crate plain element
         $plainItem = new MBlockItem();
         $plainItem->setId(0)
@@ -181,7 +184,7 @@ class MBlock
             // item result to item
             foreach (self::$result['value'][$id] as $jId => $values) {
                 // Validierung der Schlüssel
-                if (is_numeric($jId) && is_array($values)) {
+                if (is_int($jId) && is_array($values)) {
                     // init item
                     self::$items[$jId] = new MBlockItem;
                     self::$items[$jId]->setId($jId)
@@ -192,12 +195,6 @@ class MBlock
             }
         }
 
-        // key must be integer
-        foreach (self::$items as $key => $item) {
-            if (!is_int($key)) {
-                unset(self::$items[$key]);
-            }
-        }
 
         // create first element
         // don't loaded?
@@ -231,9 +228,8 @@ class MBlock
         }
 
         // foreach rex value json items
-        /** @var MBlockItem $item */
-        foreach (static::$items as $count => $item) {
-            static::$output[] = self::createOutput($item, ($count + 1), $theme);
+        foreach (self::$items as $count => $item) {
+            self::$output[] = self::createOutput($item, ($count + 1), $theme);
         }
 
         $addText = (isset($settings['initial_button_text'])) ? ' ' . $settings['initial_button_text'] : '';
@@ -242,7 +238,7 @@ class MBlock
 
         // wrap parsed form items
         $wrapper = new MBlockElement();
-        $wrapper->setOutput(implode('', static::$output))
+        $wrapper->setOutput(implode('', self::$output))
             ->setSettings(MBlockSettingsHelper::getSettings(array_merge($settings, ['mblock-plain-sortitem' => $plainItem, 'mblock-single-add' => $addItem])));
 
         // Set copy/paste toolbar based on configuration
@@ -280,10 +276,9 @@ class MBlock
     }
 
     /**
-     * @param MBlockItem $item
-     * @param $count
-     * @param null $theme
-     * @return mixed
+     * @param int $count
+     * @param string|null $theme
+     * @return string
      * @author Joachim Doerr
      */
     private static function createOutput(MBlockItem $item, $count, $theme = null)
@@ -336,7 +331,7 @@ class MBlock
      * @param MBlockItem $item Das MBlock Item
      * @author Joachim Doerr
      */
-    private static function setOfflineProperties(MBlockElement $element, MBlockItem $item)
+    private static function setOfflineProperties(MBlockElement $element, MBlockItem $item): void
     {
         $form = $item->getForm();
         
@@ -364,7 +359,7 @@ class MBlock
             } else {
                 // Method 2: Try to get from result data (backup)
                 $result = $item->getResult();
-                if ($result && is_array($result)) {
+                if ($result) {
                     foreach ($result as $resultItem) {
                         if (is_array($resultItem) && isset($resultItem['mblock_offline'])) {
                             $isOffline = ($resultItem['mblock_offline'] == '1' || 
@@ -413,7 +408,7 @@ class MBlock
      * @param MBlockItem $item Das MBlock Item
      * @author Joachim Doerr
      */
-    private static function setCopyPasteProperties(MBlockElement $element, MBlockItem $item)
+    private static function setCopyPasteProperties(MBlockElement $element, MBlockItem $item): void
     {
         // Get copy/paste configuration using rex_config. Settings page (pages/settings.php)
         // stores this under the 'mblock_copy_paste' key - reading plain 'copy_paste' here
@@ -451,7 +446,7 @@ class MBlock
      * @param MBlockElement $wrapper Das MBlock Wrapper Element
      * @author Joachim Doerr
      */
-    private static function setCopyPasteToolbar(MBlockElement $wrapper)
+    private static function setCopyPasteToolbar(MBlockElement $wrapper): void
     {
         // Get copy/paste configuration using rex_config. Settings page (pages/settings.php)
         // stores this under the 'mblock_copy_paste' key - reading plain 'copy_paste' here
@@ -484,10 +479,10 @@ class MBlock
 
     /**
      * Zentrale Methode zum Abrufen von MBlock-Daten mit optionaler Filterung
-     * @param string $rexValue REX_VALUE String (z.B. "REX_VALUE[1]")
+     * @param mixed $rexValue REX_VALUE String (z.B. "REX_VALUE[1]")
      * @param string $filter 'all', 'online', 'offline' (default: 'all')
      * @param string $offlineField Name des Offline-Feldes (default: 'mblock_offline')
-     * @return array Verarbeitete und gefilterte MBlock-Daten
+     * @return array<int, array<string, mixed>> Verarbeitete und gefilterte MBlock-Daten
      * @author Joachim Doerr
      */
     public static function getDataArray($rexValue, $filter = 'all', $offlineField = 'mblock_offline')
@@ -515,10 +510,10 @@ class MBlock
 
     /**
      * Filtert MBlock-Daten basierend auf Offline-Status
-     * @param array $data MBlock-Daten (normalerweise von rex_var::toArray("REX_VALUE[1]"))
+     * @param array<int, mixed>|null $data MBlock-Daten (normalerweise von rex_var::toArray("REX_VALUE[1]"))
      * @param string $filter 'online', 'offline' oder 'all' (default: 'all')
      * @param string $offlineField Name des Offline-Feldes (default: 'mblock_offline')
-     * @return array Gefilterte Daten
+     * @return array<int, array<string, mixed>> Gefilterte Daten
      * @author Joachim Doerr
      */
     public static function filterByStatus($data, $filter = 'all', $offlineField = 'mblock_offline')
@@ -559,7 +554,7 @@ class MBlock
      * Convenience-Methode für Online-Items mit automatischer rex_var Verarbeitung
      * @param string $rexValue REX_VALUE String (z.B. "REX_VALUE[1]")
      * @param string $offlineField Name des Offline-Feldes (default: 'mblock_offline')
-     * @return array Nur Online-Items
+     * @return array<int, array<string, mixed>> Nur Online-Items
      * @author Joachim Doerr
      */
     public static function getOnlineDataArray($rexValue, $offlineField = 'mblock_offline')
@@ -571,7 +566,7 @@ class MBlock
      * Convenience-Methode für Offline-Items mit automatischer rex_var Verarbeitung
      * @param string $rexValue REX_VALUE String (z.B. "REX_VALUE[1]")
      * @param string $offlineField Name des Offline-Feldes (default: 'mblock_offline')
-     * @return array Nur Offline-Items
+     * @return array<int, array<string, mixed>> Nur Offline-Items
      * @author Joachim Doerr
      */
     public static function getOfflineDataArray($rexValue, $offlineField = 'mblock_offline')
@@ -581,9 +576,9 @@ class MBlock
 
     /**
      * Convenience-Methode für Online-Items
-     * @param array $data MBlock-Daten
+     * @param array<int, array<string, mixed>>|null $data MBlock-Daten
      * @param string $offlineField Name des Offline-Feldes (default: 'mblock_offline')
-     * @return array Nur Online-Items
+     * @return array<int, array<string, mixed>> Nur Online-Items
      * @author Joachim Doerr
      */
     public static function getOnlineItems($data, $offlineField = 'mblock_offline')
@@ -593,9 +588,9 @@ class MBlock
     
     /**
      * Convenience-Methode für Offline-Items
-     * @param array $data MBlock-Daten
+     * @param array<int, array<string, mixed>>|null $data MBlock-Daten
      * @param string $offlineField Name des Offline-Feldes (default: 'mblock_offline')
-     * @return array Nur Offline-Items
+     * @return array<int, array<string, mixed>> Nur Offline-Items
      * @author Joachim Doerr
      */
     public static function getOfflineItems($data, $offlineField = 'mblock_offline')
@@ -605,11 +600,11 @@ class MBlock
 
     /**
      * Filtert MBlock-Items nach Feldwert
-     * @param array $items MBlock-Items
+     * @param array<int, array<string, mixed>>|null $items MBlock-Items
      * @param string $field Feldname
      * @param mixed $value Gesuchter Wert
      * @param bool $strict Strikte Vergleichung (default: false)
-     * @return array Gefilterte Items
+     * @return array<int, array<string, mixed>> Gefilterte Items
      */
     public static function filterByField($items, $field, $value, $strict = false)
     {
@@ -628,28 +623,28 @@ class MBlock
 
     /**
      * Sortiert MBlock-Items nach Feldwert
-     * @param array $items MBlock-Items
+     * @param array<int, array<string, mixed>>|null $items MBlock-Items
      * @param string $field Feldname zum Sortieren
      * @param string $direction 'asc' oder 'desc' (default: 'asc')
-     * @return array Sortierte Items
+     * @return array<int, array<string, mixed>> Sortierte Items
      */
     public static function sortByField($items, $field, $direction = 'asc')
     {
         if (!is_array($items) || empty($items)) {
-            return $items;
+            return array();
         }
 
         $direction = strtolower($direction);
         
         usort($items, function($a, $b) use ($field, $direction) {
-            $valueA = isset($a[$field]) ? $a[$field] : '';
-            $valueB = isset($b[$field]) ? $b[$field] : '';
+            $valueA = isset($a[$field]) && is_scalar($a[$field]) ? $a[$field] : '';
+            $valueB = isset($b[$field]) && is_scalar($b[$field]) ? $b[$field] : '';
             
             // Numerische Sortierung wenn beide Werte numerisch sind
             if (is_numeric($valueA) && is_numeric($valueB)) {
                 $result = ($valueA < $valueB) ? -1 : (($valueA > $valueB) ? 1 : 0);
             } else {
-                $result = strcasecmp($valueA, $valueB);
+                $result = strcasecmp((string) $valueA, (string) $valueB);
             }
             
             return $direction === 'desc' ? -$result : $result;
@@ -660,9 +655,9 @@ class MBlock
 
     /**
      * Gruppiert MBlock-Items nach Feldwert
-     * @param array $items MBlock-Items
+     * @param array<int, array<string, mixed>>|null $items MBlock-Items
      * @param string $field Feldname zum Gruppieren
-     * @return array Gruppierte Items [feldwert => [items]]
+     * @return array<int|string, list<array<string, mixed>>> Gruppierte Items [feldwert => [items]]
      */
     public static function groupByField($items, $field)
     {
@@ -673,7 +668,7 @@ class MBlock
         $groups = array();
         
         foreach ($items as $item) {
-            $groupKey = isset($item[$field]) ? $item[$field] : 'undefined';
+            $groupKey = isset($item[$field]) && (is_int($item[$field]) || is_string($item[$field])) ? $item[$field] : 'undefined';
             
             if (!isset($groups[$groupKey])) {
                 $groups[$groupKey] = array();
@@ -687,10 +682,10 @@ class MBlock
 
     /**
      * Limitiert MBlock-Items (für Pagination)
-     * @param array $items MBlock-Items
+     * @param array<int, array<string, mixed>>|null $items MBlock-Items
      * @param int $limit Maximale Anzahl Items
      * @param int $offset Start-Position (default: 0)
-     * @return array Limitierte Items
+     * @return array<int, array<string, mixed>> Limitierte Items
      */
     public static function limitItems($items, $limit, $offset = 0)
     {
@@ -703,9 +698,9 @@ class MBlock
 
     /**
      * Generiert JSON-LD Schema.org Markup für MBlock-Items
-     * @param array $items MBlock-Items
+     * @param array<int, array<string, mixed>>|null $items MBlock-Items
      * @param string $type Schema.org Type (z.B. 'Article', 'Product', 'Event')
-     * @param array $fieldMapping Mapping von MBlock-Feldern zu Schema-Properties
+     * @param array<string, string|list<string>> $fieldMapping Mapping von MBlock-Feldern zu Schema-Properties
      * @return string JSON-LD Schema Markup
      */
     public static function generateSchema($items, $type = 'Article', $fieldMapping = array())
@@ -753,10 +748,13 @@ class MBlock
                 foreach ($possibleFields as $field) {
                     if (isset($item[$field]) && !empty($item[$field])) {
                         $value = $item[$field];
+                        if (!is_scalar($value)) {
+                            continue;
+                        }
                         
                         // Spezielle Behandlung für Media-Felder
                         if (strpos($field, 'REX_MEDIA') !== false && $schemaProp === 'image') {
-                            $value = rex_url::media($value);
+                            $value = rex_url::media((string) $value);
                             if (!preg_match('#^https?://#', $value)) {
                                 $value = rex_url::frontend($value);
                             }
@@ -797,37 +795,13 @@ class MBlock
     }
 
     /**
-     * Sichere Reset-Methode mit verbesserter Speicherverwaltung
+     * Zustand fuer den naechsten MBlock im selben Modul zuruecksetzen
      * @author Joachim Doerr
      */
-    private static function reset()
+    private static function reset(): void
     {
-        // Sichere Array-Bereinigung
-        if (is_array(self::$items)) {
-            foreach (self::$items as $key => $item) {
-                if (isset(self::$items[$key])) {
-                    unset(self::$items[$key]);
-                }
-            }
-            self::$items = array();
-        }
-        
-        if (is_array(self::$result)) {
-            foreach (self::$result as $key => $value) {
-                if (isset(self::$result[$key])) {
-                    unset(self::$result[$key]);
-                }
-            }
-            self::$result = array();
-        }
-        
-        if (is_array(self::$output)) {
-            foreach (self::$output as $key => $value) {
-                if (isset(self::$output[$key])) {
-                    unset(self::$output[$key]);
-                }
-            }
-            self::$output = array();
-        }
+        self::$items = array();
+        self::$result = array();
+        self::$output = array();
     }
 }
