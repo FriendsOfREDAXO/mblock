@@ -9,6 +9,7 @@ Interne Verschlankung ohne Änderung der öffentlichen API: `MBlock::show()`, di
 
 ### Templates
 * **modern** neu: Aufbau wie der Flex-Repeater von MForm (Kopfzeile mit Griff, Status-Punkt, Nummer und Aktionen, Inhalt darunter, Hinzufügen-Streifen am Ende); übernimmt die MForm-Farbvariablen, wenn MForm installiert ist, sonst eigene Werte für hell und dunkel.
+* **focus** neu: nur der Inhalt ist sichtbar, Griff, Nummer, Aktionen und Hinzufügen-Streifen erscheinen bei Hover oder Fokus im Block (`:focus-within`, also auch per Tastatur); ohne Mauszeiger (`hover: none`) bleiben sie sichtbar. Offline-Blöcke behalten eine kleine Marke.
 * **retro_8bit** neu: Brotkasten-Optik mit beigem Gehäuse, dunklen Tasten mit farbigen Legenden und blauem C64-Bildschirm für Kopfzeile und Eingabefelder; Block-Nummer mit führender Null, `READY.`/`OFFLINE`, `LOAD "BLOCK",8,1` als Hinzufügen-Streifen.
 * Wrapper-Templates dürfen einen Streifen `<div class="mblock-add-bar"><button class="mblock-add-last">` unter der Liste haben; der Button hängt einen Block ans Ende und respektiert `max`.
 * Behoben: In allen Templates außer `standard` wurde der Klon beim Hinzufügen nie eingefügt, weil die Wrapper-Prüfung `hasClass('mblock_wrapper modern')` an der zweiten Klasse scheiterte.

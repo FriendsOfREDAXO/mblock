@@ -343,6 +343,7 @@ Die Template-Auswahl erfolgt unter `Addons > MBlock > Einstellungen`. Das CSS wi
 |---|---|
 | `standard` | Die bekannte MBlock-Darstellung, Buttons oben rechts im Block |
 | `modern` | Wie der Flex-Repeater von MForm: Kopfzeile mit Griff, Status, Nummer und Aktionen, darunter der Inhalt, am Ende ein Hinzufügen-Streifen. Nutzt die MForm-Farbvariablen, wenn MForm installiert ist |
+| `focus` | Nur der Inhalt ist sichtbar; Griff, Nummer, Aktionen und Hinzufügen-Streifen erscheinen bei Hover oder Fokus im Block. Auf Touch-Geräten bleiben sie sichtbar |
 | `retro_8bit` | Brotkasten: beiges Gehäuse, dunkle Tasten mit farbigen Legenden, blauer C64-Bildschirm für Kopfzeile und Felder |
 | `akg_skin` | Bootstrap-Grid-Variante |
 

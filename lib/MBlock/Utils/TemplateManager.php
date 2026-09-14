@@ -26,8 +26,9 @@ class TemplateManager
         $availableTemplates = array(
             'standard' => \rex_i18n::msg('mblock_theme_standard'),
             'modern' => 'Modern',
+            'focus' => 'Focus',
             'akg_skin' => 'AKG Skin',
-            'retro_8bit' => 'Retro 8bit'
+            'retro_8bit' => 'Retro 8bit (C64)'
         );
         
         // Only return templates that actually exist
