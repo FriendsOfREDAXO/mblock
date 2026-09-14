@@ -43,8 +43,7 @@ $mform = MForm::factory()
     );
 
 echo MBlock::show($id, $mform->show(), [
-    'copy_paste'     => true,
-    'online_offline' => true,
+    'copy_paste' => true,
 ]);
 ```
 
@@ -267,13 +266,13 @@ echo MBlock::show($id, $form, [
     'min'            => 1,
     'max'            => 10,
     'copy_paste'     => true,
-    'online_offline' => true,
+    'delete_confirm' => 1,
 ]);
 ```
 
 Tipps:
 
-- `online_offline` braucht ein Hidden-Feld `mblock_offline` im Formular.
+- Der Online/Offline-Schalter erscheint automatisch, sobald das Formular ein Hidden-Feld `mblock_offline` enthaelt und die Option in den MBlock-Einstellungen aktiv ist.
 - Mit `min` und `max` begrenzt du die Anzahl der Eintraege.
 - Fuer reine HTML-Module bleibt MBlock die beste Wahl.
 

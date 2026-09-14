@@ -68,3 +68,6 @@ mblock_toast_copy_success = Blok succesvol gekopieerd!
 mblock_toast_paste_success = Blok succesvol geplakt!
 mblock_toast_clipboard_empty = Geen gegevens in klembord
 mblock_toast_module_type_mismatch = Moduletype komt niet overeen
+mblock_confirm_title = Bevestigen
+mblock_confirm_cancel = Annuleren
+mblock_confirm_ok = Verwijderen

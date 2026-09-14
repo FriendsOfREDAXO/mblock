@@ -87,7 +87,7 @@ $items = MBlock::getOnlineDataArray("REX_VALUE[1]");
 $newsItems = MBlock::filterByField($items, 'category', 'news');
 
 // Sortieren
-$sorted = MBlock::sortByField($items, 'date', 'DESC', 'date');
+$sorted = MBlock::sortByField($items, 'date', 'desc');
 
 // Gruppieren
 $grouped = MBlock::groupByField($items, 'category');
@@ -106,14 +106,16 @@ $nextItems = MBlock::limitItems($items, 5, 5);
 ### Online/Offline-Status prüfen
 
 ```php
-foreach (MBlock::getDataArray("REX_VALUE[1]") as $item) {
-    if (MBlock::isOnline($item)) {
-        echo rex_escape($item['title']);
-    }
-}
-```
+// Nur Online-Blöcke (Offline-Feld leer oder 0)
+$items = MBlock::getOnlineDataArray("REX_VALUE[1]");
 
-> **Hinweis:** `MBlock::getOnlineItems()` und `getOfflineItems()` (alte Signatur mit Array-Parameter) sind deprecated. Bitte `getOnlineDataArray()` / `getOfflineDataArray()` verwenden.
+// Bereits geladene Daten filtern
+$online = MBlock::getOnlineItems(rex_var::toArray("REX_VALUE[1]"));
+
+// Einzelnen Block prüfen (seit 4.7.0)
+if (MBlock::isOnline($item)) { /* ... */ }
+$isOffline = MBlock::isOffline($item);
+```
 
 ## MForm Integration
 
@@ -320,29 +322,56 @@ $link = MFormOutputHelper::createLinkData($item['link'] ?? '');
 
 ```php
 echo MBlock::show($id, $form, [
-    'min'            => 1,       // Mindestanzahl Items (werden initial angezeigt)
-    'max'            => 10,      // Maximale Anzahl Items (0 = unbegrenzt)
-    'template'       => 'modern', // Template-Name
-    'copy_paste'     => true,    // Copy & Paste aktivieren
-    'online_offline' => true,    // Online/Offline-Toggle aktivieren
+    'min'            => 1,     // Mindestanzahl Blöcke (werden initial angezeigt)
+    'max'            => 10,    // Maximale Anzahl Blöcke
+    'copy_paste'     => true,  // Kopieren/Einfügen-Buttons (Standard: Einstellung)
+    'delete_confirm' => 1,     // Rückfrage vor dem Löschen: 1, 0 oder eigener Text
+    'input_delete'   => true,  // Eingaben in neuen Blöcken leeren
+    'smooth_scroll'  => true,  // Zum neuen Block scrollen
 ]);
 ```
 
-> **`online_offline`**: Erfordert ein `addHiddenField("$id.0.mblock_offline", '0')` im Formular.
+> Der Online/Offline-Schalter erscheint automatisch, sobald das Formular ein Hidden-Feld `mblock_offline` enthält (`addHiddenField("$id.0.mblock_offline", '0')`) und die Option in den Einstellungen aktiv ist. Das Template wird global in den Einstellungen gewählt.
 
 ## Templates & Theming
 
 ### Template auswählen
 
-Die Template-Auswahl erfolgt unter `Addons > MBlock > Einstellungen`. Das CSS wird automatisch in den `assets/`-Ordner kopiert.
+Die Template-Auswahl erfolgt unter `Addons > MBlock > Einstellungen`. Das CSS wird automatisch in den `assets/`-Ordner kopiert. Mitgeliefert sind:
+
+| Template | Optik |
+|---|---|
+| `standard` | Die bekannte MBlock-Darstellung, Buttons oben rechts im Block |
+| `modern` | Wie der Flex-Repeater von MForm: Kopfzeile mit Griff, Status, Nummer und Aktionen, darunter der Inhalt, am Ende ein Hinzufügen-Streifen. Nutzt die MForm-Farbvariablen, wenn MForm installiert ist |
+| `focus` | Nur der Inhalt ist sichtbar; Griff, Nummer, Aktionen und Hinzufügen-Streifen erscheinen bei Hover oder Fokus im Block. Auf Touch-Geräten bleiben sie sichtbar |
+| `retro_8bit` | Brotkasten: beiges Gehäuse, dunkle Tasten mit farbigen Legenden, blauer C64-Bildschirm für Kopfzeile und Felder |
+| `akg_skin` | Bootstrap-Grid-Variante |
+
+Die mitgelieferten Templates werden bei Installation und Update nach `redaxo/data/addons/mblock/templates/` kopiert und dort überschrieben. Eigene Templates bekommen deshalb einen eigenen Ordnernamen.
 
 ### Dark Mode
 
 Die mitgelieferten Templates unterstützen Dark Mode über:
 
 - `body.rex-theme-dark` (REDAXO Theme)
-- `@media (prefers-color-scheme: dark)` (Browser)
-- `[data-bs-theme="dark"]` (Bootstrap 5)
+- `@media (prefers-color-scheme: dark)` (Browser, solange kein helles Theme gewählt ist)
+- `html[data-bs-theme="dark"]` (Bootstrap 5)
+
+### CSS-Variablen
+
+Farben, Abstände und Effekte des Standard-Stylesheets sind Variablen in `:root` (`assets/mblock.css`). Für eigene Farben reicht es, sie in eigenem CSS nach dem MBlock-CSS zu überschreiben:
+
+```css
+:root {
+    --mblock-background: rgba(255, 240, 245, 0.1);
+    --mblock-border-color: rgba(220, 20, 60, 0.3);
+    --mblock-add-background: #e91e63;
+    --mblock-add-background-hover: #c2185b;
+    --mblock-toggle-width: 80px;
+}
+```
+
+Im Dark Mode setzt MBlock dieselben Variablen aus den `--mblock-dark-*`-Werten neu, z. B. `--mblock-dark-block-background`, `--mblock-dark-border-color`, `--mblock-dark-control-background` oder `--mblock-dark-add-background`. Wer beide Modi anpassen will, überschreibt die hellen Variablen in `:root` und die `--mblock-dark-*`-Werte daneben. Die vollständige Liste steht am Anfang von `assets/mblock.css`; die Gruppen sind Block (`--mblock-background`, `--mblock-border-color`, `--mblock-shadow`, `--mblock-padding`, ...), Griff (`--mblock-drag-*`), Buttons (`--mblock-button-*`, `--mblock-control-*`, `--mblock-add-*`, `--mblock-copy-hover-*`, `--mblock-paste-hover-*`), Online/Offline (`--mblock-toggle-*`, `--mblock-offline-block-*`), Zwischenablage-Leiste (`--mblock-toolbar-*`), Sortier-Platzhalter (`--mblock-ghost-*`, `--mblock-chosen-*`) und Leuchteffekte (`--mblock-glow-*`).
 
 ### Custom Templates
 
@@ -358,40 +387,15 @@ my_theme/
 
 ## Development & Build
 
-### JavaScript-Architektur
-
-MBlock verwendet drei modulare JavaScript-Dateien:
-
-- **`mblock-core.js`** – Utilities, Validierung, Übersetzungen
-- **`mblock-management.js`** – DOM-Manipulation, Sortable-Handling
-- **`mblock-features.js`** – Copy/Paste, Online/Offline Toggle, REDAXO Widgets
-
-### Build-System
+Das Verhalten im Backend steckt in einer Datei, `assets/mblock.js`. Solange der Debug-Modus oder das Debug-Addon aktiv ist, lädt `boot.php` diese Datei, sonst die minifizierte `mblock.min.js`.
 
 ```bash
 cd redaxo/src/addons/mblock/build
-./build.sh
+npm install
+node minify.js   # erzeugt assets/mblock.min.js
 ```
 
-Erstellt automatisch:
-- `mblock.js` (Development)
-- `mblock.min.js` (Production, minifiziert mit Terser)
-- Source Map für Debugging
-
-**Asset-Loading-Modi** (konfigurierbar in `boot.php`):
-
-| Modus | Verhalten |
-|-------|-----------|
-| `auto` (Standard) | Development → `mblock.js`, Production → `mblock.min.js` |
-| `modular` | 3 separate Dateien (maximales Debugging) |
-| `combined` | Immer `mblock.js` |
-| `prod` | Immer `mblock.min.js` |
-
-### Development Workflow
-
-1. Bearbeite die modularen Dateien in `assets/`
-2. `cd build && ./build.sh` ausführen
-3. Im REDAXO-Debug-Modus wird automatisch die Development-Version geladen
+Nach Änderungen an `assets/` in der Installation `assets:sync` ausführen bzw. den Asset-Cache leeren. Die JavaScript-Schnittstelle (Funktionen, `MBlockClipboard`, Events) ist in der API-Dokumentation beschrieben.
 
 ---
 

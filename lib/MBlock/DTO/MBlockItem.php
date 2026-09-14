@@ -12,9 +12,9 @@ namespace FriendsOfRedaxo\MBlock\DTO;
 class MBlockItem
 {
     /**
-     * @var array
+     * @var array<string, mixed>
      */
-    public $result;
+    public $result = array();
 
     /**
      * @var integer
@@ -22,12 +22,12 @@ class MBlockItem
     public $id;
 
     /**
-     * @var integer
+     * @var int|string
      */
     public $valueId;
 
     /**
-     * @var integer
+     * @var int|string|null
      */
     public $systemId;
 
@@ -42,12 +42,12 @@ class MBlockItem
     public $form;
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     public $payload = array();
 
     /**
-     * @return array
+     * @return array<string, mixed>
      * @author Joachim Doerr
      */
     public function getResult()
@@ -56,7 +56,7 @@ class MBlockItem
     }
 
     /**
-     * @param array $result
+     * @param array<string, mixed> $result
      * @return MBlockItem
      * @author Joachim Doerr
      */
@@ -87,7 +87,7 @@ class MBlockItem
     }
 
     /**
-     * @return int
+     * @return int|string
      * @author Joachim Doerr
      */
     public function getValueId()
@@ -96,7 +96,7 @@ class MBlockItem
     }
 
     /**
-     * @param int $valueId
+     * @param int|string $valueId
      * @return MBlockItem
      * @author Joachim Doerr
      */
@@ -107,7 +107,7 @@ class MBlockItem
     }
 
     /**
-     * @return int
+     * @return int|string|null
      * @author Joachim Doerr
      */
     public function getSystemId()
@@ -116,7 +116,7 @@ class MBlockItem
     }
 
     /**
-     * @param int $systemId
+     * @param int|string $systemId
      * @return MBlockItem
      * @author Joachim Doerr
      */
@@ -167,8 +167,8 @@ class MBlockItem
     }
 
     /**
-     * @param null $key
-     * @return array
+     * @param string|null $key
+     * @return mixed Wert des Schluessels, ohne Schluessel das ganze Payload-Array
      * @author Joachim Doerr
      */
     public function getPayload($key = null)
@@ -180,7 +180,7 @@ class MBlockItem
     }
 
     /**
-     * @param array $payload
+     * @param array<string, mixed> $payload
      * @return MBlockItem
      * @author Joachim Doerr
      */
@@ -191,8 +191,8 @@ class MBlockItem
     }
 
     /**
-     * @param $key
-     * @param $value
+     * @param string $key
+     * @param mixed $value
      * @return $this
      * @author Joachim Doerr
      */

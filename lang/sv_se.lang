@@ -68,3 +68,6 @@ mblock_toast_copy_success = Block kopierat framgångsrikt!
 mblock_toast_paste_success = Block inklistrat framgångsrikt!
 mblock_toast_clipboard_empty = Inga data i urklipp
 mblock_toast_module_type_mismatch = Modultyp matchar inte
+mblock_confirm_title = Bekräfta
+mblock_confirm_cancel = Avbryt
+mblock_confirm_ok = Ta bort

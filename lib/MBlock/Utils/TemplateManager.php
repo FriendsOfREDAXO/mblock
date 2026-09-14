@@ -18,7 +18,7 @@ class TemplateManager
      * Get all available templates from data/templates directory
      * Only built-in templates are offered, no custom templates
      * 
-     * @return array Array with template key => display name
+     * @return array<string, string> Array with template key => display name
      */
     public static function getAvailableTemplates()
     {
@@ -26,8 +26,9 @@ class TemplateManager
         $availableTemplates = array(
             'standard' => \rex_i18n::msg('mblock_theme_standard'),
             'modern' => 'Modern',
+            'focus' => 'Focus',
             'akg_skin' => 'AKG Skin',
-            'retro_8bit' => 'Retro 8bit'
+            'retro_8bit' => 'Retro 8bit (C64)'
         );
         
         // Only return templates that actually exist
@@ -64,7 +65,7 @@ class TemplateManager
         
         // If no CSS file exists, that's okay
         $cssContent = \rex_file::get($cssFile);
-        if ($cssContent === false) {
+        if (null === $cssContent) {
             return true;
         }
         
@@ -143,7 +144,7 @@ class TemplateManager
         $templatePath = \rex_path::addon('mblock', 'data/templates/' . $templateName . '/');
         $cssFile = $templatePath . $templateName . '.css';
         
-        return \rex_file::get($cssFile) !== false;
+        return null !== \rex_file::get($cssFile);
     }
     
     /**

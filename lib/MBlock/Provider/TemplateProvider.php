@@ -33,7 +33,7 @@ class TemplateProvider
         // All templates come from data/templates/ directory
         $templatePath = \rex_path::addon('mblock', 'data/templates/' . $templateName . '/mblock_' . $type . '.ini');
         if (file_exists($templatePath)) {
-            return file_get_contents($templatePath);
+            return (string) file_get_contents($templatePath);
         }
         
         // Fallback if nothing is found

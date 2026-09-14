@@ -21,13 +21,13 @@ use rex_sql_exception;
 class MBlockValueHandler
 {
     /**
-     * @return array
+     * @return array<string, mixed>
      * @author Joachim Doerr
      * @throws rex_sql_exception
      */
     public static function loadRexVars()
     {
-        $sliceId = rex_request('slice_id', 'int', false);
+        $sliceId = rex_request('slice_id', 'int', 0);
         $result = array();
 
         // Check for fake result from Gridblock or other addons
@@ -81,11 +81,6 @@ class MBlockValueHandler
                 
                 // Sichere Validierung der Input-Werte
                 foreach ($inputValues as $key => $value) {
-                    // Schlüssel-Validierung: Nur numerische und String-Schlüssel erlauben
-                    if (!is_string($key) && !is_numeric($key)) {
-                        continue; // Ungültige Schlüssel überspringen
-                    }
-                    
                     // Wert-Validierung: SQL-Injection-Schutz und Datentypprüfung
                     if (is_array($value)) {
                         // Arrays rekursiv validieren und bereinigen
@@ -102,7 +97,7 @@ class MBlockValueHandler
             }
         }
 
-        if ($sliceId !== false && is_numeric($sliceId) && $sliceId > 0) {
+        if ($sliceId > 0) {
             $table = rex::getTablePrefix() . 'article_slice';
             $fields = '*';
             $sliceId = (int) $sliceId; // Explizite Typisierung für SQL-Sicherheit
@@ -126,7 +121,8 @@ class MBlockValueHandler
                     }
 
                     // Robuste JSON-Dekodierung mit MBlockJsonHelper
-                    $valueString = (string) $result['value'][$i];
+                    $rawValue = $result['value'][$i];
+                    $valueString = is_scalar($rawValue) ? (string) $rawValue : '';
                     if (!empty($valueString)) {
                         $jsonResult = MBlockJsonHelper::decodeFromHtml($valueString, true, false);
                         
@@ -143,9 +139,9 @@ class MBlockValueHandler
     }
 
     /**
-     * @param $table
-     * @param null|int $id
-     * @return array
+     * @param mixed $table Array aus Tabelle, Spalte[, Typ-Schluessel, Attribut], z. B. explode('::', 'yform::tabelle::feld')
+     * @param int|null $id
+     * @return array<string, mixed>
      * @author Joachim Doerr
      * @throws rex_sql_exception
      */
@@ -206,23 +202,14 @@ class MBlockValueHandler
 
     /**
      * Bereinigt Array-Werte rekursiv für sicherere Verarbeitung
-     * @param array $array - Zu bereinigendes Array
-     * @return array - Bereinigtes Array
+     * @param array<mixed> $array - Zu bereinigendes Array
+     * @return array<mixed> - Bereinigtes Array
      * @author Joachim Doerr
      */
-    private static function sanitizeArrayValue($array)
+    private static function sanitizeArrayValue(array $array): array
     {
-        if (!is_array($array)) {
-            return $array;
-        }
-
         $sanitized = [];
         foreach ($array as $key => $value) {
-            // Schlüssel-Validierung
-            if (!is_string($key) && !is_numeric($key)) {
-                continue;
-            }
-
             // Wert-Validierung
             if (is_array($value)) {
                 $sanitized[$key] = self::sanitizeArrayValue($value); // Rekursiver Aufruf

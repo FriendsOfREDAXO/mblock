@@ -19,9 +19,8 @@ class MBlockValueReplacer
     use MBlockReplacerTrait;
 
     /**
-     * @param MBlockItem $item
-     * @param $count
-     * @return String
+     * @param bool $setDefaultValue
+     * @return string
      * @author Joachim Doerr
      */
     public static function replaceValueSetEmpty(MBlockItem $item, $setDefaultValue = false)
@@ -30,10 +29,7 @@ class MBlockValueReplacer
         $dom = self::createDom($item->getForm());
 
         // find inputs
-        if ($matches = $dom->getElementsByTagName('input')) {
-            /** @var DOMElement $match */
-            foreach ($matches as $match) {
-                // label for and id change
+        foreach ($dom->getElementsByTagName('input') as $match) {
                 switch ($match->getAttribute('type')) {
                     case 'checkbox':
                     case 'radio':
@@ -44,22 +40,17 @@ class MBlockValueReplacer
                         // replace value by json key
                         self::replaceValue($match, $item);
                 }
-            }
         }
 
         // find textareas
-        if ($matches = $dom->getElementsByTagName('textarea')) {
-            /** @var DOMElement $match */
-            foreach ($matches as $match) {
+        foreach ($dom->getElementsByTagName('textarea') as $match) {
                 // replace value by json key
                 self::replaceValue($match, $item);
-            }
         }
 
         // find selects
-        if ($matches = $dom->getElementsByTagName('select')) {
-            /** @var DOMElement $match */
-            foreach ($matches as $match) {
+        {
+            foreach ($dom->getElementsByTagName('select') as $match) {
                 // replace value by json key
                 if ($match->hasChildNodes()) {
                     /** @var DOMElement $child */
@@ -88,9 +79,7 @@ class MBlockValueReplacer
     }
 
     /**
-     * @param DOMElement $element
-     * @param MBlockItem $item
-     * @param bool $valueEmpty
+     * @return void
      * @author Joachim Doerr
      */
     protected static function replaceValue(DOMElement $element, MBlockItem $item)
@@ -114,8 +103,7 @@ class MBlockValueReplacer
     }
 
     /**
-     * @param DOMElement $element
-     * @param MBlockItem $item
+     * @return void
      * @author Joachim Doerr
      */
     protected static function replaceChecked(DOMElement $element, MBlockItem $item)
@@ -133,9 +121,7 @@ class MBlockValueReplacer
     }
 
     /**
-     * @param DOMElement $select
-     * @param DOMElement $option
-     * @param MBlockItem $item
+     * @return void
      * @author Joachim Doerr
      */
     protected static function replaceOptionSelect(DOMElement $select, DOMElement $option, MBlockItem $item)

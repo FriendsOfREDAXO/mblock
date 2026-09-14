@@ -1,0 +1,466 @@
+/* MBlock Theme "focus"
+ * Nur der Inhalt ist sichtbar. Griff, Nummer, Aktionen und der Hinzufuegen-Streifen erscheinen
+ * erst, wenn der Mauszeiger ueber dem Block liegt oder ein Feld darin den Fokus hat. Auf
+ * Geraeten ohne Mauszeiger bleiben die Bedienelemente sichtbar. Farben aus MForm (--mform-*),
+ * wenn vorhanden, sonst Fallbacks.
+ */
+
+.mblock_wrapper.focus {
+    --mbf-bg:            var(--mform-surface, #ffffff);
+    --mbf-bg-alt:        var(--mform-surface-alt, #f3f6fb);
+    --mbf-hover:         var(--mform-hover, #dfe3e9);
+    --mbf-border:        var(--mform-border, #dfe3e9);
+    --mbf-border-strong: var(--mform-border-strong, #c7ccd3);
+    --mbf-text:          var(--mform-text, #324050);
+    --mbf-muted:         var(--mform-muted, #68727d);
+    --mbf-link:          var(--mform-link, #2f6ea8);
+    --mbf-active-bg:     var(--mform-active-bg, #dbedf7);
+    --mbf-success:       var(--mform-success, #5bb585);
+    --mbf-danger:        var(--mform-danger, #d9534f);
+    --mbf-offline:       #e74c3c;
+    --mbf-radius:        6px;
+    --mbf-shadow-lift:   0 4px 14px rgba(0, 0, 0, .14);
+    --mbf-transition:    160ms ease;
+
+    counter-reset: mblock-item;
+}
+
+body.rex-theme-dark .mblock_wrapper.focus,
+html[data-bs-theme="dark"] .mblock_wrapper.focus {
+    --mbf-bg:            var(--mform-surface, #1a202c);
+    --mbf-bg-alt:        var(--mform-surface-alt, #212836);
+    --mbf-hover:         var(--mform-hover, #384252);
+    --mbf-border:        var(--mform-border, #3a4557);
+    --mbf-border-strong: var(--mform-border-strong, #4a5568);
+    --mbf-text:          var(--mform-text, #d5dbe3);
+    --mbf-muted:         var(--mform-muted, #8b95a3);
+    --mbf-link:          var(--mform-link, #7fb3e6);
+    --mbf-active-bg:     var(--mform-active-bg, #2d3748);
+    --mbf-danger:        var(--mform-danger, #e8857a);
+    --mbf-shadow-lift:   0 4px 14px rgba(0, 0, 0, .5);
+}
+
+@media (prefers-color-scheme: dark) {
+    body:not(.rex-theme-light) .mblock_wrapper.focus {
+        --mbf-bg:            var(--mform-surface, #1a202c);
+        --mbf-bg-alt:        var(--mform-surface-alt, #212836);
+        --mbf-hover:         var(--mform-hover, #384252);
+        --mbf-border:        var(--mform-border, #3a4557);
+        --mbf-border-strong: var(--mform-border-strong, #4a5568);
+        --mbf-text:          var(--mform-text, #d5dbe3);
+        --mbf-muted:         var(--mform-muted, #8b95a3);
+        --mbf-link:          var(--mform-link, #7fb3e6);
+        --mbf-active-bg:     var(--mform-active-bg, #2d3748);
+        --mbf-danger:        var(--mform-danger, #e8857a);
+        --mbf-shadow-lift:   0 4px 14px rgba(0, 0, 0, .5);
+    }
+}
+
+/* ---------------------------------------------------------------------------
+   Block: ruhige Flaeche, Bedienelemente unsichtbar
+   --------------------------------------------------------------------------- */
+.mblock_wrapper.focus > .sortitem {
+    counter-increment: mblock-item;
+    position: relative;
+    margin: 0 0 .75rem;
+    padding: 0;
+    background: var(--mbf-bg);
+    border: 1px solid var(--mbf-border);
+    border-radius: var(--mbf-radius);
+    box-shadow: none;
+    color: var(--mbf-text);
+    transition: border-color var(--mbf-transition), box-shadow var(--mbf-transition);
+}
+
+.mblock_wrapper.focus > .sortitem:hover,
+.mblock_wrapper.focus > .sortitem:focus-within {
+    background: var(--mbf-bg);
+    border-color: var(--mbf-border-strong);
+    box-shadow: var(--mbf-shadow-lift);
+}
+
+.mblock_wrapper.focus .focus-body {
+    padding: 2.9rem 1.9rem 1.6rem;
+}
+
+.mblock_wrapper.focus .focus-body .form-group:last-child {
+    margin-bottom: 0;
+}
+
+/* Griff links, Nummer daneben, Aktionen oben rechts: alle erst bei Hover oder Fokus */
+.mblock_wrapper.focus span.focus-handle,
+.mblock_wrapper.focus .focus-index,
+.mblock_wrapper.focus span.focus-actions {
+    position: absolute;
+    top: .5rem;
+    z-index: 2;
+    opacity: 0;
+    transition: opacity var(--mbf-transition);
+}
+
+.mblock_wrapper.focus > .sortitem:hover span.focus-handle,
+.mblock_wrapper.focus > .sortitem:hover .focus-index,
+.mblock_wrapper.focus > .sortitem:hover span.focus-actions,
+.mblock_wrapper.focus > .sortitem:focus-within span.focus-handle,
+.mblock_wrapper.focus > .sortitem:focus-within .focus-index,
+.mblock_wrapper.focus > .sortitem:focus-within span.focus-actions {
+    opacity: 1;
+}
+
+.mblock_wrapper.focus span.focus-handle {
+    left: .5rem;
+    display: flex;
+    align-items: center;
+    padding: 2px 4px;
+    color: var(--mbf-muted);
+    font-size: 14px;
+    line-height: 1;
+    letter-spacing: 0;
+    cursor: grab;
+}
+
+.mblock_wrapper.focus span.focus-handle::before {
+    content: "\2261";
+}
+
+.mblock_wrapper.focus span.focus-handle:hover {
+    color: var(--mbf-text);
+}
+
+.mblock_wrapper.focus span.focus-handle:active {
+    cursor: grabbing;
+}
+
+.mblock_wrapper.focus .focus-index {
+    left: 2rem;
+    padding: 2px 7px;
+    border: 1px solid var(--mbf-border);
+    border-radius: 999px;
+    background: var(--mbf-bg-alt);
+    color: var(--mbf-muted);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.mblock_wrapper.focus .focus-index::before {
+    content: counter(mblock-item);
+}
+
+.mblock_wrapper.focus span.focus-actions {
+    right: .5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    border: 1px solid var(--mbf-border);
+    border-radius: var(--mbf-radius);
+    background: var(--mbf-bg);
+    box-shadow: var(--mbf-shadow-lift);
+}
+
+.mblock_wrapper.focus span.focus-actions .btn-group {
+    display: flex;
+    gap: 4px;
+}
+
+.mblock_wrapper.focus span.focus-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    min-height: 26px;
+    padding: 3px 8px;
+    border: 1px solid var(--mbf-border);
+    border-radius: 0;
+    background: var(--mbf-bg);
+    color: var(--mbf-text);
+    font-size: 12px;
+    line-height: 1;
+    box-shadow: none;
+    transition: background-color var(--mbf-transition), border-color var(--mbf-transition), color var(--mbf-transition);
+}
+
+.mblock_wrapper.focus span.focus-actions .btn .rex-icon,
+.mblock_wrapper.focus span.focus-actions .btn i {
+    margin: 0;
+    font-size: 12px;
+}
+
+.mblock_wrapper.focus span.focus-actions .btn:hover:not([disabled]):not(.disabled),
+.mblock_wrapper.focus span.focus-actions .btn:focus:not([disabled]):not(.disabled) {
+    background: var(--mbf-hover);
+    border-color: var(--mbf-border-strong);
+    color: var(--mbf-text);
+    transform: none;
+    box-shadow: none;
+}
+
+.mblock_wrapper.focus span.focus-actions .btn.addme {
+    color: var(--mbf-success);
+}
+
+.mblock_wrapper.focus span.focus-actions .btn.removeme {
+    color: var(--mbf-danger);
+}
+
+.mblock_wrapper.focus span.focus-actions .btn.mblock-copy-btn:hover:not(.disabled),
+.mblock_wrapper.focus span.focus-actions .btn.mblock-paste-btn:hover:not(.disabled) {
+    background: var(--mbf-hover);
+    border-color: var(--mbf-border-strong);
+    color: var(--mbf-link);
+    box-shadow: none;
+}
+
+.mblock_wrapper.focus span.focus-actions .btn.mblock-copy-btn.is-copied {
+    background: var(--mbf-active-bg) !important;
+    border-color: var(--mbf-link) !important;
+    color: var(--mbf-link) !important;
+    transform: none;
+}
+
+.mblock_wrapper.focus span.focus-actions .btn[disabled],
+.mblock_wrapper.focus span.focus-actions .btn.disabled {
+    opacity: .4;
+    background: var(--mbf-bg) !important;
+    border-color: var(--mbf-border) !important;
+    color: var(--mbf-muted) !important;
+    cursor: default;
+}
+
+.mblock_wrapper.focus span.focus-actions .btn.mblock-offline-toggle-btn.btn-success,
+.mblock_wrapper.focus span.focus-actions .btn.mblock-offline-toggle-btn.btn-danger {
+    width: auto !important;
+    min-width: 30px !important;
+    max-width: none !important;
+    padding: 3px 8px !important;
+    font-size: 12px !important;
+    gap: 5px !important;
+    background: var(--mbf-bg) !important;
+    border-color: var(--mbf-border) !important;
+    color: var(--mbf-text) !important;
+}
+
+.mblock_wrapper.focus span.focus-actions .btn.mblock-offline-toggle-btn.btn-success:hover,
+.mblock_wrapper.focus span.focus-actions .btn.mblock-offline-toggle-btn.btn-danger:hover {
+    background: var(--mbf-hover) !important;
+    border-color: var(--mbf-border-strong) !important;
+    transform: none;
+    box-shadow: none;
+}
+
+.mblock_wrapper.focus span.focus-actions .btn.mblock-offline-toggle-btn.btn-success i {
+    color: var(--mbf-success);
+}
+
+.mblock_wrapper.focus span.focus-actions .btn.mblock-offline-toggle-btn.btn-danger i {
+    color: var(--mbf-offline);
+}
+
+/* Offline: der einzige Zustand, der ohne Hover sichtbar bleibt */
+.mblock_wrapper.focus > .sortitem.mblock-offline {
+    opacity: 1;
+    background: var(--mbf-bg-alt);
+    border-style: solid;
+    border-color: var(--mbf-border);
+    border-left: 4px solid var(--mbf-offline);
+}
+
+.mblock_wrapper.focus > .sortitem.mblock-offline::before {
+    content: "Offline";
+    position: absolute;
+    inset: auto;
+    top: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    padding: 1px 8px;
+    border-radius: 0 0 4px 4px;
+    background: var(--mbf-offline);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    pointer-events: none;
+}
+
+.mblock_wrapper.focus > .sortitem.mblock-offline .focus-body {
+    opacity: .45;
+    transition: opacity var(--mbf-transition);
+}
+
+.mblock_wrapper.focus > .sortitem.mblock-offline:hover .focus-body,
+.mblock_wrapper.focus > .sortitem.mblock-offline:focus-within .focus-body {
+    opacity: 1;
+}
+
+/* ---------------------------------------------------------------------------
+   Sortieren, Einfuegen, Hinzufuegen
+   --------------------------------------------------------------------------- */
+.mblock_wrapper.focus > .sortitem.sortable-ghost {
+    opacity: .6;
+    background: var(--mbf-active-bg);
+    border: 1px dashed var(--mbf-link);
+    padding: 0;
+    margin: 0 0 .75rem;
+    backdrop-filter: none;
+}
+
+.mblock_wrapper.focus > .sortitem.sortable-ghost::before {
+    content: none;
+}
+
+.mblock_wrapper.focus > .sortitem.mblock-sortable-chosen {
+    box-shadow: var(--mbf-shadow-lift);
+}
+
+.mblock_wrapper.focus > .sortitem.mblock-paste-glow,
+.mblock_wrapper.focus > .sortitem.mblock-add-glow,
+.mblock_wrapper.focus > .sortitem.mblock-copy-glow {
+    animation: mblockFocusFlash .9s ease-out;
+    border-color: var(--mbf-border) !important;
+    background: var(--mbf-bg) !important;
+}
+
+@keyframes mblockFocusFlash {
+    0% { background-color: var(--mbf-active-bg); border-color: var(--mbf-link); }
+    100% { background-color: var(--mbf-bg); border-color: var(--mbf-border); }
+}
+
+/* Streifen am Ende: nur eine feine Linie, wird bei Hover ueber der Liste zum Button */
+.mblock_wrapper.focus > .mblock-single-add {
+    display: none;
+}
+
+.mblock_wrapper.focus > .focus-add-bar,
+.mblock_wrapper.focus > .focus-add-bar:hover {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+}
+
+.mblock_wrapper.focus > .focus-add-bar .mblock-add-last {
+    display: block;
+    width: 100%;
+    height: 12px;
+    padding: 0;
+    overflow: hidden;
+    background: transparent;
+    border: 0;
+    border-top: 1px dashed var(--mbf-border);
+    border-radius: 0;
+    box-shadow: none;
+    color: transparent;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+    text-shadow: none;
+    transition: height var(--mbf-transition), color var(--mbf-transition), background var(--mbf-transition), border-color var(--mbf-transition);
+}
+
+.mblock_wrapper.focus:hover > .focus-add-bar .mblock-add-last,
+.mblock_wrapper.focus:focus-within > .focus-add-bar .mblock-add-last,
+.mblock_wrapper.focus > .focus-add-bar .mblock-add-last:focus {
+    height: auto;
+    padding: .5rem 1rem;
+    border: 1px dashed var(--mbf-border);
+    border-radius: var(--mbf-radius);
+    color: var(--mbf-link);
+}
+
+.mblock_wrapper.focus > .focus-add-bar .mblock-add-last:hover:not([disabled]) {
+    background: var(--mbf-active-bg);
+    border-style: solid;
+    border-color: var(--mbf-link);
+    color: var(--mbf-link);
+}
+
+.mblock_wrapper.focus > .focus-add-bar .mblock-add-last[disabled] {
+    opacity: .4;
+    cursor: default;
+}
+
+/* Zwischenablage-Leiste: schlicht, rechts */
+.mblock_wrapper.focus > .mblock-copy-paste-toolbar,
+.mblock_wrapper.focus > .mblock-copy-paste-toolbar:hover {
+    justify-content: flex-end;
+    margin: 0 0 .55rem;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+    transform: none;
+}
+
+.mblock_wrapper.focus > .mblock-copy-paste-toolbar .btn {
+    padding: 4px 10px;
+    border: 1px solid var(--mbf-border);
+    border-radius: 0;
+    background: var(--mbf-bg);
+    color: var(--mbf-muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.mblock_wrapper.focus > .mblock-copy-paste-toolbar .btn:hover {
+    background: var(--mbf-hover);
+    border-color: var(--mbf-border-strong);
+    color: var(--mbf-text);
+}
+
+/* ---------------------------------------------------------------------------
+   Ohne Mauszeiger (Touch) und bei reduzierter Bewegung: Bedienelemente immer sichtbar
+   --------------------------------------------------------------------------- */
+@media (hover: none) {
+    .mblock_wrapper.focus span.focus-handle,
+    .mblock_wrapper.focus .focus-index,
+    .mblock_wrapper.focus span.focus-actions {
+        position: static;
+        opacity: 1;
+        box-shadow: none;
+    }
+
+    .mblock_wrapper.focus > .sortitem {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: .5rem;
+        padding: .5rem .85rem 0;
+    }
+
+    .mblock_wrapper.focus span.focus-actions {
+        margin-left: auto;
+    }
+
+    .mblock_wrapper.focus .focus-body {
+        width: 100%;
+        padding: 1rem 0;
+    }
+
+    .mblock_wrapper.focus > .focus-add-bar .mblock-add-last {
+        height: auto;
+        padding: .5rem 1rem;
+        border: 1px dashed var(--mbf-border);
+        border-radius: var(--mbf-radius);
+        color: var(--mbf-link);
+    }
+}
+
+@media (max-width: 768px) {
+    .mblock_wrapper.focus .focus-body {
+        padding: 2.9rem 1rem 1rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mblock_wrapper.focus * {
+        transition: none !important;
+        animation: none !important;
+    }
+}

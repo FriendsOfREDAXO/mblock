@@ -20,8 +20,8 @@ class MBlockBootstrapReplacer
 
     /**
      * @param MBlockItem $item
-     * @param $count
-     * @return String
+     * @param int $count
+     * @return string
      * @author Joachim Doerr
      */
     public static function replaceTabIds(MBlockItem $item, $count)
@@ -67,8 +67,8 @@ class MBlockBootstrapReplacer
 
     /**
      * @param MBlockItem $item
-     * @param $count
-     * @return String
+     * @param int $count
+     * @return string
      * @author Joachim Doerr
      */
     public static function replaceCollapseIds(MBlockItem $item, $count)

@@ -18,8 +18,8 @@ class MBlockParser
     /**
      * @param MBlockElement $element
      * @param string $templateType
-     * @param null $theme
-     * @return mixed
+     * @param string|null $theme
+     * @return string
      * @author Joachim Doerr
      */
     public static function parseElement(MBlockElement $element, $templateType, $theme = null)

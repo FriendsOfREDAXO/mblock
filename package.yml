@@ -1,5 +1,5 @@
 package: mblock
-version: 4.6.8
+version: 4.7.0-beta.1
 name: MBlock
 author: Friends Of REDAXO
 supportpage: https://github.com/FriendsOfREDAXO/mblock
@@ -17,7 +17,7 @@ page:
             subpages:
                 demo_mform: { title: translate:demo_mform }
                 demo_html: { title: translate:demo_html }
-        best_practices: { title: 'translate:mblock_best_practices' }
+        best_practices: { title: 'translate:mblock_best_practices', subPath: docs/best_practices.md }
         api: { title: 'API', subPath: API.md }
         help: { title: 'translate:help', subPath: README.md }
         settings: { title: translate:configuration, itemClass: 'pull-right' }

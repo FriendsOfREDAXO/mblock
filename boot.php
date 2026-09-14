@@ -5,7 +5,7 @@
  * @license MIT
  */
 
-
+/** @var rex_addon $this */
 
 if (rex::isBackend() && is_object(rex::getUser())) {
 
@@ -24,7 +24,7 @@ if (rex::isBackend() && is_object(rex::getUser())) {
     // - Prefer the Sortable.js from the `bloecks` addon if it is available AND drag&drop is enabled there
     // - Otherwise fall back to the bundled Sortable placed in this addon's assets folder
     $bloecksAddon = rex_addon::get('bloecks');
-    if ($bloecksAddon && $bloecksAddon->isAvailable() && $bloecksAddon->getConfig('drag_drop', true)) {
+    if ($bloecksAddon->isAvailable() && $bloecksAddon->getConfig('drag_drop', true)) {
         // Use bloecks Sortable.js when bloecks is present and d&d is enabled
         rex_view::addJsFile($bloecksAddon->getAssetsUrl('js/sortable.min.js'));
         rex_view::setJsProperty('mblock_sortable_source', 'bloecks');
@@ -34,27 +34,8 @@ if (rex::isBackend() && is_object(rex::getUser())) {
         rex_view::setJsProperty('mblock_sortable_source', 'mblock');
     }
 
-    // 🔧 Development/Production Asset Management
-    // 
-    // Options:
-    // - 'auto'  : Auto-detect based on environment (recommended)
-    // - 'dev'   : Always use mblock.js (development/debugging)  
-    // - 'prod'  : Always use mblock.min.js (production/performance)
-    //
-    $assetMode = 'auto'; // Change this to 'dev' or 'prod' to override
-    
-    // Auto-detection logic
-    if ($assetMode === 'auto') {
-        // Use minified in production, development version otherwise
-        $isProduction = (
-            !rex::isDebugMode() &&                    // Debug mode disabled
-            !rex_addon::get('debug')->isAvailable()   // Debug addon not active
-        );
-        $useMinified = $isProduction;
-    } else {
-        $useMinified = ($assetMode === 'prod');
-    }
-    
+    // Minifiziertes JavaScript, sobald weder Debug-Modus noch Debug-Addon aktiv sind
+    $useMinified = !rex::isDebugMode() && !rex_addon::get('debug')->isAvailable();
     $jsFile = $useMinified ? 'mblock.min.js' : 'mblock.js';
     $debugInfo = $useMinified ? 'Production (minified)' : 'Development (source)';
     
@@ -86,8 +67,38 @@ if (rex::isBackend() && is_object(rex::getUser())) {
         'copy_success' => $this->i18n('mblock_toast_copy_success'),
         'paste_success' => $this->i18n('mblock_toast_paste_success'), 
         'clipboard_empty' => $this->i18n('mblock_toast_clipboard_empty'),
-        'module_type_mismatch' => $this->i18n('mblock_toast_module_type_mismatch')
+        'module_type_mismatch' => $this->i18n('mblock_toast_module_type_mismatch'),
+        'confirm_title' => $this->i18n('mblock_confirm_title'),
+        'confirm_cancel' => $this->i18n('mblock_confirm_cancel'),
+        'confirm_ok' => $this->i18n('mblock_confirm_ok'),
     ]);
+}
+
+// Alte globale Klassennamen (MBlock 3.x) als Aliase auf die Namespace-Klassen, damit
+// bestehender Projektcode weiterlaeuft. Ersetzt die frueheren Shim-Dateien in lib/deprecated.
+foreach ([
+    'MBlock' => \FriendsOfRedaxo\MBlock\MBlock::class,
+    'MBlockBootstrapReplacer' => \FriendsOfRedaxo\MBlock\Replacer\MBlockBootstrapReplacer::class,
+    'MBlockCheckboxReplacer' => \FriendsOfRedaxo\MBlock\Replacer\MBlockCheckboxReplacer::class,
+    'MBlockCountReplacer' => \FriendsOfRedaxo\MBlock\Replacer\MBlockCountReplacer::class,
+    'MBlockSystemButtonReplacer' => \FriendsOfRedaxo\MBlock\Replacer\MBlockSystemButtonReplacer::class,
+    'MBlockValueReplacer' => \FriendsOfRedaxo\MBlock\Replacer\MBlockValueReplacer::class,
+    'MBlockElement' => \FriendsOfRedaxo\MBlock\DTO\MBlockElement::class,
+    'MBlockItem' => \FriendsOfRedaxo\MBlock\DTO\MBlockItem::class,
+    'MBlockFormItemDecorator' => \FriendsOfRedaxo\MBlock\Decorator\MBlockFormItemDecorator::class,
+    'MBlockJsonHelper' => \FriendsOfRedaxo\MBlock\Utils\MBlockJsonHelper::class,
+    'MBlockPageHelper' => \FriendsOfRedaxo\MBlock\Utils\MBlockPageHelper::class,
+    'MBlockSessionHelper' => \FriendsOfRedaxo\MBlock\Utils\MBlockSessionHelper::class,
+    'MBlockSettingsHelper' => \FriendsOfRedaxo\MBlock\Utils\MBlockSettingsHelper::class,
+    'MBlockParser' => \FriendsOfRedaxo\MBlock\Parser\MBlockParser::class,
+    'MBlockRexFormProcessor' => \FriendsOfRedaxo\MBlock\Processor\MBlockRexFormProcessor::class,
+    'mblock_rex_form' => \FriendsOfRedaxo\MBlock\Processor\mblock_rex_form::class,
+    'MBlockTemplateFileProvider' => \FriendsOfRedaxo\MBlock\Provider\MBlockTemplateFileProvider::class,
+    'MBlockValueHandler' => \FriendsOfRedaxo\MBlock\Handler\MBlockValueHandler::class,
+] as $legacyClass => $class) {
+    if (!class_exists($legacyClass, false)) {
+        class_alias($class, $legacyClass);
+    }
 }
 
 // Sichere Session-Reset mit optimiertem MBlockSessionHelper
