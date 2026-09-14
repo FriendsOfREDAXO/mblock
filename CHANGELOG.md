@@ -1,6 +1,6 @@
 # MBlock - REDAXO Addon für Modul-Input-Blöcke
 
-## Version 4.7.0-beta.1 - 2026-09-14 ("MBlock light")
+## Version 4.7.0-beta1 - 2026-09-14 ("MBlock light")
 
 **Beta, bitte testen.** Diese Version verschlankt MBlock um rund ein Drittel und bringt drei neue Templates. Die öffentliche API ist unverändert, trotzdem ist das ein großer Umbau: Bitte in einer Testinstallation mit den eigenen Modulen prüfen (Hinzufügen, Verschieben, Kopieren/Einfügen, Online/Offline, Löschen, Speichern, Gridblock, TinyMCE, CKEditor 5, YForm/rex_form) und Auffälligkeiten als Issue melden. Die stabile 4.7.0 folgt nach der Testphase.
 
