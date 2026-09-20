@@ -56,12 +56,21 @@ class MBlockJsonHelper
     }
 
     /**
-     * Dekodiert JSON, das REDAXO mit HTML-Entities gespeichert hat.
+     * Dekodiert JSON aus der Datenbank oder aus REX_VALUE. Gültiges JSON bleibt unangetastet,
+     * damit Entities im Inhalt (&quot;, &amp;) erhalten bleiben; nur HTML-maskiertes JSON wird vorher dekodiert.
      *
      * @return mixed
      */
     public static function decodeFromHtml(string $json, bool $associative = true, bool $throwOnError = false)
     {
+        $trimmed = trim($json);
+        if ('' !== $trimmed) {
+            $decoded = json_decode($trimmed, $associative, self::MAX_DEPTH, JSON_BIGINT_AS_STRING);
+            if (JSON_ERROR_NONE === json_last_error()) {
+                return $decoded;
+            }
+        }
+
         return self::decode(htmlspecialchars_decode($json, ENT_QUOTES | ENT_HTML5), $associative, $throwOnError);
     }
 

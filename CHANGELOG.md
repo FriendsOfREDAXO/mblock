@@ -1,5 +1,13 @@
 # MBlock - REDAXO Addon für Modul-Input-Blöcke
 
+## Version 4.7.0-beta2 - 2026-09-20
+
+**Beta, bitte testen.** Eine Fehlerbehebung gegenüber beta1, sonst unverändert. Gegen MForm 10.0.0 geprüft (HTML- und MForm-Module, MForm als String und als Objekt, TinyMCE, CKEditor 5, Gridblock): Laden, Hinzufügen, Verschieben, Kopieren/Einfügen, Online/Offline, Löschen und Speichern.
+
+### Behoben
+* **Entities im Inhalt konnten Blöcke leeren:** MBlock liest die Slice-Werte als rohes JSON aus der Datenbank, schickte sie aber trotzdem durch `htmlspecialchars_decode()`. Ein wörtliches `&amp;` im Inhalt wurde so beim nächsten Speichern zu `&`. Schwerer wog `&quot;` oder `&#039;` im Inhalt (getippt oder aus einem Editor): Daraus wurde ein nacktes Anführungszeichen mitten im JSON, das JSON war ungültig, und die Bearbeitung zeigte statt der gespeicherten Blöcke einen einzelnen leeren. Wer dann speicherte, verlor die Blöcke. `MBlockJsonHelper::decodeFromHtml()` dekodiert gültiges JSON jetzt unverändert und greift nur noch bei HTML-maskiertem JSON auf die Entity-Dekodierung zurück. Das Verhalten bestand schon in 4.6.x.
+* Hinweis für ältere Installationen: Das Beispielmodul „base3_media_example“ rief früher `$mform->addFieldset()` auf, das es in MForm nicht gibt. Das Beispiel nutzt inzwischen `addFieldsetArea()`; wer eine alte Kopie installiert hat, passt sie entsprechend an.
+
 ## Version 4.7.0-beta1 - 2026-09-14 ("MBlock light")
 
 **Beta, bitte testen.** Diese Version verschlankt MBlock um rund ein Drittel und bringt drei neue Templates. Die öffentliche API ist unverändert, trotzdem ist das ein großer Umbau: Bitte in einer Testinstallation mit den eigenen Modulen prüfen (Hinzufügen, Verschieben, Kopieren/Einfügen, Online/Offline, Löschen, Speichern, Gridblock, TinyMCE, CKEditor 5, YForm/rex_form) und Auffälligkeiten als Issue melden. Die stabile 4.7.0 folgt nach der Testphase.
