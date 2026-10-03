@@ -1,5 +1,10 @@
 # MBlock - REDAXO Addon für Modul-Input-Blöcke
 
+## Unveröffentlicht
+
+### Behoben
+* **Konsole ohne Debug-Ausgaben:** Beim Speichern schrieb MBlock für jedes CKEditor-5-Feld „Cleaned … CKE5 data“ in die Browser-Konsole. Die Meldungen sind entfernt, Warnungen bei echten Fehlern (`console.warn`) bleiben.
+
 ## Version 4.7.0-beta2 - 2026-09-20
 
 **Beta, bitte testen.** Eine Fehlerbehebung gegenüber beta1, sonst unverändert. Gegen MForm 10.0.0 geprüft (HTML- und MForm-Module, MForm als String und als Objekt, TinyMCE, CKEditor 5, Gridblock): Laden, Hinzufügen, Verschieben, Kopieren/Einfügen, Online/Offline, Löschen und Speichern.

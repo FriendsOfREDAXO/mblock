@@ -2036,7 +2036,6 @@ $(document).on('submit', 'form', function(e) {
                                 const originalValue = editor.sourceElement.value;
                                 if (data !== originalValue) {
                                     editor.sourceElement.value = data;
-                                    console.log('MBlock: Cleaned CKEditor5 data for', editorId);
                                 }
                             }
                         } catch (error) {
@@ -2086,7 +2085,6 @@ $(document).on('submit', 'form', function(e) {
                     
                     if (value !== $textarea.val()) {
                         $textarea.val(value);
-                        console.log('MBlock: Cleaned textarea CKE5 data for', $textarea.attr('id') || 'unnamed');
                     }
                 }
             } catch (error) {
